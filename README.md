@@ -14,14 +14,14 @@ To adjust settings on your assistive device, please:
 
 ## Please select your device
 
-### FABI
+### [FABI](https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fabi.htm)
 
-![FABI logo](https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fabi_lowres.png)
+[![FABI logo](https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fabi_lowres.png)](https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fabi.htm)
 
 
-### FLipMouse
+### [FLipMouse](https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fm.htm)
 
-![FLipMouse logo](https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/flipmouse_lowres.png)
+[![FLipMouse logo](https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fm_lowres.png)](https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fm.htm)
 
 ## Developer information
 
@@ -30,5 +30,5 @@ This project here has two purposes:
 * We will use it as landing page for this site (GitHub pages)
 * All build files for building the ESP32 based Bluetooth and WebGUI addon are located here
 
-If you are interested in flashing/updating your ESP32 addon for FABI/FLipMouse, please go to this repository's page: https://github.com/asterics/Addon-Bluetooth-WebGUI
+If you are interested in flashing/updating your ESP32 addon for FABI/FLipMouse, please go to this repository's page: [Addon-Bluetooth-WebGUI](https://github.com/asterics/Addon-Bluetooth-WebGUI)
 
