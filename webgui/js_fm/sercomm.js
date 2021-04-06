@@ -1,12 +1,13 @@
 function SerialCommunicator() {
-    const SerialPort = require('serialport');
+    /*const SerialPort = require('serialport');
     const Readline = require('@serialport/parser-readline');
     const Delimiter = require('@serialport/parser-delimiter');
-    const parser = new Delimiter({ delimiter: '\r\n' });
+    const parser = new Delimiter({ delimiter: '\r\n' });*/
 
     //serial port instance
     var _port;
-    var _serialport;
+    var _portWriter;
+    //var _portReader;
     //value handler for reported ADC/mouthpiece values
     var _valueHandler;
     //internal value handler function for the returned data for an AT command.
@@ -64,117 +65,101 @@ function SerialCommunicator() {
             );
         });
     }
+    
+    async function listenToPort() {
+        const textDecoder = new TextDecoderStream();
+        const readableStreamClosed = _port.readable.pipeTo(textDecoder.writable);
+        const reader = textDecoder.readable.getReader();
 
-    this.init = function() {
-        return SerialPort.list().then(function(ports, errors) {
-            const device = 'FLipMouse'; // Proper AT COM device name
-            console.log(`Searching for ${device} ...`);
-            if (typeof errors === 'undefined') {
-                // race to (first) success, cf. https://stackoverflow.com/a/37235274/5728717
-                return Promise.all(
-                    ports
-                        .map(port => isATCOM(port, device))
-                        .map(port => {
-                            return port.then(
-                                resolve => Promise.reject(resolve),
-                                reject => Promise.resolve(reject)
-                            );
-                        })
-                )
-                    .then(
-                        resolve => Promise.reject(resolve),
-                        reject => Promise.resolve(reject)
-                    )
-                    .then(port => {
-                        _port = new SerialPort(port['path'], {
-                            baudRate: 115200
-                        });;
-                        _port.pipe(parser);
-                        //on a fully received line,
-                        //check if the data is a reported raw value
-                        //or returned data for a dedicated command (see sendData)
-                        parser.on('data', function(data) {
-                            console.log("data evt: " + data);
-                            if (data && data.toString().indexOf(C.LIVE_VALUE_CONSTANT) > -1) {
-                                if (L.isFunction(_valueHandler)) {
-                                    _valueHandler(data.toString());
-                                }
-                                return;
-                            }
-                            if(_internalValueFunction) {
-                                _internalValueFunction(data);
-                            }
-                        });
-                        return Promise.resolve();
-                    })
-                    .catch(() => {
-                        // throw 'No AT command capable COM port found.';
-                        console.error('No AT command capable COM port found.');
-                    });
-            } else {
-                console.error(errors);
+        // Listen to data coming from the serial device.
+        while (true) {
+			var chunk = "";
+            const { value, done } = await reader.read();
+            if (done) {
+                // Allow the serial port to be closed later.
+                //reader.releaseLock();
+                break;
             }
-        });
-    };
-
-
-    this.getPorts = function() {
-        if(_port) {
-            var list = new Array();
-            _port.list().forEach( function(port) {
-                list.push(port['path'] + port['manufacturer']);
-            });
-            return list;
+            
+            value.split("").forEach(function(part) {
+				chunk = chunk + part;
+				if(part == '\n')
+				{
+					console.log("data evt: " + chunk);
+					if (chunk.length > 2 && chunk.indexOf(C.LIVE_VALUE_CONSTANT) > -1) {
+						if (L.isFunction(_valueHandler)) {
+							_valueHandler(chunk.toString());
+						}
+					}
+					if(_internalValueFunction) {
+						_internalValueFunction(chunk);
+					}
+					chunk = "";
+				}
+			});
         }
-    };
+    }
 
+    this.init = async function() {
+		if(!("serial" in navigator)) {
+		// The Web Serial API is not supported.
+			window.alert("Browser not supported, please use Chromium, Vivaldi, Edge or Chrome");
+			return new Promise(function(resolve, reject) {
+				reject("Browser does not support serial API");
+			});
+		}
+		
+		//filter for arduino/Teensy VID/PID and our own ones
+		const filters = [
+		  { usbVendorId: 0x2341, usbProductId: 0x0043 },
+		  { usbVendorId: 0x16c0, usbProductId: 0x0483 }, //teensy
+		  { usbVendorId: 0x16c0, usbProductId: 0x0487 }, //teensy
+		  { usbVendorId: 0x2341, usbProductId: 0x0001 }
+		];
+		
+		_port = await navigator.serial.requestPort({ filters });
+		
+		// Wait for the serial port to open.
+		await _port.open({ baudRate: 115200 });
+		listenToPort();
+		
+		textEncoder = new TextEncoderStream();
+        writableStreamClosed = textEncoder.readable.pipeTo(_port.writable);
 
-    this.disconnect = function() {
-      if(_port) _port.close();
-      _port = null;
+        _portWriter = textEncoder.writable.getWriter();
+        
+        L.setVisible('#button-connect', false);
+		
+		return new Promise(function(resolve,reject) {
+			resolve() });
     };
     
     //send raw data without line endings (used for transferring binary data, e.g. updates)
-    this.sendRawData = function (value, timeout) {
+    this.sendRawData = async function (value, timeout) {
 		if (!value) return;
         if (!_port) {
             throw 'sercomm: port not initialized. call init() before sending data.';
         }
 		//send data via serial port
-        _port.write(value, function(err) {
-          if (err) {
-            return console.log('Error on write: ', err.message);
-          }
-          //console.log('message written');
-        });
+        await _portWriter.write(value);
         console.log('finished write');
-        _port.drain(function() {
-			console.log('finished drain');
-			flip.inRawMode = false;
-		});
 	}
 
 	//send data line based (for all AT commands)
-    this.sendData = function (value, timeout) {
+    this.sendData = async function (value, timeout) {
         if (!value) return;
         if (!_port) {
             throw 'sercomm: port not initialized. call init() before sending data.';
         }
 
         //send data via serial port
-        _port.write(value, function(err) {
-          if (err) {
-            return console.log('Error on write: ', err.message);
-          }
-          console.log('message written');
-        });
+        var output = value + "\r\n";
+        console.log("sending:" + output);
+        await _portWriter.write(output);
         //add NL/CR (not needed on websockets)
-        _port.write('\r\n', function(err) {
-          if (err) {
-            return console.log('Error on write delimiter: ', err.message);
-          }
-          console.log('message written');
-        });
+        //await _portWriter.write('\r\n');
+        
+        //_portWriter.releaseLock();
 
         var timeout = 3000;
         //wait for a response to this command

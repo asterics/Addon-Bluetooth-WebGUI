@@ -46,6 +46,7 @@ window.tabAction.initBtnModeActionTable = function () {
         var currentActionDiv = L.createElement('div', 'four columns', [ariaAction, getReadable(flip.getConfig(btnMode))]);
         anyConfigUnsaved = anyConfigUnsaved || flip.isConfigUnsaved(btnMode);
         var cmdDivText = flip.isConfigUnsaved(btnMode) ? '<b style="color: red">' + flip.getConfig(btnMode) + ' *</b>' : flip.getConfig(btnMode);
+        if(cmdDivText === undefined) cmdDivText = "";
         var currentAtCmdDiv = L.createElement('div', 'four columns', [ariaAtCmd, cmdDivText]);
         var spacerDiv = L.createElement('div', 'one column show-mobile space-bottom');
         liElm.appendChild(descriptionDiv);

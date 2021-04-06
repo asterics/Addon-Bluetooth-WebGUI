@@ -293,6 +293,17 @@ function FlipMouse(initFinished) {
     thiz.getCurrentSlot = function () {
         return _currentSlot;
     };
+    
+    thiz.connect = async function() {
+		await _communicator.init();
+		thiz.resetMinMaxLiveValues();
+		thiz.refreshConfig().then(function () {
+			if (L.isFunction(initFinished)) {
+				initFinished(_config[_currentSlot]);
+			}
+		}, function () {
+		});
+	}
 
     thiz.setSlot = function (slot) {
         if (thiz.getSlots().includes(slot)) {
@@ -396,16 +407,17 @@ function FlipMouse(initFinished) {
         //If yes, activate the serial port related stuff.
         //If no, activate mock,ARE or FM3 Websocket
         var userAgent = navigator.userAgent.toLowerCase();
-        if (userAgent.indexOf(' electron/') > -1) {
+        //if (userAgent.indexOf(' electron/') > -1) {
             var promise = new Promise(function(resolve) {
                 _communicator = new SerialCommunicator();
-                _communicator.init().then(function () {
+                /*_communicator.init().then(function () {
 					thiz.communicator = _communicator;
                     resolve();
-                });
+                });*/
             });
-        } else {
-            var promise = new Promise(function(resolve) {
+        //} else {
+			//TODO: re-include mock/are/WS communicators when we can detect the hosting (ESP32 or other platforms)
+            /*var promise = new Promise(function(resolve) {
                 if(window.location.href.indexOf('mock') > -1) {
                     _communicator = new MockCommunicator();
                     resolve();
@@ -424,8 +436,8 @@ function FlipMouse(initFinished) {
                         _communicator = new MockCommunicator();
                         resolve();
                     });
-            })});
-        }
+            })});*/
+        //}
 
         promise.then(function () {
             thiz.resetMinMaxLiveValues();

@@ -37,8 +37,13 @@
         </div>
         <div class="three columns hide-mobile showscreenreader">
             <div class="row">
+				<div id="button-connect">
+				<button onclick="flip.connect()">
+					<span data-i18n>Connect // Verbinden</span>
+				</button>
+				</div>
                 <label class="seven columns" for="selectSlots" data-i18n>Select Slot // Slot auswählen</label>
-                <div class="five columns text-right">
+                <div class="four columns text-right">
                     <span aria-hidden="true" style="display: none" class="connectedIndicator" title="connected">&#x2713;</span>
                     <span aria-hidden="true" class="disconnectedIndicator" title="not connected">&#x2717;</span>
                     <span id="connStateLabel" aria-hidden="false" class="hidden" data-i18n>connection status // Verbindungsstatus</span>
