@@ -1,5 +1,8 @@
 window.C = {};
 
+C.GUI_IS_HOSTED = window.location.href.indexOf('localhost') > -1 || window.location.href.indexOf('asterics.github.io') > -1;
+C.GUI_IS_ON_DEVICE = !C.GUI_IS_HOSTED;
+C.GUI_IS_MOCKED_VERSION = window.location.href.indexOf('mock') > -1;
 C.IS_ELECTRON = navigator.userAgent.toLowerCase().indexOf(' electron/') > -1;
 C.ELECTRON_CONFIG_FILENAME = 'FLipMouseGUIConfiguration';
 
