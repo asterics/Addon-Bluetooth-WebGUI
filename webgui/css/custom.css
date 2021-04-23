@@ -2,6 +2,20 @@
     margin: 1.5em;
 }
 
+#connectDiv {
+    z-index: 99;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
 div[data-tabs] {
     margin-bottom: 3em;
 }

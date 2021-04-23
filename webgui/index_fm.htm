@@ -28,6 +28,13 @@
     <script src="js_fm/elecutils.js"></script>
 </head>
 <body>
+<div id="connectDiv">
+    <div id="connectContent" style="display: none">
+        <h1>FLipMouse Configuration</h1>
+        <button data-i18n="" onclick="initFlip()">Connect to FlipMouse connected via USB // Verbinden zu FlipMouse (über USB angeschlossen)</button>
+        <button data-i18n="" onclick="testMode()">Use Test mode without real FlipMouse // Test-Modus ohne echte FlipMouse verwenden</button>
+    </div>
+</div>
 <div id="content">
     <header class="row" role="banner">
         <div>
@@ -37,11 +44,6 @@
         </div>
         <div class="three columns hide-mobile showscreenreader">
             <div class="row">
-				<div id="button-connect">
-				<button onclick="flip.connect()">
-					<span data-i18n>Connect // Verbinden</span>
-				</button>
-				</div>
                 <label class="seven columns" for="selectSlots" data-i18n>Select Slot // Slot auswählen</label>
                 <div class="four columns text-right">
                     <span aria-hidden="true" style="display: none" class="connectedIndicator" title="connected">&#x2713;</span>
@@ -594,29 +596,43 @@
         });
         L.loadScript('js_fm/i18n/i18n_' + L.getLang() + '.js', 'js_fm/i18n/i18n_en.js').then(function () {
             L('html')[0].lang = window.lang;
-            window.flip = new FlipMouse(function (config) {
-                initWithConfig(config);
-                tabSlot.initSlots();
-                tabSlot.initProcesses();
-                toTab(getCurrentTabId(), true);
-                testConnection();
-                setInterval(function () {
-                    testConnection();
-                }, 10000);
-                function testConnection() {
-                    flip.testConnection(true).then(function (isConnected) {
-                        L.setVisible('.connectedIndicator', isConnected, 'inline');
-                        L.setVisible('.disconnectedIndicator', !isConnected, 'inline');
-                        var oldState = L('#connStateText').innerHTML;
-                        var newState = isConnected ? L.translate('CONNECTED') : L.translate('NOT_CONNECTED');
-                        if(oldState != newState) {
-                            L('#connStateText').innerHTML = newState;
-                        }
-                    });
-                }
-            });
+            if (C.GUI_IS_MOCKED_VERSION || C.GUI_IS_ON_DEVICE) {
+                initFlip();
+            } else {
+                L.setVisible('#connectContent');
+            }
         });
     };
+
+    function testMode() {
+        C.GUI_IS_MOCKED_VERSION = true;
+        initFlip();
+    }
+
+    function initFlip() {
+        window.flip = new FlipMouse(function (config) {
+            L.setVisible('#connectDiv', false);
+            initWithConfig(config);
+            tabSlot.initSlots();
+            tabSlot.initProcesses();
+            toTab(getCurrentTabId(), true);
+            testConnection();
+            setInterval(function () {
+                testConnection();
+            }, 10000);
+            function testConnection() {
+                flip.testConnection(true).then(function (isConnected) {
+                    L.setVisible('.connectedIndicator', isConnected, 'inline');
+                    L.setVisible('.disconnectedIndicator', !isConnected, 'inline');
+                    var oldState = L('#connStateText').innerHTML;
+                    var newState = isConnected ? L.translate('CONNECTED') : L.translate('NOT_CONNECTED');
+                    if(oldState != newState) {
+                        L('#connStateText').innerHTML = newState;
+                    }
+                });
+            }
+        });
+    }
 
     function initWithConfig(config) {
         console.log('applying config:');
