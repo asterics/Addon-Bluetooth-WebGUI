@@ -70,6 +70,7 @@ function FlipMouse(initFinished) {
     var _atCmdQueue = [];
     var _sendingAtCmds = false;
     var _communicator;
+    var _isInitialized = false;
 
     /**
      * sends the given AT command to the FLipMouse. If sending of the last command is not completed yet, the given AT command
@@ -82,6 +83,9 @@ function FlipMouse(initFinished) {
      * @return {Promise}
      */
     thiz.sendATCmd = function (atCmd, onlyIfEmptyQueue, timeout) {
+        if (!thiz.isInitialized()) {
+            return;
+        }
         var timeoutResolve = timeout || 3000;
         if((onlyIfEmptyQueue && _atCmdQueue.length > 0) || thiz.inRawMode) {
             console.log('did not send cmd: "' + atCmd + "' because another command is executing.");
@@ -146,6 +150,10 @@ function FlipMouse(initFinished) {
             });
         });
     };
+
+    thiz.isInitialized = function () {
+        return _isInitialized;
+    }
 
     thiz.setValue = function (valueConstant, value, debounceTimeout) {
         if (!debounceTimeout) {
@@ -293,17 +301,6 @@ function FlipMouse(initFinished) {
     thiz.getCurrentSlot = function () {
         return _currentSlot;
     };
-    
-    thiz.connect = async function() {
-		await _communicator.init();
-		thiz.resetMinMaxLiveValues();
-		thiz.refreshConfig().then(function () {
-			if (L.isFunction(initFinished)) {
-				initFinished(_config[_currentSlot]);
-			}
-		}, function () {
-		});
-	}
 
     thiz.setSlot = function (slot) {
         if (thiz.getSlots().includes(slot)) {
@@ -401,52 +398,35 @@ function FlipMouse(initFinished) {
     };
 
     init();
-
     function init() {
-        //check here if running from electron.
-        //If yes, activate the serial port related stuff.
-        //If no, activate mock,ARE or FM3 Websocket
-        var userAgent = navigator.userAgent.toLowerCase();
-        //if (userAgent.indexOf(' electron/') > -1) {
-            var promise = new Promise(function(resolve) {
+        var promise = Promise.resolve().then(() => {
+            if (C.GUI_IS_MOCKED_VERSION) {
+                _communicator = new MockCommunicator();
+                return Promise.resolve();
+            } else if (C.GUI_IS_HOSTED) {
                 _communicator = new SerialCommunicator();
-                /*_communicator.init().then(function () {
-					thiz.communicator = _communicator;
-                    resolve();
-                });*/
-            });
-        //} else {
-			//TODO: re-include mock/are/WS communicators when we can detect the hosting (ESP32 or other platforms)
-            /*var promise = new Promise(function(resolve) {
-                if(window.location.href.indexOf('mock') > -1) {
-                    _communicator = new MockCommunicator();
-                    resolve();
-                    return;
-                }
-
-                ws.initWebsocket(C.FLIP_WEBSOCKET_URL).then(function (socket) {
+                return _communicator.init();
+            } else if (C.GUI_IS_ON_DEVICE) {
+                return ws.initWebsocket(C.FLIP_WEBSOCKET_URL).then(function (socket) {
                     _communicator = new WsCommunicator(C.FLIP_WEBSOCKET_URL, socket);
-                    resolve();
-                }, function error () {
-                    ws.initWebsocket(C.ARE_WEBSOCKET_URL).then(function (socket) {
-                        _communicator = new ARECommunicator(socket);
-                        resolve();
-                    }, function error () {
-                        console.warn("could not establish any websocket connection - using mock mode!");
-                        _communicator = new MockCommunicator();
-                        resolve();
-                    });
-            })});*/
-        //}
+                    return Promise.resolve();
+                });
+            }
+        });
 
         promise.then(function () {
+            _isInitialized = true;
+            thiz.pauseLiveValueListener();
             thiz.resetMinMaxLiveValues();
             thiz.refreshConfig().then(function () {
+                console.warn("refresh finished!")
                 if (L.isFunction(initFinished)) {
                     initFinished(_config[_currentSlot]);
                 }
             }, function () {
             });
+        }).catch((error) => {
+            console.warn(error);
         });
     }
 
