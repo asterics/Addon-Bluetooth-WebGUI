@@ -173,17 +173,6 @@ label {
     background-color: #cceff9;
 }
 
-.zoombutton {
-    position: absolute;
-    line-height: 0 !important;
-    text-decoration: none;
-    border: thin solid;
-    height: 1.5em;
-    width: 1.5em;
-    text-align: center;
-    padding: 0 !important;
-}
-
 .center-div
 {
     margin-right: auto;
