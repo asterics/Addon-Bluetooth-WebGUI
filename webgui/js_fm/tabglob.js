@@ -1,7 +1,7 @@
-var fs = require('fs');
+/*var fs = require('fs');
 var http = require('https');
 var tmp = require('temporary');
-var os = require('os');
+var os = require('os');*/
 
 window.tabGlobal = {};
 
