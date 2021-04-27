@@ -27,6 +27,7 @@ function FlipMouse(initFinished) {
     thiz.LIVE_PRESSURE_MIN = 'LIVE_PRESSURE_MIN';
     thiz.LIVE_PRESSURE_MIN = 'LIVE_PRESSURE_MIN';
     thiz.LIVE_PRESSURE_MAX = 'LIVE_PRESSURE_MAX';
+    thiz.LIVE_BUTTONS = 'LIVE_BUTTONS';
     thiz.FLIPMOUSE_MODE = 'FLIPMOUSE_MODE';
     thiz.VERSION = '';
 
@@ -458,6 +459,9 @@ function FlipMouse(initFinished) {
         _liveData[thiz.LIVE_RIGHT] = parseInt(valArray[4]);
         _liveData[thiz.LIVE_MOV_X] = parseInt(valArray[5]);
         _liveData[thiz.LIVE_MOV_Y] = parseInt(valArray[6]);
+        if (valArray[7]) {
+            _liveData[thiz.LIVE_BUTTONS] = valArray[7].split('').map(v => v === "1");
+        }
         _liveData[thiz.LIVE_PRESSURE_MIN] = Math.min(_liveData[thiz.LIVE_PRESSURE_MIN], _liveData[thiz.LIVE_PRESSURE]);
         _liveData[thiz.LIVE_MOV_X_MIN] = Math.min(_liveData[thiz.LIVE_MOV_X_MIN], _liveData[thiz.LIVE_MOV_X]);
         _liveData[thiz.LIVE_MOV_Y_MIN] = Math.min(_liveData[thiz.LIVE_MOV_Y_MIN], _liveData[thiz.LIVE_MOV_Y]);
