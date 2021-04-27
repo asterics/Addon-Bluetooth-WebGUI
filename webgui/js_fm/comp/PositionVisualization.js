@@ -1,5 +1,6 @@
 import { h, Component, render } from '../../js/preact.min.js';
 import htm from '../../js/htm.min.js';
+import {styleUtil} from '../stylutil.js'
 const html = htm.bind(h);
 
 class PositionVisualization extends Component {
@@ -29,18 +30,6 @@ class PositionVisualization extends Component {
 
     componentWillUnmount() {
         this.stateListener = null;
-    }
-
-    getCircleStyle() {
-        let radius = this.state.circleRadius;
-        return `width: ${radius}px;
-                height: ${radius}px;
-                background: red;
-                -moz-border-radius: ${radius/2}px;
-                -webkit-border-radius: ${radius/2}px;
-                border-radius: ${radius/2}px;
-                top: -${radius/2}px;
-                left: -${radius/2}px;`;
     }
 
     updateState(options) {
@@ -134,7 +123,7 @@ class PositionVisualization extends Component {
                             <div id="cursorPosVal" class="back-layer" style="top: 90%; left: 2%;">${this.state.maxPos}</div>
                         </div>
                         <div id="cursorPos" class="back-layer" style="top: ${this.state.pY}%; left: ${this.state.pX}%;">
-                            <div class="back-layer circle" style="${this.getCircleStyle()}"></div>
+                            <div class="back-layer circle" style="${styleUtil.getCircleStyle(this.state.circleRadius)}"></div>
                         </div>
                     </div>
                 </div>`;
