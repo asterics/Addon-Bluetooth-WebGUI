@@ -24,13 +24,15 @@
     <script src="js/wscomm.js"></script>
     <script src="js_fm/flipcomm.js"></script>
     <script src="js_fm/mockcomm.js"></script>
-    <script src="js_fm/tabbasic.js"></script>
+    <script type="module" src="js_fm/tabbasic.js"></script>
     <script src="js_fm/tabsip.js"></script>
     <script src="js_fm/tabslot.js"></script>
     <script src="js_fm/tabact.js"></script>
     <script src="js_fm/tabglob.js"></script>
+    <script type="module" src="js_fm/tabvis.js"></script>
     <script src="js_fm/elecutils.js"></script>
     <script src="js_fm/shortcut.js"></script>
+    <script type="module" src="js_fm/comp/PositionVisualization.js"></script>
 </head>
 <body>
 <div id="connectDiv">
@@ -113,35 +115,7 @@
 
             <br/>
             <div class="row">
-                <div aria-hidden="true" class="six columns">
-                    <div class="relative center-div cursorPosWrapper">
-                        <div id="orientationSign" class="back-layer full-height full-width" style="transform: rotate(270deg);">
-                            <div class="back-layer" style="top:100%; left: 35%; width: 30%; height: 10%; background-color: black; z-index: 2"></div>
-                        </div>
-                        <div id="deadZonePos" class="back-layer color-lightcyan"
-                             style="top: 40%; left: 40%; height: 20%; width: 20%;"></div>
-                        <div id="upPos" class="back-layer color-lightred"
-                             style="top: 0%; left: 48%; height: 50%; width: 4%;"></div>
-                        <div id="downPos" class="back-layer color-lightred"
-                             style="top: 50%; left: 48%; height: 50%; width: 4%;"></div>
-                        <div id="leftPos" class="back-layer color-lightred"
-                             style="top: 48%; left: 0%; height: 4%; width: 50%;"></div>
-                        <div id="rightPos" class="back-layer color-lightred"
-                             style="top: 48%; left: 50%; height: 4%; width: 50%;"></div>
-                        <div class="back-layer"
-                             style="left: 50%; height: 100%; border-right-style: solid; border-right-width: thin;"></div>
-                        <div class="back-layer"
-                             style="top: 50%; width: 100%; border-bottom-style: solid; border-bottom-width: thin;"></div>
-                        <button onclick="tabBasic.cursorPosZoomReset();" class="zoombutton" style="top: 55%;" title="Reset Zoom">&#8634;</button>
-                        <div id="cursorPosVal" class="back-layer" style="top: 90%; left: 2%;">110</div>
-                        <div id="upPosVal" class="back-layer" style="top: 0%; left: 52%">0</div>
-                        <div id="downPosVal" class="back-layer" style="top: 90%; left: 52%">0</div>
-                        <div id="leftPosVal" class="back-layer" style="top: 38%; left: 1%;">0</div>
-                        <div id="rightPosVal" class="back-layer" style="top: 38%; left: 88%">0</div>
-                        <div id="cursorPos" class="back-layer" style="top: 50%; left: 50%;">
-                            <div class="back-layer" id="circle"></div>
-                        </div>
-                    </div>
+                <div id="posVisBasic" class="six columns">
                 </div>
                 <div class="five columns">
                     <button onclick="actionAndToggle(flip.calibrate, [], ['#basic-button-calibrate', '#basic-button-calibrating'])">
@@ -590,6 +564,28 @@
                 <!-- <div class="one column show-mobile space-bottom-2x"></div> -->
             </div>
         </section>
+        <section data-tabs-pane class="tabs-pane" id="tabVis">
+            <h2 id="tabVisHeader" data-i18n>Visualization of current state // Visualisierung aktueller Status</h2>
+            <div class="row">
+                <div id="tabVisVisContainer" class="six columns"></div>
+            </div>
+            <div class="row">
+                <label for="sliderMaxRange" data-i18n="">Maximum position // Maximal angezeigte Auslenkung</label>
+                <input type="range" id="sliderMaxRange" min="10" max="1024" oninput="PositionVisualizationInstance.updateState({maxPosManual: this.value})"/>
+                <span id="sliderMaxRangeValue">?</span>
+            </div>
+            <div class="row" style="margin-top: 2em">
+                <div data-i18n="" style="margin-bottom: 1em; font-weight: bold">Show/hide elements // Elemente anzeigen/verstecken</div>
+                <button class="two columns" onclick="PositionVisualizationInstance.toggleState('showDeadzone')">Deadzone</button>
+                <button class="two columns" onclick="PositionVisualizationInstance.toggleState('showAnalogBars')">Bars</button>
+                <button class="two columns" onclick="PositionVisualizationInstance.toggleState('showAnalogValues')">Values</button>
+                <button class="two columns" onclick="PositionVisualizationInstance.toggleState('showMaxPos')">Max. Position</button>
+                <button class="two columns" onclick="PositionVisualizationInstance.toggleState('showOrientation')">Orientation</button>
+            </div>
+        </section>
+        <div style="margin-top: 10em;">
+            <a href="#tabVis" onclick="toTab('#tabVis')" data-i18n="">To Visualization // Zur Visualisierung</a>
+        </div>
     </main>
 </div>
 
@@ -749,32 +745,41 @@
             toGlobal();
         } else if (tabId.indexOf('#tabNav') > -1) {
             toNav();
+        } else if (tabId.indexOf('#tabVis') > -1) {
+            toVisualization();
         }
     }
     
     function toBasic() {
-        flip.startLiveValueListener(tabBasic.cursorPosValueHandler);
+        beforeTabChange();
+        tabBasic.init();
+        flip.startLiveValueListener(tabBasic.valueHandler);
     }
 
     function toSipPuff() {
+        beforeTabChange();
         flip.startLiveValueListener(tabSip.sipPuffValueHandler);
     }
 
     function toSlots() {
+        beforeTabChange();
         flip.stopLiveValueListener();
     }
 
     function toActions() {
+        beforeTabChange();
         flip.stopLiveValueListener();
         tabAction.init();
     }
     
     function toGlobal() {
+        beforeTabChange();
         flip.stopLiveValueListener();
         tabGlobal.init();
     }
 
     function toNav() {
+        beforeTabChange();
         tabby.toggleTab('#tabNav');
         L.toggle('#toNavLink', '#toNavBackLink');
 
@@ -788,6 +793,17 @@
             clone.className = '';
             tabNav.appendChild(clone);
         }
+    }
+
+    function toVisualization() {
+        beforeTabChange();
+        flip.startLiveValueListener(tabVis.valueHandler);
+        tabVis.init();
+    }
+
+    function beforeTabChange() {
+        tabVis.destroy();
+        tabBasic.destroy();
     }
 
     function toNavBack() {
