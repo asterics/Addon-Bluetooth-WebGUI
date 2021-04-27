@@ -33,6 +33,8 @@
     <script src="js_fm/elecutils.js"></script>
     <script src="js_fm/shortcut.js"></script>
     <script type="module" src="js_fm/comp/PositionVisualization.js"></script>
+    <script type="module" src="js_fm/comp/BtnSipPuffVisualization.js"></script>
+    <script type="module" src="js_fm/stylutil.js"></script>
 </head>
 <body>
 <div id="connectDiv">
@@ -565,9 +567,10 @@
             </div>
         </section>
         <section data-tabs-pane class="tabs-pane" id="tabVis">
-            <h2 id="tabVisHeader" data-i18n>Visualization of current state // Visualisierung aktueller Status</h2>
-            <div class="row">
-                <div id="tabVisVisContainer" class="six columns"></div>
+            <h2 id="tabVisHeader" style="margin-bottom: 2em" data-i18n>Visualization of current state // Visualisierung aktueller Status</h2>
+            <div class="row" style="margin-bottom: 2em">
+                <div id="tabVisVisContainer" class="four columns"></div>
+                <div id="tabVisBtnSipVis" class="eight columns"></div>
             </div>
             <div class="row">
                 <label for="sliderMaxRange" data-i18n="">Maximum position // Maximal angezeigte Auslenkung</label>
