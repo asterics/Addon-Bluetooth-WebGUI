@@ -6,7 +6,7 @@ window.L = function (selector) {
     }
     var selectorType = 'querySelectorAll';
 
-    if (selector.indexOf('#') === 0) {
+    if (selector.indexOf('#') === 0 && selector.indexOf(' ') === -1) {
         selectorType = 'getElementById';
         selector = selector.substr(1, selector.length);
     }
@@ -131,6 +131,10 @@ window.L.getIDSelector = function (id) {
 window.L.getPercentage = function (value, minRange, maxRange) {
     return (Math.round(((value - minRange) / (maxRange - minRange) * 100) * 1000) / 1000)
 };
+
+window.L.limitValue = function (value, min, max) {
+    return Math.max(Math.min(value, max), min);
+}
 
 window.L.getMs = function () {
     return new Date().getTime();
