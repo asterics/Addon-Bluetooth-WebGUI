@@ -66,17 +66,17 @@ class BtnSipPuffVisualization extends Component {
 
         return html`<div aria-hidden="true">
                     <div class="relative" name="fmRect" style="border: medium solid; height: 200px; width: 350px;">
-                        <div class="back-layer" style="top: 40%; left: 20%;">
+                        <div class="back-layer" style="top: 40%; left: 18%;">
                             <div class="back-layer" style="${styleUtil.getCircleStyle(circleRadius, getColor(0), 'medium solid')}; ${fontStyle}">1</div>
                         </div>
-                        <div class="back-layer" style="top: 40%; left: 50%;">
+                        <div class="back-layer" style="top: 40%; left: 48%;">
                             <div class="back-layer" style="${styleUtil.getCircleStyle(circleRadius, getColor(1), 'medium solid')}; ${fontStyle}">2</div>
                         </div>
-                        <div class="back-layer" style="top: 40%; left: 80%;">
+                        <div class="back-layer" style="top: 40%; left: 78%;">
                             <div class="back-layer" style="${styleUtil.getCircleStyle(circleRadius, getColor(2), 'medium solid')}; ${fontStyle}">3</div>
                         </div>
                         <div class="back-layer" style="top: 65%; left: 0; width: 100%; ${fontStyle}">
-                            SLOT: ${flip.getCurrentSlot()}
+                            Slot: ${flip.getCurrentSlot()}
                         </div>
                         <div class="back-layer" style="top: 30%; left: 100%; height: 40%; width: 350px; border: medium solid;">
                             <div class="relative" style="width: 100%; height: 100%">
