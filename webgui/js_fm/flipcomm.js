@@ -500,11 +500,13 @@ function FlipMouse(initFinished) {
     }
 
     function parseConfig(atCmdsString) {
+        atCmdsString = atCmdsString.replace(/\n\s*\n/g, '\n'); //replace doubled linebreaks with single one
         return parseConfigElement(atCmdsString.split('\n'));
     }
     
     //TODO: do we need both versions? I didn't want to remove the other one to avoid breaking anything
     thiz.parseConfig = function(atCmdsString,ignoreSlotName) {
+        atCmdsString = atCmdsString.replace(/\n\s*\n/g, '\n'); //replace doubled linebreaks with single one
         return parseConfigElement(atCmdsString.split('\n'),null,ignoreSlotName);
     }
 
@@ -530,7 +532,7 @@ function FlipMouse(initFinished) {
                 id++;
 			}
         } else {
-            var currentAtCmd = currentElement.substring(0, AT_CMD_LENGTH);
+            var currentAtCmd = currentElement.substring(0, AT_CMD_LENGTH).trim();
             if (VALUE_AT_CMDS.includes(currentAtCmd)) {
                 var key = L.val2key(currentAtCmd, AT_CMD_MAPPING);
                 if(key == thiz.FLIPMOUSE_MODE) {
