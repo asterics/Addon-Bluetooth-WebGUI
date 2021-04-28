@@ -621,6 +621,10 @@
             initWithConfig(config);
             tabSlot.initSlots();
             tabSlot.initProcesses();
+            flip.setSlotChangeHandler((slot, newconfig) => {
+                L('#selectSlots').value = slot;
+                initWithConfig(newconfig);
+            });
             toTab(getCurrentTabId(), true);
             testConnection();
             setInterval(function () {

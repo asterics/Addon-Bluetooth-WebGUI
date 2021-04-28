@@ -63,6 +63,7 @@ function FlipMouse(initFinished) {
     var VALUE_AT_CMDS = Object.values(AT_CMD_MAPPING);
     var debouncers = {};
     var _valueHandler = null;
+    var _slotChangeHandler = null;
     var _currentSlot = null;
     var _SLOT_CONSTANT = 'Slot:';
     var _AT_CMD_BUSY_RESPONSE = 'BUSY';
@@ -250,6 +251,10 @@ function FlipMouse(initFinished) {
         sendAtCmdNoResultHandling('AT CA');
         return thiz.testConnection();
     };
+
+    thiz.setSlotChangeHandler = function (fn) {
+        _slotChangeHandler = fn;
+    }
 
     thiz.startLiveValueListener = function (handler) {
         console.log('starting listening to live values...');
@@ -470,7 +475,13 @@ function FlipMouse(initFinished) {
             _liveData[thiz.LIVE_BUTTONS] = valArray[7].split('').map(v => v === "1");
         }
         if (valArray[8]) {
-            _currentSlot = thiz.getSlotName(parseInt(valArray[8]));
+            let slot = thiz.getSlotName(parseInt(valArray[8]));
+            if (slot !== _currentSlot) {
+                _currentSlot = slot;
+                if (_slotChangeHandler) {
+                    _slotChangeHandler(slot, _config[slot]);
+                }
+            }
         }
         _liveData[thiz.LIVE_PRESSURE_MIN] = Math.min(_liveData[thiz.LIVE_PRESSURE_MIN], _liveData[thiz.LIVE_PRESSURE]);
         _liveData[thiz.LIVE_MOV_X_MIN] = Math.min(_liveData[thiz.LIVE_MOV_X_MIN], _liveData[thiz.LIVE_MOV_X]);
@@ -509,7 +520,7 @@ function FlipMouse(initFinished) {
         if (currentElement.indexOf(_SLOT_CONSTANT) > -1) {
 			if(!ignoreSlotName)
 			{
-				var slot = currentElement.substring(_SLOT_CONSTANT.length);
+				var slot = currentElement.substring(_SLOT_CONSTANT.length).trim();
 				if (!_currentSlot) {
 					_currentSlot = slot;
 				}
