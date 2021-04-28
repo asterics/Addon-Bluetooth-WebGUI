@@ -12,6 +12,7 @@ function FlipMouse(initFinished) {
     thiz.PUFF_THRESHOLD = 'PUFF_THRESHOLD';
     thiz.PUFF_STRONG_THRESHOLD = 'PUFF_STRONG_THRESHOLD';
     thiz.ORIENTATION_ANGLE = 'ORIENTATION_ANGLE';
+    thiz.SLOT_ID = 'SLOT_ID';
 
     thiz.LIVE_PRESSURE = 'LIVE_PRESSURE';
     thiz.LIVE_UP = 'LIVE_UP';
@@ -299,6 +300,12 @@ function FlipMouse(initFinished) {
         return Object.keys(_config);
     };
 
+    thiz.getSlotName = function (id) {
+        return thiz.getSlots().reduce((total, current) => {
+            return _config[current][thiz.SLOT_ID] === id ? current : total;
+        }, '')
+    }
+
     thiz.getCurrentSlot = function () {
         return _currentSlot;
     };
@@ -462,6 +469,9 @@ function FlipMouse(initFinished) {
         if (valArray[7]) {
             _liveData[thiz.LIVE_BUTTONS] = valArray[7].split('').map(v => v === "1");
         }
+        if (valArray[8]) {
+            _currentSlot = thiz.getSlotName(parseInt(valArray[8]));
+        }
         _liveData[thiz.LIVE_PRESSURE_MIN] = Math.min(_liveData[thiz.LIVE_PRESSURE_MIN], _liveData[thiz.LIVE_PRESSURE]);
         _liveData[thiz.LIVE_MOV_X_MIN] = Math.min(_liveData[thiz.LIVE_MOV_X_MIN], _liveData[thiz.LIVE_MOV_X]);
         _liveData[thiz.LIVE_MOV_Y_MIN] = Math.min(_liveData[thiz.LIVE_MOV_Y_MIN], _liveData[thiz.LIVE_MOV_Y]);
@@ -487,10 +497,11 @@ function FlipMouse(initFinished) {
         return parseConfigElement(atCmdsString.split('\n'),null,ignoreSlotName);
     }
 
-    function parseConfigElement(remainingList, config, ignoreSlotName) {
+    function parseConfigElement(remainingList, config, ignoreSlotName, id) {
         if (!remainingList || remainingList.length == 0) {
             return _config;
         }
+        id = id || 0;
         config = config || {};
         var currentElement = remainingList[0];
         var nextElement = remainingList[1];
@@ -502,8 +513,10 @@ function FlipMouse(initFinished) {
 				if (!_currentSlot) {
 					_currentSlot = slot;
 				}
-				config = {};
-				_config[slot] = config;
+                config = {};
+                _config[slot] = config;
+                _config[slot][thiz.SLOT_ID] = id;
+                id++;
 			}
         } else {
             var currentAtCmd = currentElement.substring(0, AT_CMD_LENGTH);
@@ -522,7 +535,7 @@ function FlipMouse(initFinished) {
                 }
             }
         }
-        return parseConfigElement(remainingList.slice(1), config);
+        return parseConfigElement(remainingList.slice(1), config, false, id);
     }
 
     function loadSlotByConfig(slotName) {
