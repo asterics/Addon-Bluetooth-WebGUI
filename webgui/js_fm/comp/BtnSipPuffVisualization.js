@@ -58,10 +58,10 @@ class BtnSipPuffVisualization extends Component {
         let strongPuffP = L.getPercentage(strongPuff, rangeDown, rangeUp);
         let pressureColor = 'darkgreen';
         if (liveP > puff || liveP < sip) {
-            pressureColor = 'orange';
+            pressureColor = 'darkorange';
         }
         if (liveP > strongPuff || liveP < strongSip) {
-            pressureColor = 'red';
+            pressureColor = 'darkred';
         }
 
         return html`<div aria-hidden="true">
