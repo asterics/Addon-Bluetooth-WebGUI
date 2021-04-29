@@ -1,5 +1,5 @@
-function FlipMouse(initFinished) {
-    var thiz = this;
+function FlipMouse() {
+    let thiz = this;
     thiz.AT_CMD_MAPPING = {};
     thiz.SENSITIVITY_X = 'SENSITIVITY_X';
     thiz.SENSITIVITY_Y = 'SENSITIVITY_Y';
@@ -41,12 +41,12 @@ function FlipMouse(initFinished) {
     
     thiz.inRawMode = false;
 
-    var _config = {};
-    var _unsavedConfig = {};
-    var _liveData = {};
-    var AT_CMD_LENGTH = 5;
+    let _config = {};
+    let _unsavedConfig = {};
+    let _liveData = {};
+    let AT_CMD_LENGTH = 5;
 
-    var AT_CMD_MAPPING = {};
+    let AT_CMD_MAPPING = {};
     AT_CMD_MAPPING[thiz.SENSITIVITY_X] = 'AT AX';
     AT_CMD_MAPPING[thiz.SENSITIVITY_Y] = 'AT AY';
     AT_CMD_MAPPING[thiz.ACCELERATION] = 'AT AC';
@@ -60,99 +60,166 @@ function FlipMouse(initFinished) {
     AT_CMD_MAPPING[thiz.ORIENTATION_ANGLE] = 'AT RO';
     AT_CMD_MAPPING[thiz.FLIPMOUSE_MODE] = 'AT MM';
     AT_CMD_MAPPING[thiz.VERSION] = 'AT ID';
-    var VALUE_AT_CMDS = Object.values(AT_CMD_MAPPING);
-    var debouncers = {};
-    var _valueHandler = null;
-    var _slotChangeHandler = null;
-    var _currentSlot = null;
-    var _SLOT_CONSTANT = 'Slot:';
-    var _AT_CMD_BUSY_RESPONSE = 'BUSY';
-    var _AT_CMD_OK_RESPONSE = 'OK';
-    var _AT_CMD_MIN_WAITTIME_MS = 50;
-    var _timestampLastAtCmd = new Date().getTime();
-    var _atCmdQueue = [];
-    var _sendingAtCmds = false;
-    var _communicator;
-    var _isInitialized = false;
+    let VALUE_AT_CMDS = Object.values(AT_CMD_MAPPING);
+    let debouncers = {};
+    let _valueHandler = null;
+    let _slotChangeHandler = null;
+    let _currentSlot = null;
+    let _SLOT_CONSTANT = 'Slot:';
+
+    let _communicator;
+    let _isInitialized = false;
+
+    let _AT_CMD_MIN_WAITTIME_MS = C.GUI_IS_HOSTED ? 25 : 20;
+    let _atCmdQueue = [];
+    let _sendingAtCmds = false;
+    let _timestampLastAtCmd = new Date().getTime();
+
+    let _connectionTestIntervalHandler = null;
+    let _connectionTestCallbacks = [];
+    let _connected = false;
+    let _AT_CMD_BUSY_RESPONSE = 'BUSY';
+    let _AT_CMD_OK_RESPONSE = 'OK';
 
     /**
-     * sends the given AT command to the FLipMouse. If sending of the last command is not completed yet, the given AT command
+     * initializes the FLipMouse instance
+     * @return {Promise<* | void>} promise resolving with config of the current slot
+     */
+    thiz.init = function () {
+        let promise = Promise.resolve().then(() => {
+            if (C.GUI_IS_MOCKED_VERSION) {
+                _communicator = new MockCommunicator();
+                return Promise.resolve();
+            } else if (C.GUI_IS_HOSTED) {
+                _communicator = new SerialCommunicator();
+                return _communicator.init();
+            } else if (C.GUI_IS_ON_DEVICE) {
+                return ws.initWebsocket(C.FLIP_WEBSOCKET_URL).then(function (socket) {
+                    _communicator = new WsCommunicator(C.FLIP_WEBSOCKET_URL, socket);
+                    return Promise.resolve();
+                });
+            }
+        });
+
+        return promise.then(function () {
+            _isInitialized = true;
+            thiz.pauseLiveValueListener();
+            thiz.resetMinMaxLiveValues();
+            return thiz.refreshConfig();
+        }).then((config) => {
+            thiz.startTestingConnection();
+            return Promise.resolve(_config[_currentSlot]);
+        }).catch((error) => {
+            console.warn(error);
+        });
+    }
+
+    /**
+     * Sends the given AT command to the FLipMouse. If sending of the last command is not completed yet, the given AT command
      * is added to a queue and will be sent later. The time between two sent commands is at least _AT_CMD_MIN_WAITTIME_MS.
      * The order of sending the commands is always equal to the order of calls to this function.
      *
-     * @param atCmd
-     * @param onlyIfEmptyQueue if set to true, the command is sent only if the queue is empty
-     * @param timeout maximum time after the returned promise resolves, regardless if data was received or not. Default 3000ms.
-     * @return {Promise}
+     * @param atCmd the AT command to send
+     * @param param an optional parameter that is appended to the AT command
+     * @param timeout maximum time after the returned promise resolves, regardless if data was received or not. Default 0ms.
+     * @param onlyIfNotBusy if set to true, the command is sent only if no other AT command is currently waiting for a response
+     * @param dontLog if set to true, there are no logs to console for this command
+
+     * @return {Promise} which resolves to the result of the command or '' if no result was received.
      */
-    thiz.sendATCmd = function (atCmd, onlyIfEmptyQueue, timeout) {
+    thiz.sendATCmd = function (atCmd, param, timeout, onlyIfNotBusy, dontLog) {
         if (!thiz.isInitialized()) {
-            return;
+            return Promise.reject('cannot send AT command if not initialized.');
         }
-        var timeoutResolve = timeout || 3000;
-        if((onlyIfEmptyQueue && _atCmdQueue.length > 0) || thiz.inRawMode) {
-            console.log('did not send cmd: "' + atCmd + "' because another command is executing.");
-            return new Promise(function (resolve, reject) {
-                reject(_AT_CMD_BUSY_RESPONSE);
-            });
+        if ((onlyIfNotBusy && _atCmdQueue.length > 0) || thiz.inRawMode) {
+            if (!dontLog) console.log('did not send cmd: "' + atCmd + "' because another command is executing.");
+            return Promise.resolve(_AT_CMD_BUSY_RESPONSE);
         }
-        var promise = new Promise(function(resolve, reject) {
-            if (_atCmdQueue.length > 0) {
-                console.log("adding cmd to queue: " + atCmd);
-            }
-            _atCmdQueue.push({
-                cmd: atCmd,
+        if (_atCmdQueue.length > 0) {
+            if (!dontLog) console.log("adding cmd to queue: " + atCmd);
+        }
+        let queueElem = null;
+        let promise = new Promise(function (resolve, reject) {
+            queueElem = {
+                timeout: timeout || 0,
+                dontLog: dontLog,
+                cmd: param ? atCmd + ' ' + param : atCmd,
                 resolveFn: resolve,
                 rejectFn: reject
-            });
+            };
         });
+        queueElem.promise = promise;
+        _atCmdQueue.push(queueElem);
+
         if (!_sendingAtCmds) {
             sendNext();
         }
 
         function sendNext() {
             _sendingAtCmds = true;
-            if (_atCmdQueue.length == 0) {
+            if (_atCmdQueue.length === 0) {
                 _sendingAtCmds = false;
                 return;
             }
-            var nextCmd = _atCmdQueue.shift();
-            var timeout = _AT_CMD_MIN_WAITTIME_MS - (new Date().getTime() - _timestampLastAtCmd);
-            timeout = timeout > 0 ? timeout : 0;
-            //console.log("waiting for cmd: " + nextCmd.cmd + ", " + timeout + "ms");
+            let nextQueueElem = _atCmdQueue.shift();
+            let timeoutSend = Math.max(0, _AT_CMD_MIN_WAITTIME_MS - (new Date().getTime() - _timestampLastAtCmd));
             setTimeout(function () {
+                if (!nextQueueElem.dontLog) console.log("sending to FlipMouse: " + nextQueueElem.cmd);
                 _timestampLastAtCmd = new Date().getTime();
-                console.log("sending to FlipMouse: " + nextCmd.cmd);
-                _communicator.sendData(nextCmd.cmd, timeoutResolve).then(nextCmd.resolveFn, nextCmd.rejectFn);
-                sendNext();
-            }, timeout);
+                _communicator.sendData(nextQueueElem.cmd, nextQueueElem.timeout, nextQueueElem.dontLog).then(nextQueueElem.resolveFn, nextQueueElem.rejectFn);
+                nextQueueElem.promise.finally(() => {
+                    sendNext();
+                });
+            }, timeoutSend);
         }
 
         return promise;
     };
 
-    thiz.sendATCmdWithParam = function(atCmd, param, timeout) {
-        return thiz.sendATCmd(atCmd + ' ' + param, false, timeout);
-    };
+    /**
+     * Sends the given AT command to the FLipMouse and waits for a response, details @see sendATCmd()
+     *
+     * @param atCmd
+     * @param param
+     * @param timeout the timeout to wait for a response, default: 3000ms
+     * @param onlyIfNotBusy
+     * @param dontLog
+     * @return {Promise}
+     */
+    thiz.sendAtCmdWithResult = function(atCmd, param, timeout, onlyIfNotBusy, dontLog) {
+        timeout = timeout || 3000;
+        thiz.stopTestingConnection();
+        let promise = thiz.sendATCmd(atCmd, param, timeout, onlyIfNotBusy, dontLog);
+        promise.then(thiz.startTestingConnection);
+        return promise;
+    }
     
     thiz.sendRawData = function(data, timeout) {
         return _communicator.sendRawData(data, timeout);
     };
 
-    /**
-     * tests the connection to the flipmouse
-     * @param onlyIfEmptyQueue only sends the test if currently no other tasks are running
-     * @return {Promise}
-     */
-    thiz.testConnection = function (onlyIfEmptyQueue) {
-        return new Promise(function(resolve) {
-            thiz.sendATCmd('AT', onlyIfEmptyQueue).then(function (response) {
-                resolve(response && response.indexOf(_AT_CMD_OK_RESPONSE) > -1 ? true : false);
-            }, function (response) {
-                resolve(response && response.indexOf(_AT_CMD_BUSY_RESPONSE) > -1 ? true : false);
+    thiz.startTestingConnection = function () {
+        if (_connectionTestIntervalHandler) {
+            return;
+        }
+        function doTest() {
+            testConnection(true).then(result => {
+                _connectionTestCallbacks.forEach(fn => fn(result));
             });
-        });
-    };
+        }
+        doTest();
+        _connectionTestIntervalHandler = setInterval(doTest, 10000);
+    }
+
+    thiz.stopTestingConnection = function () {
+        clearInterval(_connectionTestIntervalHandler);
+        _connectionTestIntervalHandler = null;
+    }
+
+    thiz.addConnectionTestCallback = function (fn) {
+        _connectionTestCallbacks.push(fn);
+        _connectionTestCallbacks.forEach(fn => fn(_connected));
+    }
 
     thiz.isInitialized = function () {
         return _isInitialized;
@@ -166,13 +233,13 @@ function FlipMouse(initFinished) {
         clearInterval(debouncers[valueConstant]);
         debouncers[valueConstant] = setTimeout(function () {
             var atCmd = AT_CMD_MAPPING[valueConstant];
-            sendAtCmdNoResultHandling(atCmd + ' ' + value);
+            thiz.sendATCmd(atCmd, value);
         }, debounceTimeout);
     };
 
     thiz.refreshConfig = function () {
         return new Promise(function(resolve, reject) {
-            thiz.sendATCmd('AT LA').then(function (response) {
+            thiz.sendAtCmdWithResult('AT LA').then(function (response) {
                 parseConfig(response);
                 resolve();
             }, function () {
@@ -192,64 +259,49 @@ function FlipMouse(initFinished) {
      *
      * @return {Promise}
      */
-    thiz.save = function (updateProgressHandler) {
+    thiz.save = async function (updateProgressHandler) {
         updateProgressHandler = updateProgressHandler || function () {
         };
+        thiz.sendATCmd('AT SA', _currentSlot);
+        return Promise.resolve();
+        console.error('START!1')
         _unsavedConfig = {};
-        var progress = 0;
-        sendAtCmdNoResultHandling('AT DE');
+        let progress = 10;
+        updateProgressHandler(progress);
+        thiz.stopTestingConnection();
         thiz.pauseLiveValueListener();
-        increaseProgress(10);
-        var percentPerSlot = 50 / thiz.getSlots().length;
-        var saveSlotsPromise = new Promise(function (resolve) {
-            loadAndSaveSlot(thiz.getSlots(), 0);
+        thiz.sendATCmd('AT DE');
+        let percentPerSlot = 80 / thiz.getSlots().length;
 
-            function loadAndSaveSlot(slots, i) {
-                if (i >= slots.length) {
-                    resolve();
-                    return;
-                }
-                var slot = slots[i];
-                thiz.testConnection().then(function () {
-                    loadSlotByConfig(slot);
-                    thiz.testConnection().then(function () {
-                        sendAtCmdNoResultHandling('AT SA ' + slot);
-                        increaseProgress(percentPerSlot);
-                        loadAndSaveSlot(slots, i + 1);
-                    });
-                });
-            }
-        });
-
-        function increaseProgress(percent) {
-            progress += percent;
+        let slots = thiz.getSlots();
+        for (let i = 0; i < slots.length; i++) {
+            console.error('slot' + i)
+            loadSlotByConfig(slots[i]);
+            thiz.sendATCmd('AT SA', slots[i]);
+            await testConnection();
+            progress += percentPerSlot;
             updateProgressHandler(progress);
         }
 
-        return new Promise(function (resolve) {
-            saveSlotsPromise.then(function () {
-                thiz.testConnection().then(function () {
-                    increaseProgress(30);
-                    loadSlotByConfig(_currentSlot).then(function () {
-                        increaseProgress(10);
-                        thiz.resumeLiveValueListener();
-                        resolve();
-                    });
-                });
-            });
-        });
+        progress += 10;
+        updateProgressHandler(progress);
+        thiz.setSlot(_currentSlot);
+        thiz.resumeLiveValueListener();
+        thiz.startTestingConnection();
+        console.error('FIN!3')
+        return Promise.resolve();
     };
 
     thiz.calibrate = function () {
-        sendAtCmdNoResultHandling('AT CA');
-        return thiz.testConnection();
+        thiz.sendATCmd('AT CA');
+        return testConnection();
     };
 
     thiz.rotate = function () {
         var currentOrientation = thiz.getConfig(thiz.ORIENTATION_ANGLE);
         thiz.setValue(thiz.ORIENTATION_ANGLE, (currentOrientation + 90) % 360, 0);
-        sendAtCmdNoResultHandling('AT CA');
-        return thiz.testConnection();
+        thiz.sendATCmd('AT CA');
+        return testConnection();
     };
 
     thiz.setSlotChangeHandler = function (fn) {
@@ -284,10 +336,6 @@ function FlipMouse(initFinished) {
         slot = slot || _currentSlot;
         return _config[slot] ? _config[slot][constant] : null;
     };
-    thiz.getAllConfig = function (slot) {
-        slot = slot || _currentSlot;
-        return _config[slot] ? _config[slot] : null;
-    };
 
     thiz.isConfigUnsaved = function (constant, slot) {
         slot = slot || _currentSlot;
@@ -318,7 +366,7 @@ function FlipMouse(initFinished) {
     thiz.setSlot = function (slot) {
         if (thiz.getSlots().includes(slot)) {
             _currentSlot = slot;
-            sendAtCmdNoResultHandling('AT LO ' + slot);
+            thiz.sendATCmd('AT LO', slot);
         }
         return _config[_currentSlot];
     };
@@ -329,11 +377,11 @@ function FlipMouse(initFinished) {
         }
         _config[slotName] = L.deepCopy(_config[_currentSlot]);
         _currentSlot = slotName;
-        sendAtCmdNoResultHandling('AT SA ' + slotName);
+        thiz.sendATCmd('AT SA', slotName);
         if (progressHandler) {
             progressHandler(50);
         }
-        return thiz.testConnection();
+        return testConnection();
     };
 
     thiz.deleteSlot = function (slotName, progressHandler) {
@@ -374,29 +422,14 @@ function FlipMouse(initFinished) {
             _unsavedConfig[_currentSlot] = _unsavedConfig[_currentSlot] || [];
             _unsavedConfig[_currentSlot].push(buttonModeConstant);
         }
-        return new Promise(function (resolve) {
-            var promises = [];
-            promises.push(thiz.sendATCmd(C.AT_CMD_BTN_MODE + ' ' + indexFormatted));
-            promises.push(thiz.sendATCmd(atCmd));
-            Promise.all(promises).then(function () {
-                resolve();
-            });
-        });
+        thiz.sendATCmd(C.AT_CMD_BTN_MODE, indexFormatted);
+        thiz.sendATCmd(atCmd);
     };
 
     thiz.restoreDefaultConfiguration = function(progressCallback) {
-        var promises = [];
-        var progress = 0;
-        var progressPerItem = 100/C.DEFAULT_CONFIGURATION.length;
-        promises.push(thiz.sendATCmd('AT DE')); //delete all slots
-        promises.push(thiz.sendATCmd('AT LA')); //save slot
-        promises.push(thiz.calibrate());
-
-        return new Promise(function (resolve) {
-            Promise.all(promises).then(function () {
-                resolve();
-            });
-        });
+        thiz.sendATCmd('AT DE'); //delete all slots
+        thiz.sendATCmd('AT LA'); //save slot
+        thiz.calibrate();
     };
 
     thiz.setFlipmouseMode = function (modeConstant, dontSetConfig) {
@@ -407,49 +440,29 @@ function FlipMouse(initFinished) {
             thiz.setConfig(thiz.FLIPMOUSE_MODE, modeConstant);
         }
         var index = C.FLIPMOUSE_MODES.indexOf(modeConstant);
-        sendAtCmdNoResultHandling(AT_CMD_MAPPING[thiz.FLIPMOUSE_MODE] + ' ' + index);
+        thiz.sendATCmd(AT_CMD_MAPPING[thiz.FLIPMOUSE_MODE], index);
     };
 
-    init();
-    function init() {
-        var promise = Promise.resolve().then(() => {
-            if (C.GUI_IS_MOCKED_VERSION) {
-                _communicator = new MockCommunicator();
-                return Promise.resolve();
-            } else if (C.GUI_IS_HOSTED) {
-                _communicator = new SerialCommunicator();
-                return _communicator.init();
-            } else if (C.GUI_IS_ON_DEVICE) {
-                return ws.initWebsocket(C.FLIP_WEBSOCKET_URL).then(function (socket) {
-                    _communicator = new WsCommunicator(C.FLIP_WEBSOCKET_URL, socket);
-                    return Promise.resolve();
-                });
-            }
+    /**
+     * tests the connection to the flipmouse
+     *
+     * @param onlyIfNotBusy only do test if FLipMouse is not busy currently
+     * @return {Promise}
+     */
+    function testConnection(onlyIfNotBusy) {
+        return thiz.sendATCmd('AT', '', 3000, onlyIfNotBusy, false).then((response) => {
+            _connected = response && (response.indexOf(_AT_CMD_OK_RESPONSE) > -1 || response.indexOf(_AT_CMD_BUSY_RESPONSE) > -1) ? true : false;
+            return Promise.resolve(_connected);
         });
-
-        promise.then(function () {
-            _isInitialized = true;
-            thiz.pauseLiveValueListener();
-            thiz.resetMinMaxLiveValues();
-            thiz.refreshConfig().then(function () {
-                console.warn("refresh finished!")
-                if (L.isFunction(initFinished)) {
-                    initFinished(_config[_currentSlot]);
-                }
-            }, function () {
-            });
-        }).catch((error) => {
-            console.warn(error);
-        });
-    }
+    };
 
     function setLiveValueHandler(handler) {
         _valueHandler = handler;
         if (L.isFunction(_valueHandler)) {
-            sendAtCmdNoResultHandling('AT SR');
+            thiz.sendATCmd('AT SR');
             _communicator.setValueHandler(parseLiveValues);
         } else {
-            sendAtCmdNoResultHandling('AT ER');
+            thiz.sendATCmd('AT ER');
         }
     }
 
@@ -491,12 +504,6 @@ function FlipMouse(initFinished) {
         _liveData[thiz.LIVE_MOV_Y_MAX] = Math.max(_liveData[thiz.LIVE_MOV_Y_MAX], _liveData[thiz.LIVE_MOV_Y]);
 
         _valueHandler(_liveData);
-    }
-
-    function sendAtCmdNoResultHandling(atCmd) {
-        thiz.sendATCmd(atCmd).then(function () {
-        }, function () {
-        });
     }
 
     function parseConfig(atCmdsString) {
@@ -552,22 +559,16 @@ function FlipMouse(initFinished) {
     }
 
     function loadSlotByConfig(slotName) {
-        var config = _config[slotName];
-        return new Promise(function (resolve) {
-            var promises = [];
-            Object.keys(config).forEach(function (key) {
-                var atCmd = AT_CMD_MAPPING[key];
-                if(C.BTN_MODES.includes(key)) {
-                    promises.push(thiz.setButtonAction(key, config[key], true));
-                } else if(key == thiz.FLIPMOUSE_MODE) {
-                    promises.push(thiz.setFlipmouseMode(config[key], true));
-                } else {
-                    promises.push(thiz.sendATCmd(atCmd + ' ' + config[key]));
-                }
-            });
-            Promise.all(promises).then(function () {
-                resolve();
-            });
+        let config = _config[slotName];
+        Object.keys(config).forEach(function (key) {
+            let atCmd = AT_CMD_MAPPING[key];
+            if(C.BTN_MODES.includes(key)) {
+                thiz.setButtonAction(key, config[key], true);
+            } else if(key === thiz.FLIPMOUSE_MODE) {
+                thiz.setFlipmouseMode(config[key], true);
+            } else if (atCmd) {
+                thiz.sendATCmd(atCmd, config[key]);
+            }
         });
     }
 

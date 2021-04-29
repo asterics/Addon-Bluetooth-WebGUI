@@ -55,11 +55,12 @@ function SerialCommunicator() {
     }
 
     //send data line based (for all AT commands)
-    this.sendData = async function (value, timeout) {
+    this.sendData = async function (value, timeout, dontLog) {
         if (!value) return;
         if (!_port) {
             throw 'sercomm: port not initialized. call init() before sending data.';
         }
+        timeout = timeout || 0;
 
         //send data via serial port
         var output = value + "\r\n";
@@ -68,26 +69,32 @@ function SerialCommunicator() {
         //await _portWriter.write('\r\n');
 
         //_portWriter.releaseLock();
-
-        var timeout = 3000;
         //wait for a response to this command
         //(there might be a timeout for commands with no response)
-        return new Promise(function (resolve) {
-            var result = '';
-            var timeoutHandler = setTimeout(function () {
-                console.log("timeout of command: " + value);
-                resolve(result);
-            }, timeout);
-            _internalValueFunction = function (data) {
-                clearTimeout(timeoutHandler);
-                result += data.toString() + "\n";
-                timeoutHandler = setTimeout(function () {
-                    console.log("got result: " + result);
+
+        if (timeout > 0) {
+            return new Promise(function (resolve) {
+                let result = '';
+                let timeoutHandler = setTimeout(function () {
+                    if (!dontLog) {
+                        console.log("timeout of command: " + value);
+                    }
                     resolve(result);
-                    _internalValueFunction = null;
-                }, 200);
-            };
-        });
+                }, timeout);
+                _internalValueFunction = function (data) {
+                    clearTimeout(timeoutHandler);
+                    result += data;
+                    timeoutHandler = setTimeout(function () {
+                        if (!dontLog) {
+                            console.log("got result: " + result);
+                        }
+                        resolve(result);
+                        _internalValueFunction = null;
+                    }, 200);
+                };
+            });
+        }
+        return Promise.resolve();
     };
 
     async function listenToPort() {

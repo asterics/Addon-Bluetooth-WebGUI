@@ -176,15 +176,14 @@ window.tabGlobal.UpdateBluetooth = function (elem) {
 	
 	//issue addon update request -> Teensy switches to USB->UART passthrough
 	//for the bootloader from the addon.
-	flip.sendATCmd(C.AT_CMD_UPGRADE_ADDON).then(function(response) {
-		//disable all other AT commands
-		//will be re-enabled if the drain event sendRawData is emitted
-		flip.inRawMode = true;
-		//read all at once & send to the raw data sending function.
-		fs.readFile(filepath, (err, data) => {
-			flip.sendRawData(data,20000);
-		});
-	});
+	flip.sendATCmd(C.AT_CMD_UPGRADE_ADDON);
+    //disable all other AT commands
+    //will be re-enabled if the drain event sendRawData is emitted
+    flip.inRawMode = true;
+    //read all at once & send to the raw data sending function.
+    fs.readFile(filepath, (err, data) => {
+        flip.sendRawData(data,20000);
+    });
 }
 
 

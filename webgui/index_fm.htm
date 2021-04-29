@@ -425,7 +425,7 @@
                     </select>
                     <div style="display: flex" class="five columns">
                         <button class="column" onclick="tabAction.deleteIRCommand(L('#SELECT_LEARN_CAT_IR').value)" data-i18n>Delete // Löschen</button>
-                        <button class="column" onclick="flip.sendATCmdWithParam(C.AT_CMD_IR_PLAY, L('#SELECT_LEARN_CAT_IR').value)" data-i18n>Play // Abspielen</button>
+                        <button class="column" onclick="flip.sendATCmd(C.AT_CMD_IR_PLAY, L('#SELECT_LEARN_CAT_IR').value)" data-i18n>Play // Abspielen</button>
                         <button class="column" onclick="tabAction.selectAtCmd(C.AT_CMD_IR_PLAY + ' ' + L('#SELECT_LEARN_CAT_IR').value)" data-i18n>set action // Aktion setzen</button>
                     </div>
                 </div>
@@ -489,7 +489,7 @@
                 <label class="three columns text-right text-normal" for="PARAM_MQTT_BROKER" data-i18n>MQTT broker</label>
                 <input type="text" id="PARAM_MQTT_BROKER" class="five columns" placeholder="new MQTT broker"/>
                 <div class="three columns">
-                    <button onclick="flip.sendATCmdWithParam(C.AT_CMD_MQTT_BROKER, L('#PARAM_MQTT_BROKER').value); tabGlobal.showCheckmark(this)">
+                    <button onclick="flip.sendATCmd(C.AT_CMD_MQTT_BROKER, L('#PARAM_MQTT_BROKER').value); tabGlobal.showCheckmark(this)">
                         <span data-i18n>Set // Setzen</span>
                         <span style="display: none">&#x2714;</span>
                     </button>
@@ -500,7 +500,7 @@
                 <label class="three columns text-right text-normal" for="PARAM_MQTT_DELIM" data-i18n>MQTT delimiter // MQTT Trennzeichen</label>
                 <input type="text" id="PARAM_MQTT_DELIM" class="five columns" placeholder="new MQTT delimiter"/>
                 <div class="three columns">
-                    <button onclick="flip.sendATCmdWithParam(C.AT_CMD_MQTT_DELIMITER, L('#PARAM_MQTT_DELIM').value); tabGlobal.showCheckmark(this)">
+                    <button onclick="flip.sendATCmd(C.AT_CMD_MQTT_DELIMITER, L('#PARAM_MQTT_DELIM').value); tabGlobal.showCheckmark(this)">
                         <span data-i18n>Set // Setzen</span>
                         <span style="display: none">&#x2714;</span>
                     </button>
@@ -511,7 +511,7 @@
                 <label class="three columns text-right text-normal" for="PARAM_WIFI_NAME" data-i18n>WiFi name // WiFi Name</label>
                 <input type="text" id="PARAM_WIFI_NAME" class="five columns" placeholder="new WiFi name"/>
                 <div class="three columns">
-                    <button onclick="flip.sendATCmdWithParam(C.AT_CMD_WIFI_NAME, L('#PARAM_WIFI_NAME').value); tabGlobal.showCheckmark(this)">
+                    <button onclick="flip.sendATCmd(C.AT_CMD_WIFI_NAME, L('#PARAM_WIFI_NAME').value); tabGlobal.showCheckmark(this)">
                         <span data-i18n>Set // Setzen</span>
                         <span style="display: none">&#x2714;</span>
                     </button>
@@ -522,7 +522,7 @@
                 <label class="three columns text-right text-normal" for="PARAM_WIFI_PASSWORD" data-i18n>WiFi password // WiFi Passwort</label>
                 <input type="password" id="PARAM_WIFI_PASSWORD" class="five columns" placeholder="new WiFi password"/>
                 <div class="three columns">
-                    <button onclick="flip.sendATCmdWithParam(C.AT_CMD_WIFI_PASSWORD, L('#PARAM_WIFI_PASSWORD').value); tabGlobal.showCheckmark(this)">
+                    <button onclick="flip.sendATCmd(C.AT_CMD_WIFI_PASSWORD, L('#PARAM_WIFI_PASSWORD').value); tabGlobal.showCheckmark(this)">
                         <span data-i18n>Set // Setzen</span>
                         <span style="display: none">&#x2714;</span>
                     </button>
@@ -616,7 +616,8 @@
     }
 
     function initFlip() {
-        window.flip = new FlipMouse(function (config) {
+        window.flip = new FlipMouse();
+        flip.init().then(function (config) {
             L.setVisible('#connectDiv', false);
             initWithConfig(config);
             tabSlot.initSlots();
@@ -626,27 +627,15 @@
                 initWithConfig(newconfig);
             });
             toTab(getCurrentTabId(), true);
-            testConnection();
-            setInterval(function () {
-                testConnection();
-            }, 10000);
-            function testConnection() {
-                flip.testConnection(true).then(function (isConnected) {
-                    L.setVisible('.connectedIndicator', isConnected, 'inline');
-                    L.setVisible('.disconnectedIndicator', !isConnected, 'inline');
-                    var oldState = L('#connStateText').innerHTML;
-                    var newState = isConnected ? L.translate('CONNECTED') : L.translate('NOT_CONNECTED');
-                    if(oldState != newState) {
-                        L('#connStateText').innerHTML = newState;
-                    }
-                });
-            }
+            flip.addConnectionTestCallback((isConnected) => {
+                L.setVisible('.connectedIndicator', isConnected, 'inline');
+                L.setVisible('.disconnectedIndicator', !isConnected, 'inline');
+                L('#connStateText').innerHTML = isConnected ? L.translate('CONNECTED') : L.translate('NOT_CONNECTED');
+            });
         });
     }
 
     function initWithConfig(config) {
-        console.log('applying config:');
-        console.log(config);
         if(!config) {
             return;
         }
