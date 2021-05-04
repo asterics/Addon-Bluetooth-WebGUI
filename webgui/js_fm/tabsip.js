@@ -17,7 +17,7 @@ window.tabSip.sipSliderChanged = function (input) {
     }
 };
 
-window.tabSip.sipPuffValueHandler = function (data) {
+window.tabSip.valueHandler = function (data) {
     var min = data[flip.LIVE_PRESSURE_MIN];
     var max = data[flip.LIVE_PRESSURE_MAX];
     var val = data[flip.LIVE_PRESSURE];

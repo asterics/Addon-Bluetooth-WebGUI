@@ -9,13 +9,11 @@
 
     <link rel="stylesheet" href="css/normal.css">
     <link rel="stylesheet" href="css/skeleton.css">
-    <link rel="stylesheet" href="css/tabby.css">
     <link rel="stylesheet" href="css/custom.css">
     <link rel="stylesheet" href="css/slider.css">
     <link rel="stylesheet" href="css/bootstrap-custom.css">
     <link rel="stylesheet" href="css/bootstrap-grid.css">
     <!--<script src="lib/androidc.js"></script>-->
-    <script src="lib/tabby.js"></script>
     <script src="lib/domi18n.js"></script>
 
     <script src="js_fm/const.js"></script>
@@ -34,6 +32,7 @@
     <script type="module" src="js_fm/tabvis.js"></script>
     <script src="js_fm/elecutils.js"></script>
     <script src="js_fm/shortcut.js"></script>
+    <script src="js_fm/router.js"></script>
     <script type="module" src="js_fm/comp/PositionVisualization.js"></script>
     <script type="module" src="js_fm/comp/BtnSipPuffVisualization.js"></script>
     <script type="module" src="js_fm/stylutil.js"></script>
@@ -72,17 +71,14 @@
     <div class="row hide-mobile" style="margin-bottom: 1.5em"></div>
 
     <div data-tabs class="row" id="tabMenu" role="menubar" tabindex="-1" accesskey="0">
-        <div id="menuButtons" style="display: flex">
-            <div class="hide-mobile showscreenreader"><button role="menuitem" onclick="toTab('#tabBasic')" class="menubutton button-primary" accesskey="1" data-tab id="tabBasicBtn" data-i18n>Basic Setup // Basis-Config</button></div>
-            <div class="hide-mobile showscreenreader"><button role="menuitem" onclick="toTab('#tabPuff')" class="menubutton button-primary" accesskey="2" data-tab id="tabPuffBtn" data-i18n>Sip and Puff // Saug-Puste-Steuerung</button></div>
-            <div class="hide-mobile showscreenreader"><button role="menuitem" onclick="toTab('#tabSlots')" class="menubutton button-primary" accesskey="3" data-tab id="tabSlotsBtn" data-i18n>Slots // Slots</button></div>
-            <div class="hide-mobile showscreenreader"><button role="menuitem" onclick="toTab('#tabActions')" class="menubutton button-primary" accesskey="4" data-tab id="tabActionsBtn" data-i18n>Actions // Aktionen</button></div>
-            <div class="hide-mobile showscreenreader"><button role="menuitem" onclick="toTab('#tabGlobal')" class="menubutton button-primary" accesskey="5" data-tab id="tabGlobalBtn" data-i18n>Global // Global</button></div>
-        </div>
-        <div class="show-mobile" aria-hidden="true"><button id="toNavLink" onclick="toNav()" class="button button-primary" data-tab data-i18n>&#x2630; Menu // &#x2630; Menü</button></div>
-        <div class="show-mobile" aria-hidden="true"><button id="toNavBackLink" style="display: none" onclick="toNavBack()" class="button button-primary" data-i18n>&#8592; Back // &#8592; Zurück</button></div>
+        <button id="toNavLink" onclick="L.toggleClass('.menubutton', 'd-none')" class="col d-sm-none button button-primary" data-tab data-i18n>&#x2630; Menu // &#x2630; Menü</button>
+        <button role="menuitem" onclick="router.toView('#tabBasic')" class="col-sm m-1 d-none d-sm-block menubutton button-primary" accesskey="1" data-tab id="tabBasicBtn" data-i18n>Basic Setup // Basis-Config</button>
+        <button role="menuitem" onclick="router.toView('#tabPuff')" class="col-sm m-1 d-none d-sm-block menubutton button-primary" accesskey="2" data-tab id="tabPuffBtn" data-i18n>Sip and Puff // Saug-Puste-Steuerung</button>
+        <button role="menuitem" onclick="router.toView('#tabSlots')" class="col-sm m-1 d-none d-sm-block menubutton button-primary" accesskey="3" data-tab id="tabSlotsBtn" data-i18n>Slots // Slots</button>
+        <button role="menuitem" onclick="router.toView('#tabActions')" class="col-sm m-1 d-none d-sm-block menubutton button-primary" accesskey="4" data-tab id="tabActionsBtn" data-i18n>Actions // Aktionen</button>
+        <button role="menuitem" onclick="router.toView('#tabGlobal')" class="col-sm m-1 d-none d-sm-block menubutton button-primary" accesskey="5" data-tab id="tabGlobalBtn" data-i18n>Global // Global</button>
     </div>
-    <main data-tabs-content role="main">
+    <main role="main">
         <div aria-hidden="true" data-tabs-pane class="tabs-pane" id="tabNav">
             <div id="tabNavContainer" class="row"></div>
         </div>
@@ -589,14 +585,19 @@
             </div>
         </section>
         <div style="margin-top: 10em;">
-            <a href="#tabVis" onclick="toTab('#tabVis')" data-i18n="">To Visualization // Zur Visualisierung</a>
+            <a href="#tabVis" onclick="router.toView('#tabVis')" data-i18n="">To Visualization // Zur Visualisierung</a>
         </div>
     </main>
 </div>
 
 <script>
     window.onload = function () {
-        tabby.init();
+        router.addView('#tabBasic', tabBasic);
+        router.addView('#tabPuff', tabSip);
+        router.addView('#tabSlots', tabSlot);
+        router.addView('#tabActions', tabAction);
+        router.addView('#tabGlobal', tabGlobal);
+        router.addView('#tabVis', tabVis);
         domI18n({
             selector: '[data-i18n]',
             separator: ' // ',
@@ -628,7 +629,7 @@
                 L('#selectSlots').value = slot;
                 initWithConfig(newconfig);
             });
-            toTab(getCurrentTabId(), true);
+            router.toView();
             flip.addConnectionTestCallback((isConnected) => {
                 L.setVisible('.connectedIndicator', isConnected, 'inline');
                 L.setVisible('.disconnectedIndicator', !isConnected, 'inline');
@@ -710,122 +711,6 @@
                 }
             }
         });
-    }
-
-    function toTab(tabId, nofocus) {
-        tabId = parseTabId(tabId);
-        if(!tabId) {
-            tabId = '#tabBasic';
-        }
-        if(nofocus) {
-            L(tabId).setAttribute('data-tab-no-focus', true);
-        }
-        tabby.toggleTab(tabId);
-        if(nofocus) {
-            L(tabId).removeAttribute('data-tab-no-focus');
-        }
-        L.setSelected('.menubutton', false);
-        L.setSelected(tabId + 'Btn');
-        L.setVisible('#toNavLink');
-        L.setVisible('#toNavBackLink', false);
-        if(tabId != '#tabNav') {
-            window.lastNav = tabId;
-        }
-        if (tabId.indexOf('#tabBasic') > -1) {
-            toBasic();
-        } else if (tabId.indexOf('#tabPuff') > -1) {
-            toSipPuff();
-        } else if (tabId.indexOf('#tabSlots') > -1) {
-            toSlots();
-        } else if (tabId.indexOf('#tabActions') > -1) {
-            toActions();
-        } else if (tabId.indexOf('#tabGlobal') > -1) {
-            toGlobal();
-        } else if (tabId.indexOf('#tabNav') > -1) {
-            toNav();
-        } else if (tabId.indexOf('#tabVis') > -1) {
-            toVisualization();
-        }
-    }
-    
-    function toBasic() {
-        beforeTabChange();
-        tabBasic.init();
-        flip.startLiveValueListener(tabBasic.valueHandler);
-    }
-
-    function toSipPuff() {
-        beforeTabChange();
-        flip.startLiveValueListener(tabSip.sipPuffValueHandler);
-    }
-
-    function toSlots() {
-        beforeTabChange();
-        flip.stopLiveValueListener();
-    }
-
-    function toActions() {
-        beforeTabChange();
-        flip.stopLiveValueListener();
-        tabAction.init();
-    }
-    
-    function toGlobal() {
-        beforeTabChange();
-        flip.stopLiveValueListener();
-        tabGlobal.init();
-    }
-
-    function toNav() {
-        beforeTabChange();
-        tabby.toggleTab('#tabNav');
-        L.toggle('#toNavLink', '#toNavBackLink');
-
-        var tabNav = L('#tabNavContainer');
-        if(tabNav.hasChildNodes()) {
-            return;
-        }
-        var navItems = L('#menuButtons').children;
-        for (var i = 0; i < navItems.length; i++) {
-            var clone = navItems[i].cloneNode(true);
-            clone.className = '';
-            tabNav.appendChild(clone);
-        }
-    }
-
-    function toVisualization() {
-        beforeTabChange();
-        flip.startLiveValueListener(tabVis.valueHandler);
-        tabVis.init();
-    }
-
-    function beforeTabChange() {
-        tabVis.destroy();
-        tabBasic.destroy();
-    }
-
-    function toNavBack() {
-        L.toggle('#toNavLink', '#toNavBackLink');
-        if(window.lastNav && window.lastNav != '#tabNav') {
-            toTab(window.lastNav);
-        } else {
-            toTab('#tabBasic');
-        }
-    }
-
-    function getCurrentTabId() {
-        if(L('.tabs-pane.active')[0]) {
-            var id = parseTabId(L('.tabs-pane.active')[0].baseURI);
-        }
-        return id ? id : parseTabId(window.location.href);
-    }
-
-    function parseTabId(url) {
-        var tabId = url.indexOf('#') > -1 ? url.substring(url.indexOf('#')) : '';
-        if(tabId.indexOf('?') > -1) {
-            tabId = tabId.substring(0,tabId.indexOf('?'));
-        }
-        return tabId;
     }
 </script>
 </body>

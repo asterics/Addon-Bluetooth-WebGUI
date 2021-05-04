@@ -218,19 +218,6 @@ button.selected, .custom-radio:checked ~ label {
     display: inline;
 }
 
-#menuButtons div {
-    width: 18.4%;
-}
-
-/* exclude first div */
-#menuButtons div + div {
-    margin-left: 2%;
-}
-
-.menubutton {
-    height: 90%;
-}
-
 .btnTransparent {
     background-color: transparent;
     border: 1px solid #bbb;
