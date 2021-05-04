@@ -38,14 +38,6 @@ class PositionVisualization extends Component {
         this.setState(options);
     }
 
-    toggleState(propertyName) {
-        if (this.state[propertyName] === true || this.state[propertyName] === false) {
-            let newState = {};
-            newState[propertyName] = !this.state[propertyName];
-            this.setState(newState);
-        }
-    }
-
     setStateListener(fn) {
         this.stateListener = fn;
     }
