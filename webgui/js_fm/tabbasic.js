@@ -8,7 +8,7 @@ window.tabBasic = {};
 tabBasic.init = function () {
     flip.resetMinMaxLiveValues();
     render(html`<${PositionVisualization}/>`, document.getElementById('posVisBasic'));
-    PositionVisualizationInstance.prepareForTabBasic();
+    PositionVisualization.instance.prepareForTabBasic();
 };
 
 tabBasic.destroy = function () {
@@ -16,7 +16,7 @@ tabBasic.destroy = function () {
 };
 
 tabBasic.valueHandler = function (data) {
-    PositionVisualizationInstance.updateData(data);
+    PositionVisualization.instance.updateData(data);
 };
 
 window.tabBasic.basicSliderChanged = function (evt) {
