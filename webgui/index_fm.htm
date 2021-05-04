@@ -591,16 +591,11 @@
 
 <script>
     window.onload = function () {
-        router.addView('#tabBasic', tabBasic);
-        router.addView('#tabPuff', tabSip);
-        router.addView('#tabSlots', tabSlot);
-        router.addView('#tabActions', tabAction);
-        router.addView('#tabGlobal', tabGlobal);
-        router.addView('#tabVis', tabVis);
-        domI18n({
+        window.domI18nInstance = domI18n({
             selector: '[data-i18n]',
             separator: ' // ',
-            languages: ['en', 'de']
+            languages: ['en', 'de'],
+            enableLog: false
         });
         L.loadScript('js_fm/i18n/i18n_' + L.getLang() + '.js', 'js_fm/i18n/i18n_en.js').then(function () {
             L('html')[0].lang = window.lang;

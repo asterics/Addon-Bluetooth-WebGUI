@@ -15,9 +15,10 @@ router.toView = function(viewId) {
 
     L.setSelected('.menubutton', false);
     L.setSelected(viewId + 'Btn');
-    viewIds.forEach(id => L.setVisible(id, false));
-    L.setVisible(viewId)
+    viewIds.forEach(id => L.addClass(id, 'd-none'));
+    L.removeClass(viewId, 'd-none');
     changeView(view);
+    window.domI18nInstance.changeLanguage();
     window.location.hash = viewId;
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
