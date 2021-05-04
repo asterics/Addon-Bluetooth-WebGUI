@@ -29,12 +29,12 @@
     <script src="js_fm/tabslot.js"></script>
     <script src="js_fm/tabact.js"></script>
     <script src="js_fm/tabglob.js"></script>
-    <script type="module" src="js_fm/tabvis.js"></script>
     <script src="js_fm/elecutils.js"></script>
     <script src="js_fm/shortcut.js"></script>
     <script src="js_fm/router.js"></script>
     <script type="module" src="js_fm/comp/PositionVisualization.js"></script>
     <script type="module" src="js_fm/comp/BtnSipPuffVisualization.js"></script>
+    <script type="module" src="js_fm/views/TabVisualization.js"></script>
     <script type="module" src="js_fm/stylutil.js"></script>
 </head>
 <body>
@@ -70,7 +70,7 @@
     </header>
     <div class="row hide-mobile" style="margin-bottom: 1.5em"></div>
 
-    <div data-tabs class="row" id="tabMenu" role="menubar" tabindex="-1" accesskey="0">
+    <div class="row" id="tabMenu" role="menubar" tabindex="-1" accesskey="0">
         <button id="toNavLink" onclick="L.toggleClass('.menubutton', 'd-none')" class="col d-md-none button button-primary" data-tab data-i18n>&#x2630; Menu // &#x2630; Menü</button>
         <button role="menuitem" onclick="router.toView('#tabBasic')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="1" data-tab id="tabBasicBtn" data-i18n>Basic Setup // Basis-Config</button>
         <button role="menuitem" onclick="router.toView('#tabPuff')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="2" data-tab id="tabPuffBtn" data-i18n>Sip and Puff // Saug-Puste-Steuerung</button>
@@ -80,10 +80,10 @@
         <button role="menuitem" onclick="router.toView('#tabVis')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="6" data-tab id="tabVisBtn" data-i18n>Visualization // Visualisierung</button>
     </div>
     <main role="main">
-        <div aria-hidden="true" data-tabs-pane class="tabs-pane" id="tabNav">
-            <div id="tabNavContainer" class="row"></div>
+        <div id="viewContainer">
+
         </div>
-        <section aria-labelledby="tabBasicHeader" data-tabs-pane class="tabs-pane" id="tabBasic">
+        <section aria-labelledby="tabBasicHeader" class="tabs-pane d-none" id="tabBasic">
             <div tabindex="-1">
                 <h2 id="tabBasicHeader" style="display: none" aria-hidden="false" data-i18n>Tab one - Basic FLipMouse Setup // Tab eins - FLipMouse Basiskonfiguration</h2>
             </div>
@@ -169,7 +169,7 @@
                 </button>
             </div>
         </section>
-        <section aria-labelledby="tabPuffHeader" data-tabs-pane class="tabs-pane" id="tabPuff">
+        <section aria-labelledby="tabPuffHeader" class="tabs-pane d-none" id="tabPuff">
             <div tabindex="-1">
                 <h2 id="tabPuffHeader" style="display: none" aria-hidden="false" data-i18n>Tab two - FLipMouse Sip and Puff Configuration // Tab zwei - FLipMouse Konfiguration Saug-/Pustesteuerung</h2>
             </div>
@@ -242,7 +242,7 @@
                 </span>
             </button>
         </section>
-        <section aria-labelledby="tabSlotsHeader" data-tabs-pane class="tabs-pane" id="tabSlots">
+        <section aria-labelledby="tabSlotsHeader" class="tabs-pane d-none" id="tabSlots">
             <div tabindex="-1">
                 <h2 id="tabSlotsHeader" style="display: none" aria-hidden="false" data-i18n>Tab 3 - FLipMouse Slot configuration // Tab 3 - FLipMouse Slot Konfiguration</h2>
             </div>
@@ -323,7 +323,7 @@
                 </button>
             </div>
         </section>
-        <section aria-labelledby="tabActionsHeader" data-tabs-pane class="tabs-pane" id="tabActions">
+        <section aria-labelledby="tabActionsHeader" class="tabs-pane d-none" id="tabActions">
             <div tabindex="-1">
                 <h2 id="tabActionsHeader" style="display: none" aria-hidden="false" data-i18n>Tab 4 - FLipMouse Action configuration // Tab 4 - FLipMouse Konfiguration Aktionen</h2>
             </div>
@@ -477,7 +477,7 @@
                 </span>
             </button>
         </section>
-        <section aria-labelledby="tabGlobalHeader" data-tabs-pane class="tabs-pane" id="tabGlobal">
+        <section aria-labelledby="tabGlobalHeader" class="tabs-pane d-none" id="tabGlobal">
             <div tabindex="-1">
                 <h2 id="tabGlobalHeader" style="display: none" aria-hidden="false" data-i18n>Tab 5 - FLipMouse global properties // Tab 5 - FLipMouse globale Parameter</h2>
             </div>
@@ -565,28 +565,22 @@
                 <!-- <div class="one column show-mobile space-bottom-2x"></div> -->
             </div>
         </section>
-        <section data-tabs-pane class="tabs-pane" id="tabVis">
-            <h2 id="tabVisHeader" style="margin-bottom: 2em" data-i18n>Visualization of current state // Visualisierung aktueller Status</h2>
-            <div class="row" style="margin-bottom: 2em">
-                <div id="tabVisVisContainer" class="four columns"></div>
-                <div id="tabVisBtnSipVis" class="eight columns"></div>
-            </div>
-            <div class="row">
-                <label for="sliderMaxRange" data-i18n="">Maximum position // Maximal angezeigte Auslenkung</label>
-                <input type="range" id="sliderMaxRange" min="10" max="1024" oninput="PositionVisualizationInstance.updateState({maxPosManual: this.value})"/>
-                <span id="sliderMaxRangeValue">?</span>
-            </div>
-            <div class="row" style="margin-top: 2em">
-                <div data-i18n="" style="margin-bottom: 1em; font-weight: bold">Show/hide elements // Elemente anzeigen/verstecken</div>
-                <button class="two columns" onclick="PositionVisualizationInstance.toggleState('showDeadzone')">Deadzone</button>
-                <button class="two columns" onclick="PositionVisualizationInstance.toggleState('showAnalogBars')">Bars</button>
-                <button class="two columns" onclick="PositionVisualizationInstance.toggleState('showAnalogValues')">Values</button>
-                <button class="two columns" onclick="PositionVisualizationInstance.toggleState('showMaxPos')">Max. Position</button>
-                <button class="two columns" onclick="PositionVisualizationInstance.toggleState('showOrientation')">Orientation</button>
-            </div>
+        <section class="tabs-pane d-none" id="tabVis">
+
         </section>
     </main>
 </div>
+
+<script type="module">
+    import {TabVisualization} from "./js_fm/views/TabVisualization.js";
+
+    router.addView('#tabBasic', tabBasic);
+    router.addView('#tabPuff', tabSip);
+    router.addView('#tabSlots', tabSlot);
+    router.addView('#tabActions', tabAction);
+    router.addView('#tabGlobal', tabGlobal);
+    router.addView('#tabVis', TabVisualization);
+</script>
 
 <script>
     window.onload = function () {
