@@ -71,12 +71,13 @@
     <div class="row hide-mobile" style="margin-bottom: 1.5em"></div>
 
     <div data-tabs class="row" id="tabMenu" role="menubar" tabindex="-1" accesskey="0">
-        <button id="toNavLink" onclick="L.toggleClass('.menubutton', 'd-none')" class="col d-sm-none button button-primary" data-tab data-i18n>&#x2630; Menu // &#x2630; Menü</button>
-        <button role="menuitem" onclick="router.toView('#tabBasic')" class="col-sm m-1 d-none d-sm-block menubutton button-primary" accesskey="1" data-tab id="tabBasicBtn" data-i18n>Basic Setup // Basis-Config</button>
-        <button role="menuitem" onclick="router.toView('#tabPuff')" class="col-sm m-1 d-none d-sm-block menubutton button-primary" accesskey="2" data-tab id="tabPuffBtn" data-i18n>Sip and Puff // Saug-Puste-Steuerung</button>
-        <button role="menuitem" onclick="router.toView('#tabSlots')" class="col-sm m-1 d-none d-sm-block menubutton button-primary" accesskey="3" data-tab id="tabSlotsBtn" data-i18n>Slots // Slots</button>
-        <button role="menuitem" onclick="router.toView('#tabActions')" class="col-sm m-1 d-none d-sm-block menubutton button-primary" accesskey="4" data-tab id="tabActionsBtn" data-i18n>Actions // Aktionen</button>
-        <button role="menuitem" onclick="router.toView('#tabGlobal')" class="col-sm m-1 d-none d-sm-block menubutton button-primary" accesskey="5" data-tab id="tabGlobalBtn" data-i18n>Global // Global</button>
+        <button id="toNavLink" onclick="L.toggleClass('.menubutton', 'd-none')" class="col d-md-none button button-primary" data-tab data-i18n>&#x2630; Menu // &#x2630; Menü</button>
+        <button role="menuitem" onclick="router.toView('#tabBasic')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="1" data-tab id="tabBasicBtn" data-i18n>Basic Setup // Basis-Config</button>
+        <button role="menuitem" onclick="router.toView('#tabPuff')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="2" data-tab id="tabPuffBtn" data-i18n>Sip and Puff // Saug-Puste-Steuerung</button>
+        <button role="menuitem" onclick="router.toView('#tabSlots')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="3" data-tab id="tabSlotsBtn" data-i18n>Slots // Slots</button>
+        <button role="menuitem" onclick="router.toView('#tabActions')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="4" data-tab id="tabActionsBtn" data-i18n>Actions // Aktionen</button>
+        <button role="menuitem" onclick="router.toView('#tabGlobal')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="5" data-tab id="tabGlobalBtn" data-i18n>Global // Global</button>
+        <button role="menuitem" onclick="router.toView('#tabVis')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="6" data-tab id="tabVisBtn" data-i18n>Visualization // Visualisierung</button>
     </div>
     <main role="main">
         <div aria-hidden="true" data-tabs-pane class="tabs-pane" id="tabNav">
@@ -584,9 +585,6 @@
                 <button class="two columns" onclick="PositionVisualizationInstance.toggleState('showOrientation')">Orientation</button>
             </div>
         </section>
-        <div style="margin-top: 10em;">
-            <a href="#tabVis" onclick="router.toView('#tabVis')" data-i18n="">To Visualization // Zur Visualisierung</a>
-        </div>
     </main>
 </div>
 
