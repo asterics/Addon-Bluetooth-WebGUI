@@ -69,20 +69,28 @@ window.L.selectAsList = function (selector) {
 };
 
 window.L.addClass = function (selector, className) {
-    var list = L.selectAsList(selector);
-    list.forEach(function (elem) {
-        if(elem.className.indexOf(className) == -1) {
-            elem.className += ' ' + className;
-        }
-    });
+    L.toggleClass(selector, className, false, true);
 };
 
 window.L.removeClass = function (selector, className) {
-    var list = L.selectAsList(selector);
-    list.forEach(function (elem) {
-        elem.className = L.replaceAll(elem.className, className, '');
-    });
+    L.toggleClass(selector, className, true, false);
 };
+
+window.L.toggleClass = function (selector, className, dontAdd, dontRemove) {
+    let list = L.selectAsList(selector);
+    list.forEach(function (elem) {
+        let classes = elem.className.split(' ');
+        if (classes.indexOf(className) === -1) {
+            if (!dontAdd) {
+                elem.className += ' ' + className;
+                elem.className = elem.className.trim();
+            }
+        } else if (!dontRemove) {
+            classes = classes.filter(c => c.trim() !== className);
+            elem.className = classes.join(' ');
+        }
+    });
+}
 
 window.L.setSelected = function (selector, selected) {
     if(selected == undefined) selected = true;
