@@ -8,7 +8,7 @@ class BtnSipPuffVisualization extends Component {
     constructor() {
         super();
 
-        window.BtnSipPuffVisualizationInstance = this;
+        BtnSipPuffVisualization.instance = this;
         this.stateListener = null;
         this.state = {
             liveData: {}
@@ -17,6 +17,9 @@ class BtnSipPuffVisualization extends Component {
 
     componentWillUnmount() {
         this.stateListener = null;
+        if (BtnSipPuffVisualization.instance === this) {
+            BtnSipPuffVisualization.instance = null;
+        }
     }
 
     updateState(options) {

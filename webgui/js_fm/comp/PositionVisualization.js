@@ -8,8 +8,7 @@ class PositionVisualization extends Component {
     constructor() {
         super();
 
-        window.PositionVisualizationInstance = this;
-
+        PositionVisualization.instance = this;
         this.stateListener = null;
         this.state = {
             liveData: {},
@@ -30,6 +29,9 @@ class PositionVisualization extends Component {
 
     componentWillUnmount() {
         this.stateListener = null;
+        if (PositionVisualization.instance === this) {
+            PositionVisualization.instance = null;
+        }
     }
 
     updateState(options) {
@@ -130,5 +132,4 @@ class PositionVisualization extends Component {
     }
 }
 
-//let instance = render(html`<${PositionVisualization}/>`, document.getElementById('connectContent'));
 export {PositionVisualization};
