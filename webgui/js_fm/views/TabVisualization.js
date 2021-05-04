@@ -2,6 +2,8 @@ import { h, Component, render } from '../../js/preact.min.js';
 import htm from '../../js/htm.min.js';
 import {PositionVisualization} from "../comp/PositionVisualization.js";
 import {BtnSipPuffVisualization} from "../comp/BtnSipPuffVisualization.js";
+import {preactUtil} from "../preactUtil.js";
+
 const html = htm.bind(h);
 
 class TabVisualization extends Component {
@@ -22,11 +24,11 @@ class TabVisualization extends Component {
             </div>
             <div class="row" style="margin-top: 2em">
                 <div data-i18n="" style="margin-bottom: 1em; font-weight: bold">Show/hide elements // Elemente anzeigen/verstecken</div>
-                <button class="two columns" onclick="${() => PositionVisualization.instance.toggleState('showDeadzone')}">Deadzone</button>
-                <button class="two columns" onclick="${() => PositionVisualization.instance.toggleState('showAnalogBars')}">Bars</button>
-                <button class="two columns" onclick="${() => PositionVisualization.instance.toggleState('showAnalogValues')}">Values</button>
-                <button class="two columns" onclick="${() => PositionVisualization.instance.toggleState('showMaxPos')}">Max. Position</button>
-                <button class="two columns" onclick="${() => PositionVisualization.instance.toggleState('showOrientation')}">Orientation</button>
+                <button class="two columns" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showDeadzone')}">Deadzone</button>
+                <button class="two columns" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showAnalogBars')}">Bars</button>
+                <button class="two columns" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showAnalogValues')}">Values</button>
+                <button class="two columns" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showMaxPos')}">Max. Position</button>
+                <button class="two columns" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showOrientation')}">Orientation</button>
             </div>`;
     }
 }
