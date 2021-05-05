@@ -24,8 +24,6 @@
     <script src="js/wscomm.js"></script>
     <script src="js_fm/flipcomm.js"></script>
     <script src="js_fm/mockcomm.js"></script>
-    <script type="module" src="js_fm/tabbasic.js"></script>
-    <script src="js_fm/tabsip.js"></script>
     <script src="js_fm/tabslot.js"></script>
     <script src="js_fm/tabact.js"></script>
     <script src="js_fm/tabglob.js"></script>
@@ -68,95 +66,23 @@
             <select aria-hidden="true" id="selectSlots" class="slot-select row u-full-width" onchange="tabSlot.selectSlot(this)">
             </select>
         </div>
-    </header>
-    <div class="row hide-mobile" style="margin-bottom: 1.5em"></div>
 
-    <div class="row" id="tabMenu" role="menubar" tabindex="-1" accesskey="0">
-        <button id="toNavLink" onclick="L.toggleClass('.menubutton', 'd-none')" class="col d-md-none button button-primary" data-tab data-i18n>&#x2630; Menu // &#x2630; Menü</button>
-        <button role="menuitem" onclick="router.toView('#tabBasic')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="1" data-tab id="tabBasicBtn" data-i18n>Basic Setup // Basis-Config</button>
-        <button role="menuitem" onclick="router.toView('#tabPuff')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="2" data-tab id="tabPuffBtn" data-i18n>Sip and Puff // Saug-Puste-Steuerung</button>
-        <button role="menuitem" onclick="router.toView('#tabSlots')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="3" data-tab id="tabSlotsBtn" data-i18n>Slots // Slots</button>
-        <button role="menuitem" onclick="router.toView('#tabActions')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="4" data-tab id="tabActionsBtn" data-i18n>Actions // Aktionen</button>
-        <button role="menuitem" onclick="router.toView('#tabGlobal')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="5" data-tab id="tabGlobalBtn" data-i18n>Global // Global</button>
-        <button role="menuitem" onclick="router.toView('#tabVis')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="6" data-tab id="tabVisBtn" data-i18n>Visualization // Visualisierung</button>
-    </div>
+        <div class="container-fluid mt-2 mb-5">
+            <div class="row" id="tabMenu" role="menubar" tabindex="-1" accesskey="0">
+                <button id="toNavLink" onclick="L.toggleClass('.menubutton', 'd-none')" class="col d-md-none button button-primary" data-tab data-i18n>&#x2630; Menu // &#x2630; Menü</button>
+                <button role="menuitem" onclick="router.toView('#tabBasic')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="1" data-tab id="tabBasicBtn" data-i18n>Basic Setup // Basis-Config</button>
+                <button role="menuitem" onclick="router.toView('#tabPuff')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="2" data-tab id="tabPuffBtn" data-i18n>Sip and Puff // Saug-Puste-Steuerung</button>
+                <button role="menuitem" onclick="router.toView('#tabSlots')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="3" data-tab id="tabSlotsBtn" data-i18n>Slots // Slots</button>
+                <button role="menuitem" onclick="router.toView('#tabActions')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="4" data-tab id="tabActionsBtn" data-i18n>Actions // Aktionen</button>
+                <button role="menuitem" onclick="router.toView('#tabGlobal')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="5" data-tab id="tabGlobalBtn" data-i18n>Global // Global</button>
+                <button role="menuitem" onclick="router.toView('#tabVis')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="6" data-tab id="tabVisBtn" data-i18n>Visualization // Visualisierung</button>
+            </div>
+        </div>
+    </header>
     <main role="main">
         <div id="viewContainer">
 
         </div>
-        <section aria-labelledby="tabPuffHeader" class="tabs-pane d-none" id="tabPuff">
-            <div tabindex="-1">
-                <h2 id="tabPuffHeader" style="display: none" aria-hidden="false" data-i18n>Tab two - FLipMouse Sip and Puff Configuration // Tab zwei - FLipMouse Konfiguration Saug-/Pustesteuerung</h2>
-            </div>
-            <span id="pressureLiveA11yLabel" aria-hidden="false" class="hidden" data-i18n="">Current pressure value of FLipMouse // Aktueller Wert Druck der FLipMouse</span>
-            <span id="pressureLiveA11y" aria-describedby="pressureLiveA11yLabel" class="onlyscreenreader" role="status" aria-live="off" accesskey="w" tabindex="-1"></span>
-            <div id="tab-puff-container" class="relative container">
-                <div class="row back-layer full-height full-width">
-                    <div aria-hidden="true" class="two columns"><span style="font-size: 1px; color: transparent">_</span></div>
-                    <div class="ten columns full-height relative">
-                        <div id="guide-current" class="back-layer full-height border-right-gray"
-                             style="width: 50%;"></div>
-                        <div id="guide-max" class="back-layer full-height border-right-red" style="width: 50%;"></div>
-                        <div id="guide-min" class="back-layer full-height border-right-blue" style="width: 50%;"></div>
-                    </div>
-                </div>
-
-                <br/>
-                <label for="SIP_THRESHOLD" data-i18n>Sip Threshold: // Schwellenwert Saugen:</label>
-                <div id="SIP_THRESHOLD_WRAPPER" class="row">
-                    <span aria-hidden="true" id="SIP_THRESHOLD_VAL" class="text-center two columns">0</span>
-                    <input type="range" oninput="tabSip.sipSliderChanged(this)" onchange="tabSip.sipSliderChanged(this)"
-                           id="SIP_THRESHOLD" min="0" max="1023" class="ten columns" accesskey="y"/>
-                </div>
-                <label for="SIP_STRONG_THRESHOLD" data-i18n>Strong Sip Threshold: // Schwellenwert Saugen
-                    stark:</label>
-                <div id="SIP_STRONG_THRESHOLD_WRAPPER" class="row">
-                    <span aria-hidden="true" id="SIP_STRONG_THRESHOLD_VAL" class="text-center two columns">0</span>
-                    <input type="range" oninput="tabSip.sipSliderChanged(this)" onchange="tabSip.sipSliderChanged(this)"
-                           id="SIP_STRONG_THRESHOLD" min="0" max="1023" class="ten columns" accesskey="x"/>
-                </div>
-
-                <br/>
-                <label aria-hidden="true" data-i18n>Live values: // Aktuelle Werte:</label>
-                <div class="row" aria-hidden="true">
-                    <div id="value-bar-wrapper" class="text-center two columns">
-                        <span data-i18n>current: // aktuell:</span><span id="currentValue">0</span>,
-                        <span>max:</span><span id="maxValue">0</span>,
-                        <span>min:</span><span id="minValue">-1</span>
-                    </div>
-                    <div class="ten columns"
-                         style="position:relative; height: 2em; border-style: solid; border-width: thin; background-color: transparent">
-                        <div id="sippuff-value-bar" class="value-bar" style="width: 50%;"></div>
-                    </div>
-                </div>
-
-                <br/>
-                <br/>
-                <label for="PUFF_THRESHOLD" data-i18n>Puff Threshold: // Schwellenwert Pusten:</label>
-                <div id="PUFF_THRESHOLD_WRAPPER" class="row">
-                    <span aria-hidden="true" id="PUFF_THRESHOLD_VAL" class="text-center two columns">0</span>
-                    <input type="range" oninput="tabSip.sipSliderChanged(this)" onchange="tabSip.sipSliderChanged(this)"
-                           id="PUFF_THRESHOLD" min="0" max="1023" class="ten columns" accesskey="c">
-                </div>
-                <label for="PUFF_STRONG_THRESHOLD" data-i18n>Strong Puff Threshold: // Schwellenwert Pusten
-                    stark:</label>
-                <div id="PUFF_STRONG_THRESHOLD_WRAPPER" class="row">
-                    <span aria-hidden="true" id="PUFF_STRONG_THRESHOLD_VAL" class="text-center two columns">0</span>
-                    <input type="range" oninput="tabSip.sipSliderChanged(this)" onchange="tabSip.sipSliderChanged(this)"
-                           id="PUFF_STRONG_THRESHOLD" min="0" max="1023" class="ten columns" accesskey="v">
-                </div>
-            </div>
-
-            <br/>
-            <br/>
-            <button id="sip-puff-button" onclick="actionAndToggle(flip.save, [], ['#sip-puff-button-normal', '#sip-puff-button-saving'], '#save-sip-value-bar')" class="u-full-width" style="position: relative;">
-                <i id="save-sip-value-bar" class="value-bar color-lightercyan" style="width: 0%;"></i>
-                <span id="sip-puff-button-normal" style="position: relative" data-i18n>Save // Speichern</span>
-                <span id="sip-puff-button-saving" style="display: none" data-i18n>Saving... // Wird
-                    gespeichert...
-                </span>
-            </button>
-        </section>
         <section aria-labelledby="tabSlotsHeader" class="tabs-pane d-none" id="tabSlots">
             <div tabindex="-1">
                 <h2 id="tabSlotsHeader" style="display: none" aria-hidden="false" data-i18n>Tab 3 - FLipMouse Slot configuration // Tab 3 - FLipMouse Slot Konfiguration</h2>
@@ -489,9 +415,10 @@
 <script type="module">
     import {TabVisualization} from "./js_fm/views/TabVisualization.js";
     import {TabBasic} from "./js_fm/views/TabBasic.js";
+    import {TabSipPuff} from "./js_fm/views/TabSipPuff.js";
 
     router.addView('#tabBasic', TabBasic);
-    router.addView('#tabPuff', tabSip);
+    router.addView('#tabPuff', TabSipPuff);
     router.addView('#tabSlots', tabSlot);
     router.addView('#tabActions', tabAction);
     router.addView('#tabGlobal', tabGlobal);
@@ -525,12 +452,11 @@
         window.flip = new FlipMouse();
         flip.init().then(function (config) {
             L.setVisible('#connectDiv', false);
-            initWithConfig(config);
             tabSlot.initSlots();
             tabSlot.initProcesses();
             flip.setSlotChangeHandler((slot, newconfig) => {
                 L('#selectSlots').value = slot;
-                initWithConfig(newconfig);
+                //TODO
             });
             router.toView();
             flip.addConnectionTestCallback((isConnected) => {
@@ -539,23 +465,6 @@
                 L('#connStateText').innerHTML = isConnected ? L.translate('CONNECTED') : L.translate('NOT_CONNECTED');
             });
         });
-    }
-
-    function initWithConfig(config) {
-        if(!config) {
-            return;
-        }
-        setSliderValue(flip.SIP_THRESHOLD, config[flip.SIP_THRESHOLD]);
-        setSliderValue(flip.SIP_STRONG_THRESHOLD, config[flip.SIP_STRONG_THRESHOLD]);
-        setSliderValue(flip.PUFF_THRESHOLD, config[flip.PUFF_THRESHOLD]);
-        setSliderValue(flip.PUFF_STRONG_THRESHOLD, config[flip.PUFF_STRONG_THRESHOLD]);
-    }
-
-    function setSliderValue(constant, value, dontSetSlider) {
-        L('#' + constant + '_VAL').innerHTML = value;
-        if (!dontSetSlider) {
-            L('#' + constant).value = value;
-        }
     }
 
     function actionAndToggle(actionFunction, argList, toggleElementList, progressBarId) {
