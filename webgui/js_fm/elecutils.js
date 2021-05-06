@@ -28,7 +28,6 @@ setInterval(function() {
 							elem.value = processActivationMapping[i]["slot"];
 						});
 						tabAction.init();
-						tabSlot.initProcesses();
 						initWithConfig(config);
 						console.log("loading slot " + processActivationMapping[i]["slot"] +", because of process " + processPath);
 					}

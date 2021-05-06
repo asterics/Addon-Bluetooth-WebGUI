@@ -24,7 +24,6 @@
     <script src="js/wscomm.js"></script>
     <script src="js_fm/flipcomm.js"></script>
     <script src="js_fm/mockcomm.js"></script>
-    <script src="js_fm/tabslot.js"></script>
     <script src="js_fm/tabact.js"></script>
     <script src="js_fm/tabglob.js"></script>
     <script src="js_fm/elecutils.js"></script>
@@ -34,6 +33,7 @@
     <script type="module" src="js_fm/comp/PositionVisualization.js"></script>
     <script type="module" src="js_fm/comp/BtnSipPuffVisualization.js"></script>
     <script type="module" src="js_fm/views/TabVisualization.js"></script>
+    <script type="module" src="js_fm/views/TabSlots.js"></script>
     <script type="module" src="js_fm/stylutil.js"></script>
 </head>
 <body>
@@ -47,123 +47,41 @@
     </div>
 </div>
 <div id="content">
-    <header class="row" role="banner">
-        <div>
-            <h1 id="mainHeading" tabindex="-1" class="nine columns" data-i18n>FLipMouse Configuration // FLipMouse Konfiguration</h1>
-            <span aria-hidden="true" class="show-mobile headerConnectIndicator green connectedIndicator" style="display: none" title="connected">&#x2713;</span>
-            <span aria-hidden="true" class="show-mobile headerConnectIndicator red disconnectedIndicator" title="not connected">&#x2717;</span>
-        </div>
-        <div class="three columns hide-mobile showscreenreader">
-            <div class="row">
-                <label class="seven columns" for="selectSlots" data-i18n>Select Slot // Slot auswählen</label>
-                <div class="four columns text-right">
-                    <span aria-hidden="true" style="display: none" class="connectedIndicator" title="connected">&#x2713;</span>
-                    <span aria-hidden="true" class="disconnectedIndicator" title="not connected">&#x2717;</span>
-                    <span id="connStateLabel" aria-hidden="false" class="hidden" data-i18n>connection status // Verbindungsstatus</span>
-                    <span id="connStateText" aria-hidden="false" aria-describedby="connStateLabel" aria-live="assertive" role="status" class="show-desktop" accesskey="p" data-i18n>not connected // nicht verbunden</span>
+    <header class="container-fluid" role="banner">
+        <div class="row">
+            <div>
+                <h1 id="mainHeading" tabindex="-1" class="nine columns" data-i18n>FLipMouse Configuration // FLipMouse Konfiguration</h1>
+                <span aria-hidden="true" class="show-mobile headerConnectIndicator green connectedIndicator" style="display: none" title="connected">&#x2713;</span>
+                <span aria-hidden="true" class="show-mobile headerConnectIndicator red disconnectedIndicator" title="not connected">&#x2717;</span>
+            </div>
+            <div class="three columns hide-mobile showscreenreader">
+                <div class="row">
+                    <label class="seven columns" for="selectSlots" data-i18n>Select Slot // Slot auswählen</label>
+                    <div class="four columns text-right">
+                        <span aria-hidden="true" style="display: none" class="connectedIndicator" title="connected">&#x2713;</span>
+                        <span aria-hidden="true" class="disconnectedIndicator" title="not connected">&#x2717;</span>
+                        <span id="connStateLabel" aria-hidden="false" class="hidden" data-i18n>connection status // Verbindungsstatus</span>
+                        <span id="connStateText" aria-hidden="false" aria-describedby="connStateLabel" aria-live="assertive" role="status" class="show-desktop" accesskey="p" data-i18n>not connected // nicht verbunden</span>
+                    </div>
                 </div>
+                <select aria-hidden="true" id="selectSlots" class="slot-select row u-full-width" onchange="flip.setSlot(this.value)">
+                </select>
             </div>
-            <select aria-hidden="true" id="selectSlots" class="slot-select row u-full-width" onchange="tabSlot.selectSlot(this)">
-            </select>
         </div>
-
-        <div class="container-fluid mt-2 mb-5">
-            <div class="row" id="tabMenu" role="menubar" tabindex="-1" accesskey="0">
-                <button id="toNavLink" onclick="L.toggleClass('.menubutton', 'd-none')" class="col d-md-none button button-primary" data-tab data-i18n>&#x2630; Menu // &#x2630; Menü</button>
-                <button role="menuitem" onclick="router.toView('#tabBasic')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="1" data-tab id="tabBasicBtn" data-i18n>Basic Setup // Basis-Config</button>
-                <button role="menuitem" onclick="router.toView('#tabPuff')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="2" data-tab id="tabPuffBtn" data-i18n>Sip and Puff // Saug-Puste-Steuerung</button>
-                <button role="menuitem" onclick="router.toView('#tabSlots')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="3" data-tab id="tabSlotsBtn" data-i18n>Slots // Slots</button>
-                <button role="menuitem" onclick="router.toView('#tabActions')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="4" data-tab id="tabActionsBtn" data-i18n>Actions // Aktionen</button>
-                <button role="menuitem" onclick="router.toView('#tabGlobal')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="5" data-tab id="tabGlobalBtn" data-i18n>Global // Global</button>
-                <button role="menuitem" onclick="router.toView('#tabVis')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="6" data-tab id="tabVisBtn" data-i18n>Visualization // Visualisierung</button>
-            </div>
+        <div class="row mb-5" id="tabMenu" role="menubar" tabindex="-1" accesskey="0">
+            <button id="toNavLink" onclick="L.toggleClass('.menubutton', 'd-none')" class="col d-md-none button button-primary" data-tab data-i18n>&#x2630; Menu // &#x2630; Menü</button>
+            <button role="menuitem" onclick="router.toView('#tabBasic')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="1" data-tab id="tabBasicBtn" data-i18n>Basic Setup // Basis-Config</button>
+            <button role="menuitem" onclick="router.toView('#tabPuff')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="2" data-tab id="tabPuffBtn" data-i18n>Sip and Puff // Saug-Puste-Steuerung</button>
+            <button role="menuitem" onclick="router.toView('#tabSlots')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="3" data-tab id="tabSlotsBtn" data-i18n>Slots // Slots</button>
+            <button role="menuitem" onclick="router.toView('#tabActions')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="4" data-tab id="tabActionsBtn" data-i18n>Actions // Aktionen</button>
+            <button role="menuitem" onclick="router.toView('#tabGlobal')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="5" data-tab id="tabGlobalBtn" data-i18n>Global // Global</button>
+            <button role="menuitem" onclick="router.toView('#tabVis')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="6" data-tab id="tabVisBtn" data-i18n>Visualization // Visualisierung</button>
         </div>
     </header>
     <main role="main">
         <div id="viewContainer">
 
         </div>
-        <section aria-labelledby="tabSlotsHeader" class="tabs-pane d-none" id="tabSlots">
-            <div tabindex="-1">
-                <h2 id="tabSlotsHeader" style="display: none" aria-hidden="false" data-i18n>Tab 3 - FLipMouse Slot configuration // Tab 3 - FLipMouse Slot Konfiguration</h2>
-            </div>
-            <div class="row">
-                <label for="selectSlots2" data-i18n>Select active slot // Aktiven Slot auswählen</label>
-                <select id="selectSlots2" class="slot-select u-full-width" onchange="tabSlot.selectSlot(this)">
-                </select>
-            </div>
-            
-            <div id="processSelectionDiv" style="display: none"  class="row">
-                <label for="selectProcess" data-i18n>Select activation program // Aktivierendes Programm wählen</label>
-                <select id="selectProcess" class="process-select u-full-width" onchange="tabSlot.selectProcess(this)">
-                </select>
-            </div>
-
-            <br/>
-            <div class="row">
-                <div data-i18n>
-                    <label for="newSlotLabelEn">Create new slot</label>
-                    <label for="newSlotLabelDe">Neuen Slot anlegen</label>
-                </div>
-                <div data-i18n class="u-full-width">
-                    <input id="newSlotLabelEn" oninput="tabSlot.saveSlotLabelChanged(this)" type="text" class="u-full-width" placeholder="insert name for new slot" maxlength="15"/>
-                    <input id="newSlotLabelDe" oninput="tabSlot.saveSlotLabelChanged(this)" type="text" class="u-full-width" placeholder="Name für neuen Slot eingeben" maxlength="15"/>
-                </div>
-                <button id="create-slot-button" disabled onclick="tabSlot.createSlot(['#create-slot-button-normal', '#create-slot-button-saving'], '#create-slot-value-bar')" class="u-full-width" style="position: relative;">
-                    <i id="create-slot-value-bar" class="value-bar color-lightercyan" style="width: 0%;"></i>
-                    <span id="create-slot-button-normal" style="position: relative" data-i18n>Create Slot // Slot anlegen</span>
-                    <span id="create-slot-button-saving" style="display: none" data-i18n>creating slot... // Slot wird anlgelegt...</span>
-                </button>
-            </div>
-
-            <br/>
-            <div class="row">
-                <label for="selectSlotDelete" data-i18n>Delete Slot // Slot löschen</label>
-                <select id="selectSlotDelete" class="slot-select u-full-width">
-                </select>
-                <button id="delete-slot-button" onclick="tabSlot.deleteSlot(['#delete-slot-button-normal', '#delete-slot-button-saving'], '#delete-slot-value-bar')" class="u-full-width" style="position: relative;">
-                    <i id="delete-slot-value-bar" class="value-bar color-lightercyan" style="width: 0%;"></i>
-                    <span id="delete-slot-button-normal" style="position: relative" data-i18n>Delete Slot // Slot löschen</span>
-                    <span id="delete-slot-button-saving" style="display: none" data-i18n>deleting slot... // Slot wird gelöscht...</span>
-                </button>
-            </div>
-            
-            <div class="row">
-                <label for="selectSlotDownload" data-i18n>Download Slot(s) // Slot(s) herunterladen</label>
-                <select id="selectSlotDownload" class="slot-select u-full-width">
-                </select>
-                <button id="download-slot-button" onclick="tabSlot.downloadSlot()" class="u-full-width" style="position: relative;">
-                    <span id="download-slot-button-normal" style="position: relative" data-i18n>Download Slot // Slot herunterladen</span>
-                </button>
-                <button id="download-allslots-button" onclick="tabSlot.downloadAllSlots()" class="u-full-width" style="position: relative;">
-                    <span id="download-allslots-button-normal" style="position: relative" data-i18n>Download all Slots // Alle Slots herunterladen</span>
-                </button>
-            </div>
-            
-            <div class="row">
-                <label for="selectSlotUpload" data-i18n>Upload Slot(s) // Slot(s) hochladen</label>
-                <div data-i18n class="u-full-width">
-					<input type=file id="selectSlotUpload" accept=".set">
-				</div>
-                <div data-i18n class="u-full-width">
-                    <input id="uploadSlotLabelEn"  oninput="tabSlot.uploadSlotLabelChanged(this)" type="text" class="u-full-width" placeholder="insert name for new slot" maxlength="15"/>
-                    <input id="uploadSlotLabelDe"  oninput="tabSlot.uploadSlotLabelChanged(this)" type="text" class="u-full-width" placeholder="Name für neuen Slot eingeben" maxlength="15"/>
-                </div>
-                <button id="upload-slot-button" disabled onclick="tabSlot.uploadSlot()" class="u-full-width" style="position: relative;">
-                    <span id="upload-slot-button-normal" style="position: relative" data-i18n>Upload Slot(s) // Slot(s) hochladen</span>
-                </button>
-            </div>
-
-            <br/>
-            <div class="row">
-                <label for="reset-slot-button" data-i18n>Reset to default configuration // Rücksetzen auf Defaulteinstellungen</label>
-                <button id="reset-slot-button" onclick="tabSlot.resetConfig(['#reset-slot-button-normal', '#reset-slot-button-saving'], '#reset-slot-value-bar')" class="u-full-width" style="position: relative;">
-                    <i id="reset-slot-value-bar" class="value-bar color-lightercyan" style="width: 0%;"></i>
-                    <span id="reset-slot-button-normal" style="position: relative" data-i18n>Reset // Zurücksetzen</span>
-                    <span id="reset-slot-button-saving" style="display: none" data-i18n>Resetting... // Wird zurückgesetzt...</span>
-                </button>
-            </div>
-        </section>
         <section aria-labelledby="tabActionsHeader" class="tabs-pane d-none" id="tabActions">
             <div tabindex="-1">
                 <h2 id="tabActionsHeader" style="display: none" aria-hidden="false" data-i18n>Tab 4 - FLipMouse Action configuration // Tab 4 - FLipMouse Konfiguration Aktionen</h2>
@@ -416,10 +334,11 @@
     import {TabVisualization} from "./js_fm/views/TabVisualization.js";
     import {TabBasic} from "./js_fm/views/TabBasic.js";
     import {TabSipPuff} from "./js_fm/views/TabSipPuff.js";
+    import {TabSlots} from "./js_fm/views/TabSlots.js";
 
     router.addView('#tabBasic', TabBasic);
     router.addView('#tabPuff', TabSipPuff);
-    router.addView('#tabSlots', tabSlot);
+    router.addView('#tabSlots', TabSlots);
     router.addView('#tabActions', tabAction);
     router.addView('#tabGlobal', tabGlobal);
     router.addView('#tabVis', TabVisualization);
@@ -452,8 +371,6 @@
         window.flip = new FlipMouse();
         flip.init().then(function (config) {
             L.setVisible('#connectDiv', false);
-            tabSlot.initSlots();
-            tabSlot.initProcesses();
             flip.setSlotChangeHandler((slot, newconfig) => {
                 L('#selectSlots').value = slot;
                 //TODO
