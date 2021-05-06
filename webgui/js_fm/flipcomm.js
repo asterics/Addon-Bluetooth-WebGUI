@@ -429,7 +429,7 @@ function FlipMouse() {
     thiz.restoreDefaultConfiguration = function(progressCallback) {
         thiz.sendATCmd('AT DE'); //delete all slots
         thiz.sendATCmd('AT LA'); //save slot
-        thiz.calibrate();
+        return thiz.calibrate();
     };
 
     thiz.setFlipmouseMode = function (modeConstant, dontSetConfig) {
@@ -584,14 +584,14 @@ function FlipMouse() {
 				ret = ret + C.AT_CMD_BTN_MODE + ' ' + indexFormatted + "\n";
 				ret = ret + config[key] + "\n";
 
-			} else if(key == thiz.FLIPMOUSE_MODE) {
-				ret = ret + atCmd + " " + C.FLIPMOUSE_MODES.indexOf(config[key]) + "\n";
-				//C.FLIPMOUSE_MODES = FLIPMOUSE_MODE_MOUSE
-				//promises.push(thiz.setFlipmouseMode(config[key], true));
-			} else {
-				ret = ret + atCmd + ' ' + config[key] + "\n";
-			}
-		});
+            } else if (key === thiz.FLIPMOUSE_MODE) {
+                ret = ret + atCmd + " " + C.FLIPMOUSE_MODES.indexOf(config[key]) + "\n";
+                //C.FLIPMOUSE_MODES = FLIPMOUSE_MODE_MOUSE
+                //promises.push(thiz.setFlipmouseMode(config[key], true));
+            } else if (atCmd) {
+                ret = ret + atCmd + ' ' + config[key] + "\n";
+            }
+        });
 		
         return ret;
     }
