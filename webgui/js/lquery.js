@@ -231,6 +231,11 @@ window.L.getLang = function () {
  * @return {*}
  */
 window.L.translate = function(translationKey) {
+    if (translationKey.indexOf(' // ') > -1) {
+        let translations = translationKey.split(' // ');
+        return 'en'.toUpperCase() === L.getLang().toUpperCase() ? translations[0] : translations[1];
+    }
+
     var translated = i18n[translationKey] ? i18n[translationKey] : translationKey;
     for(var i=1; i<arguments.length; i++) {
         translated = translated.replace('{?}', arguments[i]);
@@ -270,3 +275,15 @@ window.L.loadScript = function (source, fallbackSource) {
         document.head.appendChild(script);
     });
 };
+
+//THX: https://phpcoder.tech/wp-content/cache/all/create-dynamically-generated-text-file-and-download-using-javascript/index.html
+L.downloadasTextFile = function (filename, text) {
+    let element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+}
