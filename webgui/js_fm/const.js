@@ -133,11 +133,122 @@ C.BTN_MODE_SIP = 'BTN_MODE_SIP';
 C.BTN_MODE_STRONG_SIP = 'BTN_MODE_STRONG_SIP';
 C.BTN_MODE_PUFF = 'BTN_MODE_PUFF';
 C.BTN_MODE_STRONG_PUFF = 'BTN_MODE_STRONG_PUFF';
+C.BTN_MODE_STRONG_SIP_UP = 'BTN_MODE_STRONG_SIP_UP';
+C.BTN_MODE_STRONG_SIP_DOWN = 'BTN_MODE_STRONG_SIP_DOWN';
+C.BTN_MODE_STRONG_SIP_LEFT = 'BTN_MODE_STRONG_SIP_LEFT';
+C.BTN_MODE_STRONG_SIP_RIGHT = 'BTN_MODE_STRONG_SIP_RIGHT';
 C.BTN_MODES = [C.BTN_MODE_BUTTON_1, C.BTN_MODE_BUTTON_2, C.BTN_MODE_BUTTON_3,
     C.BTN_MODE_STICK_UP, C.BTN_MODE_STICK_DOWN, C.BTN_MODE_STICK_LEFT, C.BTN_MODE_STICK_RIGHT,
     C.BTN_MODE_SIP, C.BTN_MODE_STRONG_SIP, C.BTN_MODE_PUFF, C.BTN_MODE_STRONG_PUFF];
 C.BTN_MODES_WITHOUT_STICK = [C.BTN_MODE_BUTTON_1, C.BTN_MODE_BUTTON_2, C.BTN_MODE_BUTTON_3,
     C.BTN_MODE_SIP, C.BTN_MODE_STRONG_SIP, C.BTN_MODE_PUFF, C.BTN_MODE_STRONG_PUFF];
+
+C.BTN_CAT_BTN = 'BTN_CAT_BTN';
+C.BTN_CAT_STICK = 'BTN_CAT_STICK';
+C.BTN_CAT_SIPPUFF = 'BTN_CAT_SIPPUFF';
+C.BTN_CAT_STICKPLUS = 'BTN_CAT_STICKPLUS';
+C.BTN_CATEGORIES = [{
+    constant: C.BTN_CAT_BTN,
+    label: 'Buttons'
+}, {
+    constant: C.BTN_CAT_STICK,
+    label: 'Stick actions // Stick-Aktionen'
+}, {
+    constant: C.BTN_CAT_SIPPUFF,
+    label: 'Sip/Puff // Ansaugen/Pusten'
+}, {
+    constant: C.BTN_CAT_STICKPLUS,
+    label: 'Advanced stick actions // Erweiterte Stick-Aktionen'
+}]
+
+C.BTN_MODES2 = [{
+    constant: C.BTN_MODE_BUTTON_1,
+    index: 1,
+    label: 'Button 1',
+    category: C.BTN_CAT_BTN
+}, {
+    constant: C.BTN_MODE_BUTTON_1,
+    index: 2,
+    label: 'Button 2',
+    category: C.BTN_CAT_BTN
+}, {
+    constant: C.BTN_MODE_BUTTON_1,
+    index: 3,
+    label: 'Button 3',
+    category: C.BTN_CAT_BTN
+}, {
+    constant: C.BTN_MODE_STICK_UP,
+    index: 4,
+    label: 'Stick Up // Stick nach oben',
+    category: C.BTN_CAT_STICK
+}, {
+    constant: C.BTN_MODE_STICK_UP,
+    index: 5,
+    label: 'Stick Down // Stick nach unten',
+    category: C.BTN_CAT_STICK
+}, {
+    constant: C.BTN_MODE_STICK_UP,
+    index: 6,
+    label: 'Stick Left // Stick nach links',
+    category: C.BTN_CAT_STICK
+}, {
+    constant: C.BTN_MODE_STICK_UP,
+    index: 7,
+    label: 'Stick Right // Stick nach rechts',
+    category: C.BTN_CAT_STICK
+}, {
+    constant: C.BTN_MODE_SIP,
+    index: 8,
+    label: 'Sip // Ansaugen',
+    category: C.BTN_CAT_SIPPUFF
+}, {
+    constant: C.BTN_MODE_STRONG_SIP,
+    index: 9,
+    label: 'Strong sip // Stark ansaugen',
+    category: C.BTN_CAT_SIPPUFF
+}, {
+    constant: C.BTN_MODE_STRONG_SIP,
+    index: 10,
+    label: 'Puff // Pusten',
+    category: C.BTN_CAT_SIPPUFF
+}, {
+    constant: C.BTN_MODE_STRONG_SIP,
+    index: 11,
+    label: 'Strong Puff // Stark pusten',
+    category: C.BTN_CAT_SIPPUFF
+}, {
+    index: 12,
+    label: 'Strong Sip + Up // Stark ansaugen + nach oben',
+    category: C.BTN_CAT_STICKPLUS
+}, {
+    index: 13,
+    label: 'Strong Sip + Down // Stark ansaugen + nach unten',
+    category: C.BTN_CAT_STICKPLUS
+}, {
+    index: 14,
+    label: 'Strong Sip + Left // Stark ansaugen + nach links',
+    category: C.BTN_CAT_STICKPLUS
+}, {
+    index: 15,
+    label: 'Strong Sip + Right // Stark ansaugen + nach rechts',
+    category: C.BTN_CAT_STICKPLUS
+}, {
+    index: 16,
+    label: 'Strong Puff + Up // Stark pusten + nach oben',
+    category: C.BTN_CAT_STICKPLUS
+}, {
+    index: 17,
+    label: 'Strong Puff + Down // Stark pusten + nach unten',
+    category: C.BTN_CAT_STICKPLUS
+}, {
+    index: 18,
+    label: 'Strong Puff + Left // Stark pusten + nach links',
+    category: C.BTN_CAT_STICKPLUS
+}, {
+    index: 19,
+    label: 'Strong Puff + Right // Stark pusten + nach rechts',
+    category: C.BTN_CAT_STICKPLUS
+}];
 
 C.LEARN_CAT_KEYBOARD = 'LEARN_CAT_KEYBOARD';
 C.LEARN_CAT_MOUSE = 'LEARN_CAT_MOUSE';
