@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/normal.css">
     <link rel="stylesheet" href="css/skeleton.css">
     <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="css/modal.css">
     <link rel="stylesheet" href="css/slider.css">
     <link rel="stylesheet" href="css/bootstrap-custom.css">
     <link rel="stylesheet" href="css/bootstrap-grid.css">
@@ -34,6 +35,7 @@
     <script type="module" src="js_fm/comp/BtnSipPuffVisualization.js"></script>
     <script type="module" src="js_fm/views/TabVisualization.js"></script>
     <script type="module" src="js_fm/views/TabSlots.js"></script>
+    <script type="module" src="js_fm/views/TabActions.js"></script>
     <script type="module" src="js_fm/stylutil.js"></script>
 </head>
 <body>
@@ -82,7 +84,7 @@
         <div id="viewContainer">
 
         </div>
-        <section aria-labelledby="tabActionsHeader" class="tabs-pane d-none" id="tabActions">
+        <section aria-labelledby="tabActionsHeader" class="tabs-pane d-none" id="tabActions" style="display: none">
             <div tabindex="-1">
                 <h2 id="tabActionsHeader" style="display: none" aria-hidden="false" data-i18n>Tab 4 - FLipMouse Action configuration // Tab 4 - FLipMouse Konfiguration Aktionen</h2>
             </div>
@@ -335,11 +337,12 @@
     import {TabBasic} from "./js_fm/views/TabBasic.js";
     import {TabSipPuff} from "./js_fm/views/TabSipPuff.js";
     import {TabSlots} from "./js_fm/views/TabSlots.js";
+    import {TabActions} from "./js_fm/views/TabActions.js";
 
     router.addView('#tabBasic', TabBasic);
     router.addView('#tabPuff', TabSipPuff);
     router.addView('#tabSlots', TabSlots);
-    router.addView('#tabActions', tabAction);
+    router.addView('#tabActions', TabActions);
     router.addView('#tabGlobal', tabGlobal);
     router.addView('#tabVis', TabVisualization);
 </script>
