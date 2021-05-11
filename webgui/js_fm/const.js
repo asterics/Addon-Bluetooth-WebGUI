@@ -12,38 +12,55 @@ C.LIVE_VALUE_CONSTANT = 'VALUES:';
 
 C.MAX_LENGTH_ATCMD = 400;
 C.LENGTH_ATCMD_PREFIX = 6; //with space (e.g. "AT KW ")
-C.AT_CMD_KEYPRESS = 'AT KP';
 C.AT_CMD_WRITEWORD = 'AT KW';
+C.AT_CMD_KEYPRESS = 'AT KP';
+C.AT_CMD_KEYHOLD = 'AT KH';
+C.AT_CMD_KEYTOGGLE = 'AT KT';
+C.AT_CMD_KEYRELEASE = 'AT KR';
+C.AT_CMD_KEYRELEASEALL = 'AT RA';
 C.AT_CMD_BTN_MODE = 'AT BM';
 
 C.AT_CMD_CLICK_MOUSE_L = 'AT CL';
 C.AT_CMD_CLICK_MOUSE_R = 'AT CR';
 C.AT_CMD_CLICK_MOUSE_M = 'AT CM';
 C.AT_CMD_DOUBLECLICK_MOUSE_L = 'AT CD';
-C.AT_CMD_PRESSHOLD_MOUSE_L = 'AT PL';
-C.AT_CMD_PRESSHOLD_MOUSE_R = 'AT PR';
-C.AT_CMD_PRESSHOLD_MOUSE_M = 'AT PM';
+C.AT_CMD_MOUSE_TOGGLE_L = 'AT TL';
+C.AT_CMD_MOUSE_TOGGLE_R = 'AT TR';
+C.AT_CMD_MOUSE_TOGGLE_M = 'AT TM';
+C.AT_CMD_HOLD_MOUSE_L = 'AT HL';
+C.AT_CMD_HOLD_MOUSE_R = 'AT HR';
+C.AT_CMD_HOLD_MOUSE_M = 'AT HM';
 C.AT_CMD_RELEASE_MOUSE_L = 'AT RL';
 C.AT_CMD_RELEASE_MOUSE_R = 'AT RR';
 C.AT_CMD_RELEASE_MOUSE_M = 'AT RM';
 C.AT_CMD_MOUSEWHEEL_UP = 'AT WU';
 C.AT_CMD_MOUSEWHEEL_DOWN = 'AT WD';
 
-C.AT_CMDS_MOUSE = [C.AT_CMD_CLICK_MOUSE_L, C.AT_CMD_CLICK_MOUSE_R, C.AT_CMD_CLICK_MOUSE_M, C.AT_CMD_DOUBLECLICK_MOUSE_L, C.AT_CMD_PRESSHOLD_MOUSE_L, C.AT_CMD_PRESSHOLD_MOUSE_R, C.AT_CMD_PRESSHOLD_MOUSE_M, C.AT_CMD_RELEASE_MOUSE_L, C.AT_CMD_RELEASE_MOUSE_R, C.AT_CMD_RELEASE_MOUSE_M, C.AT_CMD_MOUSEWHEEL_UP, C.AT_CMD_MOUSEWHEEL_DOWN];
+C.AT_CMDS_MOUSE = [C.AT_CMD_CLICK_MOUSE_L, C.AT_CMD_CLICK_MOUSE_R, C.AT_CMD_CLICK_MOUSE_M, C.AT_CMD_DOUBLECLICK_MOUSE_L, C.AT_CMD_HOLD_MOUSE_L, C.AT_CMD_HOLD_MOUSE_R, C.AT_CMD_HOLD_MOUSE_M, C.AT_CMD_RELEASE_MOUSE_L, C.AT_CMD_RELEASE_MOUSE_R, C.AT_CMD_RELEASE_MOUSE_M, C.AT_CMD_MOUSEWHEEL_UP, C.AT_CMD_MOUSEWHEEL_DOWN];
 
 C.AT_CMD_CALIBRATION = 'AT CA';
 C.AT_CMD_NEXT_SLOT = 'AT NE';
 C.AT_CMD_LOAD_SLOT = 'AT LO';
-C.AT_CMD_PLAY_INFRARED = 'AT IP';
 C.AT_CMD_MAKRO = 'AT MA';
 C.AT_CMD_NO_CMD = 'AT NC';
 C.AT_CMD_UPGRADE_ADDON = 'AT UG';
+
+C.AT_CMD_JOYSTICK_X = 'AT JX';
+C.AT_CMD_JOYSTICK_Y = 'AT JY';
+C.AT_CMD_JOYSTICK_Z = 'AT JZ';
+C.AT_CMD_JOYSTICK_ZTURN = 'AT JT';
+C.AT_CMD_JOYSTICK_SLIDER = 'AT JS';
+C.AT_CMD_JOYSTICK_BUTTON_PRESS = 'AT JP';
+C.AT_CMD_JOYSTICK_BUTTON_RELEASE = 'AT JR';
+C.AT_CMD_JOYSTICK_HAT_POS = 'AT JH';
 
 C.AT_CMD_MQTT_PUBLISH = 'AT MQ';
 C.AT_CMD_REST = 'AT RE';
 
 C.AT_CMD_IR_RECORD = 'AT IR';
 C.AT_CMD_IR_PLAY = 'AT IP';
+C.AT_CMD_IR_HOLD = 'AT IH';
+C.AT_CMD_IR_STOP = 'AT IS';
 C.AT_CMD_IR_DELETE = 'AT IC';
 C.AT_CMD_IR_LIST = 'AT IL';
 
@@ -53,6 +70,174 @@ C.AT_CMD_WIFI_NAME = 'AT WH';
 C.AT_CMD_WIFI_PASSWORD = 'AT WP';
 
 C.AT_CMDS_FLIP = [C.AT_CMD_CALIBRATION, C.AT_CMD_NEXT_SLOT, C.AT_CMD_LOAD_SLOT, C.AT_CMD_MQTT_PUBLISH, C.AT_CMD_REST, C.AT_CMD_NO_CMD];
+
+C.AT_CMD_CAT_KEYBOARD = 'AT_CMD_CAT_KEYBOARD';
+C.AT_CMD_CAT_MOUSE = 'AT_CMD_CAT_MOUSE';
+C.AT_CMD_CAT_JOYSTICK = 'AT_CMD_CAT_MOUSE';
+C.AT_CMD_CAT_DEVICE = 'AT_CMD_CAT_DEVICE';
+C.AT_CMD_CAT_IR = 'AT_CMD_CAT_IR';
+C.AT_CMD_CATEGORIES = [{
+    constant: C.AT_CMD_CAT_KEYBOARD,
+    label: 'Keyboard // Tastatur'
+}, {
+    constant: C.AT_CMD_CAT_MOUSE,
+    label: 'Mouse // Maus'
+}, {
+    constant: C.AT_CMD_CAT_JOYSTICK,
+    label: 'Joystick'
+}, {
+    constant: C.AT_CMD_CAT_DEVICE,
+    label: 'Device // Gerät'
+}, {
+    constant: C.AT_CMD_CAT_IR,
+    label: 'Infrared // Infrarot'
+}];
+
+C.AT_CMDS_ACTIONS = [{
+    cmd: C.AT_CMD_CLICK_MOUSE_L,
+    label: 'Click left mouse button // Klick linke Maustaste',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_CLICK_MOUSE_R,
+    label: 'Click right mouse button // Klick rechte Maustaste',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_CLICK_MOUSE_M,
+    label: 'Click middle mouse button (wheel) // Klick mittlere Maustaste (Mausrad)',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_DOUBLECLICK_MOUSE_L,
+    label: 'Double click left mouse button // Doppelklick linke Maustaste',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_MOUSE_TOGGLE_L,
+    label: 'Press or release left mouse button (toggle) // Drücken oder Loslassen linke Maustaste (wechseln)',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_MOUSE_TOGGLE_R,
+    label: 'Press or release right mouse button (toggle) // Drücken oder Loslassen rechte Maustaste (wechseln)',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_MOUSE_TOGGLE_M,
+    label: 'Press or release middle mouse button (toggle) // Drücken oder Loslassen mittlere Maustaste (wechseln)',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_HOLD_MOUSE_L,
+    label: 'Hold left mouse button // Linke Maustaste halten',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_HOLD_MOUSE_R,
+    label: 'Hold right mouse button // Rechte Maustaste halten',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_HOLD_MOUSE_M,
+    label: 'Hold middle mouse button // Mittlere Maustaste halten',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_RELEASE_MOUSE_L,
+    label: 'Release left mouse button // Linke Maustaste loslassen',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_RELEASE_MOUSE_R,
+    label: 'Release right mouse button // Rechte Maustaste loslassen',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_RELEASE_MOUSE_M,
+    label: 'Release middle mouse button // Mittlere Maustaste loslassen',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_MOUSEWHEEL_UP,
+    label: 'Mouse wheel up // Mausrad nach oben',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_MOUSEWHEEL_DOWN,
+    label: 'Mouse wheel down // Mausrad nach unten',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_WRITEWORD,
+    label: 'Write word // Schreibe Wort',
+    category: C.AT_CMD_CAT_KEYBOARD
+}, {
+    cmd: C.AT_CMD_KEYPRESS,
+    label: 'Press key(s) // Taste(n) drücken',
+    category: C.AT_CMD_CAT_KEYBOARD
+}, {
+    cmd: C.AT_CMD_KEYHOLD,
+    label: 'Hold key(s) // Taste(n) halten',
+    category: C.AT_CMD_CAT_KEYBOARD
+},  {
+    cmd: C.AT_CMD_KEYTOGGLE,
+    label: 'Press or release key(s) (toggle) // Taste(n) drücken oder auslassen (wechseln)',
+    category: C.AT_CMD_CAT_KEYBOARD
+}, {
+    cmd: C.AT_CMD_KEYRELEASE,
+    label: 'Release specific key(s) // Spezifische Taste(n) auslassen',
+    category: C.AT_CMD_CAT_KEYBOARD
+}, {
+    cmd: C.AT_CMD_KEYRELEASEALL,
+    label: 'Release all key(s) // Alle Taste(n) auslassen',
+    category: C.AT_CMD_CAT_KEYBOARD
+}, {
+    cmd: C.AT_CMD_LOAD_SLOT,
+    label: 'Load slot by name // Slot per Name laden',
+    category: C.AT_CMD_CAT_DEVICE
+}, {
+    cmd: C.AT_CMD_NEXT_SLOT,
+    label: 'Load next slot // Nächsten Slot laden',
+    category: C.AT_CMD_CAT_DEVICE
+}, {
+    cmd: C.AT_CMD_NO_CMD,
+    label: 'No command // Keine Funktion',
+    category: C.AT_CMD_CAT_DEVICE
+}, {
+    cmd: C.AT_CMD_CALIBRATION,
+    label: 'Calibrate stick middle position // Stick-Mittelposition kalibrieren',
+    category: C.AT_CMD_CAT_DEVICE
+}, {
+    cmd: C.AT_CMD_IR_PLAY,
+    label: 'Play infrared command // Infrarot-Kommando abspielen',
+    category: C.AT_CMD_CAT_IR
+}, {
+    cmd: C.AT_CMD_IR_HOLD,
+    label: 'Hold infrared command // Infrarot-Kommando halten',
+    category: C.AT_CMD_CAT_IR
+}, {
+    cmd: C.AT_CMD_IR_STOP,
+    label: 'Stop infrared command // Infrarot-Kommando stoppen',
+    category: C.AT_CMD_CAT_IR
+}, {
+    cmd: C.AT_CMD_JOYSTICK_X,
+    label: 'Joystick set x-axis // Joystick x-Achse setzen',
+    category: C.AT_CMD_CAT_JOYSTICK
+}, {
+    cmd: C.AT_CMD_JOYSTICK_Y,
+    label: 'Joystick set y-axis // Joystick y-Achse setzen',
+    category: C.AT_CMD_CAT_JOYSTICK
+}, {
+    cmd: C.AT_CMD_JOYSTICK_Z,
+    label: 'Joystick set z-axis // Joystick z-Achse setzen',
+    category: C.AT_CMD_CAT_JOYSTICK
+}, {
+    cmd: C.AT_CMD_JOYSTICK_ZTURN,
+    label: 'Joystick set z-turn // Joystick z-Drehung setzen',
+    category: C.AT_CMD_CAT_JOYSTICK
+}, {
+    cmd: C.AT_CMD_JOYSTICK_SLIDER,
+    label: 'Joystick set slider // Joystick Regler setzen',
+    category: C.AT_CMD_CAT_JOYSTICK
+}, {
+    cmd: C.AT_CMD_JOYSTICK_BUTTON_PRESS,
+    label: 'Press joystick button // Joystick-Button drücken',
+    category: C.AT_CMD_CAT_JOYSTICK
+}, {
+    cmd: C.AT_CMD_JOYSTICK_BUTTON_RELEASE,
+    label: 'Release joystick button // Joystick-Button auslassen',
+    category: C.AT_CMD_CAT_JOYSTICK
+}, {
+    cmd: C.AT_CMD_JOYSTICK_HAT_POS,
+    label: 'Set hat switch position // Joystick Rundblickschalter-Position setzen',
+    category: C.AT_CMD_CAT_JOYSTICK
+}];
 
 C.ADDITIONAL_FIELD_TEXT = 'ADDITIONAL_FIELD_TEXT';
 C.ADDITIONAL_FIELD_SELECT = 'ADDITIONAL_FIELD_SELECT';
