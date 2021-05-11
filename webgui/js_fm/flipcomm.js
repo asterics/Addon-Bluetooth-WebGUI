@@ -337,6 +337,10 @@ function FlipMouse() {
         return _config[slot] ? _config[slot][constant] : null;
     };
 
+    thiz.getAllSlotConfigs = function () {
+        return JSON.parse(JSON.stringify(_config));
+    };
+
     thiz.isConfigUnsaved = function (constant, slot) {
         slot = slot || _currentSlot;
         return _unsavedConfig[slot] ? _unsavedConfig[slot].indexOf(constant) > -1 : false;
