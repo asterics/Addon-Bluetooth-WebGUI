@@ -1,6 +1,8 @@
 import { h, Component, render } from '../../js/preact.min.js';
 import htm from '../../js/htm.min.js';
 import {ActionEditModal} from "../modals/ActionEditModal.js";
+import {RadioFieldset} from "../comp/RadioFieldset.js";
+
 
 const html = htm.bind(h);
 class TabActions extends Component {
@@ -34,14 +36,13 @@ class TabActions extends Component {
         } else {
             L.removeClass('body', 'modal-open');
         }
+        let categoryElements = C.BTN_CATEGORIES.map(cat => {return {value: cat.constant, label: cat.label}});
+        categoryElements = [{value: null, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
 
         return html`<div id="tabActions">
              <h2 data-i18n="">Action configuration // Konfiguration Aktionen</h2>
              <div class="d-md-none filter-buttons mb-3">
-                <h3>Filter</h3>
-                <div data-i18n="">Show categories: // Zeige Kategorien:</div>
-                ${C.BTN_CATEGORIES.map(category => html`<button data-i18n="" onclick="${() => this.setState({showCategory: category.constant})}" disabled="${state.showCategory === category.constant ? 'disabled' : ''}">${category.label}</button>`)}
-                <button data-i18n="" onclick="${() => this.setState({showCategory: null})}" disabled="${!state.showCategory ? 'disabled' : ''}">All categories // Alle Kategorien</button>
+                ${html`<${RadioFieldset} legend="Show categories: // Zeige Kategorien:" onchange="${(value) => this.setState({showCategory: value})}" elements="${categoryElements}" value="${state.showCategory}"/>`}
              </div>
              
              <ul>
@@ -75,7 +76,7 @@ TabActions.destroy = function () {
 }
 
 TabActions.style = html`<style>
-    #tabActions .filter-buttons button {
+    #tabActions .filter-buttons .button {
         display: inline-block;
         padding: 0 5px !important;
         line-height: unset;

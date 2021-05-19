@@ -1,6 +1,7 @@
 import { h, Component, render } from '../../js/preact.min.js';
 import htm from '../../js/htm.min.js';
 import {InputKeyboard} from "../comp/InputKeyboard.js";
+import {RadioFieldset} from "../comp/RadioFieldset.js";
 
 const html = htm.bind(h);
 class ActionEditModal extends Component {
@@ -39,7 +40,6 @@ class ActionEditModal extends Component {
     }
 
     setAtCmdSuffix(suffix) {
-        log.warn(suffix)
         this.setState({
             atCmdSuffix: suffix
         })
@@ -52,6 +52,8 @@ class ActionEditModal extends Component {
     render(props) {
         let state = this.state;
         let btnMode = props.buttonMode;
+        let categoryElements = C.AT_CMD_CATEGORIES.map(cat => {return {value: cat.constant, label: cat.label}});
+        categoryElements = [{value: null, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
 
         return html`
             <div class="modal-mask">
@@ -67,9 +69,7 @@ class ActionEditModal extends Component {
     
                         <div class="modal-body container-fluid">
                             <div class="filter-buttons mb-4">
-                                <div data-i18n="">Show action categories: // Zeige Aktions-Kategorien:</div>
-                                ${C.AT_CMD_CATEGORIES.map(category => html`<button data-i18n="" onclick="${() => this.selectActionCategory(category.constant)}" disabled="${state.showCategory === category.constant ? 'disabled' : ''}">${category.label}</button>`)}
-                                <button data-i18n="" onclick="${() => this.selectActionCategory(null)}" disabled="${!state.showCategory ? 'disabled' : ''}">All categories // Alle Kategorien</button>
+                                ${html`<${RadioFieldset} legend="Show action categories: // Zeige Aktions-Kategorien:" onchange="${(value) => this.selectActionCategory(value)}" elements="${categoryElements}" value="${state.showCategory}"/>`}
                             </div>
                             <div class="row">
                                 <label for="actionSelect" class="col-md-4" data-i18n="">Selection action // Aktion auswählen</label>

@@ -1,0 +1,25 @@
+import { h, Component } from '../../js/preact.min.js';
+import htm from '../../js/htm.min.js';
+const html = htm.bind(h);
+
+class RadioFieldset extends Component {
+    render(props) {
+        props.onchange = props.onchange || (() => {});
+        props.legend = props.legend || '';
+        props.elements = props.elements || []; // objects with value and label property
+        props.value = props.value || null;
+        props.name = props.name || props.elements[0].value + props.elements[1].value;
+        return html`
+            <fieldset role="radiogroup" onchange="${(event) => props.onchange(event.target.value)}">
+                <legend>${L.translate(props.legend)}</legend>
+                ${props.elements.map(el => html`
+                    <div class="d-inline">
+                        <input id="${props.name + '_' + el.value}" value="${el.value}" checked="${el.value === props.value}" name="${props.name}" type="radio" class="custom-radio"/>
+                        <label for="${props.name + '_' + el.value}" class="button btnTransparent">${L.translate(el.label)}</label>
+                    </div>
+                `)}
+            </fieldset>`;
+    }
+}
+
+export {RadioFieldset};
