@@ -73,7 +73,7 @@ C.AT_CMDS_FLIP = [C.AT_CMD_CALIBRATION, C.AT_CMD_NEXT_SLOT, C.AT_CMD_LOAD_SLOT, 
 
 C.AT_CMD_CAT_KEYBOARD = 'AT_CMD_CAT_KEYBOARD';
 C.AT_CMD_CAT_MOUSE = 'AT_CMD_CAT_MOUSE';
-C.AT_CMD_CAT_JOYSTICK = 'AT_CMD_CAT_MOUSE';
+C.AT_CMD_CAT_JOYSTICK = 'AT_CMD_CAT_JOYSTICK';
 C.AT_CMD_CAT_DEVICE = 'AT_CMD_CAT_DEVICE';
 C.AT_CMD_CAT_IR = 'AT_CMD_CAT_IR';
 C.AT_CMD_CATEGORIES = [{
@@ -93,7 +93,24 @@ C.AT_CMD_CATEGORIES = [{
     label: 'Infrared // Infrarot'
 }];
 
+C.INPUTFIELD_TYPE_KEYBOARD = 'INPUTFIELD_TYPE_KEYBOARD';
+C.INPUTFIELD_TYPE_TEXT = 'INPUTFIELD_TYPE_TEXT';
+C.INPUTFIELD_TYPE_NUMBER = 'INPUTFIELD_TYPE_NUMBER';
+C.INPUTFIELD_TYPE_SELECT = 'INPUTFIELD_TYPE_SELECT';
+
 C.AT_CMDS_ACTIONS = [{
+    cmd: C.AT_CMD_HOLD_MOUSE_L,
+    label: 'Hold left mouse button (as long as input action) // Linke Maustaste halten (für Dauer der Eingabe-Aktion)',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_HOLD_MOUSE_R,
+    label: 'Hold right mouse button (as long as input action) // Rechte Maustaste halten (für Dauer der Eingabe-Aktion)',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_HOLD_MOUSE_M,
+    label: 'Hold middle mouse button (as long as input action) // Mittlere Maustaste halten (für Dauer der Eingabe-Aktion)',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
     cmd: C.AT_CMD_CLICK_MOUSE_L,
     label: 'Click left mouse button // Klick linke Maustaste',
     category: C.AT_CMD_CAT_MOUSE
@@ -122,18 +139,6 @@ C.AT_CMDS_ACTIONS = [{
     label: 'Press or release middle mouse button (toggle) // Drücken oder Loslassen mittlere Maustaste (wechseln)',
     category: C.AT_CMD_CAT_MOUSE
 }, {
-    cmd: C.AT_CMD_HOLD_MOUSE_L,
-    label: 'Hold left mouse button // Linke Maustaste halten',
-    category: C.AT_CMD_CAT_MOUSE
-}, {
-    cmd: C.AT_CMD_HOLD_MOUSE_R,
-    label: 'Hold right mouse button // Rechte Maustaste halten',
-    category: C.AT_CMD_CAT_MOUSE
-}, {
-    cmd: C.AT_CMD_HOLD_MOUSE_M,
-    label: 'Hold middle mouse button // Mittlere Maustaste halten',
-    category: C.AT_CMD_CAT_MOUSE
-}, {
     cmd: C.AT_CMD_RELEASE_MOUSE_L,
     label: 'Release left mouse button // Linke Maustaste loslassen',
     category: C.AT_CMD_CAT_MOUSE
@@ -154,53 +159,61 @@ C.AT_CMDS_ACTIONS = [{
     label: 'Mouse wheel down // Mausrad nach unten',
     category: C.AT_CMD_CAT_MOUSE
 }, {
-    cmd: C.AT_CMD_WRITEWORD,
-    label: 'Write word // Schreibe Wort',
-    category: C.AT_CMD_CAT_KEYBOARD
+    cmd: C.AT_CMD_KEYHOLD,
+    label: 'Hold key(s) (as long as input action) // Taste(n) halten (für Dauer der Eingabe-Aktion)',
+    category: C.AT_CMD_CAT_KEYBOARD,
+    input: C.INPUTFIELD_TYPE_KEYBOARD
 }, {
     cmd: C.AT_CMD_KEYPRESS,
-    label: 'Press key(s) // Taste(n) drücken',
-    category: C.AT_CMD_CAT_KEYBOARD
+    label: 'Press key(s) + release automatically // Taste(n) drücken + wieder loslassen',
+    category: C.AT_CMD_CAT_KEYBOARD,
+    input: C.INPUTFIELD_TYPE_KEYBOARD
 }, {
-    cmd: C.AT_CMD_KEYHOLD,
-    label: 'Hold key(s) // Taste(n) halten',
-    category: C.AT_CMD_CAT_KEYBOARD
-},  {
     cmd: C.AT_CMD_KEYTOGGLE,
     label: 'Press or release key(s) (toggle) // Taste(n) drücken oder auslassen (wechseln)',
-    category: C.AT_CMD_CAT_KEYBOARD
+    category: C.AT_CMD_CAT_KEYBOARD,
+    input: C.INPUTFIELD_TYPE_KEYBOARD
+}, {
+    cmd: C.AT_CMD_WRITEWORD,
+    label: 'Write word // Schreibe Wort',
+    category: C.AT_CMD_CAT_KEYBOARD,
+    input: C.INPUTFIELD_TYPE_TEXT
 }, {
     cmd: C.AT_CMD_KEYRELEASE,
     label: 'Release specific key(s) // Spezifische Taste(n) auslassen',
-    category: C.AT_CMD_CAT_KEYBOARD
+    category: C.AT_CMD_CAT_KEYBOARD,
+    input: C.INPUTFIELD_TYPE_KEYBOARD
 }, {
     cmd: C.AT_CMD_KEYRELEASEALL,
     label: 'Release all key(s) // Alle Taste(n) auslassen',
     category: C.AT_CMD_CAT_KEYBOARD
 }, {
-    cmd: C.AT_CMD_LOAD_SLOT,
-    label: 'Load slot by name // Slot per Name laden',
-    category: C.AT_CMD_CAT_DEVICE
-}, {
     cmd: C.AT_CMD_NEXT_SLOT,
     label: 'Load next slot // Nächsten Slot laden',
+    category: C.AT_CMD_CAT_DEVICE
+}, {
+    cmd: C.AT_CMD_LOAD_SLOT,
+    label: 'Load slot by name // Slot per Name laden',
+    category: C.AT_CMD_CAT_DEVICE,
+    input: C.INPUTFIELD_TYPE_TEXT
+}, {
+    cmd: C.AT_CMD_CALIBRATION,
+    label: 'Calibrate stick middle position // Stick-Mittelposition kalibrieren',
     category: C.AT_CMD_CAT_DEVICE
 }, {
     cmd: C.AT_CMD_NO_CMD,
     label: 'No command // Keine Funktion',
     category: C.AT_CMD_CAT_DEVICE
 }, {
-    cmd: C.AT_CMD_CALIBRATION,
-    label: 'Calibrate stick middle position // Stick-Mittelposition kalibrieren',
-    category: C.AT_CMD_CAT_DEVICE
-}, {
     cmd: C.AT_CMD_IR_PLAY,
     label: 'Play infrared command // Infrarot-Kommando abspielen',
-    category: C.AT_CMD_CAT_IR
+    category: C.AT_CMD_CAT_IR,
+    input: C.INPUTFIELD_TYPE_SELECT
 }, {
     cmd: C.AT_CMD_IR_HOLD,
     label: 'Hold infrared command // Infrarot-Kommando halten',
-    category: C.AT_CMD_CAT_IR
+    category: C.AT_CMD_CAT_IR,
+    input: C.INPUTFIELD_TYPE_SELECT
 }, {
     cmd: C.AT_CMD_IR_STOP,
     label: 'Stop infrared command // Infrarot-Kommando stoppen',
@@ -208,35 +221,43 @@ C.AT_CMDS_ACTIONS = [{
 }, {
     cmd: C.AT_CMD_JOYSTICK_X,
     label: 'Joystick set x-axis // Joystick x-Achse setzen',
-    category: C.AT_CMD_CAT_JOYSTICK
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
 }, {
     cmd: C.AT_CMD_JOYSTICK_Y,
     label: 'Joystick set y-axis // Joystick y-Achse setzen',
-    category: C.AT_CMD_CAT_JOYSTICK
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
 }, {
     cmd: C.AT_CMD_JOYSTICK_Z,
     label: 'Joystick set z-axis // Joystick z-Achse setzen',
-    category: C.AT_CMD_CAT_JOYSTICK
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
 }, {
     cmd: C.AT_CMD_JOYSTICK_ZTURN,
     label: 'Joystick set z-turn // Joystick z-Drehung setzen',
-    category: C.AT_CMD_CAT_JOYSTICK
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
 }, {
     cmd: C.AT_CMD_JOYSTICK_SLIDER,
     label: 'Joystick set slider // Joystick Regler setzen',
-    category: C.AT_CMD_CAT_JOYSTICK
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
 }, {
     cmd: C.AT_CMD_JOYSTICK_BUTTON_PRESS,
     label: 'Press joystick button // Joystick-Button drücken',
-    category: C.AT_CMD_CAT_JOYSTICK
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
 }, {
     cmd: C.AT_CMD_JOYSTICK_BUTTON_RELEASE,
     label: 'Release joystick button // Joystick-Button auslassen',
-    category: C.AT_CMD_CAT_JOYSTICK
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
 }, {
     cmd: C.AT_CMD_JOYSTICK_HAT_POS,
     label: 'Set hat switch position // Joystick Rundblickschalter-Position setzen',
-    category: C.AT_CMD_CAT_JOYSTICK
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
 }];
 
 C.ADDITIONAL_FIELD_TEXT = 'ADDITIONAL_FIELD_TEXT';
@@ -254,6 +275,7 @@ C.JS_KEYCODE_BACKSPACE = 8;
 C.JS_KEYCODE_SPACE = 32;
 C.JS_KEYCODE_TAB = 9;
 C.JS_KEYCODE_GUI = 91; //Windows / Mac key
+C.JS_KEYCODE_F5 = 116;
 
 //A-Z
 for (var code = 65; code <= 90; code++) {
@@ -336,11 +358,11 @@ C.BTN_CATEGORIES = [{
     constant: C.BTN_CAT_BTN,
     label: 'Buttons'
 }, {
-    constant: C.BTN_CAT_STICK,
-    label: 'Stick actions // Stick-Aktionen'
-}, {
     constant: C.BTN_CAT_SIPPUFF,
     label: 'Sip/Puff // Ansaugen/Pusten'
+}, {
+    constant: C.BTN_CAT_STICK,
+    label: 'Stick actions // Stick-Aktionen'
 }, {
     constant: C.BTN_CAT_STICKPLUS,
     label: 'Advanced stick actions // Erweiterte Stick-Aktionen'
