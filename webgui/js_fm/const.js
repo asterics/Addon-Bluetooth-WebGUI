@@ -5,6 +5,7 @@ C.GUI_IS_ON_DEVICE = !C.GUI_IS_HOSTED;
 C.GUI_IS_MOCKED_VERSION = window.location.href.indexOf('mock') > -1;
 C.IS_ELECTRON = navigator.userAgent.toLowerCase().indexOf(' electron/') > -1;
 C.ELECTRON_CONFIG_FILENAME = 'FLipMouseGUIConfiguration';
+C.IS_TOUCH_DEVICE = 'ontouchstart' in document.documentElement;
 
 C.ARE_WEBSOCKET_URL = 'ws://' + window.location.hostname + ':8092/ws/astericsData';
 C.FLIP_WEBSOCKET_URL = 'ws://' + window.location.hostname + ':1804/';

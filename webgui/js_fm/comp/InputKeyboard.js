@@ -63,7 +63,7 @@ class InputKeyboard extends Component {
         let state = this.state;
         return html`
             <div class="row">
-                <label for="selectKeys" class="col-md-4" data-i18n="">Add keys manually // Tasten manuell hinzufügen</label>
+                <label for="selectKeys" class="col-md-4" data-i18n="">Add keys // Tasten hinzufügen</label>
                 <div class="col-md-8">
                     <div class="row">
                         <div class="col-9 col-md-8">
@@ -80,7 +80,7 @@ class InputKeyboard extends Component {
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row ${C.IS_TOUCH_DEVICE ? '' : 'd-none'}">
                 <label for="inputKeyboard" class="col-md-4" data-i18n="">Insert keys // Eingabe Tasten</label>
                 <div class="col-md-8">
                     <div class="row">
@@ -92,7 +92,19 @@ class InputKeyboard extends Component {
                         </div>
                     </div>
                 </div>
-                
+            </div>
+            <div class="row ${C.IS_TOUCH_DEVICE ? 'd-none' : ''}">
+                <strong class="col-md-4" data-i18n="">Selected keys // Ausgewählte Tasten</strong>
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-12 col-md-8 mb-3">
+                            <span>${state.currentValue || L.translate('(no keys selected) // (keine Tasten ausgewählt)')}</span>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <button class="col-12" onclick="${() => this.rerenderList([])}">${L.translate('Clear // Löschen')}</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             `;
     }
