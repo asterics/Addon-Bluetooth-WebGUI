@@ -11,7 +11,6 @@ class TabActions extends Component {
         TabActions.instance = this;
         this.state = {
             showCategory: null,
-            showAllSlots: false,
             modalBtnMode: null
         }
     }
@@ -29,10 +28,7 @@ class TabActions extends Component {
         let configs = flip.getAllSlotConfigs();
         configs['slot2'] = configs['mouse'];
         let btnModes = C.BTN_MODES2.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
-        let allSlots = Object.keys(configs);
-        let showSlots = state.showAllSlots ? Object.keys(configs) : [flip.getCurrentSlot()];
         let modalOpen = !!state.modalBtnMode;
-        let showCategories = C.BTN_CATEGORIES.filter(cat => !state.showCategory || cat.constant === state.showCategory);
         if(modalOpen) {
             L.addClass('body', 'modal-open');
         } else {
@@ -41,41 +37,29 @@ class TabActions extends Component {
 
         return html`<div id="tabActions">
              <h2 data-i18n="">Action configuration // Konfiguration Aktionen</h2>
-             <h3>Filter</h3>
-             <div>
-                <div data-i18n="">Show action categories: // Zeige Aktions-Kategorien:</div>
+             <div class="d-md-none filter-buttons mb-3">
+                <h3>Filter</h3>
+                <div data-i18n="">Show categories: // Zeige Kategorien:</div>
                 ${C.BTN_CATEGORIES.map(category => html`<button data-i18n="" onclick="${() => this.setState({showCategory: category.constant})}" disabled="${state.showCategory === category.constant ? 'disabled' : ''}">${category.label}</button>`)}
                 <button data-i18n="" onclick="${() => this.setState({showCategory: null})}" disabled="${!state.showCategory ? 'disabled' : ''}">All categories // Alle Kategorien</button>
              </div>
-             ${(() => {
-                if(allSlots.length > 1) {
-                    return html`
-                        <div>
-                            <div data-i18n="">Show slots: // Zeige Slots:</div>
-                            <button disabled="${state.showAllSlots ? 'disabled' : ''}" onclick="${() => this.setState({showAllSlots: true})}" data-i18n="">All Slots // Alle Slots</button>
-                            <button disabled="${!state.showAllSlots ? 'disabled' : ''}" onclick="${() => this.setState({showAllSlots: false})}" data-i18n="">Only current Slot // Nur aktueller Slot</button>
-                        </div>`;
-                } else return '';
-             })()}
-             ${showCategories.map(category => html`
-                 <h3 class="mt-5">${L.translate(category.label)}</h3>
-                 <ul>
-                    ${btnModes.filter(btnMode => btnMode.category === category.constant).map(btnMode => html`
-                    <li>
-                        <b>${L.translate(btnMode.label)}</b>
-                        ${(() => {
-                            if(showSlots.length === 1) {
-                                return html`: <a href="javascript:;" onclick="${() => this.setState({modalBtnMode: btnMode})}">${L.getReadableATCMD(configs[showSlots[0]][btnMode.constant])}</a>`;
-                            } else {
-                                return html`
-                                    <ul>
-                                        ${showSlots.map(slot => html`<li><span>Slot "${slot}": <a href="javascript:;" onclick="${() => this.setState({modalBtnMode: btnMode})}">${L.getReadableATCMD(configs[slot][btnMode.constant])}</a></span></li>`)}
-                                    </ul>`;
-                            }
-                        })()}
+             
+             <ul>
+                <li class="row d-none d-md-flex" aria-hidden="true" style="font-style: italic">
+                    <span class="col-12 col-md">Bezeichnung</span>
+                    ${Object.keys(configs).map(slot => html`<span class="col-12 col-md">Slot "${slot}"</span>`)}
+                </li>
+                ${btnModes.filter(btnMode => !state.showCategory || btnMode.category === state.showCategory).map((btnMode, index) => html`
+                    <li class="row py-3 py-md-0" style="${index % 2 === 1 ? 'background-color: lightgray' : ''}">
+                        <b class="col-12 col-md">${L.translate(btnMode.label)}</b>
+                        ${Object.keys(configs).map(slot => html`
+                            <span class="col-12 col-md">
+                                <span class="d-md-none">Slot "${slot}": </span>
+                                <a href="javascript:;" title="${L.translate(btnMode.label) + (configs[slot][btnMode.constant] ? ': ' + configs[slot][btnMode.constant] : '')}" onclick="${() => this.setState({modalBtnMode: btnMode})}">${L.getReadableATCMD(configs[slot][btnMode.constant])}</a>
+                            </span>
+                        `)}
                     </li>`)}
-                </ul>`
-            )}
+            </ul>
             ${modalOpen ? html`<${ActionEditModal} buttonMode="${state.modalBtnMode}" closeHandler="${() => this.setState({modalBtnMode: ''})}"/>` : ''}
             ${TabActions.style}
         </div>`;
@@ -91,7 +75,7 @@ TabActions.destroy = function () {
 }
 
 TabActions.style = html`<style>
-    #tabActions button {
+    #tabActions .filter-buttons button {
         display: inline-block;
         padding: 0 5px !important;
         line-height: unset;
