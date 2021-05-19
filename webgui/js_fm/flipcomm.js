@@ -337,6 +337,11 @@ function FlipMouse() {
         return _config[slot] ? _config[slot][constant] : null;
     };
 
+    thiz.getATCmd = function (constant, slot) {
+        let config = thiz.getConfig(constant, slot);
+        return config ? config.substring(0, C.LENGTH_ATCMD_PREFIX).trim() : null;
+    }
+
     thiz.getAllSlotConfigs = function () {
         return JSON.parse(JSON.stringify(_config));
     };
