@@ -337,6 +337,15 @@ function FlipMouse() {
         return _config[slot] ? _config[slot][constant] : null;
     };
 
+    thiz.getATCmd = function (constant, slot) {
+        let config = thiz.getConfig(constant, slot);
+        return config ? config.substring(0, C.LENGTH_ATCMD_PREFIX).trim() : null;
+    }
+
+    thiz.getAllSlotConfigs = function () {
+        return JSON.parse(JSON.stringify(_config));
+    };
+
     thiz.isConfigUnsaved = function (constant, slot) {
         slot = slot || _currentSlot;
         return _unsavedConfig[slot] ? _unsavedConfig[slot].indexOf(constant) > -1 : false;
@@ -429,7 +438,7 @@ function FlipMouse() {
     thiz.restoreDefaultConfiguration = function(progressCallback) {
         thiz.sendATCmd('AT DE'); //delete all slots
         thiz.sendATCmd('AT LA'); //save slot
-        thiz.calibrate();
+        return thiz.calibrate();
     };
 
     thiz.setFlipmouseMode = function (modeConstant, dontSetConfig) {
@@ -584,14 +593,14 @@ function FlipMouse() {
 				ret = ret + C.AT_CMD_BTN_MODE + ' ' + indexFormatted + "\n";
 				ret = ret + config[key] + "\n";
 
-			} else if(key == thiz.FLIPMOUSE_MODE) {
-				ret = ret + atCmd + " " + C.FLIPMOUSE_MODES.indexOf(config[key]) + "\n";
-				//C.FLIPMOUSE_MODES = FLIPMOUSE_MODE_MOUSE
-				//promises.push(thiz.setFlipmouseMode(config[key], true));
-			} else {
-				ret = ret + atCmd + ' ' + config[key] + "\n";
-			}
-		});
+            } else if (key === thiz.FLIPMOUSE_MODE) {
+                ret = ret + atCmd + " " + C.FLIPMOUSE_MODES.indexOf(config[key]) + "\n";
+                //C.FLIPMOUSE_MODES = FLIPMOUSE_MODE_MOUSE
+                //promises.push(thiz.setFlipmouseMode(config[key], true));
+            } else if (atCmd) {
+                ret = ret + atCmd + ' ' + config[key] + "\n";
+            }
+        });
 		
         return ret;
     }
