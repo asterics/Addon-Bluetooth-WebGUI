@@ -7,8 +7,6 @@
     <link rel="shortcut icon" href="favicon_fm.ico" type="image/x-icon">
     <link rel="icon" href="favicon_fm.ico" type="image/x-icon">
 
-    <link rel="stylesheet" href="css/bootstrap-custom.css">
-    <link rel="stylesheet" href="css/bootstrap-grid.css">
     <script src="lib/domi18n.js"></script>
     <script src="lib/loglevel.min.js"></script>
 
@@ -21,7 +19,11 @@
 <div id="connectDiv">
     <div id="connectContent">
         <h1>FLipMouse Test</h1>
-        <button onclick="start()">Start Test</button>
+        <button onclick="initAndStart(doAllTests)">Start All Tests</button>
+        <br/>
+        <br/>
+        <div>Start single test:</div>
+        <div id="singleTests"></div>
     </div>
     <h2>Log</h2>
     <button onclick="document.getElementById('log').innerHTML = ''">Clear Log</button>
@@ -31,23 +33,46 @@
 </div>
 
 <script>
-
-    let PRINT_DEBUG = true;
-    let DEFAULT_CONFIG = "{\"mouse\":{\"SLOT_ID\":0,\"SENSITIVITY_X\":38,\"SENSITIVITY_Y\":38,\"DEADZONE_X\":22,\"DEADZONE_Y\":22,\"MAX_SPEED\":50,\"ACCELERATION\":20,\"SIP_THRESHOLD\":444,\"PUFF_THRESHOLD\":596,\"PUFF_STRONG_THRESHOLD\":611,\"SIP_STRONG_THRESHOLD\":399,\"FLIPMOUSE_MODE\":\"MODE_MOUSE\",\"ORIENTATION_ANGLE\":270,\"BTN_MODE_BUTTON_1\":\"AT NE\",\"BTN_MODE_BUTTON_2\":\"AT KW asdf\",\"BTN_MODE_BUTTON_3\":\"AT NC\",\"BTN_MODE_STICK_UP\":\"AT KP KEY_UP\",\"BTN_MODE_STICK_DOWN\":\"AT KP KEY_DOWN\",\"BTN_MODE_STICK_LEFT\":\"AT KP KEY_LEFT\",\"BTN_MODE_STICK_RIGHT\":\"AT KP KEY_RIGHT\",\"BTN_MODE_SIP\":\"AT HL\",\"BTN_MODE_STRONG_SIP\":\"AT NC\",\"BTN_MODE_PUFF\":\"AT CR\",\"BTN_MODE_STRONG_PUFF\":\"AT CA\"}}";
+    let PRINT_DEBUG = false;
+    let DEFAULT_CONFIG = "{\"mouse\":{\"SLOT_ID\":0,\"SENSITIVITY_X\":40,\"SENSITIVITY_Y\":40,\"DEADZONE_X\":20,\"DEADZONE_Y\":20,\"MAX_SPEED\":50,\"ACCELERATION\":20,\"SIP_THRESHOLD\":400,\"PUFF_THRESHOLD\":600,\"PUFF_STRONG_THRESHOLD\":800,\"SIP_STRONG_THRESHOLD\":10,\"FLIPMOUSE_MODE\":\"MODE_MOUSE\",\"ORIENTATION_ANGLE\":0,\"BTN_MODE_BUTTON_1\":\"AT NE\",\"BTN_MODE_BUTTON_2\":\"AT NC\",\"BTN_MODE_BUTTON_3\":\"AT NC\",\"BTN_MODE_STICK_UP\":\"AT KP KEY_UP\",\"BTN_MODE_STICK_DOWN\":\"AT KP KEY_DOWN\",\"BTN_MODE_STICK_LEFT\":\"AT KP KEY_LEFT\",\"BTN_MODE_STICK_RIGHT\":\"AT KP KEY_RIGHT\",\"BTN_MODE_SIP\":\"AT HL\",\"BTN_MODE_STRONG_SIP\":\"AT NC\",\"BTN_MODE_PUFF\":\"AT CR\",\"BTN_MODE_STRONG_PUFF\":\"AT CA\"}}";
     let DEFAULT_SLOTNAME = "mouse";
     let DEFAULT_SLOT = JSON.parse(DEFAULT_CONFIG)[DEFAULT_SLOTNAME];
     let assertFails = 0;
     let assertSuccess = 0;
+    let isTesting = false;
 
-    async function doAllTests() {
-        //await doTest(testDefaultConfig, 'testDefaultConfig');
-        //await doTest(testChangeValueDeadzone, 'testChangeValueDeadzone');
-        //await doTest(testSecondSlot, 'testSecondSlot');
-        await doTest(testChangeSlotLength, 'testChangeSlotLength');
-    }
+    /////////////////////////
+    // test cases
+    /////////////////////////
+    let tests = [{
+        fn: testDefaultConfig,
+        name: 'testDefaultConfig'
+    }, {
+        fn: testChangeValueDeadzone,
+        name: 'testChangeValueDeadzone'
+    }, {
+        fn: testSecondSlot,
+        name: 'testSecondSlot'
+    }, {
+        fn: testIncreaseSlotLength,
+        name: 'testIncreaseSlotLength'
+    }, {
+        fn: testDecreaseSlotLength,
+        name: 'testDecreaseSlotLength'
+    }, {
+        fn: testDeleteSlot,
+        name: 'testDeleteSlot'
+    }, {
+        fn: addDelete5Slots,
+        name: 'addDelete5Slots'
+    }, {
+        fn: differentValuesInSlots,
+        name: 'differentValuesInSlots'
+    }];
 
     async function testDefaultConfig() {
         let config = flip.getAllSlotConfigs();
+        log.info(config);
         assertEqual(config, DEFAULT_CONFIG);
     }
 
@@ -59,15 +84,15 @@
     }
 
     async function testSecondSlot() {
-        await flip.sendATCmd('AT SA slot2');
+        await flip.sendAtCmdWithResult('AT SA slot2');
         await flip.refreshConfig();
         let allSlots = flip.getAllSlotConfigs();
         assertEqual(allSlots[DEFAULT_SLOTNAME], DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
         assertEqual(allSlots['slot2'], DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
     }
 
-    async function testChangeSlotLength() {
-        await flip.sendATCmd('AT SA slot2');
+    async function testIncreaseSlotLength() {
+        await flip.sendAtCmdWithResult('AT SA slot2');
         await flip.sendATCmd('AT LO', DEFAULT_SLOTNAME);
         await flip.setButtonAction(C.BTN_MODE_BUTTON_1, 'AT KW 123'); // button mode for Slot mouse
         await flip.sendATCmd('AT SA', DEFAULT_SLOTNAME);
@@ -78,32 +103,129 @@
         assertEqual(slot2, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
         assertEqual(flip.getConfig(C.BTN_MODE_BUTTON_1), 'AT KW 123');
         await flip.setButtonAction(C.BTN_MODE_BUTTON_1, 'AT KW 12345'); // button mode for Slot mouse
-        await flip.sendATCmd('AT SA', DEFAULT_SLOTNAME);
+        await flip.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
         await flip.refreshConfig();
         assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID, C.BTN_MODE_BUTTON_1]});
         assertEqual(slot2, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
         assertEqual(flip.getConfig(C.BTN_MODE_BUTTON_1), 'AT KW 12345');
     }
 
-    function start() {
-        if (window.flip) {
-            return doAllTests();
-        }
-        window.flip = new FlipMouse();
-        flip.init().then(function () {
-            doAllTests();
-        });
+    async function testDecreaseSlotLength() {
+        await flip.sendAtCmdWithResult('AT SA slot2');
+        await flip.sendATCmd('AT LO', DEFAULT_SLOTNAME);
+        await flip.setButtonAction(C.BTN_MODE_BUTTON_1, 'AT KW 1234567890'); // button mode for Slot mouse
+        await flip.sendATCmd('AT SA', DEFAULT_SLOTNAME);
+        await flip.refreshConfig();
+        let slot2 = flip.getAllSlotConfigs()['slot2'];
+        let slotMouse = flip.getAllSlotConfigs()[DEFAULT_SLOTNAME];
+        assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID, C.BTN_MODE_BUTTON_1]});
+        assertEqual(slot2, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
+        assertEqual(flip.getConfig(C.BTN_MODE_BUTTON_1), 'AT KW 1234567890');
+        await flip.setButtonAction(C.BTN_MODE_BUTTON_1, 'AT KW 123'); // button mode for Slot mouse
+        await flip.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
+        await flip.refreshConfig();
+        assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID, C.BTN_MODE_BUTTON_1]});
+        assertEqual(slot2, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
+        assertEqual(flip.getConfig(C.BTN_MODE_BUTTON_1), 'AT KW 123');
     }
+
+    async function testDeleteSlot() {
+        await flip.sendAtCmdWithResult('AT SA newSlot');
+        await flip.refreshConfig();
+        assertTrue(flip.getSlots().includes(DEFAULT_SLOTNAME));
+        assertTrue(flip.getSlots().includes('newSlot'));
+        await flip.sendAtCmdWithResult('AT DE newSlot');
+        await flip.refreshConfig();
+        assertTrue(flip.getSlots().includes(DEFAULT_SLOTNAME));
+        assertFalse(flip.getSlots().includes('newSlot'));
+    }
+
+    async function addDelete5Slots() {
+        await flip.sendAtCmdWithResult('AT SA slot1');
+        await flip.sendAtCmdWithResult('AT SA slot2');
+        await flip.sendAtCmdWithResult('AT SA slot3');
+        await flip.sendAtCmdWithResult('AT SA slot4');
+        await flip.sendAtCmdWithResult('AT SA slot5');
+        await flip.refreshConfig();
+        assertTrue(flip.getSlots().includes(DEFAULT_SLOTNAME));
+        assertTrue(flip.getSlots().includes('slot1'));
+        assertTrue(flip.getSlots().includes('slot2'));
+        assertTrue(flip.getSlots().includes('slot3'));
+        assertTrue(flip.getSlots().includes('slot4'));
+        assertTrue(flip.getSlots().includes('slot5'));
+        await flip.sendAtCmdWithResult('AT DE slot1');
+        await flip.sendAtCmdWithResult('AT DE slot2');
+        await flip.sendAtCmdWithResult('AT DE slot3');
+        await flip.sendAtCmdWithResult('AT DE slot4');
+        await flip.sendAtCmdWithResult('AT DE slot5');
+        await flip.refreshConfig();
+        assertTrue(flip.getSlots().includes(DEFAULT_SLOTNAME));
+        assertEqual(flip.getSlots().length, 1);
+    }
+
+    async function differentValuesInSlots() {
+        await flip.sendATCmd('AT DX', 123);
+        await flip.sendAtCmdWithResult('AT SA slot2');
+        await flip.sendATCmd('AT LO', DEFAULT_SLOTNAME);
+        await flip.sendATCmd('AT DX', 12);
+        await flip.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
+        await flip.refreshConfig();
+        assertEqual(flip.getConfig(flip.DEADZONE_X, 'slot2'), 123);
+        assertEqual(flip.getConfig(flip.DEADZONE_X, DEFAULT_SLOTNAME), 12);
+    }
+
 
     /////////////////////////
     // util functions
     /////////////////////////
+    async function doAllTests() {
+        if (isTesting) {
+            return;
+        }
+        isTesting = true;
+        for (let i = 0; i < tests.length; i++) {
+            await doTest(tests[i].fn, tests[i].name);
+        }
+        isTesting = false;
+    }
+
+    async function initAndStart(runFn) {
+        if (window.flip) {
+            return runFn();
+        }
+        window.flip = new FlipMouse();
+        flip.neverTestConnection();
+        flip.init().then(function () {
+            runFn();
+        });
+    }
+
+    function prepareSingleTestButtons() {
+        for (let i = 0; i < tests.length; i++) {
+            let button = document.createElement('button');
+            button.onclick = function () {
+                initAndStart(async function() {
+                    if (isTesting) {
+                        return;
+                    }
+                    isTesting = true;
+                    await doTest(tests[i].fn, tests[i].name);
+                    isTesting = false;
+                });
+            }
+            button.innerText = tests[i].name;
+            document.getElementById('singleTests').appendChild(button);
+        }
+    }
+    prepareSingleTestButtons();
+
     async function doTest(testFn, testName) {
         assertFails = 0;
         assertSuccess = 0;
         print(`Testing "${testName}"...`)
-        await flip.restoreDefaultConfiguration();
-        await sleep(3000); // Pausiert die Funktion für 3 Sekunden
+        let value = await flip.sendAtCmdWithResult('AT RS');
+        log.warn('done reset: ' + value);
+        await flip.refreshConfig();
         await testFn();
         if (assertFails > 0) {
             printWarn(`Test "${testName}" failed with ${assertFails} assertion violations and ${assertSuccess} successful assertions!`)
@@ -113,6 +235,8 @@
     }
 
     function assertEqual(val1, val2, options) {
+        if (!isString(val1)) val1 = JSON.parse(JSON.stringify(val1));
+        if (!isString(val2)) val2 = JSON.parse(JSON.stringify(val2));
         options = options || {};
         if (options.ignoreProperties) {
             options.ignoreProperties.forEach(ignore => {
@@ -124,45 +248,60 @@
         val2 = isString(val2) ? val2 : JSON.stringify(val2);
         if (val1 !== val2) {
             assertFails++;
-            log.warn('assert failed!');
-            log.warn(val1);
-            log.warn(val2);
-            printWarn('assertion failed:');
-            printWarn('value1: ' + val1);
-            printWarn('value2: ' + val2);
+            printWarn('<b>Assert failed:</b>');
+            printWarn('Value 1: ' + highlightDiffs(val1, val2), 1);
+            printWarn('Value 2: ' + highlightDiffs(val2, val1), 2);
+            log.error('Assert failed!');
         } else {
             assertSuccess++;
-            log.info('assert success');
-            printDebug('assertion success:');
-            printDebug('value1: ' + val1);
-            printDebug('value2: ' + val2);
+            printDebug('<b>Assert success</b>');
+            printDebug('Value 1: ' + val1, 1);
+            printDebug('Value 2: ' + val2, 2);
         }
+    }
+
+    function assertTrue(value) {
+        assertEqual(!!value, true);
+    }
+
+    function assertFalse(value) {
+        assertEqual(!value, true);
     }
 
     function isString(str) {
         return typeof str === 'string' || str instanceof String;
     }
 
-    function print(text, color) {
+    function print(text, color, breaks) {
+        breaks = breaks || 0;
         color = color || 'black';
-        let html = `<div style="color: ${color}">${text}</div>`;
+        let html = `<div style="color: ${color}; overflow-wrap: break-word">${text}</div>`;
+        for (let i = 0; i < breaks; i++) html += "<br/>";
         document.getElementById('log').innerHTML += html;
     }
 
-    function printWarn(text) {
-        print(text, 'darkred');
+    function printWarn(text, breaks) {
+        print(text, 'darkred', breaks);
     }
 
-    function printSuccess(text) {
-        print(text, 'green');
+    function printSuccess(text, breaks) {
+        print(text, 'green', breaks);
     }
 
-    function printDebug(text) {
-        if (PRINT_DEBUG) print(text, 'gray');
+    function printDebug(text, breaks) {
+        if (PRINT_DEBUG) print(text, 'gray', breaks);
     }
 
-    function sleep(milliseconds) {
-        return new Promise(resolve => setTimeout(resolve, milliseconds));
+    function highlightDiffs(compare, base) {
+        let result = '';
+        compare.split('').forEach(function (val, i) {
+            if (val !== base.charAt(i)) {
+                result += "<b>" + val + "</b>";
+            } else {
+                result += val;
+            }
+        });
+        return result;
     }
 </script>
 </body>
