@@ -78,6 +78,7 @@ function FlipMouse() {
     let _connectionTestIntervalHandler = null;
     let _connectionTestCallbacks = [];
     let _connected = false;
+    let _neverTestConnection = false;
     let _AT_CMD_BUSY_RESPONSE = 'BUSY';
     let _AT_CMD_OK_RESPONSE = 'OK';
 
@@ -199,7 +200,7 @@ function FlipMouse() {
     };
 
     thiz.startTestingConnection = function () {
-        if (_connectionTestIntervalHandler) {
+        if (_connectionTestIntervalHandler || _neverTestConnection) {
             return;
         }
         function doTest() {
@@ -214,6 +215,11 @@ function FlipMouse() {
     thiz.stopTestingConnection = function () {
         clearInterval(_connectionTestIntervalHandler);
         _connectionTestIntervalHandler = null;
+    }
+
+    thiz.neverTestConnection = function () {
+        _neverTestConnection = true;
+        thiz.stopTestingConnection();
     }
 
     thiz.addConnectionTestCallback = function (fn) {
@@ -240,6 +246,7 @@ function FlipMouse() {
     thiz.refreshConfig = function () {
         return new Promise(function(resolve, reject) {
             thiz.sendAtCmdWithResult('AT LA').then(function (response) {
+                _config = {};
                 parseConfig(response);
                 resolve();
             }, function () {
@@ -404,6 +411,12 @@ function FlipMouse() {
         return thiz.save(progressHandler);
     };
 
+    thiz.getIRCommands = function () {
+        return thiz.sendAtCmdWithResult('AT IL').then(result => {
+            return Promise.resolve(result.split('\n').map(elem => elem.split(':')[1]));
+        });
+    }
+
     thiz.getLiveData = function (constant) {
         if (constant) {
             return _liveData[constant];
@@ -436,8 +449,7 @@ function FlipMouse() {
     };
 
     thiz.restoreDefaultConfiguration = function(progressCallback) {
-        thiz.sendATCmd('AT DE'); //delete all slots
-        thiz.sendATCmd('AT LA'); //save slot
+        thiz.sendATCmd('AT RS');
         return thiz.calibrate();
     };
 
