@@ -42,7 +42,7 @@ class PositionVisualization extends Component {
         this.stateListener = fn;
     }
 
-    prepareForTabBasic() {
+    prepareForTabStick() {
         this.setState({
             showAnalogBars: false,
             showAnalogValues: true,

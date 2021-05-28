@@ -72,7 +72,7 @@
         </div>
         <div class="row mb-5" id="tabMenu" role="menubar" tabindex="-1" accesskey="0">
             <button id="toNavLink" onclick="L.toggleClass('.menubutton', 'd-none')" class="col d-md-none button button-primary" data-tab data-i18n>&#x2630; Menu // &#x2630; Menü</button>
-            <button role="menuitem" onclick="router.toView('#tabBasic')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="1" data-tab id="tabBasicBtn" data-i18n>Basic Setup // Basis-Config</button>
+            <button role="menuitem" onclick="router.toView('#tabStick')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="1" data-tab id="tabStickBtn">Stick-Config</button>
             <button role="menuitem" onclick="router.toView('#tabPuff')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="2" data-tab id="tabPuffBtn" data-i18n>Sip and Puff // Saug-Puste-Steuerung</button>
             <button role="menuitem" onclick="router.toView('#tabSlots')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="3" data-tab id="tabSlotsBtn" data-i18n>Slots // Slots</button>
             <button role="menuitem" onclick="router.toView('#tabActions')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="4" data-tab id="tabActionsBtn" data-i18n>Actions // Aktionen</button>
@@ -334,12 +334,12 @@
 
 <script type="module">
     import {TabVisualization} from "./js_fm/views/TabVisualization.js";
-    import {TabBasic} from "./js_fm/views/TabBasic.js";
+    import {TabStick} from "./js_fm/views/TabStick.js";
     import {TabSipPuff} from "./js_fm/views/TabSipPuff.js";
     import {TabSlots} from "./js_fm/views/TabSlots.js";
     import {TabActions} from "./js_fm/views/TabActions.js";
 
-    router.addView('#tabBasic', TabBasic);
+    router.addView('#tabStick', TabStick);
     router.addView('#tabPuff', TabSipPuff);
     router.addView('#tabSlots', TabSlots);
     router.addView('#tabActions', TabActions);

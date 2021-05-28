@@ -79,7 +79,7 @@ class TabSlots extends Component {
         let slots = flip.getSlots();
 
         return html`
-            <h2 id="tabSlotsHeader" style="display: none" aria-hidden="false" data-i18n>Tab 3 - FLipMouse Slot configuration // Tab 3 - FLipMouse Slot Konfiguration</h2>
+            <h2 data-i18n="">Slot configuration // Slot Konfiguration</h2>
             <div class="container-fluid px-0">
                 <div class="row">
                     <div class="col-12">

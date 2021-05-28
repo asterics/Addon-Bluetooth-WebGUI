@@ -2,10 +2,11 @@ import { h, Component, render } from '../../js/preact.min.js';
 import htm from '../../js/htm.min.js';
 import {PositionVisualization} from "../comp/PositionVisualization.js";
 import {preactUtil} from "../preactUtil.js";
+import {RadioFieldset} from "../comp/RadioFieldset.js";
 
 const html = htm.bind(h);
 
-class TabBasic extends Component {
+class TabStick extends Component {
     constructor() {
         super();
 
@@ -16,6 +17,7 @@ class TabBasic extends Component {
             DEADZONE_Y: flip.getConfig(flip.DEADZONE_Y),
             splitSensitivity: flip.getConfig(flip.SENSITIVITY_X) !== flip.getConfig(flip.SENSITIVITY_Y),
             splitDeadzone: flip.getConfig(flip.DEADZONE_X) !== flip.getConfig(flip.DEADZONE_Y),
+            mouseMode: flip.getConfig(flip.FLIPMOUSE_MODE)
         }
     }
 
@@ -43,11 +45,14 @@ class TabBasic extends Component {
     
     render() {
         let state = this.state;
-        let thiz = this;
 
-        return html`<h2 id="TabBasicHeader" style="display: none" aria-hidden="false" data-i18n>Tab one - Basic FLipMouse Setup // Tab eins - FLipMouse Basiskonfiguration</h2>
+        return html`
+            <h2 data-i18n>Stick Configuration // Stick-Konfiguration</h2>
             <span id="posLiveA11yLabel" aria-hidden="false" class="hidden" data-i18n="">Current position of FLipMouse Stick // Aktuelle Position des Sticks der FLipMouse</span>
             <span id="posLiveA11y" aria-describedby="posLiveA11yLabel" class="onlyscreenreader" role="status" aria-live="off" accesskey="q" tabindex="-1"></span>
+            <div class="mb-5">
+                ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => flip.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${state.mouseMode}"/>`}
+            </div>
             <div id="basic-SENSITIVITY-single" style="display: ${!state.splitSensitivity ? 'block' : 'none'}">
                 <label for="SENSITIVITY" data-i18n>Sensitivity: // Sensitivität:</label>
                 <a aria-hidden="true" class="u-pull-right" href="javascript:;" onclick="${() => this.toggleState('splitSensitivity', [flip.SENSITIVITY_X, flip.SENSITIVITY_Y])}" data-i18n>show x/y separately // zeige x/y getrennt</a>
@@ -128,18 +133,18 @@ class TabBasic extends Component {
     }
 }
 
-TabBasic.init = function () {
-    render(html`<${TabBasic}/>`, document.getElementById('viewContainer'));
+TabStick.init = function () {
+    render(html`<${TabStick}/>`, document.getElementById('viewContainer'));
     flip.resetMinMaxLiveValues();
-    PositionVisualization.instance.prepareForTabBasic();
+    PositionVisualization.instance.prepareForTabStick();
 };
 
-TabBasic.destroy = function () {
+TabStick.destroy = function () {
     render(null, document.getElementById('viewContainer'));
 }
 
-TabBasic.valueHandler = function (data) {
+TabStick.valueHandler = function (data) {
     PositionVisualization.instance.updateData(data);
 };
 
-export {TabBasic};
+export {TabStick};
