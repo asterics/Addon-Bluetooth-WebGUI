@@ -17,6 +17,7 @@ class InputKeyboard extends Component {
 
     handleKeydown(event) {
         if (event.repeat) {
+            event.preventDefault();
             return;
         }
 
@@ -80,7 +81,7 @@ class InputKeyboard extends Component {
                     </div>
                 </div>
             </div>
-            <div class="row ${C.IS_TOUCH_DEVICE ? '' : 'd-none'}">
+            <div class="row ${C.IS_TOUCH_DEVICE ? 'd-none' : ''}">
                 <label for="inputKeyboard" class="col-md-4" data-i18n="">Insert keys // Eingabe Tasten</label>
                 <div class="col-md-8">
                     <div class="row">
@@ -93,7 +94,7 @@ class InputKeyboard extends Component {
                     </div>
                 </div>
             </div>
-            <div class="row ${C.IS_TOUCH_DEVICE ? 'd-none' : ''}">
+            <div class="row ${C.IS_TOUCH_DEVICE ? '' : 'd-none'}">
                 <strong class="col-md-4" data-i18n="">Selected keys // Ausgewählte Tasten</strong>
                 <div class="col-md-8">
                     <div class="row">
