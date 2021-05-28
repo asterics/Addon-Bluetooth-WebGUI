@@ -12,31 +12,47 @@ class ActionEditModal extends Component {
         ActionEditModal.instance = this;
 
         let currentAtCmdString = flip.getATCmd(props.buttonMode.constant) || C.AT_CMD_NO_CMD;
-        let currentAtCmdObject = C.AT_CMDS_ACTIONS.filter(atCmd => currentAtCmdString === atCmd.cmd)[0];
-        let showCategory = currentAtCmdString ? C.AT_CMDS_ACTIONS.filter(atCmd => atCmd.cmd === currentAtCmdString)[0].category: null;
+        let currentAtCmdObject = C.AT_CMDS_ACTIONS.filter(atCmd => currentAtCmdString === atCmd.cmd)[0] || C.AT_CMDS_ACTIONS[0];
+        currentAtCmdString = currentAtCmdObject.cmd;
+        let showCategory = currentAtCmdString && currentAtCmdString !== C.AT_CMD_NO_CMD ? C.AT_CMDS_ACTIONS.filter(atCmd => atCmd.cmd === currentAtCmdString)[0].category: null;
         let possibleAtCmds = C.AT_CMDS_ACTIONS.filter(atCmd => !showCategory || atCmd.category === showCategory);
         this.state = {
             showCategory: showCategory,
             atCmd: currentAtCmdObject,
             atCmdSuffix: '',
-            possibleAtCmds: possibleAtCmds
+            possibleAtCmds: possibleAtCmds,
+            selectOptions: []
         }
     }
 
     selectActionCategory(category) {
         let possible = C.AT_CMDS_ACTIONS.filter(atCmd => !category || atCmd.category === category);
+        let atCmd = possible.includes(this.state.atCmd) ? this.state.atCmd : possible[0];
         this.setState({
             showCategory: category,
-            possibleAtCmds: possible,
-            atCmd: possible.includes(this.state.atCmd) ? this.state.atCmd : possible[0]
-        })
+            possibleAtCmds: possible
+        });
+        this.setAtCmd(atCmd.cmd);
     }
 
     setAtCmd(atCmdString) {
         let atCmdObject = C.AT_CMDS_ACTIONS.filter(atCmd => atCmdString === atCmd.cmd)[0];
         this.setState({
-            atCmd: atCmdObject
+            atCmd: atCmdObject,
+            selectOptions: []
         });
+        if (atCmdObject.optionsFn) {
+            let parts = atCmdObject.optionsFn.split('.');
+            let fn = window;
+            parts.forEach(part => {
+                fn = fn[part];
+            });
+            Promise.resolve(fn()).then(result => {
+                this.setState({
+                    selectOptions: result
+                });
+            })
+        }
     }
 
     setAtCmdSuffix(suffix) {
@@ -83,14 +99,31 @@ class ActionEditModal extends Component {
                                 ${(() => {
                                     switch (state.atCmd.input) {
                                         case C.INPUTFIELD_TYPE_TEXT:
-                                            return html`<input type="text"/>`;
+                                            return html`
+                                                <div class="row">
+                                                    <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
+                                                    <div class="col-md-8">
+                                                        <input id="inputText" type="text" class="col-12"/>
+                                                    </div>
+                                                </div>`;
                                         case C.INPUTFIELD_TYPE_NUMBER:
-                                            return html`<input type="number"/>`;
+                                            return html`
+                                                <div class="row">
+                                                    <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
+                                                    <div class="col-md-8">
+                                                        <input id="inputText" type="number" class="col-12"/>
+                                                    </div>
+                                                </div>`;
                                         case C.INPUTFIELD_TYPE_SELECT:
                                             return html`
-                                                <select>
-                                                    <option>Test</option>
-                                                </select>`;
+                                                <div class="row">
+                                                    <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
+                                                    <div class="col-md-8">
+                                                        <select class="col-12">
+                                                            ${state.selectOptions.map(option => html`<option value="${option}">${option}</option>`)}
+                                                        </select>
+                                                    </div>
+                                                </div>`;
                                         case C.INPUTFIELD_TYPE_KEYBOARD:
                                             return html`<${InputKeyboard} onchange="${(value) => this.setAtCmdSuffix(value)}"/>`;
                                     }
