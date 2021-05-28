@@ -24,6 +24,25 @@ class TabActions extends Component {
     componentDidUpdate() {
         domI18nInstance.changeLanguage();
     }
+
+    getLinkTitle(btnMode, slot) {
+        let modeValue = flip.getConfig(flip.FLIPMOUSE_MODE);
+        if (modeValue !== C.FLIPMOUSE_MODE_ALT.value && btnMode.category === C.BTN_CAT_STICK) {
+            return L.translate(btnMode.label);
+        } else {
+            return L.translate(btnMode.label) + (flip.getConfig(btnMode.constant, slot) ? ': ' + flip.getConfig(btnMode.constant, slot) : '');
+        }
+    }
+
+    getLinkLabel(btnMode, slot) {
+        let modeValue = flip.getConfig(flip.FLIPMOUSE_MODE);
+        if (modeValue !== C.FLIPMOUSE_MODE_ALT.value && btnMode.category === C.BTN_CAT_STICK) {
+            let mode = C.FLIPMOUSE_MODES.filter(mode => mode.value === modeValue)[0];
+            return L.translate(mode.label);
+        } else {
+            return L.getReadableATCMD(flip.getConfig(btnMode.constant, slot));
+        }
+    }
     
     render() {
         let state = this.state;
@@ -56,7 +75,7 @@ class TabActions extends Component {
                         ${Object.keys(configs).map(slot => html`
                             <span class="col-12 col-md">
                                 <span class="d-md-none">Slot "${slot}": </span>
-                                <a href="javascript:;" title="${L.translate(btnMode.label) + (configs[slot][btnMode.constant] ? ': ' + configs[slot][btnMode.constant] : '')}" onclick="${() => this.setState({modalBtnMode: btnMode})}">${L.getReadableATCMD(configs[slot][btnMode.constant])}</a>
+                                <a href="javascript:;" title="${this.getLinkTitle(btnMode, slot)}" onclick="${() => this.setState({modalBtnMode: btnMode})}">${this.getLinkLabel(btnMode, slot)}</a>
                             </span>
                         `)}
                     </li>`)}
