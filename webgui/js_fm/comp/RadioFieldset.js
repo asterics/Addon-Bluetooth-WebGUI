@@ -10,7 +10,7 @@ class RadioFieldset extends Component {
         props.value = props.value || null;
         props.name = props.name || props.elements[0].value + props.elements[1].value;
         return html`
-            <fieldset role="radiogroup" onchange="${(event) => props.onchange(event.target.value)}">
+            <fieldset class="radio-fieldset" role="radiogroup" onchange="${(event) => props.onchange(event.target.value)}">
                 <legend>${L.translate(props.legend)}</legend>
                 ${props.elements.map(el => html`
                     <div class="d-inline">
@@ -18,8 +18,20 @@ class RadioFieldset extends Component {
                         <label for="${props.name + '_' + el.value}" class="button btnTransparent">${L.translate(el.label)}</label>
                     </div>
                 `)}
-            </fieldset>`;
+            </fieldset>
+            ${RadioFieldset.style}`;
     }
 }
+
+RadioFieldset.style = html`<style>
+    .radio-fieldset .button {
+        display: inline-block;
+        padding: 0 5px !important;
+        line-height: unset;
+        width: unset;
+        margin: 0.5em 0.5em 0.5em 0;
+        text-transform: none;
+    }
+</style>`
 
 export {RadioFieldset};

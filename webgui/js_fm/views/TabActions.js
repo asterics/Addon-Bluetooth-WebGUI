@@ -76,15 +76,6 @@ TabActions.destroy = function () {
 }
 
 TabActions.style = html`<style>
-    #tabActions .filter-buttons .button {
-        display: inline-block;
-        padding: 0 5px !important;
-        line-height: unset;
-        width: unset;
-        margin: 0.5em 0.5em 0.5em 0;
-        text-transform: none;
-    }
-    
     #tabActions ul {
         list-style-type: none;
     }
