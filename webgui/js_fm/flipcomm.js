@@ -453,14 +453,11 @@ function FlipMouse() {
         return thiz.calibrate();
     };
 
-    thiz.setFlipmouseMode = function (modeConstant, dontSetConfig) {
-        if(!C.FLIPMOUSE_MODES.includes(modeConstant)) {
+    thiz.setFlipmouseMode = function (index) {
+        if (!C.FLIPMOUSE_MODES.map(mode => mode.value).includes(parseInt(index))) {
             return;
         }
-        if(!dontSetConfig) {
-            thiz.setConfig(thiz.FLIPMOUSE_MODE, modeConstant);
-        }
-        var index = C.FLIPMOUSE_MODES.indexOf(modeConstant);
+        thiz.setConfig(thiz.FLIPMOUSE_MODE, index);
         thiz.sendATCmd(AT_CMD_MAPPING[thiz.FLIPMOUSE_MODE], index);
     };
 
@@ -563,12 +560,7 @@ function FlipMouse() {
             var currentAtCmd = currentElement.substring(0, AT_CMD_LENGTH).trim();
             if (VALUE_AT_CMDS.includes(currentAtCmd)) {
                 var key = L.val2key(currentAtCmd, AT_CMD_MAPPING);
-                if(key == thiz.FLIPMOUSE_MODE) {
-                    var index = parseInt(currentElement.substring(AT_CMD_LENGTH));
-                    config[key] = C.FLIPMOUSE_MODES[index];
-                } else {
-                    config[key] = parseInt(currentElement.substring(AT_CMD_LENGTH));
-                }
+                config[key] = parseInt(currentElement.substring(AT_CMD_LENGTH));
             } else if(currentAtCmd.indexOf(C.AT_CMD_BTN_MODE) > -1) {
                 var buttonModeIndex = parseInt(currentElement.substring(AT_CMD_LENGTH));
                 if(C.BTN_MODES[buttonModeIndex-1]) {
@@ -586,7 +578,7 @@ function FlipMouse() {
             if(C.BTN_MODES.includes(key)) {
                 thiz.setButtonAction(key, config[key], true);
             } else if(key === thiz.FLIPMOUSE_MODE) {
-                thiz.setFlipmouseMode(config[key], true);
+                thiz.setFlipmouseMode(config[key]);
             } else if (atCmd) {
                 thiz.sendATCmd(atCmd, config[key]);
             }
@@ -604,11 +596,6 @@ function FlipMouse() {
 				var indexFormatted = ("0" + index).slice(-2); //1 => 01
 				ret = ret + C.AT_CMD_BTN_MODE + ' ' + indexFormatted + "\n";
 				ret = ret + config[key] + "\n";
-
-            } else if (key === thiz.FLIPMOUSE_MODE) {
-                ret = ret + atCmd + " " + C.FLIPMOUSE_MODES.indexOf(config[key]) + "\n";
-                //C.FLIPMOUSE_MODES = FLIPMOUSE_MODE_MOUSE
-                //promises.push(thiz.setFlipmouseMode(config[key], true));
             } else if (atCmd) {
                 ret = ret + atCmd + ' ' + config[key] + "\n";
             }
