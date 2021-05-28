@@ -100,6 +100,10 @@ C.INPUTFIELD_TYPE_NUMBER = 'INPUTFIELD_TYPE_NUMBER';
 C.INPUTFIELD_TYPE_SELECT = 'INPUTFIELD_TYPE_SELECT';
 
 C.AT_CMDS_ACTIONS = [{
+    cmd: C.AT_CMD_NO_CMD,
+    label: 'No command // Keine Funktion',
+    category: C.AT_CMD_CAT_DEVICE
+}, {
     cmd: C.AT_CMD_HOLD_MOUSE_L,
     label: 'Hold left mouse button (as long as input action) // Linke Maustaste halten (für Dauer der Eingabe-Aktion)',
     category: C.AT_CMD_CAT_MOUSE
@@ -196,25 +200,24 @@ C.AT_CMDS_ACTIONS = [{
     cmd: C.AT_CMD_LOAD_SLOT,
     label: 'Load slot by name // Slot per Name laden',
     category: C.AT_CMD_CAT_DEVICE,
-    input: C.INPUTFIELD_TYPE_TEXT
+    input: C.INPUTFIELD_TYPE_SELECT,
+    optionsFn: 'flip.getSlots'
 }, {
     cmd: C.AT_CMD_CALIBRATION,
     label: 'Calibrate stick middle position // Stick-Mittelposition kalibrieren',
     category: C.AT_CMD_CAT_DEVICE
 }, {
-    cmd: C.AT_CMD_NO_CMD,
-    label: 'No command // Keine Funktion',
-    category: C.AT_CMD_CAT_DEVICE
-}, {
     cmd: C.AT_CMD_IR_PLAY,
     label: 'Play infrared command // Infrarot-Kommando abspielen',
     category: C.AT_CMD_CAT_IR,
-    input: C.INPUTFIELD_TYPE_SELECT
+    input: C.INPUTFIELD_TYPE_SELECT,
+    optionsFn: 'flip.getIRCommands'
 }, {
     cmd: C.AT_CMD_IR_HOLD,
     label: 'Hold infrared command // Infrarot-Kommando halten',
     category: C.AT_CMD_CAT_IR,
-    input: C.INPUTFIELD_TYPE_SELECT
+    input: C.INPUTFIELD_TYPE_SELECT,
+    optionsFn: 'flip.getIRCommands'
 }, {
     cmd: C.AT_CMD_IR_STOP,
     label: 'Stop infrared command // Infrarot-Kommando stoppen',
