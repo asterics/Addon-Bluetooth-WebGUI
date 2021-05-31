@@ -7,7 +7,7 @@ class RadioFieldset extends Component {
         props.onchange = props.onchange || (() => {});
         props.legend = props.legend || '';
         props.elements = props.elements || []; // objects with value and label property
-        props.value = props.value || null;
+        props.value = props.value !== undefined ? props.value : null;
         props.name = props.name || props.elements[0].value + props.elements[1].value;
         return html`
             <fieldset class="radio-fieldset" role="radiogroup" onchange="${(event) => props.onchange(event.target.value)}">
