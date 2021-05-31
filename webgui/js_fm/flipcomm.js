@@ -414,7 +414,7 @@ function FlipMouse() {
 
     thiz.getIRCommands = function () {
         return thiz.sendAtCmdWithResult('AT IL').then(result => {
-            return Promise.resolve(result.split('\n').map(elem => elem.split(':')[1]));
+            return Promise.resolve(result.split('\n').map(elem => elem.split(':')[1]).filter(elem => !!elem));
         });
     }
 
