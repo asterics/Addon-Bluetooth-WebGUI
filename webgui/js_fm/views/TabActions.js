@@ -13,7 +13,8 @@ class TabActions extends Component {
         TabActions.instance = this;
         this.state = {
             showCategory: null,
-            modalBtnMode: null
+            modalBtnMode: null,
+            modalSlot: null
         }
     }
 
@@ -75,12 +76,12 @@ class TabActions extends Component {
                         ${Object.keys(configs).map(slot => html`
                             <span class="col-12 col-md">
                                 <span class="d-md-none">Slot "${slot}": </span>
-                                <a href="javascript:;" title="${this.getLinkTitle(btnMode, slot)}" onclick="${() => this.setState({modalBtnMode: btnMode})}">${this.getLinkLabel(btnMode, slot)}</a>
+                                <a href="javascript:;" title="${this.getLinkTitle(btnMode, slot)}" onclick="${() => this.setState({modalBtnMode: btnMode, modalSlot: slot})}">${this.getLinkLabel(btnMode, slot)}</a>
                             </span>
                         `)}
                     </li>`)}
             </ul>
-            ${modalOpen ? html`<${ActionEditModal} buttonMode="${state.modalBtnMode}" closeHandler="${() => this.setState({modalBtnMode: ''})}"/>` : ''}
+            ${modalOpen ? html`<${ActionEditModal} buttonMode="${state.modalBtnMode}" slot="${state.modalSlot}" closeHandler="${() => this.setState({modalBtnMode: ''})}"/>` : ''}
             ${TabActions.style}
         </div>`;
     }
