@@ -20,3 +20,7 @@
     clip: auto;
     white-space: normal;
 }
+
+.font-weight-bold {
+    font-weight: bold;
+}
