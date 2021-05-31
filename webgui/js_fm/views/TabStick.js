@@ -17,7 +17,7 @@ class TabStick extends Component {
             DEADZONE_Y: flip.getConfig(flip.DEADZONE_Y),
             splitSensitivity: flip.getConfig(flip.SENSITIVITY_X) !== flip.getConfig(flip.SENSITIVITY_Y),
             splitDeadzone: flip.getConfig(flip.DEADZONE_X) !== flip.getConfig(flip.DEADZONE_Y),
-            mouseMode: flip.getConfig(flip.FLIPMOUSE_MODE)
+            mouseMode: parseInt(flip.getConfig(flip.FLIPMOUSE_MODE))
         }
     }
 
@@ -144,7 +144,9 @@ TabStick.destroy = function () {
 }
 
 TabStick.valueHandler = function (data) {
-    PositionVisualization.instance.updateData(data);
+    if (PositionVisualization.instance) {
+        PositionVisualization.instance.updateData(data);
+    }
 };
 
 export {TabStick};

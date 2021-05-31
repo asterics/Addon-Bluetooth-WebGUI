@@ -42,12 +42,16 @@ TabVisualization.destroy = function () {
 }
 
 TabVisualization.valueHandler = function (data) {
-    BtnSipPuffVisualization.instance.updateData(data);
-    PositionVisualization.instance.updateData(data);
-    PositionVisualization.instance.setStateListener((state) => {
-        L('#sliderMaxRange').value = state.maxPos;
-        L('#sliderMaxRangeValue').innerHTML = state.maxPos;
-    })
+    if (BtnSipPuffVisualization.instance) {
+        BtnSipPuffVisualization.instance.updateData(data);
+    }
+    if (PositionVisualization.instance) {
+        PositionVisualization.instance.updateData(data);
+        PositionVisualization.instance.setStateListener((state) => {
+            L('#sliderMaxRange').value = state.maxPos;
+            L('#sliderMaxRangeValue').innerHTML = state.maxPos;
+        })
+    }
 };
 
 export {TabVisualization};
