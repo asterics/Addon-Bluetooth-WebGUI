@@ -10,6 +10,7 @@ class ActionEditModal extends Component {
         super();
 
         ActionEditModal.instance = this;
+        this.props = props;
 
         let currentAtCmdString = flip.getATCmd(props.buttonMode.constant) || C.AT_CMD_NO_CMD;
         let currentAtCmdObject = C.AT_CMDS_ACTIONS.filter(atCmd => currentAtCmdString === atCmd.cmd)[0] || C.AT_CMDS_ACTIONS[0];
@@ -21,7 +22,9 @@ class ActionEditModal extends Component {
             atCmd: currentAtCmdObject,
             atCmdSuffix: '',
             possibleAtCmds: possibleAtCmds,
-            selectOptions: []
+            selectOptions: [],
+            shouldChangeMode: false,
+            hasChanges: false
         }
     }
 
@@ -38,8 +41,10 @@ class ActionEditModal extends Component {
     setAtCmd(atCmdString) {
         let atCmdObject = C.AT_CMDS_ACTIONS.filter(atCmd => atCmdString === atCmd.cmd)[0];
         this.setState({
+            atCmdSuffix: '',
             atCmd: atCmdObject,
-            selectOptions: []
+            selectOptions: [],
+            hasChanges: true
         });
         if (atCmdObject.optionsFn) {
             let parts = atCmdObject.optionsFn.split('.');
@@ -57,8 +62,20 @@ class ActionEditModal extends Component {
 
     setAtCmdSuffix(suffix) {
         this.setState({
-            atCmdSuffix: suffix
+            atCmdSuffix: suffix,
+            hasChanges: true
         })
+    }
+
+    save() {
+        if (this.state.shouldChangeMode) {
+            flip.setFlipmouseMode(C.FLIPMOUSE_MODE_ALT.value)
+        }
+        if (this.state.hasChanges) {
+            let atCmd = this.state.atCmdSuffix ? this.state.atCmd.cmd + ' ' + this.state.atCmdSuffix : this.state.atCmd.cmd;
+            flip.setButtonAction(this.props.buttonMode.constant, atCmd);
+        }
+        this.props.closeHandler();
     }
 
     componentDidUpdate() {
@@ -70,6 +87,8 @@ class ActionEditModal extends Component {
         let btnMode = props.buttonMode;
         let categoryElements = C.AT_CMD_CATEGORIES.map(cat => {return {value: cat.constant, label: cat.label}});
         categoryElements = [{value: null, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
+        let showActionSelection = flip.getConfig(flip.FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value || btnMode.category !== C.BTN_CAT_STICK || state.shouldChangeMode;
+        let mode = C.FLIPMOUSE_MODES.filter(mode => mode.value === flip.getConfig(flip.FLIPMOUSE_MODE, props.slot))[0];
 
         return html`
             <div class="modal-mask">
@@ -80,22 +99,32 @@ class ActionEditModal extends Component {
                             <h1 name="header">
                                 <span data-i18n="">Action for  // Aktion für </span>
                                 <span>"${L.translate(btnMode.label)}"</span>
+                                <span> (Slot: ${props.slot})</span>
                             </h1>
                         </div>
     
-                        <div class="modal-body container-fluid">
-                            <div class="filter-buttons mb-4">
-                                ${html`<${RadioFieldset} legend="Show action categories: // Zeige Aktions-Kategorien:" onchange="${(value) => this.selectActionCategory(value)}" elements="${categoryElements}" value="${state.showCategory}"/>`}
-                            </div>
-                            <div class="row">
-                                <label for="actionSelect" class="col-md-4" data-i18n="">Selection action // Aktion auswählen</label>
-                                <div class="col-md-8" >
-                                    <select id="actionSelect" class="col-12" value="${state.atCmd.cmd}" onchange="${(event) => this.setAtCmd(event.target.value)}">
-                                        ${state.possibleAtCmds.map(atCmd => html`<option value="${atCmd.cmd}">${L.translate(atCmd.label)}</option>`)}
-                                    </select>
+                        <div class="modal-body container-fluid p-0">
+                            <div class="${showActionSelection ? 'd-none' : ''}">
+                                <span class="pr-2" data-i18n="">Stick is currently used for: // Stick wird derzeit verwendet für:</span>
+                                <strong>${L.translate(mode.label)}</strong>
+                                <div>
+                                    <a href="javascript:;" onclick="${() => this.setState({shouldChangeMode: true})}">
+                                        <span>${L.translate('Deactivate {?} mode for defining an action // {?} deaktivieren um Aktion zu konfigurieren', mode.label)}</span>
+                                    </a>
                                 </div>
                             </div>
-                            <div>
+                            <div class="${!showActionSelection ? 'd-none' : ''}">
+                                <div class="filter-buttons mb-4">
+                                    ${html`<${RadioFieldset} legend="Show action categories: // Zeige Aktions-Kategorien:" onchange="${(value) => this.selectActionCategory(value)}" elements="${categoryElements}" value="${state.showCategory}"/>`}
+                                </div>
+                                <div class="row">
+                                    <label for="actionSelect" class="col-md-4" data-i18n="">Selection action // Aktion auswählen</label>
+                                    <div class="col-md-8">
+                                        <select id="actionSelect" class="col-12" value="${state.atCmd.cmd}" onchange="${(event) => this.setAtCmd(event.target.value)}">
+                                            ${state.possibleAtCmds.map(atCmd => html`<option value="${atCmd.cmd}">${L.translate(atCmd.label)}</option>`)}
+                                        </select>
+                                    </div>
+                                </div>
                                 ${(() => {
                                     switch (state.atCmd.input) {
                                         case C.INPUTFIELD_TYPE_TEXT:
@@ -103,7 +132,7 @@ class ActionEditModal extends Component {
                                                 <div class="row">
                                                     <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
                                                     <div class="col-md-8">
-                                                        <input id="inputText" type="text" class="col-12"/>
+                                                        <input id="inputText" onchange="${(event) => this.setAtCmdSuffix(event.target.value)}" type="text" class="col-12"/>
                                                     </div>
                                                 </div>`;
                                         case C.INPUTFIELD_TYPE_NUMBER:
@@ -111,7 +140,7 @@ class ActionEditModal extends Component {
                                                 <div class="row">
                                                     <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
                                                     <div class="col-md-8">
-                                                        <input id="inputText" type="number" class="col-12"/>
+                                                        <input id="inputText" type="number" onchange="${(event) => this.setAtCmdSuffix(event.target.value)}" class="col-12"/>
                                                     </div>
                                                 </div>`;
                                         case C.INPUTFIELD_TYPE_SELECT:
@@ -119,7 +148,7 @@ class ActionEditModal extends Component {
                                                 <div class="row">
                                                     <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
                                                     <div class="col-md-8">
-                                                        <select class="col-12">
+                                                        <select class="col-12" onchange="${(event) => this.setAtCmdSuffix(event.target.value)}">
                                                             ${state.selectOptions.map(option => html`<option value="${option}">${option}</option>`)}
                                                         </select>
                                                     </div>
@@ -131,14 +160,16 @@ class ActionEditModal extends Component {
                             </div>
                         </div>
     
-                        <div class="modal-footer mt-4">
-                            <div class="button-container">
-                                <button title="Keyboard: [Esc]" onclick="${() => props.closeHandler()}">
-                                    <i class="fas fa-times"/> <span data-i18n>Cancel // Abbrechen</span>
-                                </button>
-                                <button title="Keyboard: [Ctrl + Enter]">
-                                    <i class="fas fa-check"/> <span data-i18n>OK</span>
-                                </button>
+                        <div class="modal-footer mt-5">
+                            <div class="row">
+                                <div class="col">
+                                    <button title="Keyboard: [Esc]" onclick="${() => props.closeHandler()}">
+                                        <span data-i18n>Cancel // Abbrechen</span>
+                                    </button>
+                                </div>
+                                <div class="col">
+                                    <button title="Keyboard: [Ctrl + Enter]" onclick="${() => this.save()}" class="button-primary" data-i18n="">Save // Speichern</button>
+                                </div>
                             </div>
                         </div>
                     </div>
