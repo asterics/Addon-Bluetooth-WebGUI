@@ -393,17 +393,17 @@ C.BTN_MODES2 = [{
     label: 'Stick Up // Stick nach oben',
     category: C.BTN_CAT_STICK
 }, {
-    constant: C.BTN_MODE_STICK_UP,
+    constant: C.BTN_MODE_STICK_DOWN,
     index: 5,
     label: 'Stick Down // Stick nach unten',
     category: C.BTN_CAT_STICK
 }, {
-    constant: C.BTN_MODE_STICK_UP,
+    constant: C.BTN_MODE_STICK_LEFT,
     index: 6,
     label: 'Stick Left // Stick nach links',
     category: C.BTN_CAT_STICK
 }, {
-    constant: C.BTN_MODE_STICK_UP,
+    constant: C.BTN_MODE_STICK_RIGHT,
     index: 7,
     label: 'Stick Right // Stick nach rechts',
     category: C.BTN_CAT_STICK
