@@ -144,7 +144,7 @@ function FlipMouse() {
             queueElem = {
                 timeout: timeout || 0,
                 dontLog: dontLog,
-                cmd: param ? atCmd + ' ' + param : atCmd,
+                cmd: param !== undefined ? atCmd + ' ' + param : atCmd,
                 resolveFn: resolve,
                 rejectFn: reject
             };
@@ -454,7 +454,8 @@ function FlipMouse() {
     };
 
     thiz.setFlipmouseMode = function (index) {
-        if (!C.FLIPMOUSE_MODES.map(mode => mode.value).includes(parseInt(index))) {
+        index = parseInt(index);
+        if (!C.FLIPMOUSE_MODES.map(mode => mode.value).includes(index)) {
             return;
         }
         thiz.setConfig(thiz.FLIPMOUSE_MODE, index);
