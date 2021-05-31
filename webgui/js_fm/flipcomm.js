@@ -449,7 +449,7 @@ function FlipMouse() {
 
     thiz.restoreDefaultConfiguration = function(progressCallback) {
         thiz.sendATCmd('AT RS');
-        return thiz.calibrate();
+        return thiz.refreshConfig();
     };
 
     thiz.setFlipmouseMode = function (index) {
