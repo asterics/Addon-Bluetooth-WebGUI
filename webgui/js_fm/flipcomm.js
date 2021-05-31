@@ -140,11 +140,12 @@ function FlipMouse() {
             if (!dontLog) console.log("adding cmd to queue: " + atCmd);
         }
         let queueElem = null;
+        let cmd = param !== undefined ? atCmd + ' ' + param : atCmd;
         let promise = new Promise(function (resolve, reject) {
             queueElem = {
                 timeout: timeout || 0,
                 dontLog: dontLog,
-                cmd: param !== undefined ? atCmd + ' ' + param : atCmd,
+                cmd: cmd.trim(),
                 resolveFn: resolve,
                 rejectFn: reject
             };
