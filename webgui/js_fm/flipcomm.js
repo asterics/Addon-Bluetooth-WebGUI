@@ -434,18 +434,16 @@ function FlipMouse() {
         _liveData[thiz.LIVE_MOV_Y_MAX] = -1;
     };
 
-    thiz.setButtonAction = function(buttonModeConstant, atCmd, dontSetConfig) {
-        var index = C.BTN_MODES.indexOf(buttonModeConstant) + 1;
-        var indexFormatted = ("0" + index).slice(-2); //1 => 01
-        if(!index || !atCmd) {
+    thiz.setButtonAction = function(buttonModeConstant, atCmd) {
+        let index = C.BTN_MODES2.filter(btnMode => btnMode.constant === buttonModeConstant)[0].index;
+        if (!index || !atCmd) {
             return;
         }
-        if(!dontSetConfig) {
-            thiz.setConfig(buttonModeConstant, atCmd);
-            _unsavedConfig[_currentSlot] = _unsavedConfig[_currentSlot] || [];
-            _unsavedConfig[_currentSlot].push(buttonModeConstant);
-        }
-        thiz.sendATCmd(C.AT_CMD_BTN_MODE, indexFormatted);
+        thiz.setConfig(buttonModeConstant, atCmd);
+        _unsavedConfig[_currentSlot] = _unsavedConfig[_currentSlot] || [];
+        _unsavedConfig[_currentSlot].push(buttonModeConstant);
+
+        thiz.sendATCmd(C.AT_CMD_BTN_MODE, index);
         thiz.sendATCmd(atCmd);
     };
 
@@ -578,7 +576,7 @@ function FlipMouse() {
         Object.keys(config).forEach(function (key) {
             let atCmd = AT_CMD_MAPPING[key];
             if(C.BTN_MODES.includes(key)) {
-                thiz.setButtonAction(key, config[key], true);
+                thiz.setButtonAction(key, config[key]);
             } else if(key === thiz.FLIPMOUSE_MODE) {
                 thiz.setFlipmouseMode(config[key]);
             } else if (atCmd) {
