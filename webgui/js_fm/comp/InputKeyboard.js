@@ -49,10 +49,14 @@ class InputKeyboard extends Component {
     }
 
     rerenderList(list) {
+        let value = list.join(' ');
         this.setState({
             keycodeList: list,
-            currentValue: list.join(' ')
+            currentValue: value
         });
+        if (this.props.onchange) {
+            this.props.onchange(value);
+        }
     }
 
     isLastListElemAndCurrent(keycode, currentKeyCode) {
