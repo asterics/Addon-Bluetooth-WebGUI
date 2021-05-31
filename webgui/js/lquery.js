@@ -230,15 +230,17 @@ window.L.getLang = function () {
  * @param translationKey the key to translate
  * @return {*}
  */
-window.L.translate = function(translationKey) {
+window.L.translate = function (translationKey) {
+    translationKey = translationKey || '';
+    let translated = '';
     if (translationKey.indexOf(' // ') > -1) {
         let translations = translationKey.split(' // ');
-        return 'en'.toUpperCase() === L.getLang().toUpperCase() ? translations[0] : translations[1];
+        translated = 'en'.toUpperCase() === L.getLang().toUpperCase() ? translations[0] : translations[1];
+    } else {
+        translated = i18n[translationKey] ? i18n[translationKey] : translationKey;
     }
-
-    var translated = i18n[translationKey] ? i18n[translationKey] : translationKey;
-    for(var i=1; i<arguments.length; i++) {
-        translated = translated.replace('{?}', arguments[i]);
+    for (let i = 1; i < arguments.length; i++) {
+        translated = translated.replace('{?}', L.translate(arguments[i]));
     }
     return translated;
 };
