@@ -294,15 +294,8 @@ L.getReadableATCMD = function (atCmd) {
     if (!atCmd) {
         return L.translate(C.AT_CMD_NO_CMD);
     }
-    let translation = L.translate(atCmd);
-    if (translation !== atCmd) {
-        return translation;
-    }
-    let prefix = atCmd.substring(0, C.LENGTH_ATCMD_PREFIX - 1);
-    let postfix = atCmd.substring(C.LENGTH_ATCMD_PREFIX);
-    if (prefix === C.AT_CMD_KEYPRESS) {
-        postfix = postfix.replace(/ /g, ' + ');
-    }
-    postfix = postfix.replace(/KEY_/g, '');
-    return L.translate(prefix, postfix + ' '); //add space to prevent word detection in tablet/smartphone input
+    let prefix = atCmd.substring(0, C.LENGTH_ATCMD_PREFIX - 1).trim();
+    let cmdObject = C.AT_CMDS_ACTIONS.filter(elem => elem.cmd === prefix)[0];
+    let label = cmdObject ? (cmdObject.shortLabel || cmdObject.label) : atCmd;
+    return L.translate(label);
 }
