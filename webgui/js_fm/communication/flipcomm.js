@@ -259,47 +259,12 @@ function FlipMouse() {
     };
 
     /**
-     * saves the complete current configuration (all slots) to the FLipMouse. This is done by the following steps:
-     * 1) Deleting alls slots
-     * 2) loading slot configuration to FLipMouse
-     * 3) saving slot
-     * 4) go back to (2) for next slot, until all slots are saved
-     * 5) loading slot configuration to FLipMouse that was loaded before saving
+     * saves the complete current configuration (all slots) to the FLipMouse
      *
      * @return {Promise}
      */
     thiz.save = async function (updateProgressHandler) {
-        updateProgressHandler = updateProgressHandler || function () {
-        };
         thiz.sendATCmd('AT SA', _currentSlot);
-        return Promise.resolve();
-
-        //TODO: remove!
-        console.error('START!1')
-        _unsavedConfig = {};
-        let progress = 10;
-        updateProgressHandler(progress);
-        thiz.stopTestingConnection();
-        thiz.pauseLiveValueListener();
-        thiz.sendATCmd('AT DE');
-        let percentPerSlot = 80 / thiz.getSlots().length;
-
-        let slots = thiz.getSlots();
-        for (let i = 0; i < slots.length; i++) {
-            console.error('slot' + i)
-            loadSlotByConfig(slots[i]);
-            thiz.sendATCmd('AT SA', slots[i]);
-            await testConnection();
-            progress += percentPerSlot;
-            updateProgressHandler(progress);
-        }
-
-        progress += 10;
-        updateProgressHandler(progress);
-        thiz.setSlot(_currentSlot);
-        thiz.resumeLiveValueListener();
-        thiz.startTestingConnection();
-        console.error('FIN!3')
         return Promise.resolve();
     };
 
