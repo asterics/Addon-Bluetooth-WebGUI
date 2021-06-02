@@ -9,8 +9,8 @@ class InputKeyboard extends Component {
 
         this.props = props;
         this.state = {
-            currentValue: '',
-            keycodeList: [],
+            currentValue: props.value,
+            keycodeList: props.value ? props.value.split(' ') : [],
             selectedKey: C.KEYCODE_MAPPING[C.SUPPORTED_KEYCODES[0]]
         };
     }
