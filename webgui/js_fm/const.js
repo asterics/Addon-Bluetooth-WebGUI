@@ -165,11 +165,11 @@ C.AT_CMDS_ACTIONS = [{
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_MOUSEWHEEL_UP,
-    label: 'Mouse wheel up // Mausrad nach oben',
+    label: 'Scroll down // Nach unten scrollen',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_MOUSEWHEEL_DOWN,
-    label: 'Mouse wheel down // Mausrad nach unten',
+    label: 'Scroll up // Nach oben scrollen',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_KEYHOLD,
