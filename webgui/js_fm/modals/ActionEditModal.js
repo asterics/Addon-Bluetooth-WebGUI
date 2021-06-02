@@ -148,7 +148,7 @@ class ActionEditModal extends Component {
                                                 <div class="row">
                                                     <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
                                                     <div class="col-md-8">
-                                                        <input id="inputText" value="${state.atCmdSuffix}" onchange="${(event) => this.setAtCmdSuffix(event.target.value)}" type="text" class="col-12"/>
+                                                        <input id="inputText" value="${state.atCmdSuffix}" oninput="${(event) => this.setAtCmdSuffix(event.target.value)}" type="text" class="col-12" placeholder="${L.translate('Input text // Text eingeben')}"/>
                                                     </div>
                                                 </div>`;
                                         case C.INPUTFIELD_TYPE_NUMBER:
@@ -156,7 +156,7 @@ class ActionEditModal extends Component {
                                                 <div class="row">
                                                     <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
                                                     <div class="col-md-8">
-                                                        <input id="inputText" value="${parseInt(state.atCmdSuffix)}" type="number" onchange="${(event) => this.setAtCmdSuffix(event.target.value)}" class="col-12"/>
+                                                        <input id="inputText" value="${parseInt(state.atCmdSuffix)}" type="number" oninput="${(event) => this.setAtCmdSuffix(parseInt(event.target.value))}" placeholder="${L.translate('Input number // Zahl eingeben')}" class="col-12"/>
                                                     </div>
                                                 </div>`;
                                         case C.INPUTFIELD_TYPE_SELECT:
@@ -185,12 +185,12 @@ class ActionEditModal extends Component {
                         <div class="modal-footer mt-5">
                             <div class="row">
                                 <div class="col">
-                                    <button title="Keyboard: [Esc]" onclick="${() => props.closeHandler()}">
+                                    <button onclick="${() => props.closeHandler()}">
                                         <span data-i18n>Cancel // Abbrechen</span>
                                     </button>
                                 </div>
                                 <div class="col">
-                                    <button title="Keyboard: [Ctrl + Enter]" onclick="${() => this.save()}" class="button-primary" data-i18n="">Save // Speichern</button>
+                                    <button onclick="${() => this.save()}" disabled="${this.state.atCmd.input && !this.state.atCmdSuffix}" class="button-primary" data-i18n="">Save // Speichern</button>
                                 </div>
                             </div>
                         </div>
