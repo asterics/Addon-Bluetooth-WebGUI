@@ -25,7 +25,6 @@
     <script src="js/wscomm.js"></script>
     <script src="js_fm/flipcomm.js"></script>
     <script src="js_fm/mockcomm.js"></script>
-    <script src="js_fm/tabact.js"></script>
     <script src="js_fm/tabglob.js"></script>
     <script src="js_fm/elecutils.js"></script>
     <script src="js_fm/shortcut.js"></script>
@@ -84,160 +83,6 @@
         <div id="viewContainer">
 
         </div>
-        <section aria-labelledby="tabActionsHeader" class="tabs-pane d-none" id="tabActions" style="display: none">
-            <div tabindex="-1">
-                <h2 id="tabActionsHeader" style="display: none" aria-hidden="false" data-i18n>Tab 4 - FLipMouse Action configuration // Tab 4 - FLipMouse Konfiguration Aktionen</h2>
-            </div>
-            <div class="row">
-                <h3 id="fieldsetModeLabel" style="display: inline-block;" data-i18n>FLipMouse mode // FLipMouse Modus</h3>
-                <a aria-hidden="true" id="hideModeHelpTextA" data-i18n style="display: none" href="javascript:L.toggleInline('#showModeHelpTextA', '#hideModeHelpTextA');L.toggle('#modeHelpText');">hide info // verstecke Info</a>
-                <a aria-hidden="true" id="showModeHelpTextA" data-i18n href="javascript:L.toggleInline('#showModeHelpTextA', '#hideModeHelpTextA');L.toggle('#modeHelpText');">show info // zeige Info</a>
-            </div>
-            <div data-i18n id="modeHelpText" style="display: none" aria-hidden="false">
-                <p>Select the mode of the FLipMouse. In "Mouse" Mode the stick is used to move the mouse, in "Alternative" mode the stick can be used to trigger custom actions.</p>
-                <p>Wähle den FLipMouse Modus. Im "Maus" Modus bewegt der Stick die Maus, im "Alternative" Modus kann der Stick verwendet werden um benutzerdefinierte Aktionen auszulösen.</p>
-            </div>
-            <div class="row space-bottom">
-                <fieldset role="radiogroup" aria-labelledby="fieldsetModeLabel">
-                    <div class="six columns">
-                        <input aria-hidden="false" type="radio" name="modeRadio" role="radio" id="MODE_MOUSE" class="custom-radio" onchange="tabAction.selectMode(this)"/>
-                        <label for="MODE_MOUSE" class="button btnTransparent" data-i18n>Mouse // Maus</label>
-                    </div>
-                    <div class="six columns">
-                        <input aria-hidden="false" type="radio" name="modeRadio" role="radio" id="MODE_ALTERNATIVE" class="custom-radio" onchange="tabAction.selectMode(this)"/>
-                        <label for="MODE_ALTERNATIVE" class="button btnTransparent" data-i18n>Alternative // Alternativ</label>
-                    </div>
-                </fieldset>
-            </div>
-            <h3 data-i18n>Change actions // Aktionen ändern</h3>
-            <div class="row">
-                <label class="three columns text-right text-normal" for="selectActionButton" data-i18n>Action to define // Zu belegende Funktion</label>
-                <select id="selectActionButton" class="five columns" onchange="tabAction.selectActionButton(this.value)">
-                </select>
-                <div class="four columns">
-                    <span id="currentActionLabel" class="hide-tablet-inline" data-i18n>Current action: // Aktuelle Aktion:</span>
-                    <span id="currentAction" class="hide-mobile-inline"></span>
-                </div>
-            </div>
-            <div class="row" style="margin: 0.5em 0 0.5em 0">
-                <fieldset role="radiogroup" aria-labelledby="fieldsetActionCategoryLabel">
-                    <legend id="fieldsetActionCategoryLabel" class="three columns text-right text-normal" data-i18n>Action category // Aktions-Kategorie</legend>
-                    <div class="eight columns">
-                        <div class="act-category-btn">
-                            <input checked aria-hidden="false" type="radio" name="actCatRadio" role="radio" id="LEARN_CAT_KEYBOARD" class="custom-radio" onchange="tabAction.selectActionCategory(this)"/>
-                            <label for="LEARN_CAT_KEYBOARD" class="button btnTransparent" data-i18n>Keyboard // Tastatur</label>
-                        </div>
-                        <div class="act-category-btn">
-                            <input aria-hidden="false" type="radio" name="actCatRadio" role="radio" id="LEARN_CAT_MOUSE" class="custom-radio" onchange="tabAction.selectActionCategory(this)"/>
-                            <label for="LEARN_CAT_MOUSE" class="button btnTransparent" data-i18n>Mouse // Maus</label>
-                        </div>
-                        <div class="act-category-btn">
-                            <input aria-hidden="false" type="radio" name="actCatRadio" role="radio" id="LEARN_CAT_IR" class="custom-radio" onchange="tabAction.selectActionCategory(this)"/>
-                            <label for="LEARN_CAT_IR" class="button btnTransparent" data-i18n>Infrared // Infrarot</label>
-                        </div>
-                        <div class="act-category-btn">
-                            <input aria-hidden="false" type="radio" name="actCatRadio" role="radio" id="LEARN_CAT_FLIPACTIONS" class="custom-radio" onchange="tabAction.selectActionCategory(this)"/>
-                            <label for="LEARN_CAT_FLIPACTIONS" class="button btnTransparent" data-i18n>other // andere</label>
-                        </div>
-                        <div class="act-category-btn">
-                            <input aria-hidden="false" type="radio" name="actCatRadio" role="radio" id="LEARN_CAT_CUSTOM" class="custom-radio" onchange="tabAction.selectActionCategory(this)"/>
-                            <label for="LEARN_CAT_CUSTOM" class="button btnTransparent">Custom</label>
-                        </div>
-                    </div>
-                </fieldset>
-            </div>
-            <div id="WRAPPER_LEARN_CAT_KEYBOARD">
-                <div class="row">
-                    <label class="three columns text-right text-normal" for="INPUT_LEARN_CAT_KEYBOARD" data-i18n>Action Input // Eingabe Aktion</label>
-                    <input type="text" id="INPUT_LEARN_CAT_KEYBOARD" class="six columns" onkeydown="tabAction.handleKeyBoardEvent(event)" oninput="tabAction.handleOnKeyboardInput(event)" autocomplete="off"/>
-                    <button onclick="tabAction.resetRec()" class="two columns" data-i18n>Reset // Löschen</button>
-                </div>
-                <div class="row">
-                    <label id="labelSpecialKeys" class="three columns text-right text-normal" data-i18n>Special Keys // Spezialtasten</label>
-                    <div class="eight columns">
-                        <fieldset role="group" aria-labelledby="labelSpecialKeys">
-                            <button class="special-key btnTransparent" data-i18n onclick="tabAction.addSpecialKey(C.JS_KEYCODE_CTRL)">Ctrl // Strg</button>
-                            <button class="special-key btnTransparent" onclick="tabAction.addSpecialKey(C.JS_KEYCODE_ALT)">Alt</button>
-                            <button class="special-key btnTransparent" onclick="tabAction.addSpecialKey(C.JS_KEYCODE_SHIFT)">Shift</button>
-                            <button class="special-key btnTransparent" onclick="tabAction.addSpecialKey(C.JS_KEYCODE_GUI)">Win</button>
-                            <button class="special-key btnTransparent" onclick="tabAction.addSpecialKey(C.JS_KEYCODE_TAB)">Tab</button>
-                            <select aria-hidden="true" id="SELECT_LEARN_CAT_KEYBOARD_SPECIAL" onchange="tabAction.addSpecialKey(this.value)">
-                            </select>
-                        </fieldset>
-                    </div>
-                </div>
-                <div class="row">
-                    <label class="three columns text-right text-normal" data-i18n>Recorded AT Command // Aufgenommenes AT Kommando</label>
-                    <div id="recordedAtCmd" class="six columns space-bottom" data-i18n>(none) // (leer)</div>
-                    <div id="recordedActionA11y" aria-live="assertive" role="alert" aria-hidden="false" class="hidden"></div>
-                    <button id="buttonRecOK" onclick="tabAction.saveRec()" disabled class="two columns" data-i18n="">Test // Testen</button>
-                </div>
-            </div>
-            <div id="WRAPPER_LEARN_CAT_MOUSE" class="row" style="display: none">
-                <label class="three columns text-right text-normal" for="SELECT_LEARN_CAT_MOUSE" data-i18n>Action // Aktion</label>
-                <select id="SELECT_LEARN_CAT_MOUSE" class="eight columns" onchange="tabAction.selectAtCmd(this.value)">
-                </select>
-            </div>
-            <div id="WRAPPER_LEARN_CAT_IR" class="row" style="display: none">
-                <div class="row">
-                    <label class="three columns text-right text-normal" for="SELECT_LEARN_CAT_IR" data-i18n>IR command // IR Kommando</label>
-                    <select id="SELECT_LEARN_CAT_IR" class="three columns">
-                    </select>
-                    <div style="display: flex" class="five columns">
-                        <button class="column" onclick="tabAction.deleteIRCommand(L('#SELECT_LEARN_CAT_IR').value)" data-i18n>Delete // Löschen</button>
-                        <button class="column" onclick="flip.sendATCmd(C.AT_CMD_IR_PLAY, L('#SELECT_LEARN_CAT_IR').value)" data-i18n>Play // Abspielen</button>
-                        <button class="column" onclick="tabAction.selectAtCmd(C.AT_CMD_IR_PLAY + ' ' + L('#SELECT_LEARN_CAT_IR').value)" data-i18n>set action // Aktion setzen</button>
-                    </div>
-                </div>
-                <div class="row">
-                    <label class="three columns text-right text-normal" for="INPUT_LEARN_CAT_IR" data-i18n>new command // neues Kommando</label>
-                    <input type="text" id="INPUT_LEARN_CAT_IR" class="three columns" placeholder="command name" oninput="L('#record-action').disabled = !this.value">
-                    <button id="record-action" disabled onclick="tabAction.recordIRCommand()" class="three columns" style="position: relative;">
-                        <span id="record-action-button-normal" style="position: relative" data-i18n>Record // Aufnahme</span>
-                        <span id="record-action-button-saving" style="display: none" data-i18n>recording... // wird  aufgenommen...</span>
-                    </button>
-                </div>
-            </div>
-            <div id="WRAPPER_LEARN_CAT_FLIPACTIONS" class="row" style="display: none">
-                <label class="three columns text-right text-normal" for="SELECT_LEARN_CAT_FLIPACTIONS" data-i18n>Action // Aktion</label>
-                <select id="SELECT_LEARN_CAT_FLIPACTIONS" class="eight columns" onchange="tabAction.selectAtCmd(this.value)">
-                </select>
-            </div>
-            <div id="WRAPPER_LEARN_CAT_CUSTOM" class="row" style="display: none">
-                <label class="three columns text-right text-normal" for="INPUT_LEARN_CAT_CUSTOM" data-i18n>AT command // AT Kommando</label>
-                <input type="text" id="INPUT_LEARN_CAT_CUSTOM" class="six columns">
-                <button class="two columns" onclick="tabAction.selectAtCmd(L('#INPUT_LEARN_CAT_CUSTOM').value)" data-i18n>Test // Testen</button>
-            </div>
-            <div id="WRAPPER_ADDITIONAL_FIELD_TEXT" class="row" style="display: none">
-                <label class="three columns text-right text-normal" for="ADDITIONAL_FIELD_TEXT" data-i18n>AT command // AT Kommando</label>
-                <input type="text" id="ADDITIONAL_FIELD_TEXT" class="six columns">
-                <button class="two columns" onclick="tabAction.setAtCmdWithAdditionalData(L('#ADDITIONAL_FIELD_TEXT').value)" data-i18n>Test // Testen</button>
-            </div>
-            <div id="WRAPPER_ADDITIONAL_FIELD_SELECT" class="row" style="display: none">
-                <label class="three columns text-right text-normal" for="ADDITIONAL_FIELD_SELECT" data-i18n></label>
-                <select id="ADDITIONAL_FIELD_SELECT" class="six columns">
-                </select>
-                <button class="two columns" onclick="tabAction.setAtCmdWithAdditionalData(L('#ADDITIONAL_FIELD_SELECT').value)" data-i18n>Test // Testen</button>
-            </div>
-
-            <br/>
-            <h3 data-i18n>Current saved mapping // Aktuelle gespeicherte Konfiguration</h3>
-            <div id="currentConfigTh" class="hide-mobile row thead" aria-hidden="true">
-                <div class="two columns" data-i18n>Description // Bezeichnung</div>
-                <div class="four columns" data-i18n>Current action // aktuelle Aktion</div>
-                <div class="four columns" data-i18n>Current AT command // aktuelles AT Kommando</div>
-            </div>
-            <ol id="currentConfigTb" class="tbody"></ol>
-
-            <br id="tabActSaveBtnSpacer"/>
-            <button id="save-action" onclick="actionAndToggle(flip.save, [], ['#save-action-button-normal', '#save-action-button-saving'], '#save-action-value-bar').then(function() {tabAction.init()})" class="u-full-width" style="position: relative;">
-                <i id="save-action-value-bar" class="value-bar color-lightercyan" style="width: 0%;"></i>
-                <span id="save-action-button-normal" style="position: relative" data-i18n>Save // Speichern</span>
-                <span id="save-action-button-saving" style="display: none" data-i18n>Saving... // Wird
-                    gespeichert...
-                </span>
-            </button>
-        </section>
         <section aria-labelledby="tabGlobalHeader" class="tabs-pane d-none" id="tabGlobal">
             <div tabindex="-1">
                 <h2 id="tabGlobalHeader" style="display: none" aria-hidden="false" data-i18n>Tab 5 - FLipMouse global properties // Tab 5 - FLipMouse globale Parameter</h2>
@@ -325,9 +170,6 @@
                 </div>
                 <!-- <div class="one column show-mobile space-bottom-2x"></div> -->
             </div>
-        </section>
-        <section class="tabs-pane d-none" id="tabVis">
-
         </section>
     </main>
 </div>
