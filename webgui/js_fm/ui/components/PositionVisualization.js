@@ -1,6 +1,6 @@
-import { h, Component, render } from '../../js/preact.min.js';
-import htm from '../../js/htm.min.js';
-import {styleUtil} from '../util/styleUtil.js'
+import { h, Component, render } from '../../../js/preact.min.js';
+import htm from '../../../js/htm.min.js';
+import {styleUtil} from '../../util/styleUtil.js'
 const html = htm.bind(h);
 
 class PositionVisualization extends Component {

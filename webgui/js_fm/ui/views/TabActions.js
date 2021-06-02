@@ -1,5 +1,5 @@
-import { h, Component, render } from '../../js/preact.min.js';
-import htm from '../../js/htm.min.js';
+import { h, Component, render } from '../../../js/preact.min.js';
+import htm from '../../../js/htm.min.js';
 import {ActionEditModal} from "../modals/ActionEditModal.js";
 import {RadioFieldset} from "../components/RadioFieldset.js";
 

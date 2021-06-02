@@ -1,5 +1,5 @@
-import { h, Component, render } from '../../js/preact.min.js';
-import htm from '../../js/htm.min.js';
+import { h, Component, render } from '../../../js/preact.min.js';
+import htm from '../../../js/htm.min.js';
 
 const html = htm.bind(h);
 class TabSipPuff extends Component {

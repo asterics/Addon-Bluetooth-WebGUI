@@ -29,11 +29,11 @@
     <script src="js_fm/shortcut.js"></script>
     <script src="js_fm/router.js"></script>
     <script type="module" src="js_fm/util/preactUtil.js"></script>
-    <script type="module" src="js_fm/components/PositionVisualization.js"></script>
-    <script type="module" src="js_fm/components/BtnSipPuffVisualization.js"></script>
-    <script type="module" src="js_fm/views/TabVisualization.js"></script>
-    <script type="module" src="js_fm/views/TabSlots.js"></script>
-    <script type="module" src="js_fm/views/TabActions.js"></script>
+    <script type="module" src="js_fm/ui/components/PositionVisualization.js"></script>
+    <script type="module" src="js_fm/ui/components/BtnSipPuffVisualization.js"></script>
+    <script type="module" src="js_fm/ui/views/TabVisualization.js"></script>
+    <script type="module" src="js_fm/ui/views/TabSlots.js"></script>
+    <script type="module" src="js_fm/ui/views/TabActions.js"></script>
     <script type="module" src="js_fm/util/styleUtil.js"></script>
 </head>
 <body>
@@ -174,11 +174,11 @@
 </div>
 
 <script type="module">
-    import {TabVisualization} from "./js_fm/views/TabVisualization.js";
-    import {TabStick} from "./js_fm/views/TabStick.js";
-    import {TabSipPuff} from "./js_fm/views/TabSipPuff.js";
-    import {TabSlots} from "./js_fm/views/TabSlots.js";
-    import {TabActions} from "./js_fm/views/TabActions.js";
+    import {TabVisualization} from "./js_fm/ui/views/TabVisualization.js";
+    import {TabStick} from "./js_fm/ui/views/TabStick.js";
+    import {TabSipPuff} from "./js_fm/ui/views/TabSipPuff.js";
+    import {TabSlots} from "./js_fm/ui/views/TabSlots.js";
+    import {TabActions} from "./js_fm/ui/views/TabActions.js";
 
     router.addView('#tabStick', TabStick);
     router.addView('#tabPuff', TabSipPuff);
