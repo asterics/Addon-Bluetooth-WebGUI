@@ -74,7 +74,7 @@
             <button role="menuitem" onclick="router.toView('#tabPuff')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="2" data-tab id="tabPuffBtn" data-i18n>Sip and Puff // Saug-Puste-Steuerung</button>
             <button role="menuitem" onclick="router.toView('#tabSlots')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="3" data-tab id="tabSlotsBtn" data-i18n>Slots // Slots</button>
             <button role="menuitem" onclick="router.toView('#tabActions')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="4" data-tab id="tabActionsBtn" data-i18n>Actions // Aktionen</button>
-            <button role="menuitem" onclick="router.toView('#tabGlobal')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="5" data-tab id="tabGlobalBtn" data-i18n>Global // Global</button>
+            <button role="menuitem" onclick="router.toView('#tabGeneral')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="5" data-tab id="tabGeneralBtn" data-i18n>General // Allgemein</button>
             <button role="menuitem" onclick="router.toView('#tabVis')" class="col-md m-1 d-none d-md-block menubutton button-primary" accesskey="6" data-tab id="tabVisBtn" data-i18n>Visualization // Visualisierung</button>
         </div>
     </header>
@@ -179,12 +179,13 @@
     import {TabSipPuff} from "./js_fm/ui/views/TabSipPuff.js";
     import {TabSlots} from "./js_fm/ui/views/TabSlots.js";
     import {TabActions} from "./js_fm/ui/views/TabActions.js";
+    import {TabGeneral} from "./js_fm/ui/views/TabGeneral.js";
 
     router.addView('#tabStick', TabStick);
     router.addView('#tabPuff', TabSipPuff);
     router.addView('#tabSlots', TabSlots);
     router.addView('#tabActions', TabActions);
-    router.addView('#tabGlobal', tabGlobal);
+    router.addView('#tabGeneral', TabGeneral);
     router.addView('#tabVis', TabVisualization);
 </script>
 

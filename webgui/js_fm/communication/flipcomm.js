@@ -442,6 +442,19 @@ function FlipMouse() {
         thiz.sendATCmd(AT_CMD_MAPPING[thiz.FLIPMOUSE_MODE], index);
     };
 
+    thiz.setDeviceMode = function (modeNr, slot) {
+        let originalSlot = _currentSlot;
+        if (slot !== _currentSlot) {
+            thiz.save();
+            thiz.setSlot(slot);
+        }
+        thiz.sendATCmd(C.AT_CMD_DEVICE_MODE, modeNr);
+        thiz.save();
+        if (originalSlot !== _currentSlot) {
+            thiz.setSlot(originalSlot);
+        }
+    }
+
     /**
      * tests the connection to the flipmouse
      *
