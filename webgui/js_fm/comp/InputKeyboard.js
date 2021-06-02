@@ -90,7 +90,7 @@ class InputKeyboard extends Component {
                 <div class="col-md-8">
                     <div class="row">
                         <div class="col-12 col-md-8">
-                            <input id="inputKeyboard" class="col-12" type="text" value="${this.state.currentValue}" onkeydown="${(event) => this.handleKeydown(event)}"/>
+                            <input id="inputKeyboard" class="col-12" type="text" value="${this.state.currentValue}" onkeydown="${(event) => this.handleKeydown(event)}" placeholder="${L.translate('Input keys with keyboard // Tasten mit Tastatur eingeben')}"/>
                         </div>
                         <div class="col-12 col-md-4">
                             <button class="col-12" onclick="${() => this.rerenderList([])}">${L.translate('Clear // Löschen')}</button>
