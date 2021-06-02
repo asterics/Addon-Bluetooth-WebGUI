@@ -79,6 +79,7 @@ function FlipMouse() {
     let _connectionTestCallbacks = [];
     let _connected = false;
     let _neverTestConnection = false;
+    let _AT_CMD_IR_TIMEOUT_RESPONSE = 'IR_TIMEOUT';
     let _AT_CMD_BUSY_RESPONSE = 'BUSY';
     let _AT_CMD_OK_RESPONSE = 'OK';
 
@@ -350,6 +351,11 @@ function FlipMouse() {
         return config ? config.substring(0, C.LENGTH_ATCMD_PREFIX).trim() : null;
     }
 
+    thiz.getATCmdSuffix = function (constant, slot) {
+        let config = thiz.getConfig(constant, slot);
+        return config ? config.substring(C.LENGTH_ATCMD_PREFIX).trim() : null;
+    }
+
     thiz.getAllSlotConfigs = function () {
         return JSON.parse(JSON.stringify(_config));
     };
@@ -413,9 +419,16 @@ function FlipMouse() {
     };
 
     thiz.getIRCommands = function () {
-        return thiz.sendAtCmdWithResult('AT IL').then(result => {
-            return Promise.resolve(result.split('\n').map(elem => elem.split(':')[1]).filter(elem => !!elem));
+        return thiz.sendAtCmdWithResult(C.AT_CMD_IR_LIST).then(result => {
+            return Promise.resolve(result.split('\n').map(elem => elem.split(':')[1]).filter(elem => !!elem).map(e => e.trim()));
         });
+    }
+
+    thiz.recordIrCommand = function (name) {
+        return flip.sendAtCmdWithResult(C.AT_CMD_IR_RECORD, name, 11000).then(result => {
+            let success = result && result.indexOf(_AT_CMD_IR_TIMEOUT_RESPONSE) === -1;
+            return Promise.resolve(success);
+        })
     }
 
     thiz.getLiveData = function (constant) {
