@@ -42,8 +42,9 @@ class ActionEditModal extends Component {
 
     setAtCmd(atCmdString) {
         let atCmdObject = C.AT_CMDS_ACTIONS.filter(atCmd => atCmdString === atCmd.cmd)[0];
+        let isAndWasKeyboard = atCmdObject.input === C.INPUTFIELD_TYPE_KEYBOARD && this.state.atCmd.input === C.INPUTFIELD_TYPE_KEYBOARD;
         this.setState({
-            atCmdSuffix: '',
+            atCmdSuffix: isAndWasKeyboard ? this.state.atCmdSuffix : '',
             atCmd: atCmdObject,
             selectOptions: [],
             hasChanges: true
