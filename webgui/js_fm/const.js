@@ -63,6 +63,7 @@ C.AT_CMD_IR_PLAY = 'AT IP';
 C.AT_CMD_IR_HOLD = 'AT IH';
 C.AT_CMD_IR_STOP = 'AT IS';
 C.AT_CMD_IR_DELETE = 'AT IC';
+C.AT_CMD_IR_WIPE = 'AT IW';
 C.AT_CMD_IR_LIST = 'AT IL';
 
 C.AT_CMD_MQTT_BROKER = 'AT MH';
@@ -106,14 +107,17 @@ C.AT_CMDS_ACTIONS = [{
 }, {
     cmd: C.AT_CMD_HOLD_MOUSE_L,
     label: 'Hold left mouse button (as long as input action) // Linke Maustaste halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold left mouse button // Linke Maustaste halten',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_HOLD_MOUSE_R,
     label: 'Hold right mouse button (as long as input action) // Rechte Maustaste halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold right mouse button // Rechte Maustaste halten',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_HOLD_MOUSE_M,
     label: 'Hold middle mouse button (as long as input action) // Mittlere Maustaste halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold middle mouse button // Mittlere Maustaste halten',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_CLICK_MOUSE_L,
@@ -126,6 +130,7 @@ C.AT_CMDS_ACTIONS = [{
 }, {
     cmd: C.AT_CMD_CLICK_MOUSE_M,
     label: 'Click middle mouse button (wheel) // Klick mittlere Maustaste (Mausrad)',
+    shortLabel: 'Click middle mouse button // Klick mittlere Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_DOUBLECLICK_MOUSE_L,
@@ -134,14 +139,17 @@ C.AT_CMDS_ACTIONS = [{
 }, {
     cmd: C.AT_CMD_MOUSE_TOGGLE_L,
     label: 'Press or release left mouse button (toggle) // Drücken oder Loslassen linke Maustaste (wechseln)',
+    shortLabel: 'Press/release left mouse button // Drücken/Loslassen linke Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_MOUSE_TOGGLE_R,
     label: 'Press or release right mouse button (toggle) // Drücken oder Loslassen rechte Maustaste (wechseln)',
+    shortLabel: 'Press/release right mouse button // Drücken/Loslassen rechte Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_MOUSE_TOGGLE_M,
     label: 'Press or release middle mouse button (toggle) // Drücken oder Loslassen mittlere Maustaste (wechseln)',
+    shortLabel: 'Press/release middle mouse button // Drücken/Loslassen mittlere Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_RELEASE_MOUSE_L,
@@ -166,16 +174,19 @@ C.AT_CMDS_ACTIONS = [{
 }, {
     cmd: C.AT_CMD_KEYHOLD,
     label: 'Hold key(s) (as long as input action) // Taste(n) halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold key(s) // Taste(n) halten',
     category: C.AT_CMD_CAT_KEYBOARD,
     input: C.INPUTFIELD_TYPE_KEYBOARD
 }, {
     cmd: C.AT_CMD_KEYPRESS,
     label: 'Press key(s) + release automatically // Taste(n) drücken + wieder loslassen',
+    shortLabel: 'Press key(s) // Taste(n) drücken',
     category: C.AT_CMD_CAT_KEYBOARD,
     input: C.INPUTFIELD_TYPE_KEYBOARD
 }, {
     cmd: C.AT_CMD_KEYTOGGLE,
     label: 'Press or release key(s) (toggle) // Taste(n) drücken oder auslassen (wechseln)',
+    shortLabel: 'Press/release key(s) // Taste(n) drücken/auslassen',
     category: C.AT_CMD_CAT_KEYBOARD,
     input: C.INPUTFIELD_TYPE_KEYBOARD
 }, {
@@ -186,11 +197,13 @@ C.AT_CMDS_ACTIONS = [{
 }, {
     cmd: C.AT_CMD_KEYRELEASE,
     label: 'Release specific key(s) // Spezifische Taste(n) auslassen',
+    shortLabel: 'Release key(s) // Taste(n) auslassen',
     category: C.AT_CMD_CAT_KEYBOARD,
     input: C.INPUTFIELD_TYPE_KEYBOARD
 }, {
     cmd: C.AT_CMD_KEYRELEASEALL,
     label: 'Release all key(s) // Alle Taste(n) auslassen',
+    shortLabel: 'Release key(s) // Taste(n) auslassen',
     category: C.AT_CMD_CAT_KEYBOARD
 }, {
     cmd: C.AT_CMD_NEXT_SLOT,
@@ -378,12 +391,12 @@ C.BTN_MODES2 = [{
     label: 'Button 1',
     category: C.BTN_CAT_BTN
 }, {
-    constant: C.BTN_MODE_BUTTON_1,
+    constant: C.BTN_MODE_BUTTON_2,
     index: 2,
     label: 'Button 2',
     category: C.BTN_CAT_BTN
 }, {
-    constant: C.BTN_MODE_BUTTON_1,
+    constant: C.BTN_MODE_BUTTON_3,
     index: 3,
     label: 'Button 3',
     category: C.BTN_CAT_BTN
