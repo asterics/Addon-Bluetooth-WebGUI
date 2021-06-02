@@ -1,6 +1,7 @@
 import { h, Component, render } from '../../js/preact.min.js';
 import htm from '../../js/htm.min.js';
 import {InputKeyboard} from "../comp/InputKeyboard.js";
+import {ManageIR} from "../comp/ManageIR.js";
 import {RadioFieldset} from "../comp/RadioFieldset.js";
 
 const html = htm.bind(h);
@@ -20,12 +21,13 @@ class ActionEditModal extends Component {
         this.state = {
             showCategory: showCategory,
             atCmd: currentAtCmdObject,
-            atCmdSuffix: '',
+            atCmdSuffix: flip.getATCmdSuffix(props.buttonMode.constant),
             possibleAtCmds: possibleAtCmds,
             selectOptions: [],
             shouldChangeMode: false,
             hasChanges: false
         }
+        this.updateSelect(currentAtCmdObject);
     }
 
     selectActionCategory(category) {
@@ -46,6 +48,18 @@ class ActionEditModal extends Component {
             selectOptions: [],
             hasChanges: true
         });
+        this.updateSelect(atCmdObject);
+    }
+
+    updateIrSelect(newName) {
+        if (newName) {
+            this.setAtCmdSuffix(newName);
+        }
+        this.updateSelect();
+    }
+
+    updateSelect(atCmdObject) {
+        atCmdObject = atCmdObject || this.state.atCmd;
         if (atCmdObject.optionsFn) {
             let parts = atCmdObject.optionsFn.split('.');
             let fn = window;
@@ -53,8 +67,10 @@ class ActionEditModal extends Component {
                 fn = fn[part];
             });
             Promise.resolve(fn()).then(result => {
+                result = result || [];
                 this.setState({
-                    selectOptions: result
+                    selectOptions: result,
+                    atCmdSuffix: result.includes(this.state.atCmdSuffix) ? this.state.atCmdSuffix : result[0]
                 });
             })
         }
@@ -132,7 +148,7 @@ class ActionEditModal extends Component {
                                                 <div class="row">
                                                     <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
                                                     <div class="col-md-8">
-                                                        <input id="inputText" onchange="${(event) => this.setAtCmdSuffix(event.target.value)}" type="text" class="col-12"/>
+                                                        <input id="inputText" value="${state.atCmdSuffix}" onchange="${(event) => this.setAtCmdSuffix(event.target.value)}" type="text" class="col-12"/>
                                                     </div>
                                                 </div>`;
                                         case C.INPUTFIELD_TYPE_NUMBER:
@@ -140,7 +156,7 @@ class ActionEditModal extends Component {
                                                 <div class="row">
                                                     <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
                                                     <div class="col-md-8">
-                                                        <input id="inputText" type="number" onchange="${(event) => this.setAtCmdSuffix(event.target.value)}" class="col-12"/>
+                                                        <input id="inputText" value="${parseInt(state.atCmdSuffix)}" type="number" onchange="${(event) => this.setAtCmdSuffix(event.target.value)}" class="col-12"/>
                                                     </div>
                                                 </div>`;
                                         case C.INPUTFIELD_TYPE_SELECT:
@@ -148,13 +164,19 @@ class ActionEditModal extends Component {
                                                 <div class="row">
                                                     <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
                                                     <div class="col-md-8">
-                                                        <select class="col-12" onchange="${(event) => this.setAtCmdSuffix(event.target.value)}">
+                                                        <select class="col-12" value="${state.atCmdSuffix || state.selectOptions[0]}" onchange="${(event) => this.setAtCmdSuffix(event.target.value)}" disabled="${state.selectOptions.length === 0}">
+                                                            ${state.selectOptions.length === 0 ? html`<option value="" disabled selected data-i18n="">(empty) // (leer)</option>` : ''}
                                                             ${state.selectOptions.map(option => html`<option value="${option}">${option}</option>`)}
                                                         </select>
                                                     </div>
                                                 </div>`;
                                         case C.INPUTFIELD_TYPE_KEYBOARD:
-                                            return html`<${InputKeyboard} onchange="${(value) => this.setAtCmdSuffix(value)}"/>`;
+                                            return html`<${InputKeyboard} value="${state.atCmdSuffix}"  onchange="${(value) => this.setAtCmdSuffix(value)}"/>`;
+                                    }
+                                })()}
+                                ${(() => {
+                                    if (state.atCmd.category === C.AT_CMD_CAT_IR && state.atCmd.input === C.INPUTFIELD_TYPE_SELECT) {
+                                            return html`<${ManageIR} irCmds="${state.selectOptions}" onchange="${(newName) => this.updateIrSelect(newName)}"/>`;
                                     }
                                 })()}
                             </div>
