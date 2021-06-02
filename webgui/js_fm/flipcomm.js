@@ -273,6 +273,8 @@ function FlipMouse() {
         };
         thiz.sendATCmd('AT SA', _currentSlot);
         return Promise.resolve();
+
+        //TODO: remove!
         console.error('START!1')
         _unsavedConfig = {};
         let progress = 10;
@@ -415,6 +417,7 @@ function FlipMouse() {
         if(slotName == _currentSlot) {
             _currentSlot = thiz.getSlots()[0];
         }
+        // TODO
         return thiz.save(progressHandler);
     };
 
@@ -605,7 +608,8 @@ function FlipMouse() {
 		Object.keys(config).forEach(function (key) {
 			var atCmd = AT_CMD_MAPPING[key];
 			if(C.BTN_MODES.includes(key)) {
-				var index = C.BTN_MODES.indexOf(key) + 1;
+				//TODO improve
+			    var index = C.BTN_MODES.indexOf(key) + 1;
 				var indexFormatted = ("0" + index).slice(-2); //1 => 01
 				ret = ret + C.AT_CMD_BTN_MODE + ' ' + indexFormatted + "\n";
 				ret = ret + config[key] + "\n";

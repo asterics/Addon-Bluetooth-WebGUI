@@ -1,7 +1,7 @@
 import { h, Component, render } from '../../js/preact.min.js';
 import htm from '../../js/htm.min.js';
-import {PositionVisualization} from "../comp/PositionVisualization.js";
-import {BtnSipPuffVisualization} from "../comp/BtnSipPuffVisualization.js";
+import {PositionVisualization} from "../components/PositionVisualization.js";
+import {BtnSipPuffVisualization} from "../components/BtnSipPuffVisualization.js";
 import {preactUtil} from "../preactUtil.js";
 
 const html = htm.bind(h);

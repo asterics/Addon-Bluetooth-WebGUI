@@ -1,8 +1,8 @@
 import { h, Component, render } from '../../js/preact.min.js';
 import htm from '../../js/htm.min.js';
-import {InputKeyboard} from "../comp/InputKeyboard.js";
-import {ManageIR} from "../comp/ManageIR.js";
-import {RadioFieldset} from "../comp/RadioFieldset.js";
+import {InputKeyboard} from "../components/InputKeyboard.js";
+import {ManageIR} from "../components/ManageIR.js";
+import {RadioFieldset} from "../components/RadioFieldset.js";
 
 const html = htm.bind(h);
 class ActionEditModal extends Component {
