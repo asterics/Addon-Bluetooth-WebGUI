@@ -53,3 +53,7 @@ body.modal-open {
 .modal-wrapper h1 {
     font-size: 2em;
 }
+
+.modal-wrapper h2 {
+    font-size: 1.4em;
+}
