@@ -63,6 +63,8 @@ function FlipMouse() {
     let VALUE_AT_CMDS = Object.values(AT_CMD_MAPPING);
     let debouncers = {};
     let _valueHandler = null;
+    let _liveValueIntervall = null;
+    let _liveValueLastParse = 0;
     let _slotChangeHandler = null;
     let _currentSlot = null;
     let _SLOT_CONSTANT = 'Slot:';
@@ -77,17 +79,17 @@ function FlipMouse() {
 
     let _connectionTestIntervalHandler = null;
     let _connectionTestCallbacks = [];
-    let _connected = false;
-    let _neverTestConnection = false;
+    let _connected = true;
     let _AT_CMD_IR_TIMEOUT_RESPONSE = 'IR_TIMEOUT';
     let _AT_CMD_BUSY_RESPONSE = 'BUSY';
     let _AT_CMD_OK_RESPONSE = 'OK';
 
     /**
      * initializes the FLipMouse instance
+     * @param dontGetLiveValues if true, live values are not requested by default
      * @return {Promise<* | void>} promise resolving with config of the current slot
      */
-    thiz.init = function () {
+    thiz.init = function (dontGetLiveValues) {
         let promise = Promise.resolve().then(() => {
             if (C.GUI_IS_MOCKED_VERSION) {
                 _communicator = new MockCommunicator();
@@ -105,10 +107,13 @@ function FlipMouse() {
 
         return promise.then(function () {
             _isInitialized = true;
-            thiz.pauseLiveValueListener();
             thiz.resetMinMaxLiveValues();
             return thiz.refreshConfig();
         }).then((config) => {
+            if (!dontGetLiveValues) {
+                thiz.sendATCmd('AT SR');
+                _communicator.setValueHandler(parseLiveValues);
+            }
             thiz.startTestingConnection();
             return Promise.resolve(_config[_currentSlot]);
         }).catch((error) => {
@@ -191,9 +196,7 @@ function FlipMouse() {
      */
     thiz.sendAtCmdWithResult = function(atCmd, param, timeout, onlyIfNotBusy, dontLog) {
         timeout = timeout || 3000;
-        thiz.stopTestingConnection();
         let promise = thiz.sendATCmd(atCmd, param, timeout, onlyIfNotBusy, dontLog);
-        promise.then(thiz.startTestingConnection);
         return promise;
     }
     
@@ -202,26 +205,15 @@ function FlipMouse() {
     };
 
     thiz.startTestingConnection = function () {
-        if (_connectionTestIntervalHandler || _neverTestConnection) {
+        if (_connectionTestIntervalHandler) {
             return;
         }
         function doTest() {
-            testConnection(true).then(result => {
-                _connectionTestCallbacks.forEach(fn => fn(result));
-            });
+            _connected = !_liveValueLastParse || new Date().getTime() - _liveValueLastParse < 1000;
+            _connectionTestCallbacks.forEach(fn => fn(_connected));
         }
         doTest();
-        _connectionTestIntervalHandler = setInterval(doTest, 10000);
-    }
-
-    thiz.stopTestingConnection = function () {
-        clearInterval(_connectionTestIntervalHandler);
-        _connectionTestIntervalHandler = null;
-    }
-
-    thiz.neverTestConnection = function () {
-        _neverTestConnection = true;
-        thiz.stopTestingConnection();
+        _connectionTestIntervalHandler = setInterval(doTest, 500);
     }
 
     thiz.addConnectionTestCallback = function (fn) {
@@ -285,27 +277,11 @@ function FlipMouse() {
     }
 
     thiz.startLiveValueListener = function (handler) {
-        console.log('starting listening to live values...');
-        setLiveValueHandler(handler);
+        _valueHandler = handler;
     };
 
     thiz.stopLiveValueListener = function () {
-        setLiveValueHandler(null);
-        console.log('listening to live values stopped.');
-    };
-
-    thiz.pauseLiveValueListener = function () {
-        thiz.sendATCmd('AT ER');
-        console.log('listening to live values stopped.');
-    };
-
-    thiz.resumeLiveValueListener = function () {
-        if (_valueHandler) {
-            thiz.sendATCmd('AT SR');
-            console.log('listening to live values resumed.');
-        } else {
-            console.log('listening to live values not resumed, because no value handler.');
-        }
+        _valueHandler = null;
     };
 
     thiz.getConfig = function (constant, slot) {
@@ -478,59 +454,51 @@ function FlipMouse() {
      */
     function testConnection(onlyIfNotBusy) {
         return thiz.sendATCmd('AT', '', 3000, onlyIfNotBusy, false).then((response) => {
-            _connected = response && (response.indexOf(_AT_CMD_OK_RESPONSE) > -1 || response.indexOf(_AT_CMD_BUSY_RESPONSE) > -1) ? true : false;
-            return Promise.resolve(_connected);
+            let connected = response && (response.indexOf(_AT_CMD_OK_RESPONSE) > -1 || response.indexOf(_AT_CMD_BUSY_RESPONSE) > -1) ? true : false;
+            return Promise.resolve(connected);
         });
     };
 
-    function setLiveValueHandler(handler) {
-        _valueHandler = handler;
-        if (L.isFunction(_valueHandler)) {
-            thiz.sendATCmd('AT SR');
-            _communicator.setValueHandler(parseLiveValues);
-        } else {
-            thiz.sendATCmd('AT ER');
-        }
-    }
-
     function parseLiveValues(data) {
-        if (!L.isFunction(_valueHandler)) {
-            _communicator.setValueHandler(null);
-            return;
-        }
-        if (!data || data.indexOf('VALUES') == -1) {
+        if (!data) {
             console.log('error parsing live data: ' + data);
             return;
         }
+        _liveValueIntervall = _valueHandler ? null : 300;
 
-        var valArray = data.split(':')[1].split(',');
-        _liveData[thiz.LIVE_PRESSURE] = parseInt(valArray[0]);
-        _liveData[thiz.LIVE_UP] = parseInt(valArray[1]);
-        _liveData[thiz.LIVE_DOWN] = parseInt(valArray[2]);
-        _liveData[thiz.LIVE_LEFT] = parseInt(valArray[3]);
-        _liveData[thiz.LIVE_RIGHT] = parseInt(valArray[4]);
-        _liveData[thiz.LIVE_MOV_X] = parseInt(valArray[5]);
-        _liveData[thiz.LIVE_MOV_Y] = parseInt(valArray[6]);
-        if (valArray[7]) {
-            _liveData[thiz.LIVE_BUTTONS] = valArray[7].split('').map(v => v === "1");
-        }
-        if (valArray[8]) {
-            let slot = thiz.getSlotName(parseInt(valArray[8]));
-            if (slot !== _currentSlot) {
-                _currentSlot = slot;
-                if (_slotChangeHandler) {
-                    _slotChangeHandler(slot, _config[slot]);
+        if (!_liveValueIntervall || new Date().getTime() - _liveValueLastParse > _liveValueIntervall) {
+            _liveValueLastParse = new Date().getTime();
+            var valArray = data.split(':')[1].split(',');
+            _liveData[thiz.LIVE_PRESSURE] = parseInt(valArray[0]);
+            _liveData[thiz.LIVE_UP] = parseInt(valArray[1]);
+            _liveData[thiz.LIVE_DOWN] = parseInt(valArray[2]);
+            _liveData[thiz.LIVE_LEFT] = parseInt(valArray[3]);
+            _liveData[thiz.LIVE_RIGHT] = parseInt(valArray[4]);
+            _liveData[thiz.LIVE_MOV_X] = parseInt(valArray[5]);
+            _liveData[thiz.LIVE_MOV_Y] = parseInt(valArray[6]);
+            if (valArray[7]) {
+                _liveData[thiz.LIVE_BUTTONS] = valArray[7].split('').map(v => v === "1");
+            }
+            if (valArray[8]) {
+                let slot = thiz.getSlotName(parseInt(valArray[8]));
+                if (slot && slot !== _currentSlot) {
+                    _currentSlot = slot;
+                    if (_slotChangeHandler) {
+                        _slotChangeHandler(slot, _config[slot]);
+                    }
                 }
             }
-        }
-        _liveData[thiz.LIVE_PRESSURE_MIN] = Math.min(_liveData[thiz.LIVE_PRESSURE_MIN], _liveData[thiz.LIVE_PRESSURE]);
-        _liveData[thiz.LIVE_MOV_X_MIN] = Math.min(_liveData[thiz.LIVE_MOV_X_MIN], _liveData[thiz.LIVE_MOV_X]);
-        _liveData[thiz.LIVE_MOV_Y_MIN] = Math.min(_liveData[thiz.LIVE_MOV_Y_MIN], _liveData[thiz.LIVE_MOV_Y]);
-        _liveData[thiz.LIVE_PRESSURE_MAX] = Math.max(_liveData[thiz.LIVE_PRESSURE_MAX], _liveData[thiz.LIVE_PRESSURE]);
-        _liveData[thiz.LIVE_MOV_X_MAX] = Math.max(_liveData[thiz.LIVE_MOV_X_MAX], _liveData[thiz.LIVE_MOV_X]);
-        _liveData[thiz.LIVE_MOV_Y_MAX] = Math.max(_liveData[thiz.LIVE_MOV_Y_MAX], _liveData[thiz.LIVE_MOV_Y]);
+            _liveData[thiz.LIVE_PRESSURE_MIN] = Math.min(_liveData[thiz.LIVE_PRESSURE_MIN], _liveData[thiz.LIVE_PRESSURE]);
+            _liveData[thiz.LIVE_MOV_X_MIN] = Math.min(_liveData[thiz.LIVE_MOV_X_MIN], _liveData[thiz.LIVE_MOV_X]);
+            _liveData[thiz.LIVE_MOV_Y_MIN] = Math.min(_liveData[thiz.LIVE_MOV_Y_MIN], _liveData[thiz.LIVE_MOV_Y]);
+            _liveData[thiz.LIVE_PRESSURE_MAX] = Math.max(_liveData[thiz.LIVE_PRESSURE_MAX], _liveData[thiz.LIVE_PRESSURE]);
+            _liveData[thiz.LIVE_MOV_X_MAX] = Math.max(_liveData[thiz.LIVE_MOV_X_MAX], _liveData[thiz.LIVE_MOV_X]);
+            _liveData[thiz.LIVE_MOV_Y_MAX] = Math.max(_liveData[thiz.LIVE_MOV_Y_MAX], _liveData[thiz.LIVE_MOV_Y]);
 
-        _valueHandler(_liveData);
+            if (L.isFunction(_valueHandler)) {
+                _valueHandler(_liveData);
+            }
+        }
     }
 
     function parseConfig(atCmdsString) {

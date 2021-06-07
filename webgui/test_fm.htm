@@ -215,8 +215,7 @@
             return runFn();
         }
         window.flip = new FlipMouse();
-        flip.neverTestConnection();
-        flip.init().then(function () {
+        flip.init(true).then(function () {
             runFn();
         });
     }
