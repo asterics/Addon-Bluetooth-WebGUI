@@ -45,6 +45,8 @@ function MockCommunicator() {
                 thiz.y = 0;
             } else if (value.indexOf('AT IL') > -1) {
                 resolve('IRCommand0:play\nIRCommand1:pause\nIRCommand2:stop');
+            } else if (value.indexOf('AT ID') > -1) {
+                resolve('VERSION 1.0');
             }
             setTimeout(function () {
                 resolve();
