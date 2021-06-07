@@ -139,51 +139,6 @@
             });
         });
     }
-
-    function actionAndToggle(actionFunction, argList, toggleElementList, progressBarId) {
-        return new Promise(function (resolve) {
-            var maxProgress = 0;
-            var stopProgressBar = false;
-            argList = argList || [];
-            L.toggle.apply(null, toggleElementList);
-            var promise = actionFunction.apply(null, argList.concat(progressHandler));
-            if (promise && promise.then) {
-                promise.then(function () {
-                    if (progressBarId) {
-                        progressHandler(100, 100);
-                        setTimeout(function () {
-                            stopProgressBar = true;
-                            L(progressBarId).style = 'width: 0%;';
-                        }, 500);
-                    }
-                    L.toggle.apply(null, toggleElementList);
-                    resolve();
-                }, function () {
-                    stopProgressBar = true;
-                });
-            }
-
-            function progressHandler(progress, timeConstant) {
-                var startTime = L.getMs();
-                timeConstant = timeConstant || 1000;
-                if (progressBarId) {
-                    updateProgressBar(maxProgress);
-                }
-
-                function updateProgressBar(oldPrg) {
-                    setTimeout(function () {
-                        var t = L.getMs() - startTime;
-                        var p = (progress - oldPrg) * (1 - Math.exp(-t / timeConstant)) + oldPrg;
-                        if (p > maxProgress && !stopProgressBar) {
-                            maxProgress = p;
-                            L(progressBarId).style = 'width: ' + p + '%;';
-                            updateProgressBar(oldPrg);
-                        }
-                    }, 50);
-                }
-            }
-        });
-    }
 </script>
 </body>
 </html>

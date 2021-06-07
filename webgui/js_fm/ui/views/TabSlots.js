@@ -10,27 +10,33 @@ class TabSlots extends Component {
         TabSlots.instance = this;
         this.state = {
             newSlotName: '',
-            selectedSlot: flip.getSlots()[0]
+            selectedSlot: flip.getCurrentSlot(),
+            slots: flip.getSlots()
         }
     }
 
-    createSlot(toggleElementList, progressBarId) {
+    createSlot() {
         let thiz = this;
-        actionAndToggle(flip.createSlot, [this.state.newSlotName], toggleElementList, progressBarId).then(function () {
+        flip.createSlot(this.state.newSlotName).then(function () {
             thiz.setState({
-                newSlotName: ''
+                newSlotName: '',
+                slots: flip.getSlots(),
+                selectedSlot: flip.getCurrentSlot()
             });
         });
     }
 
-    deleteSlot(toggleElementList, progressBarId) {
+    deleteSlot() {
         let thiz = this;
         let confirmMessage = L.translate('CONFIRM_DELETE_SLOT', this.state.selectedSlot);
         if (!window.confirm(confirmMessage)) {
             return;
         }
-        actionAndToggle(flip.deleteSlot, [this.state.selectedSlot], toggleElementList, progressBarId).then(function () {
-            thiz.render();
+        flip.deleteSlot(this.state.selectedSlot).then(function () {
+            thiz.setState({
+                selectedSlot: flip.getCurrentSlot(),
+                slots: flip.getSlots()
+            })
         });
     };
 
@@ -62,12 +68,17 @@ class TabSlots extends Component {
         L.downloadasTextFile("flipmouseconfig-" + datestr + ".set", configstr);
     };
 
-    resetConfig(toggleElementList, progressBarId) {
+    resetConfig() {
         let confirmMessage = L.translate('CONFIRM_RESET_SLOTS');
         if(!window.confirm(confirmMessage)){
             return;
         }
-        actionAndToggle(flip.restoreDefaultConfiguration, [], toggleElementList, progressBarId).then(() => this.render());
+        flip.restoreDefaultConfiguration().then(() => {
+            this.setState({
+                slots: flip.getSlots(),
+                selectedSlot: flip.getCurrentSlot()
+            });
+        });
     };
 
     componentDidUpdate() {
@@ -76,7 +87,7 @@ class TabSlots extends Component {
     
     render() {
         let state = this.state;
-        let slots = flip.getSlots();
+        let slots = state.slots;
 
         return html`
             <h2 data-i18n="">Slot configuration // Slot Konfiguration</h2>
@@ -84,7 +95,7 @@ class TabSlots extends Component {
                 <div class="row">
                     <div class="col-12">
                         <label for="selectSlots2" data-i18n>Select slot for action // Slot für Aktion auswählen</label>
-                        <select id="selectSlots2" class="col-12" onchange="${(event) => this.setState({selectedSlot: event.target.value})}">
+                        <select id="selectSlots2" class="col-12" value="${state.selectedSlot}" onchange="${(event) => this.setState({selectedSlot: event.target.value})}">
                             ${slots.map(slot => html`<option value="${slot}">${slot}</option>`)}
                         </select>
                     </div>
@@ -95,10 +106,8 @@ class TabSlots extends Component {
                         <button onclick="${() => flip.setSlot(this.state.selectedSlot)}" data-i18n="">Activate Slot // Slot aktivieren</button>
                     </div>
                     <div class="col-md-6">
-                        <button id="delete-slot-button" disabled="${slots.length === 0}" onclick="${() => this.deleteSlot(['#delete-slot-button-normal', '#delete-slot-button-saving'], '#delete-slot-value-bar')}" style="position: relative;">
-                            <i id="delete-slot-value-bar" class="value-bar color-lightercyan" style="width: 0%;"></i>
-                            <span id="delete-slot-button-normal" style="position: relative" data-i18n>Delete Slot // Slot löschen</span>
-                            <span id="delete-slot-button-saving" style="display: none" data-i18n>deleting slot... // Slot wird gelöscht...</span>
+                        <button disabled="${slots.length === 0}" onclick="${() => this.deleteSlot()}">
+                            <span data-i18n>Delete Slot // Slot löschen</span>
                         </button>
                     </div>
                 </div>
@@ -117,13 +126,11 @@ class TabSlots extends Component {
                         <label for="newSlotLabel" data-i18n="">Create new slot // Neuen Slot anlegen</label>
                     </div>
                     <div class="col-12">
-                        <input id="newSlotLabel" class="col-12" oninput="${(event) => this.setState({newSlotName: event.target.value})}" type="text" placeholder="${L.translate('insert name for new slot // Namen für neuen Slot eingeben')}" maxlength="15"/>
+                        <input id="newSlotLabel" class="col-12" value="${state.newSlotName}" oninput="${(event) => this.setState({newSlotName: event.target.value})}" type="text" placeholder="${L.translate('insert name for new slot // Namen für neuen Slot eingeben')}" maxlength="15"/>
                     </div>
                     <div class="col-12">
-                        <button id="create-slot-button" disabled="${!state.newSlotName}" onclick="${() => this.createSlot(['#create-slot-button-normal', '#create-slot-button-saving'], '#create-slot-value-bar')}" class="u-full-width" style="position: relative;">
-                            <i id="create-slot-value-bar" class="value-bar color-lightercyan" style="width: 0%;"></i>
-                            <span id="create-slot-button-normal" style="position: relative" data-i18n>Create Slot // Slot anlegen</span>
-                            <span id="create-slot-button-saving" style="display: none" data-i18n>creating slot... // Slot wird anlgelegt...</span>
+                        <button disabled="${!state.newSlotName}" onclick="${() => this.createSlot()}" class="u-full-width">
+                            <span data-i18n>Create Slot // Slot anlegen</span>
                         </button>
                     </div>
                 </div>
@@ -150,10 +157,8 @@ class TabSlots extends Component {
                         <label for="reset-slot-button" data-i18n>Reset to default configuration // Rücksetzen auf Defaulteinstellungen</label>
                     </div>
                     <div class="col-12">
-                        <button id="reset-slot-button" onclick="${() => this.resetConfig(['#reset-slot-button-normal', '#reset-slot-button-saving'], '#reset-slot-value-bar')}" class="u-full-width" style="position: relative;">
-                            <i id="reset-slot-value-bar" class="value-bar color-lightercyan" style="width: 0%;"></i>
-                            <span id="reset-slot-button-normal" style="position: relative" data-i18n>Reset // Zurücksetzen</span>
-                            <span id="reset-slot-button-saving" style="display: none" data-i18n>Resetting... // Wird zurückgesetzt...</span>
+                        <button onclick="${() => this.resetConfig()}" class="u-full-width">
+                            <span data-i18n>Reset // Zurücksetzen</span>
                         </button>
                     </div>
                 </div>

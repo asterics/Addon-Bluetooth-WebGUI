@@ -84,13 +84,11 @@ class TabStick extends Component {
                     <${PositionVisualization}/>
                 </div>
                 <div class="five columns">
-                    <button onclick="${() => actionAndToggle(flip.calibrate, [], ['#basic-button-calibrate', '#basic-button-calibrating'])}">
-                        <span data-i18n id="basic-button-calibrate">Calibrate middle position // Mittelposition kalibrieren</span>
-                        <span id="basic-button-calibrating" style="display: none;" data-i18n>Calibrating... // wird kalibriert...</span>
+                    <button onclick="${() => flip.calibrate()}">
+                        <span data-i18n="">Calibrate middle position // Mittelposition kalibrieren</span>
                     </button>
-                    <button onclick="${() => actionAndToggle(flip.rotate, [], ['#basic-button-rotate', '#basic-button-rotating'])}">
-                        <span data-i18n id="basic-button-rotate">\u21BB Rotate right // \u21BB Nach rechts drehen</span>
-                        <span id="basic-button-rotating" style="display: none;" data-i18n>Rotating... // wird gedreht...</span>
+                    <button onclick="${() => flip.rotate()}">
+                        <span data-i18n="">\u21BB Rotate right // \u21BB Nach rechts drehen</span>
                     </button>
                 </div>
             </div>
@@ -116,19 +114,6 @@ class TabStick extends Component {
                     <span id="DEADZONE_Y_VAL" class="text-center one column">${state.DEADZONE_Y}</span>
                     <input type="range" value="${state.DEADZONE_Y}" oninput="${(event) => this.sliderChanged(event, [flip.DEADZONE_Y])}" id="DEADZONE_Y" min="0" max="650" class="eleven columns"/>
                 </div>
-            </div>
-
-
-            <br/>
-            <br/>
-            <div class="row">
-                <button id="basic-button" onclick="${() => actionAndToggle(flip.save, [], ['#basic-button-normal', '#basic-button-saving'], '#save-basic-value-bar')}" class="one-third" style="position: relative;">
-                    <i id="save-basic-value-bar" class="value-bar color-lightercyan" style="width: 0%;"></i>
-                    <span id="basic-button-normal" data-i18n>Save // Speichern</span>
-                    <span id="basic-button-saving" style="display: none;" data-i18n>Saving... // Wird
-                        gespeichert...
-                    </span>
-                </button>
             </div>`;
     }
 }

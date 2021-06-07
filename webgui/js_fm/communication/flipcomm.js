@@ -263,7 +263,7 @@ function FlipMouse() {
      *
      * @return {Promise}
      */
-    thiz.save = async function (updateProgressHandler) {
+    thiz.save = async function () {
         thiz.sendATCmd('AT SA', _currentSlot);
         return Promise.resolve();
     };
@@ -356,34 +356,34 @@ function FlipMouse() {
     thiz.setSlot = function (slot) {
         if (thiz.getSlots().includes(slot)) {
             _currentSlot = slot;
-            thiz.sendATCmd('AT LO', slot);
+            thiz.sendATCmd(C.AT_CMD_LOAD_SLOT, slot);
         }
         return _config[_currentSlot];
     };
 
-    thiz.createSlot = function (slotName, progressHandler) {
+    thiz.createSlot = function (slotName) {
         if (!slotName || thiz.getSlots().includes(slotName)) {
             console.warn('slot not saved because no slot name or slot already existing!');
         }
         _config[slotName] = L.deepCopy(_config[_currentSlot]);
-        _currentSlot = slotName;
-        thiz.sendATCmd('AT SA', slotName);
-        if (progressHandler) {
-            progressHandler(50);
-        }
+        thiz.sendATCmd(C.AT_CMD_SAVE_SLOT, slotName);
+        thiz.setSlot(slotName);
         return testConnection();
     };
 
-    thiz.deleteSlot = function (slotName, progressHandler) {
+    thiz.deleteSlot = function (slotName) {
         if (!slotName || !thiz.getSlots().includes(slotName)) {
             console.warn('slot not deleted because no slot name or slot not existing!');
         }
         delete _config[slotName];
-        if(slotName == _currentSlot) {
+        thiz.sendATCmd(C.AT_CMD_DELETE_SLOT, slotName);
+        if (slotName === _currentSlot) {
             _currentSlot = thiz.getSlots()[0];
+            if (_currentSlot) {
+                thiz.sendATCmd(C.AT_CMD_LOAD_SLOT, _currentSlot);
+            }
         }
-        // TODO
-        return thiz.save(progressHandler);
+        return Promise.resolve();
     };
 
     thiz.getIRCommands = function () {
@@ -428,8 +428,10 @@ function FlipMouse() {
         thiz.sendATCmd(atCmd);
     };
 
-    thiz.restoreDefaultConfiguration = function(progressCallback) {
+    thiz.restoreDefaultConfiguration = function() {
         thiz.sendATCmd('AT RS');
+        _currentSlot = null;
+        _config = {};
         return thiz.refreshConfig();
     };
 

@@ -142,17 +142,7 @@ class TabSipPuff extends Component {
                     <input type="range" value="${state.PUFF_STRONG_THRESHOLD}" oninput="${(event) => this.sliderChanged(event, flip.PUFF_STRONG_THRESHOLD)}"
                            id="PUFF_STRONG_THRESHOLD" min="${state.minRange}" max="${state.maxRange}" class="ten columns" accesskey="v"/>
                 </div>
-            </div>
-
-            <br/>
-            <br/>
-            <button id="sip-puff-button" onclick="actionAndToggle(flip.save, [], ['#sip-puff-button-normal', '#sip-puff-button-saving'], '#save-sip-value-bar')" class="u-full-width" style="position: relative;">
-                <i id="save-sip-value-bar" class="value-bar color-lightercyan" style="width: 0%;"></i>
-                <span id="sip-puff-button-normal" style="position: relative" data-i18n>Save // Speichern</span>
-                <span id="sip-puff-button-saving" style="display: none" data-i18n>Saving... // Wird
-                    gespeichert...
-                </span>
-            </button>`;
+            </div>`;
     }
 }
 
