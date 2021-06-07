@@ -455,6 +455,19 @@ function FlipMouse() {
         }
     }
 
+    thiz.getVersion = function () {
+        return thiz.sendAtCmdWithResult(C.AT_CMD_VERSION).then(result => {
+            return Promise.resolve(L.formatVersion(result));
+        });
+    }
+
+    thiz.getBTVersion = function () {
+        return thiz.sendAtCmdWithResult(C.AT_BT_COMMAND, '$ID', 1000).then(result => {
+            result = result || '';
+            return Promise.resolve(result.trim() ? L.formatVersion(result) : '');
+        });
+    }
+
     /**
      * tests the connection to the flipmouse
      *
