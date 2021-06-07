@@ -299,3 +299,46 @@ L.getReadableATCMD = function (atCmd) {
     let label = cmdObject ? (cmdObject.shortLabel || cmdObject.label) : atCmd;
     return L.translate(label);
 }
+
+L.HTTPRequest = function (url, method, responseType) {
+    let xhr = new XMLHttpRequest();
+    xhr.open(method, url, true);
+    xhr.responseType = responseType;
+    return new Promise((resolve, reject) => {
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                resolve(xhr.response);
+            } else {
+                reject();
+            }
+        };
+        xhr.send();
+    });
+}
+
+L.parseVersion = function (versionString) {
+    versionString = versionString.replace(/[^0-9.]/g, ''); //only digits and dots
+    if (!versionString) {
+        return {};
+    }
+    let versions = versionString.split('.');
+    return {
+        major: parseInt(versions[0]) || 0,
+        minor: parseInt(versions[1]) || 0,
+        patch: parseInt(versions[2]) || 0
+    }
+}
+
+L.formatVersion = function (versionString) {
+    let version = L.parseVersion(versionString);
+    return `${version.major}.${version.minor}.${version.patch}`;
+}
+
+L.isVersionNewer = function (oldVersion, newVersion) {
+    let vOld = L.parseVersion(oldVersion);
+    let vNew = L.parseVersion(newVersion);
+    if (vOld.major !== vNew.major) return vNew.major > vOld.major;
+    if (vOld.minor !== vNew.minor) return vNew.minor > vOld.minor;
+    if (vOld.patch !== vNew.patch) return vNew.patch > vOld.patch;
+    return false;
+}
