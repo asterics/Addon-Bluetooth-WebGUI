@@ -237,7 +237,7 @@ window.L.translate = function (translationKey) {
         let translations = translationKey.split(' // ');
         translated = 'en'.toUpperCase() === L.getLang().toUpperCase() ? translations[0] : translations[1];
     } else {
-        translated = i18n[translationKey] ? i18n[translationKey] : translationKey;
+        translated = translationKey;
     }
     for (let i = 1; i < arguments.length; i++) {
         translated = translated.replace('{?}', L.translate(arguments[i]));
