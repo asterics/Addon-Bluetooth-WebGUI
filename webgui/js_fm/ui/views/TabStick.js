@@ -22,10 +22,6 @@ class TabStick extends Component {
 
         flip.resetMinMaxLiveValues();
     }
-
-    componentDidUpdate() {
-        domI18nInstance.changeLanguage();
-    }
     
     sliderChanged(event, constants) {
         this.valueChanged(event.target.value, constants);
@@ -49,15 +45,15 @@ class TabStick extends Component {
         let state = this.state;
 
         return html`
-            <h2 data-i18n>Stick Configuration // Stick-Konfiguration</h2>
-            <span id="posLiveA11yLabel" aria-hidden="false" class="hidden" data-i18n="">Current position of FLipMouse Stick // Aktuelle Position des Sticks der FLipMouse</span>
+            <h2>${L.translate('Stick Configuration // Stick-Konfiguration')}</h2>
+            <span id="posLiveA11yLabel" class="sr-only">${L.translate('Current position of FLipMouse Stick // Aktuelle Position des Sticks der FLipMouse')}</span>
             <span id="posLiveA11y" aria-describedby="posLiveA11yLabel" class="onlyscreenreader" role="status" aria-live="off" accesskey="q" tabindex="-1"></span>
             <div class="mb-5">
                 ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => flip.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${state.mouseMode}"/>`}
             </div>
             <div id="basic-SENSITIVITY-single" style="display: ${!state.splitSensitivity ? 'block' : 'none'}">
-                <label for="SENSITIVITY" data-i18n>Sensitivity: // Sensitivität:</label>
-                <a aria-hidden="true" class="u-pull-right" href="javascript:;" onclick="${() => this.toggleState('splitSensitivity', [flip.SENSITIVITY_X, flip.SENSITIVITY_Y])}" data-i18n>show x/y separately // zeige x/y getrennt</a>
+                <label for="SENSITIVITY">${L.translate('Sensitivity: // Sensitivität:')}</label>
+                <a aria-hidden="true" class="u-pull-right" href="javascript:;" onclick="${() => this.toggleState('splitSensitivity', [flip.SENSITIVITY_X, flip.SENSITIVITY_Y])}">${L.translate('show x/y separately // zeige x/y getrennt')}</a>
                 <div class="row">
                     <span aria-hidden="true" id="SENSITIVITY_VAL" class="text-center one column">${state.SENSITIVITY_X}</span>
                     <input type="range" value="${state.SENSITIVITY_X}" oninput="${(event) => this.sliderChanged(event, [flip.SENSITIVITY_X, flip.SENSITIVITY_Y])}"
@@ -65,14 +61,14 @@ class TabStick extends Component {
                 </div>
             </div>
             <div id="basic-SENSITIVITY-xy" style="display: ${state.splitSensitivity ? 'block' : 'none'}">
-                <label for="SENSITIVITY_X" data-i18n>Horizontal Sensitivity: // Sensitivität horizontal:</label>
-                <a aria-hidden="true" class="u-pull-right" href="javascript:;" onclick="${() => this.toggleState('splitSensitivity', [flip.SENSITIVITY_X, flip.SENSITIVITY_Y])}" data-i18n>hide separate x/y // zeige  x/y gemeinsam</a>
+                <label for="SENSITIVITY_X">${L.translate('Horizontal Sensitivity: // Sensitivität horizontal:')}</label>
+                <a aria-hidden="true" class="u-pull-right" href="javascript:;" onclick="${() => this.toggleState('splitSensitivity', [flip.SENSITIVITY_X, flip.SENSITIVITY_Y])}">${L.translate('hide separate x/y // zeige  x/y gemeinsam')}</a>
                 <div class="row">
                     <span id="SENSITIVITY_X_VAL" class="text-center one column">${state.SENSITIVITY_X}</span>
                     <input type="range" value="${state.SENSITIVITY_X}" oninput="${(event) => this.sliderChanged(event, [flip.SENSITIVITY_X])}"
                            id="SENSITIVITY_X" min="0" max="255" class="eleven columns"/>
                 </div>
-                <label for="SENSITIVITY_Y" data-i18n>Vertical Sensitivity: // Sensitivität vertikal:</label>
+                <label for="SENSITIVITY_Y">${L.translate('Vertical Sensitivity: // Sensitivität vertikal:')}</label>
                 <div class="row">
                     <span id="SENSITIVITY_Y_VAL" class="text-center one column">${state.SENSITIVITY_Y}</span>
                     <input type="range" value="${state.SENSITIVITY_Y}" oninput="${(event) => this.sliderChanged(event, [flip.SENSITIVITY_Y])}"
@@ -87,10 +83,10 @@ class TabStick extends Component {
                 </div>
                 <div class="five columns">
                     <button onclick="${() => flip.calibrate()}">
-                        <span data-i18n="">Calibrate middle position // Mittelposition kalibrieren</span>
+                        <span>${L.translate('Calibrate middle position // Mittelposition kalibrieren')}</span>
                     </button>
                     <button onclick="${() => flip.rotate()}">
-                        <span data-i18n="">\u21BB Rotate right // \u21BB Nach rechts drehen</span>
+                        <span>${L.translate('\u21BB Rotate right // \u21BB Nach rechts drehen')}</span>
                     </button>
                 </div>
             </div>
@@ -98,7 +94,7 @@ class TabStick extends Component {
             <br/>
             <div id="basic-DEADZONE-single" style="display: ${!state.splitDeadzone ? 'block' : 'none'}">
                 <label lang="en" for="DEADZONE">Deadzone:</label>
-                <a aria-hidden="true" class="u-pull-right" href="javascript:;" onclick="${() => this.toggleState('splitDeadzone', [flip.DEADZONE_X, flip.DEADZONE_Y])}" data-i18n>show x/y separately // zeige x/y getrennt</a>
+                <a aria-hidden="true" class="u-pull-right" href="javascript:;" onclick="${() => this.toggleState('splitDeadzone', [flip.DEADZONE_X, flip.DEADZONE_Y])}">${L.translate('show x/y separately // zeige x/y getrennt')}</a>
                 <div class="row">
                     <span aria-hidden="true" id="DEADZONE_VAL" class="text-center one column">${state.DEADZONE_X}</span>
                     <input type="range" value="${state.DEADZONE_X}" oninput="${(event) => this.sliderChanged(event, [flip.DEADZONE_X, flip.DEADZONE_Y])}" id="DEADZONE" min="0" max="650" class="eleven columns" accesskey="s"/>
@@ -106,7 +102,7 @@ class TabStick extends Component {
             </div>
             <div id="basic-DEADZONE-xy" style="display: ${state.splitDeadzone ? 'block' : 'none'}">
                 <label for="DEADZONE_X">Horizontal Deadzone:</label>
-                <a aria-hidden="true" class="u-pull-right" href="javascript:;" onclick="${() => this.toggleState('splitDeadzone', [flip.DEADZONE_X, flip.DEADZONE_Y])}" data-i18n>hide separate x/y // zeige x/y gemeinsam</a>
+                <a aria-hidden="true" class="u-pull-right" href="javascript:;" onclick="${() => this.toggleState('splitDeadzone', [flip.DEADZONE_X, flip.DEADZONE_Y])}">${L.translate('hide separate x/y // zeige x/y gemeinsam')}</a>
                 <div class="row">
                     <span id="DEADZONE_X_VAL" class="text-center one column">${state.DEADZONE_X}</span>
                     <input type="range" value="${state.DEADZONE_X}" oninput="${(event) => this.sliderChanged(event, [flip.DEADZONE_X])}" id="DEADZONE_X" min="0" max="650" class="eleven columns"/>

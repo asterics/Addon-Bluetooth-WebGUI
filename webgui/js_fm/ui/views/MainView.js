@@ -31,12 +31,6 @@ class MainView extends Component {
         this.addView('#tabGeneral', TabGeneral, 'General // Allgemein');
         this.addView('#tabVis', TabVisualization, 'Visualization // Visualisierung');
 
-        window.domI18nInstance = domI18n({
-            selector: '[data-i18n]',
-            separator: ' // ',
-            languages: ['en', 'de'],
-            enableLog: false
-        });
         L('html')[0].lang = L.getLang();
         if (C.GUI_IS_MOCKED_VERSION || C.GUI_IS_ON_DEVICE) {
             this.initFlip();
@@ -106,7 +100,6 @@ class MainView extends Component {
             flip.stopLiveValueListener();
         }
 
-        window.domI18nInstance.changeLanguage();
         window.location.hash = viewHash;
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
@@ -128,18 +121,18 @@ class MainView extends Component {
         <header class="container-fluid ${state.showMainScreen ? '' : 'd-none'}" role="banner">
             <div class="row">
                 <div>
-                    <h1 id="mainHeading" tabindex="-1" class="nine columns" data-i18n>FLipMouse Configuration // FLipMouse Konfiguration</h1>
+                    <h1 id="mainHeading" tabindex="-1" class="nine columns">${L.translate('FLipMouse Configuration // FLipMouse Konfiguration')}</h1>
                     <span aria-hidden="true" class="show-mobile headerConnectIndicator green connectedIndicator" title="connected">&#x2713;</span>
                     <span aria-hidden="true" class="show-mobile headerConnectIndicator red disconnectedIndicator" style="display: none" title="not connected">&#x2717;</span>
                 </div>
                 <div class="three columns hide-mobile showscreenreader">
                     <div class="row">
-                        <label class="seven columns" for="selectSlots" data-i18n>Select Slot // Slot auswählen</label>
+                        <label class="seven columns" for="selectSlots">${L.translate('Select Slot // Slot auswählen')}</label>
                         <div class="four columns text-right">
                             <span aria-hidden="true" class="connectedIndicator" title="connected">&#x2713;</span>
                             <span aria-hidden="true" style="display: none" class="disconnectedIndicator" title="not connected">&#x2717;</span>
-                            <span id="connStateLabel" aria-hidden="false" class="hidden" data-i18n>connection status // Verbindungsstatus</span>
-                            <span id="connStateText" aria-hidden="false" aria-describedby="connStateLabel" aria-live="assertive" role="status" class="show-desktop" accesskey="p" data-i18n>not connected // nicht verbunden</span>
+                            <span id="connStateLabel" aria-hidden="false" class="hidden">${L.translate('connection status // Verbindungsstatus')}</span>
+                            <span id="connStateText" aria-hidden="false" aria-describedby="connStateLabel" aria-live="assertive" role="status" class="show-desktop" accesskey="p">${L.translate('not connected // nicht verbunden')}</span>
                         </div>
                     </div>
                     <select aria-hidden="true" id="selectSlots" class="slot-select row u-full-width" value="${state.currentSlot}" onchange="${(event) => flip.setSlot(event.target.value)}">
@@ -150,7 +143,7 @@ class MainView extends Component {
                 </div>
             </div>
             <div class="row mb-5" id="tabMenu" role="menubar" tabindex="-1" accesskey="0">
-                <button id="toNavLink" onclick="L.toggleClass('.menubutton', 'd-none')" class="col d-md-none button button-primary" data-tab data-i18n>&#x2630; Menu // &#x2630; Menü</button>
+                <button id="toNavLink" onclick="L.toggleClass('.menubutton', 'd-none')" class="col d-md-none button button-primary">${L.translate('&#x2630; Menu // &#x2630; Menü')}</button>
                 ${state.views.map(view => html`
                     <button role="menuitem" onclick="${() => this.toView(view.hash)}" class="col-md m-1 d-none d-md-block menubutton button-primary ${state.currentView.hash === view.hash ? 'selected' : ''}" aria-selected="${state.currentView.hash === view.hash}">
                         ${L.translate(view.label)}

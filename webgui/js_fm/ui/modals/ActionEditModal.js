@@ -94,10 +94,6 @@ class ActionEditModal extends Component {
         }
         this.props.closeHandler();
     }
-
-    componentDidUpdate() {
-        domI18nInstance.changeLanguage();
-    }
     
     render(props) {
         let state = this.state;
@@ -114,7 +110,7 @@ class ActionEditModal extends Component {
                         <a class="close-button" href="javascript:void(0);" onclick="${() => props.closeHandler()}">X</a>
                         <div class="modal-header">
                             <h1 name="header">
-                                <span data-i18n="">Action for  // Aktion für </span>
+                                <span>${L.translate('Action for  // Aktion für ')}</span>
                                 <span>"${L.translate(btnMode.label)}"</span>
                                 <span> (Slot: ${props.slot})</span>
                             </h1>
@@ -122,7 +118,7 @@ class ActionEditModal extends Component {
     
                         <div class="modal-body container-fluid p-0">
                             <div class="${showActionSelection ? 'd-none' : ''}">
-                                <span class="pr-2" data-i18n="">Stick is currently used for: // Stick wird derzeit verwendet für:</span>
+                                <span class="pr-2">${L.translate('Stick is currently used for: // Stick wird derzeit verwendet für:')}</span>
                                 <strong>${L.translate(mode.label)}</strong>
                                 <div>
                                     <a href="javascript:;" onclick="${() => this.setState({shouldChangeMode: true})}">
@@ -135,7 +131,7 @@ class ActionEditModal extends Component {
                                     ${html`<${RadioFieldset} legend="Show action categories: // Zeige Aktions-Kategorien:" onchange="${(value) => this.selectActionCategory(value)}" elements="${categoryElements}" value="${state.showCategory}"/>`}
                                 </div>
                                 <div class="row">
-                                    <label for="actionSelect" class="col-md-4" data-i18n="">Selection action // Aktion auswählen</label>
+                                    <label for="actionSelect" class="col-md-4">${L.translate('Selection action // Aktion auswählen')}</label>
                                     <div class="col-md-8">
                                         <select id="actionSelect" class="col-12" value="${state.atCmd.cmd}" onchange="${(event) => this.setAtCmd(event.target.value)}">
                                             ${state.possibleAtCmds.map(atCmd => html`<option value="${atCmd.cmd}">${L.translate(atCmd.label)}</option>`)}
@@ -166,7 +162,7 @@ class ActionEditModal extends Component {
                                                     <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
                                                     <div class="col-md-8">
                                                         <select class="col-12" value="${state.atCmdSuffix || state.selectOptions[0]}" onchange="${(event) => this.setAtCmdSuffix(event.target.value)}" disabled="${state.selectOptions.length === 0}">
-                                                            ${state.selectOptions.length === 0 ? html`<option value="" disabled selected data-i18n="">(empty) // (leer)</option>` : ''}
+                                                            ${state.selectOptions.length === 0 ? html`<option value="" disabled selected>${L.translate('(empty) // (leer)')}</option>` : ''}
                                                             ${state.selectOptions.map(option => html`<option value="${option}">${option}</option>`)}
                                                         </select>
                                                     </div>
@@ -187,11 +183,11 @@ class ActionEditModal extends Component {
                             <div class="row">
                                 <div class="col">
                                     <button onclick="${() => props.closeHandler()}">
-                                        <span data-i18n>Cancel // Abbrechen</span>
+                                        ${L.translate('Cancel // Abbrechen')}
                                     </button>
                                 </div>
                                 <div class="col">
-                                    <button onclick="${() => this.save()}" disabled="${this.state.atCmd.input && !this.state.atCmdSuffix}" class="button-primary" data-i18n="">Save // Speichern</button>
+                                    <button onclick="${() => this.save()}" disabled="${this.state.atCmd.input && !this.state.atCmdSuffix}" class="button-primary">${L.translate('Save // Speichern')}</button>
                                 </div>
                             </div>
                         </div>

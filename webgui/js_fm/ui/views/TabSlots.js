@@ -81,20 +81,16 @@ class TabSlots extends Component {
         });
     };
 
-    componentDidUpdate() {
-        domI18nInstance.changeLanguage();
-    }
-    
     render() {
         let state = this.state;
         let slots = state.slots;
 
         return html`
-            <h2 data-i18n="">Slot configuration // Slot Konfiguration</h2>
+            <h2>${L.translate('Slot configuration // Slot Konfiguration')}</h2>
             <div class="container-fluid px-0">
                 <div class="row">
                     <div class="col-12">
-                        <label for="selectSlots2" data-i18n>Select slot for action // Slot für Aktion auswählen</label>
+                        <label for="selectSlots2">${L.translate('Select slot for action // Slot für Aktion auswählen')}</label>
                         <select id="selectSlots2" class="col-12" value="${state.selectedSlot}" onchange="${(event) => this.setState({selectedSlot: event.target.value})}">
                             ${slots.map(slot => html`<option value="${slot}">${slot}</option>`)}
                         </select>
@@ -103,41 +99,41 @@ class TabSlots extends Component {
                
                 <div class="row">
                     <div class="col-md-6">
-                        <button onclick="${() => flip.setSlot(this.state.selectedSlot)}" data-i18n="">Activate Slot // Slot aktivieren</button>
+                        <button onclick="${() => flip.setSlot(this.state.selectedSlot)}">${L.translate('Activate Slot // Slot aktivieren')}</button>
                     </div>
                     <div class="col-md-6">
                         <button disabled="${slots.length <= 1}" onclick="${() => this.deleteSlot()}">
-                            <span data-i18n>Delete Slot // Slot löschen</span>
+                            <span>${L.translate('Delete Slot // Slot löschen')}</span>
                         </button>
                     </div>
                 </div>
                 
                 <div class="row">
                     <div class="col-md-6">
-                        <button onclick="${() => this.downloadSlot()}" data-i18n="">Download Slot // Slot herunterladen</button>
+                        <button onclick="${() => this.downloadSlot()}">${L.translate('Download Slot // Slot herunterladen')}</button>
                     </div>
                     <div class="col-md-6">
-                        <button onclick="${() => this.downloadAllSlots()}" data-i18n="">Download all Slots // Alle Slots herunterladen</button>
+                        <button onclick="${() => this.downloadAllSlots()}">${L.translate('Download all Slots // Alle Slots herunterladen')}</button>
                     </div>
                 </div>
             
                 <div class="row mt-4">
                     <div class="col-12">
-                        <label for="newSlotLabel" data-i18n="">Create new slot // Neuen Slot anlegen</label>
+                        <label for="newSlotLabel">${L.translate('Create new slot // Neuen Slot anlegen')}</label>
                     </div>
                     <div class="col-12">
                         <input id="newSlotLabel" class="col-12" value="${state.newSlotName}" oninput="${(event) => this.setState({newSlotName: event.target.value})}" type="text" placeholder="${L.translate('insert name for new slot // Namen für neuen Slot eingeben')}" maxlength="15"/>
                     </div>
                     <div class="col-12">
                         <button disabled="${!state.newSlotName}" onclick="${() => this.createSlot()}" class="u-full-width">
-                            <span data-i18n>Create Slot // Slot anlegen</span>
+                            <span>${L.translate('Create Slot // Slot anlegen')}</span>
                         </button>
                     </div>
                 </div>
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        <label for="selectSlotUpload" data-i18n>Upload Slot(s) // Slot(s) hochladen</label>
+                        <label for="selectSlotUpload">${L.translate('Upload Slot(s) // Slot(s) hochladen')}</label>
                     </div>
                     <div class="col-12">
                         <input type=file id="selectSlotUpload" accept=".set"/>
@@ -147,18 +143,18 @@ class TabSlots extends Component {
                     </div>
                     <div class="col-12">
                         <button id="upload-slot-button" disabled="${!state.uploadSlotName}" onclick="${() => this.uploadSlot()}" class="u-full-width" style="position: relative;">
-                            <span id="upload-slot-button-normal" style="position: relative" data-i18n>Upload Slot(s) // Slot(s) hochladen</span>
+                            <span id="upload-slot-button-normal" style="position: relative">${L.translate('Upload Slot(s) // Slot(s) hochladen')}</span>
                         </button>
                     </div>
                 </div>
     
                 <div class="row mt-4">
                     <div class="col-12">
-                        <label for="reset-slot-button" data-i18n>Reset to default configuration // Rücksetzen auf Defaulteinstellungen</label>
+                        <label for="reset-slot-button">${L.translate('Reset to default configuration // Rücksetzen auf Defaulteinstellungen')}</label>
                     </div>
                     <div class="col-12">
                         <button onclick="${() => this.resetConfig()}" class="u-full-width">
-                            <span data-i18n>Reset // Zurücksetzen</span>
+                            <span>${L.translate('Reset // Zurücksetzen')}</span>
                         </button>
                     </div>
                 </div>

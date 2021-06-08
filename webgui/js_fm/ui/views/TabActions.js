@@ -22,10 +22,6 @@ class TabActions extends Component {
         L.removeClass('body', 'modal-open');
     }
 
-    componentDidUpdate() {
-        domI18nInstance.changeLanguage();
-    }
-
     getLinkTitle(btnMode, slot) {
         let modeValue = flip.getConfig(flip.FLIPMOUSE_MODE, slot);
         if (modeValue !== C.FLIPMOUSE_MODE_ALT.value && btnMode.category === C.BTN_CAT_STICK) {
@@ -64,7 +60,7 @@ class TabActions extends Component {
         categoryElements = [{value: null, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
 
         return html`<div id="tabActions">
-             <h2 data-i18n="">Action configuration // Konfiguration Aktionen</h2>
+             <h2>${L.translate('Action configuration // Konfiguration Aktionen')}</h2>
              <div class="d-md-none filter-buttons mb-3">
                 ${html`<${RadioFieldset} legend="Show categories: // Zeige Kategorien:" onchange="${(value) => this.setState({showCategory: value})}" elements="${categoryElements}" value="${state.showCategory}"/>`}
              </div>

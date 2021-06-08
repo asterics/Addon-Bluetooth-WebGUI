@@ -52,9 +52,9 @@ class ManageIR extends Component {
         props.irCmds = props.irCmds || [];
 
         return html`
-            <h2 data-i18n="">Manage IR Commands // IR Kommandos verwalten</h2>
+            <h2>${L.translate('Manage IR Commands // IR Kommandos verwalten')}</h2>
             <div class="row">
-                <label for="inputIRName" class="col-12 col-md-4" data-i18n="">New IR Command // Neues IR Kommando</label>
+                <label for="inputIRName" class="col-12 col-md-4">${L.translate('New IR Command // Neues IR Kommando')}</label>
                 <div class="col-md-8">
                     <div class="row">
                         <div class="col-md-6">
@@ -62,26 +62,26 @@ class ManageIR extends Component {
                         </div>
                         <div class="col-md-6">
                             <button class="col-12" disabled="${!state.irCmdName}" onclick="${() => this.recordIrCmd()}">
-                                <span data-i18n="" class="${state.isRecording ? 'd-none' : ''}">${L.translate('Record // Aufnahme')}</span>
-                                <span data-i18n="" class="${!state.isRecording ? 'd-none' : ''}">${L.translate('Recording ... // Aufnahme ...')}</span>
+                                <span class="${state.isRecording ? 'd-none' : ''}">${L.translate('Record // Aufnahme')}</span>
+                                <span class="${!state.isRecording ? 'd-none' : ''}">${L.translate('Recording ... // Aufnahme ...')}</span>
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="row">
-                <label for="selectIRDelete" class="col-12 col-md-4" data-i18n="">Delete IR command // IR Kommando löschen</label>
+                <label for="selectIRDelete" class="col-12 col-md-4">${L.translate('Delete IR command // IR Kommando löschen')}</label>
                 <div class="col-md-8">
                     <div class="row">
                         <div class="col-md-6">
                             <select class="col-12" value="${state.deleteIrName || props.irCmds[0]}" onchange="${(event) => this.setState({deleteIrName: event.target.value})}" disabled="${props.irCmds.length === 0}">
-                                ${props.irCmds.length === 0 ? html`<option value="" disabled selected data-i18n="">(empty) // (leer)</option>` : ''}
+                                ${props.irCmds.length === 0 ? html`<option value="" disabled selected>${L.translate('(empty) // (leer)')}</option>` : ''}
                                 ${props.irCmds.map(option => html`<option value="${option}">${option}</option>`)}
                             </select>
                         </div>
                         <div class="col-md-6">
                             <button class="col-12" onclick="${() => this.deleteIrCmd()}" disabled="${props.irCmds.length === 0}">
-                                <span data-i18n="">Delete // Löschen</span>
+                                <span>${L.translate('Delete // Löschen')}</span>
                             </button>
                         </div>
                     </div>
@@ -90,7 +90,7 @@ class ManageIR extends Component {
             <div class="row">
                 <div class="col-md-8 offset-md-4">
                     <button class="col-12" onclick="${() => this.deleteAllIrCmds()}">
-                        <span data-i18n="">Delete all // Alle löschen</span>
+                        <span>${L.translate('Delete all // Alle löschen')}</span>
                     </button>
                 </div>
             </div>
