@@ -334,6 +334,9 @@ function FlipMouse() {
             _currentSlot = slot;
             thiz.sendATCmd(C.AT_CMD_LOAD_SLOT, slot);
         }
+        if (_slotChangeHandler) {
+            _slotChangeHandler();
+        }
         return _config[_currentSlot];
     };
 
@@ -344,6 +347,9 @@ function FlipMouse() {
         _config[slotName] = L.deepCopy(_config[_currentSlot]);
         thiz.sendATCmd(C.AT_CMD_SAVE_SLOT, slotName);
         thiz.setSlot(slotName);
+        if (_slotChangeHandler) {
+            _slotChangeHandler();
+        }
         return testConnection();
     };
 
@@ -358,6 +364,9 @@ function FlipMouse() {
             if (_currentSlot) {
                 thiz.sendATCmd(C.AT_CMD_LOAD_SLOT, _currentSlot);
             }
+        }
+        if (_slotChangeHandler) {
+            _slotChangeHandler();
         }
         return Promise.resolve();
     };
@@ -404,11 +413,17 @@ function FlipMouse() {
         thiz.sendATCmd(atCmd);
     };
 
-    thiz.restoreDefaultConfiguration = function() {
+    thiz.restoreDefaultConfiguration = function () {
         thiz.sendATCmd('AT RS');
         _currentSlot = null;
         _config = {};
-        return thiz.refreshConfig();
+        let promise = thiz.refreshConfig();
+        promise.then(() => {
+            if (_slotChangeHandler) {
+                _slotChangeHandler();
+            }
+        })
+        return promise;
     };
 
     thiz.setFlipmouseMode = function (index) {
@@ -484,7 +499,7 @@ function FlipMouse() {
                 if (slot && slot !== _currentSlot) {
                     _currentSlot = slot;
                     if (_slotChangeHandler) {
-                        _slotChangeHandler(slot, _config[slot]);
+                        _slotChangeHandler();
                     }
                 }
             }
