@@ -131,7 +131,7 @@ class MainView extends Component {
                         <div class="four columns text-right">
                             <span aria-hidden="true" class="connectedIndicator" title="connected">&#x2713;</span>
                             <span aria-hidden="true" style="display: none" class="disconnectedIndicator" title="not connected">&#x2717;</span>
-                            <span id="connStateLabel" aria-hidden="false" class="hidden">${L.translate('connection status // Verbindungsstatus')}</span>
+                            <span id="connStateLabel" class="sr-only">${L.translate('connection status // Verbindungsstatus')}</span>
                             <span id="connStateText" aria-hidden="false" aria-describedby="connStateLabel" aria-live="assertive" role="status" class="show-desktop" accesskey="p">${L.translate('not connected // nicht verbunden')}</span>
                         </div>
                     </div>

@@ -85,7 +85,7 @@ class TabSipPuff extends Component {
 
         return html`
             <h2>${L.translate('Sip/Puff Configuration // Konfiguration Saug-/Pustesteuerung')}</h2>
-            <span id="pressureLiveA11yLabel" aria-hidden="false" class="hidden">${L.translate('Current pressure value of FLipMouse // Aktueller Wert Druck der FLipMouse')}</span>
+            <span id="pressureLiveA11yLabel" class="sr-only">${L.translate('Current pressure value of FLipMouse // Aktueller Wert Druck der FLipMouse')}</span>
             <span id="pressureLiveA11y" aria-describedby="pressureLiveA11yLabel" class="onlyscreenreader" role="status" aria-live="off" accesskey="w" tabindex="-1">${state.valueA11y}</span>
             <div id="tab-puff-container" class="relative container-fluid">
                 <div class="row back-layer full-height full-width">
