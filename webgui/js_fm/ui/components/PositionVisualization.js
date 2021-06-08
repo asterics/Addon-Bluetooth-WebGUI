@@ -5,7 +5,7 @@ const html = htm.bind(h);
 
 class PositionVisualization extends Component {
 
-    constructor() {
+    constructor(props) {
         super();
 
         PositionVisualization.instance = this;
@@ -25,6 +25,17 @@ class PositionVisualization extends Component {
             maxPos: 100,
             maxPosManual: undefined
         };
+
+        if (props.mode === 'tabStick') {
+            this.setState({
+                showAnalogBars: false,
+                showAnalogValues: true,
+                showOrientation: true,
+                showDeadzone: true,
+                showMaxPos: true,
+                circleRadius: 10
+            });
+        }
     }
 
     componentWillUnmount() {
@@ -40,17 +51,6 @@ class PositionVisualization extends Component {
 
     setStateListener(fn) {
         this.stateListener = fn;
-    }
-
-    prepareForTabStick() {
-        this.setState({
-            showAnalogBars: false,
-            showAnalogValues: true,
-            showOrientation: true,
-            showDeadzone: true,
-            showMaxPos: true,
-            circleRadius: 10
-        });
     }
 
     updateData(data) {

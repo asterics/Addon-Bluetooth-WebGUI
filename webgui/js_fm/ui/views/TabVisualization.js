@@ -33,14 +33,6 @@ class TabVisualization extends Component {
     }
 }
 
-TabVisualization.init = function () {
-    render(html`<${TabVisualization}/>`, document.getElementById('viewContainer'));
-};
-
-TabVisualization.destroy = function () {
-    render(null, document.getElementById('viewContainer'));
-}
-
 TabVisualization.valueHandler = function (data) {
     if (BtnSipPuffVisualization.instance) {
         BtnSipPuffVisualization.instance.updateData(data);

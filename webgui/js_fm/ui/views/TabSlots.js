@@ -28,7 +28,7 @@ class TabSlots extends Component {
 
     deleteSlot() {
         let thiz = this;
-        let confirmMessage = L.translate('CONFIRM_DELETE_SLOT', this.state.selectedSlot);
+        let confirmMessage = L.translate('Do you really want to delete the slot "{?}"? // Möchten Sie den Slot "{?}" wirklich löschen?', this.state.selectedSlot);
         if (!window.confirm(confirmMessage)) {
             return;
         }
@@ -69,7 +69,7 @@ class TabSlots extends Component {
     };
 
     resetConfig() {
-        let confirmMessage = L.translate('CONFIRM_RESET_SLOTS');
+        let confirmMessage = L.translate('Do you really want to reset the FLipMouse to the default configuration? // Möchten Sie die FLipMouse wirklich auf die Standardeinstellungen zurücksetzen?');
         if(!window.confirm(confirmMessage)){
             return;
         }
@@ -106,7 +106,7 @@ class TabSlots extends Component {
                         <button onclick="${() => flip.setSlot(this.state.selectedSlot)}" data-i18n="">Activate Slot // Slot aktivieren</button>
                     </div>
                     <div class="col-md-6">
-                        <button disabled="${slots.length === 0}" onclick="${() => this.deleteSlot()}">
+                        <button disabled="${slots.length <= 1}" onclick="${() => this.deleteSlot()}">
                             <span data-i18n>Delete Slot // Slot löschen</span>
                         </button>
                     </div>
@@ -164,14 +164,6 @@ class TabSlots extends Component {
                 </div>
             </div>`;
     }
-}
-
-TabSlots.init = function () {
-    render(html`<${TabSlots}/>`, document.getElementById('viewContainer'));
-};
-
-TabSlots.destroy = function () {
-    render(null, document.getElementById('viewContainer'));
 }
 
 export {TabSlots};

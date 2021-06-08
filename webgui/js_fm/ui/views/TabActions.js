@@ -91,14 +91,6 @@ class TabActions extends Component {
     }
 }
 
-TabActions.init = function () {
-    render(html`<${TabActions}/>`, document.getElementById('viewContainer'));
-};
-
-TabActions.destroy = function () {
-    render(null, document.getElementById('viewContainer'));
-}
-
 TabActions.style = html`<style>
     #tabActions ul {
         list-style-type: none;

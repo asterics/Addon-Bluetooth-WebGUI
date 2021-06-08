@@ -19,6 +19,8 @@ class TabStick extends Component {
             splitDeadzone: flip.getConfig(flip.DEADZONE_X) !== flip.getConfig(flip.DEADZONE_Y),
             mouseMode: parseInt(flip.getConfig(flip.FLIPMOUSE_MODE))
         }
+
+        flip.resetMinMaxLiveValues();
     }
 
     componentDidUpdate() {
@@ -81,7 +83,7 @@ class TabStick extends Component {
             <br/>
             <div class="row">
                 <div id="posVisBasic" class="six columns">
-                    <${PositionVisualization}/>
+                    <${PositionVisualization} mode="tabStick"/>
                 </div>
                 <div class="five columns">
                     <button onclick="${() => flip.calibrate()}">
@@ -116,16 +118,6 @@ class TabStick extends Component {
                 </div>
             </div>`;
     }
-}
-
-TabStick.init = function () {
-    render(html`<${TabStick}/>`, document.getElementById('viewContainer'));
-    flip.resetMinMaxLiveValues();
-    PositionVisualization.instance.prepareForTabStick();
-};
-
-TabStick.destroy = function () {
-    render(null, document.getElementById('viewContainer'));
 }
 
 TabStick.valueHandler = function (data) {

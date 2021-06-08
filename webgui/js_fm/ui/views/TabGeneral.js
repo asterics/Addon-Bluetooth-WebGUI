@@ -109,12 +109,4 @@ class TabGeneral extends Component {
     }
 }
 
-TabGeneral.init = function () {
-    render(html`<${TabGeneral}/>`, document.getElementById('viewContainer'));
-};
-
-TabGeneral.destroy = function () {
-    render(null, document.getElementById('viewContainer'));
-}
-
 export {TabGeneral};

@@ -146,14 +146,6 @@ class TabSipPuff extends Component {
     }
 }
 
-TabSipPuff.init = function () {
-    render(html`<${TabSipPuff}/>`, document.getElementById('viewContainer'));
-};
-
-TabSipPuff.destroy = function () {
-    render(null, document.getElementById('viewContainer'));
-}
-
 TabSipPuff.valueHandler = function (data) {
    TabSipPuff.instance.updateData(data);
 };
