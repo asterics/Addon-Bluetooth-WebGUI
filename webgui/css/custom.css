@@ -208,16 +208,6 @@ button.selected, .custom-radio:checked ~ label {
     left:-9999px;
 }
 
-.connectedIndicator {
-    color: green;
-    display: inline;
-}
-
-.disconnectedIndicator {
-    color: red;
-    display: inline;
-}
-
 .btnTransparent {
     background-color: transparent;
     border: 1px solid #bbb;

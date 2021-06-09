@@ -22,7 +22,8 @@ class MainView extends Component {
             showMainScreen: false,
             currentSlot: null,
             slots: [],
-            connected: true
+            connected: true,
+            menuOpen: false
         }
         this.addView('#tabStick', TabStick, 'Stick-Config');
         this.addView('#tabPuff', TabSipPuff, 'Sip and Puff // Saug-Puste-Steuerung');
@@ -92,7 +93,8 @@ class MainView extends Component {
         let view = this.state.views.filter(el => el.hash === viewHash)[0];
 
         this.setState({
-            currentView: view
+            currentView: view,
+            menuOpen: false
         });
         if (view.object.valueHandler) {
             flip.startLiveValueListener(view.object.valueHandler);
@@ -118,37 +120,40 @@ class MainView extends Component {
                 </div>
             </div>
         </div>
-        <header class="container-fluid ${state.showMainScreen ? '' : 'd-none'}" role="banner">
+        <header class="container-fluid p-0 ${state.showMainScreen ? '' : 'd-none'}" role="banner">
             <div class="row">
-                <div>
-                    <h1 id="mainHeading" tabindex="-1" class="nine columns">${L.translate('FLipMouse Configuration // FLipMouse Konfiguration')}</h1>
-                    <span aria-hidden="true" class="show-mobile headerConnectIndicator green connectedIndicator" title="connected">&#x2713;</span>
-                    <span aria-hidden="true" class="show-mobile headerConnectIndicator red disconnectedIndicator" style="display: none" title="not connected">&#x2717;</span>
-                </div>
-                <div class="three columns hide-mobile showscreenreader">
-                    <div class="row">
-                        <label class="seven columns" for="selectSlots">${L.translate('Select Slot // Slot auswählen')}</label>
-                        <div class="four columns text-right">
-                            <span aria-hidden="true" class="connectedIndicator" title="connected">&#x2713;</span>
-                            <span aria-hidden="true" style="display: none" class="disconnectedIndicator" title="not connected">&#x2717;</span>
-                            <span id="connStateLabel" class="sr-only">${L.translate('connection status // Verbindungsstatus')}</span>
-                            <span id="connStateText" aria-hidden="false" aria-describedby="connStateLabel" aria-live="assertive" role="status" class="show-desktop" accesskey="p">${L.translate('not connected // nicht verbunden')}</span>
-                        </div>
-                    </div>
-                    <select aria-hidden="true" id="selectSlots" class="slot-select row u-full-width" value="${state.currentSlot}" onchange="${(event) => flip.setSlot(event.target.value)}">
+                <h1 id="mainHeading" tabindex="-1" class="col col-md-6">${L.translate('FLipMouse Configuration // FLipMouse Konfiguration')}</h1>
+                <div class="d-none d-md-inline-block col-md-3">
+                    <label class="col-12" for="selectSlots">${L.translate('Select Slot // Slot auswählen')}</label>
+                    <div class="col-12">
+                        <select id="selectSlots" class="col-12" value="${state.currentSlot}" onchange="${(event) => flip.setSlot(event.target.value)}">
                         ${state.slots.map((slot) => html`
                             <option value="${slot}">${slot}</option>
                         `)}
                     </select>
+                    </div>
+                </div>
+                <div class="col col-md-3">
+                    <span class="sr-only">${L.translate('connection status // Verbindungsstatus')}</span>
+                    <div class="justify-content-end align-items-center ${state.connected ? 'd-flex' : 'd-none'}">
+                        <span aria-hidden="true" title="connected" style="font-size: 2em">${'\u2713'}</span>
+                        <span aria-live="assertive" role="status" class="d-none d-md-block ml-2">${L.translate(' connected //  verbunden')}</span>
+                    </div>
+                    <div class="justify-content-end align-items-center ${state.connected ? 'd-none' : 'd-flex'}">
+                        <span aria-hidden="true" title="not connected" style="font-size: 2em">${'\u2717'}</span>
+                        <span aria-live="assertive" role="status" class="d-none d-md-block ml-2">${L.translate('not connected // nicht verbunden')}</span>
+                    </div>
                 </div>
             </div>
-            <div class="row mb-5" id="tabMenu" role="menubar" tabindex="-1" accesskey="0">
-                <button id="toNavLink" onclick="L.toggleClass('.menubutton', 'd-none')" class="col d-md-none button button-primary">${L.translate('&#x2630; Menu // &#x2630; Menü')}</button>
-                ${state.views.map(view => html`
-                    <button role="menuitem" onclick="${() => this.toView(view.hash)}" class="col-md m-1 d-none d-md-block menubutton button-primary ${state.currentView.hash === view.hash ? 'selected' : ''}" aria-selected="${state.currentView.hash === view.hash}">
-                        ${L.translate(view.label)}
-                    </button>
-                `)}
+            <div class="container-fluid">
+                <div class="row mb-5" id="tabMenu" role="menubar" tabindex="-1" accesskey="0">
+                    <button id="toNavLink" onclick="${() => this.setState({menuOpen: !state.menuOpen})}" class="col d-md-none button button-primary">${L.translate('\u2630 Menu // \u2630 Menü')}</button>
+                    ${state.views.map(view => html`
+                        <button role="menuitem" onclick="${() => this.toView(view.hash)}" class="col-md m-1 d-md-block menubutton button-primary ${state.menuOpen ? '' : 'd-none'} ${state.currentView.hash === view.hash ? 'selected' : ''}" aria-selected="${state.currentView.hash === view.hash}">
+                            ${L.translate(view.label)}
+                        </button>
+                    `)}
+                </div>
             </div>
         </header>
         <main role="main">
