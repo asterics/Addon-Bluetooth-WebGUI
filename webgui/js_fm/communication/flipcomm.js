@@ -1,18 +1,5 @@
 function FlipMouse() {
     let thiz = this;
-    thiz.AT_CMD_MAPPING = {};
-    thiz.SENSITIVITY_X = 'SENSITIVITY_X';
-    thiz.SENSITIVITY_Y = 'SENSITIVITY_Y';
-    thiz.ACCELERATION = 'ACCELERATION';
-    thiz.MAX_SPEED = 'MAX_SPEED';
-    thiz.DEADZONE_X = 'DEADZONE_X';
-    thiz.DEADZONE_Y = 'DEADZONE_Y';
-    thiz.SIP_THRESHOLD = 'SIP_THRESHOLD';
-    thiz.SIP_STRONG_THRESHOLD = 'SIP_STRONG_THRESHOLD';
-    thiz.PUFF_THRESHOLD = 'PUFF_THRESHOLD';
-    thiz.PUFF_STRONG_THRESHOLD = 'PUFF_STRONG_THRESHOLD';
-    thiz.ORIENTATION_ANGLE = 'ORIENTATION_ANGLE';
-    thiz.SLOT_ID = 'SLOT_ID';
 
     thiz.LIVE_PRESSURE = 'LIVE_PRESSURE';
     thiz.LIVE_UP = 'LIVE_UP';
@@ -29,38 +16,12 @@ function FlipMouse() {
     thiz.LIVE_PRESSURE_MIN = 'LIVE_PRESSURE_MIN';
     thiz.LIVE_PRESSURE_MAX = 'LIVE_PRESSURE_MAX';
     thiz.LIVE_BUTTONS = 'LIVE_BUTTONS';
-    thiz.FLIPMOUSE_MODE = 'FLIPMOUSE_MODE';
-    thiz.VERSION = '';
-
-    thiz.SIP_PUFF_IDS = [
-        L.getIDSelector(thiz.SIP_THRESHOLD),
-        L.getIDSelector(thiz.SIP_STRONG_THRESHOLD),
-        L.getIDSelector(thiz.PUFF_THRESHOLD),
-        L.getIDSelector(thiz.PUFF_STRONG_THRESHOLD)
-    ];
     
     thiz.inRawMode = false;
 
-    let _config = {};
-    let _unsavedConfig = {};
+    let _slots = [];
     let _liveData = {};
-    let AT_CMD_LENGTH = 5;
 
-    let AT_CMD_MAPPING = {};
-    AT_CMD_MAPPING[thiz.SENSITIVITY_X] = 'AT AX';
-    AT_CMD_MAPPING[thiz.SENSITIVITY_Y] = 'AT AY';
-    AT_CMD_MAPPING[thiz.ACCELERATION] = 'AT AC';
-    AT_CMD_MAPPING[thiz.MAX_SPEED] = 'AT MS';
-    AT_CMD_MAPPING[thiz.DEADZONE_X] = 'AT DX';
-    AT_CMD_MAPPING[thiz.DEADZONE_Y] = 'AT DY';
-    AT_CMD_MAPPING[thiz.SIP_THRESHOLD] = 'AT TS';
-    AT_CMD_MAPPING[thiz.SIP_STRONG_THRESHOLD] = 'AT SS';
-    AT_CMD_MAPPING[thiz.PUFF_THRESHOLD] = 'AT TP';
-    AT_CMD_MAPPING[thiz.PUFF_STRONG_THRESHOLD] = 'AT SP';
-    AT_CMD_MAPPING[thiz.ORIENTATION_ANGLE] = 'AT RO';
-    AT_CMD_MAPPING[thiz.FLIPMOUSE_MODE] = 'AT MM';
-    AT_CMD_MAPPING[thiz.VERSION] = 'AT ID';
-    let VALUE_AT_CMDS = Object.values(AT_CMD_MAPPING);
     let debouncers = {};
     let _valueHandler = null;
     let _liveValueIntervall = null;
@@ -115,7 +76,7 @@ function FlipMouse() {
                 _communicator.setValueHandler(parseLiveValues);
             }
             thiz.startTestingConnection();
-            return Promise.resolve(_config[_currentSlot]);
+            return Promise.resolve();
         }).catch((error) => {
             console.warn(error);
         });
@@ -199,7 +160,7 @@ function FlipMouse() {
         let promise = thiz.sendATCmd(atCmd, param, timeout, onlyIfNotBusy, dontLog);
         return promise;
     }
-    
+
     thiz.sendRawData = function(data, timeout) {
         return _communicator.sendRawData(data, timeout);
     };
@@ -225,14 +186,13 @@ function FlipMouse() {
         return _isInitialized;
     }
 
-    thiz.setValue = function (valueConstant, value, debounceTimeout) {
+    thiz.setValue = function (atCmd, value, debounceTimeout) {
         if (!debounceTimeout) {
             debounceTimeout = 300;
         }
-        thiz.setConfig(valueConstant, parseInt(value));
-        clearInterval(debouncers[valueConstant]);
-        debouncers[valueConstant] = setTimeout(function () {
-            var atCmd = AT_CMD_MAPPING[valueConstant];
+        thiz.setConfig(atCmd, parseInt(value));
+        clearInterval(debouncers[atCmd]);
+        debouncers[atCmd] = setTimeout(function () {
             thiz.sendATCmd(atCmd, value);
         }, debounceTimeout);
     };
@@ -240,8 +200,8 @@ function FlipMouse() {
     thiz.refreshConfig = function () {
         return new Promise(function(resolve, reject) {
             thiz.sendAtCmdWithResult('AT LA').then(function (response) {
-                _config = {};
-                parseConfig(response);
+                _slots = parseConfig(response);
+                _currentSlot = _currentSlot || _slots[0].name;
                 resolve();
             }, function () {
                 console.log("could not get config!");
@@ -266,8 +226,8 @@ function FlipMouse() {
     };
 
     thiz.rotate = function () {
-        var currentOrientation = thiz.getConfig(thiz.ORIENTATION_ANGLE);
-        thiz.setValue(thiz.ORIENTATION_ANGLE, (currentOrientation + 90) % 360, 0);
+        var currentOrientation = thiz.getConfig(C.AT_CMD_ORIENTATION_ANGLE);
+        thiz.setValue(C.AT_CMD_ORIENTATION_ANGLE, (currentOrientation + 90) % 360, 0);
         thiz.sendATCmd('AT CA');
         return testConnection();
     };
@@ -284,45 +244,49 @@ function FlipMouse() {
         _valueHandler = null;
     };
 
-    thiz.getConfig = function (constant, slot) {
-        slot = slot || _currentSlot;
-        return _config[slot] ? _config[slot][constant] : null;
+    thiz.getConfig = function (constant, slotName) {
+        let slotConfig = thiz.getSlotConfigs(slotName || _currentSlot);
+        if (slotConfig[constant]) {
+            let value = slotConfig[constant] + '';
+            let intValue = parseInt(value);
+            return intValue + '' === value.trim() ? intValue : value;
+        }
+        return null;
     };
 
-    thiz.getATCmd = function (constant, slot) {
-        let config = thiz.getConfig(constant, slot);
-        return config ? config.substring(0, C.LENGTH_ATCMD_PREFIX).trim() : null;
+    thiz.getButtonActionATCmd = function (index, slot) {
+        let action = thiz.getButtonAction(index, slot);
+        return action ? action.substring(0, C.LENGTH_ATCMD_PREFIX).trim() : null;
     }
 
-    thiz.getATCmdSuffix = function (constant, slot) {
-        let config = thiz.getConfig(constant, slot);
-        return config ? config.substring(C.LENGTH_ATCMD_PREFIX).trim() : null;
+    thiz.getButtonActionATCmdSuffix = function (index, slot) {
+        let action = thiz.getButtonAction(index, slot);
+        return action ? action.substring(C.LENGTH_ATCMD_PREFIX).trim() : null;
     }
 
-    thiz.getAllSlotConfigs = function () {
-        return JSON.parse(JSON.stringify(_config));
-    };
-
-    thiz.isConfigUnsaved = function (constant, slot) {
-        slot = slot || _currentSlot;
-        return _unsavedConfig[slot] ? _unsavedConfig[slot].indexOf(constant) > -1 : false;
-    };
-
-    thiz.setConfig = function (constant, value, slot) {
-        slot = slot || _currentSlot;
-        if (_config[slot]) {
-            _config[slot][constant] = value;
+    thiz.setConfig = function (constant, value, slotName) {
+        let slotConfig = thiz.getSlotConfigs(slotName || _currentSlot);
+        if (slotConfig) {
+            slotConfig[constant] = value;
         }
     };
 
     thiz.getSlots = function () {
-        return Object.keys(_config);
+        return _slots.map(slotObject => slotObject.name);
     };
 
+    thiz.getAllSlotObjects = function () {
+        return JSON.parse(JSON.stringify(_slots));
+    }
+
+    thiz.getSlotConfigs = function (slotName) {
+        let object = _slots.filter(slot => slot.name === slotName)[0];
+        return object && object.config ? object.config : {};
+    }
+
     thiz.getSlotName = function (id) {
-        return thiz.getSlots().reduce((total, current) => {
-            return _config[current][thiz.SLOT_ID] === id ? current : total;
-        }, '')
+        id = id || 0;
+        return _slots[id] ? _slots[id].name : '';
     }
 
     thiz.getCurrentSlot = function () {
@@ -337,14 +301,17 @@ function FlipMouse() {
         if (_slotChangeHandler) {
             _slotChangeHandler();
         }
-        return _config[_currentSlot];
     };
 
     thiz.createSlot = function (slotName) {
         if (!slotName || thiz.getSlots().includes(slotName)) {
             console.warn('slot not saved because no slot name or slot already existing!');
         }
-        _config[slotName] = L.deepCopy(_config[_currentSlot]);
+        let slotConfig = thiz.getSlotConfigs(_currentSlot);
+        _slots.push({
+            name: slotName,
+            config: L.deepCopy(slotConfig)
+        });
         thiz.sendATCmd(C.AT_CMD_SAVE_SLOT, slotName);
         thiz.setSlot(slotName);
         if (_slotChangeHandler) {
@@ -357,7 +324,7 @@ function FlipMouse() {
         if (!slotName || !thiz.getSlots().includes(slotName)) {
             console.warn('slot not deleted because no slot name or slot not existing!');
         }
-        delete _config[slotName];
+        _slots = _slots.filter(slotObject => slotObject.name !== slotName);
         thiz.sendATCmd(C.AT_CMD_DELETE_SLOT, slotName);
         if (slotName === _currentSlot) {
             _currentSlot = thiz.getSlots()[0];
@@ -400,23 +367,25 @@ function FlipMouse() {
         _liveData[thiz.LIVE_MOV_Y_MAX] = -1;
     };
 
-    thiz.setButtonAction = function(buttonModeConstant, atCmd) {
-        let index = C.BTN_MODES2.filter(btnMode => btnMode.constant === buttonModeConstant)[0].index;
-        if (!index || !atCmd) {
+    thiz.setButtonAction = function(buttonModeIndex, atCmd) {
+        if (buttonModeIndex === undefined || !atCmd) {
             return;
         }
-        thiz.setConfig(buttonModeConstant, atCmd);
-        _unsavedConfig[_currentSlot] = _unsavedConfig[_currentSlot] || [];
-        _unsavedConfig[_currentSlot].push(buttonModeConstant);
-
-        thiz.sendATCmd(C.AT_CMD_BTN_MODE, index);
+        buttonModeIndex = parseInt(buttonModeIndex);
+        thiz.setConfig(C.AT_CMD_BTN_MODE + " " + buttonModeIndex, atCmd);
+        thiz.sendATCmd(C.AT_CMD_BTN_MODE, buttonModeIndex);
         thiz.sendATCmd(atCmd);
     };
+
+    thiz.getButtonAction = function (buttonModeIndex, slot) {
+        buttonModeIndex = parseInt(buttonModeIndex);
+        return thiz.getConfig(C.AT_CMD_BTN_MODE + " " + buttonModeIndex, slot);
+    }
 
     thiz.restoreDefaultConfiguration = function () {
         thiz.sendATCmd('AT RS');
         _currentSlot = null;
-        _config = {};
+        _slots = [];
         let promise = thiz.refreshConfig();
         promise.then(() => {
             if (_slotChangeHandler) {
@@ -431,8 +400,8 @@ function FlipMouse() {
         if (!C.FLIPMOUSE_MODES.map(mode => mode.value).includes(index)) {
             return;
         }
-        thiz.setConfig(thiz.FLIPMOUSE_MODE, index);
-        thiz.sendATCmd(AT_CMD_MAPPING[thiz.FLIPMOUSE_MODE], index);
+        thiz.setConfig(C.AT_CMD_FLIPMOUSE_MODE, index);
+        thiz.sendATCmd(C.AT_CMD_FLIPMOUSE_MODE, index);
     };
 
     thiz.setDeviceMode = function (modeNr, slot) {
@@ -518,79 +487,41 @@ function FlipMouse() {
 
     function parseConfig(atCmdsString) {
         atCmdsString = atCmdsString.replace(/\n\s*\n/g, '\n'); //replace doubled linebreaks with single one
-        return parseConfigElement(atCmdsString.split('\n'));
-    }
-    
-    //TODO: do we need both versions? I didn't want to remove the other one to avoid breaking anything
-    thiz.parseConfig = function(atCmdsString,ignoreSlotName) {
-        atCmdsString = atCmdsString.replace(/\n\s*\n/g, '\n'); //replace doubled linebreaks with single one
-        return parseConfigElement(atCmdsString.split('\n'),null,ignoreSlotName);
-    }
-
-    function parseConfigElement(remainingList, config, ignoreSlotName, id) {
-        if (!remainingList || remainingList.length == 0) {
-            return _config;
-        }
-        id = id || 0;
-        config = config || {};
-        var currentElement = remainingList[0];
-        var nextElement = remainingList[1];
-
-        if (currentElement.indexOf(_SLOT_CONSTANT) > -1) {
-			if(!ignoreSlotName)
-			{
-				var slot = currentElement.substring(_SLOT_CONSTANT.length).trim();
-				if (!_currentSlot) {
-					_currentSlot = slot;
-				}
-                config = {};
-                _config[slot] = config;
-                _config[slot][thiz.SLOT_ID] = id;
-                id++;
-			}
-        } else {
-            var currentAtCmd = currentElement.substring(0, AT_CMD_LENGTH).trim();
-            if (VALUE_AT_CMDS.includes(currentAtCmd)) {
-                var key = L.val2key(currentAtCmd, AT_CMD_MAPPING);
-                config[key] = parseInt(currentElement.substring(AT_CMD_LENGTH));
-            } else if(currentAtCmd.indexOf(C.AT_CMD_BTN_MODE) > -1) {
-                var buttonModeIndex = parseInt(currentElement.substring(AT_CMD_LENGTH));
-                if(C.BTN_MODES[buttonModeIndex-1]) {
-                    config[C.BTN_MODES[buttonModeIndex-1]] = nextElement.trim();
+        let elements = atCmdsString.split('\n');
+        let parsedSlots = [];
+        let currentParsedSlot = null;
+        for (let i = 0; i < elements.length; i++) {
+            let currentElement = elements[i];
+            let nextElement = elements[i + 1] || '';
+            if (currentElement.indexOf(_SLOT_CONSTANT) > -1) {
+                let slotName = currentElement.substring(_SLOT_CONSTANT.length).trim();
+                currentParsedSlot = {
+                    name: slotName,
+                    config: {}
+                };
+                parsedSlots.push(currentParsedSlot);
+            } else {
+                let currentAtCmd = currentElement.substring(0, C.LENGTH_ATCMD_PREFIX - 1).trim();
+                if (currentAtCmd.indexOf(C.AT_CMD_BTN_MODE) > -1) {
+                    let buttonModeIndex = parseInt(currentElement.substring(C.LENGTH_ATCMD_PREFIX - 1));
+                    currentParsedSlot.config[C.AT_CMD_BTN_MODE + ' ' + buttonModeIndex] = nextElement.trim();
+                } else if (C.AT_CMDS_SETTINGS.indexOf(currentAtCmd) > -1) {
+                    currentParsedSlot.config[currentAtCmd] = currentElement.substring(C.LENGTH_ATCMD_PREFIX - 1).trim();
                 }
             }
         }
-        return parseConfigElement(remainingList.slice(1), config, false, id);
-    }
-
-    function loadSlotByConfig(slotName) {
-        let config = _config[slotName];
-        Object.keys(config).forEach(function (key) {
-            let atCmd = AT_CMD_MAPPING[key];
-            if(C.BTN_MODES.includes(key)) {
-                thiz.setButtonAction(key, config[key]);
-            } else if(key === thiz.FLIPMOUSE_MODE) {
-                thiz.setFlipmouseMode(config[key]);
-            } else if (atCmd) {
-                thiz.sendATCmd(atCmd, config[key]);
-            }
-        });
+        return parsedSlots;
     }
 
     thiz.getSlotConfigText = function(slotName) {
-        var config = _config[slotName];
-        var ret = "Slot:"+slotName+"\n";
+        let config = thiz.getSlotConfigs(slotName);
+        let ret = "Slot:"+slotName+"\n";
 
-		Object.keys(config).forEach(function (key) {
-			var atCmd = AT_CMD_MAPPING[key];
-			if(C.BTN_MODES.includes(key)) {
-				//TODO improve
-			    var index = C.BTN_MODES.indexOf(key) + 1;
-				var indexFormatted = ("0" + index).slice(-2); //1 => 01
-				ret = ret + C.AT_CMD_BTN_MODE + ' ' + indexFormatted + "\n";
-				ret = ret + config[key] + "\n";
-            } else if (atCmd) {
-                ret = ret + atCmd + ' ' + config[key] + "\n";
+        Object.keys(config).forEach(function (key) {
+            if (key.indexOf(C.AT_CMD_BTN_MODE) > -1) {
+                ret = ret + key + '\n' + config[key] + "\n";
+            } else {
+                ret = ret + key + ' ' + config[key] + "\n";
             }
         });
 		

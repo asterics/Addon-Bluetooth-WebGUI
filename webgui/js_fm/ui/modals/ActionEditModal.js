@@ -13,7 +13,7 @@ class ActionEditModal extends Component {
         ActionEditModal.instance = this;
         this.props = props;
 
-        let currentAtCmdString = flip.getATCmd(props.buttonMode.constant) || C.AT_CMD_NO_CMD;
+        let currentAtCmdString = flip.getButtonActionATCmd(props.buttonMode.index, props.slot) || C.AT_CMD_NO_CMD;
         let currentAtCmdObject = C.AT_CMDS_ACTIONS.filter(atCmd => currentAtCmdString === atCmd.cmd)[0] || C.AT_CMDS_ACTIONS[0];
         currentAtCmdString = currentAtCmdObject.cmd;
         let showCategory = currentAtCmdString && currentAtCmdString !== C.AT_CMD_NO_CMD ? C.AT_CMDS_ACTIONS.filter(atCmd => atCmd.cmd === currentAtCmdString)[0].category: null;
@@ -21,7 +21,7 @@ class ActionEditModal extends Component {
         this.state = {
             showCategory: showCategory,
             atCmd: currentAtCmdObject,
-            atCmdSuffix: flip.getATCmdSuffix(props.buttonMode.constant),
+            atCmdSuffix: flip.getButtonActionATCmdSuffix(props.buttonMode.index, props.slot),
             possibleAtCmds: possibleAtCmds,
             selectOptions: [],
             shouldChangeMode: false,
@@ -90,7 +90,7 @@ class ActionEditModal extends Component {
         }
         if (this.state.hasChanges) {
             let atCmd = this.state.atCmdSuffix ? this.state.atCmd.cmd + ' ' + this.state.atCmdSuffix : this.state.atCmd.cmd;
-            flip.setButtonAction(this.props.buttonMode.constant, atCmd);
+            flip.setButtonAction(this.props.buttonMode.index, atCmd);
         }
         this.props.closeHandler();
     }
@@ -100,8 +100,8 @@ class ActionEditModal extends Component {
         let btnMode = props.buttonMode;
         let categoryElements = C.AT_CMD_CATEGORIES.map(cat => {return {value: cat.constant, label: cat.label}});
         categoryElements = [{value: null, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
-        let showActionSelection = flip.getConfig(flip.FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value || btnMode.category !== C.BTN_CAT_STICK || state.shouldChangeMode;
-        let mode = C.FLIPMOUSE_MODES.filter(mode => mode.value === flip.getConfig(flip.FLIPMOUSE_MODE, props.slot))[0];
+        let showActionSelection = flip.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value || btnMode.category !== C.BTN_CAT_STICK || state.shouldChangeMode;
+        let mode = C.FLIPMOUSE_MODES.filter(mode => mode.value === flip.getConfig(C.AT_CMD_FLIPMOUSE_MODE, props.slot))[0];
 
         return html`
             <div class="modal-mask">

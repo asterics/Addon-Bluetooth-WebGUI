@@ -47,6 +47,7 @@ class TabSlots extends Component {
         var reader=new FileReader();
         reader.readAsText(file[0]);
         reader.onloadend = function(e) {
+            //TODO
             //config = flip.parseConfig(e.target.result,true);
             flip.createSlot(slotName,null);
         };

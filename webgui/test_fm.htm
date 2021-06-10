@@ -6,13 +6,12 @@
 
     <link rel="shortcut icon" href="favicon_fm.ico" type="image/x-icon">
     <link rel="icon" href="favicon_fm.ico" type="image/x-icon">
-
-    <script src="lib/domi18n.js"></script>
+    
     <script src="lib/loglevel.min.js"></script>
 
     <script src="js_fm/const.js"></script>
     <script src="js/lquery.js"></script>
-    <script src="js_fm/communication/sercomm.js"></script>
+    <script src="js/adapter/sercomm.js"></script>
     <script src="js_fm/communication/flipcomm.js"></script>
 </head>
 <body>
@@ -34,9 +33,9 @@
 
 <script>
     let PRINT_DEBUG = false;
-    let DEFAULT_CONFIG = "{\"mouse\":{\"SLOT_ID\":0,\"SENSITIVITY_X\":40,\"SENSITIVITY_Y\":40,\"DEADZONE_X\":20,\"DEADZONE_Y\":20,\"MAX_SPEED\":50,\"ACCELERATION\":20,\"SIP_THRESHOLD\":400,\"PUFF_THRESHOLD\":600,\"PUFF_STRONG_THRESHOLD\":800,\"SIP_STRONG_THRESHOLD\":10,\"FLIPMOUSE_MODE\":1,\"ORIENTATION_ANGLE\":0,\"BTN_MODE_BUTTON_1\":\"AT NE\",\"BTN_MODE_BUTTON_2\":\"AT NC\",\"BTN_MODE_BUTTON_3\":\"AT NC\",\"BTN_MODE_STICK_UP\":\"AT KP KEY_UP\",\"BTN_MODE_STICK_DOWN\":\"AT KP KEY_DOWN\",\"BTN_MODE_STICK_LEFT\":\"AT KP KEY_LEFT\",\"BTN_MODE_STICK_RIGHT\":\"AT KP KEY_RIGHT\",\"BTN_MODE_SIP\":\"AT HL\",\"BTN_MODE_STRONG_SIP\":\"AT NC\",\"BTN_MODE_PUFF\":\"AT CR\",\"BTN_MODE_STRONG_PUFF\":\"AT CA\"}}";
+    let DEFAULT_CONFIG = "[{\"name\":\"mouse\",\"config\":{\"AT AX\":\"40\",\"AT AY\":\"40\",\"AT DX\":\"20\",\"AT DY\":\"20\",\"AT MS\":\"50\",\"AT AC\":\"20\",\"AT TS\":\"400\",\"AT TP\":\"600\",\"AT SP\":\"800\",\"AT SS\":\"10\",\"AT MM\":\"1\",\"AT GV\":\"40\",\"AT RV\":\"20\",\"AT RH\":\"20\",\"AT RO\":\"0\",\"AT BT\":\"1\",\"AT BM 1\":\"AT NE\",\"AT BM 2\":\"AT NC\",\"AT BM 3\":\"AT NC\",\"AT BM 4\":\"AT KP KEY_UP\",\"AT BM 5\":\"AT KP KEY_DOWN\",\"AT BM 6\":\"AT KP KEY_LEFT\",\"AT BM 7\":\"AT KP KEY_RIGHT\",\"AT BM 8\":\"AT HL\",\"AT BM 9\":\"AT NC\",\"AT BM 10\":\"AT CR\",\"AT BM 11\":\"AT CA\",\"AT BM 12\":\"AT NC\",\"AT BM 13\":\"AT NC\",\"AT BM 14\":\"AT NC\",\"AT BM 15\":\"AT NC\",\"AT BM 16\":\"AT NC\",\"AT BM 17\":\"AT NC\",\"AT BM 18\":\"AT NC\",\"AT BM 19\":\"AT NC\"}}]";
     let DEFAULT_SLOTNAME = "mouse";
-    let DEFAULT_SLOT = JSON.parse(DEFAULT_CONFIG)[DEFAULT_SLOTNAME];
+    let DEFAULT_SLOT = JSON.parse(DEFAULT_CONFIG).filter(slot => slot.name === DEFAULT_SLOTNAME)[0].config;
     let assertFails = 0;
     let assertSuccess = 0;
     let isTesting = false;
@@ -74,7 +73,7 @@
     }];
 
     async function testDefaultConfig() {
-        let config = flip.getAllSlotConfigs();
+        let config = flip.getAllSlotObjects();
         log.info(JSON.stringify(config));
         assertEqual(config, DEFAULT_CONFIG);
     }
@@ -83,53 +82,56 @@
         await flip.sendATCmd('AT DX', 123);
         await flip.sendATCmd('AT SA mouse');
         await flip.refreshConfig();
-        assertEqual(flip.getConfig(flip.DEADZONE_X), 123);
+        assertEqual(flip.getConfig(C.AT_CMD_DEADZONE_X), 123);
     }
 
     async function testSecondSlot() {
         await flip.sendAtCmdWithResult('AT SA slot2');
         await flip.refreshConfig();
-        let allSlots = flip.getAllSlotConfigs();
-        assertEqual(allSlots[DEFAULT_SLOTNAME], DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
-        assertEqual(allSlots['slot2'], DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
+        assertEqual(flip.getSlotConfigs(DEFAULT_SLOTNAME), DEFAULT_SLOT);
+        assertEqual(flip.getSlotConfigs('slot2'), DEFAULT_SLOT);
     }
 
     async function testIncreaseSlotLength() {
         await flip.sendAtCmdWithResult('AT SA slot2');
         await flip.sendATCmd('AT LO', DEFAULT_SLOTNAME);
-        await flip.setButtonAction(C.BTN_MODE_BUTTON_1, 'AT KW 123'); // button mode for Slot mouse
+        await flip.setButtonAction(1, 'AT KW 123'); // button mode for Slot mouse
         await flip.sendATCmd('AT SA', DEFAULT_SLOTNAME);
         await flip.refreshConfig();
-        let slot2 = flip.getAllSlotConfigs()['slot2'];
-        let slotMouse = flip.getAllSlotConfigs()[DEFAULT_SLOTNAME];
-        assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID, C.BTN_MODE_BUTTON_1]});
-        assertEqual(slot2, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
-        assertEqual(flip.getConfig(C.BTN_MODE_BUTTON_1), 'AT KW 123');
-        await flip.setButtonAction(C.BTN_MODE_BUTTON_1, 'AT KW 12345'); // button mode for Slot mouse
+        let slot2 = flip.getSlotConfigs('slot2');
+        let slotMouse = flip.getSlotConfigs(DEFAULT_SLOTNAME);
+        assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
+        assertEqual(slot2, DEFAULT_SLOT);
+        assertEqual(flip.getButtonAction(1), 'AT KW 123');
+        await flip.setButtonAction(1, 'AT KW 12345'); // button mode for Slot mouse
         await flip.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
         await flip.refreshConfig();
-        assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID, C.BTN_MODE_BUTTON_1]});
-        assertEqual(slot2, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
-        assertEqual(flip.getConfig(C.BTN_MODE_BUTTON_1), 'AT KW 12345');
+        slot2 = flip.getSlotConfigs('slot2');
+        slotMouse = flip.getSlotConfigs(DEFAULT_SLOTNAME);
+        assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
+        assertEqual(slot2, DEFAULT_SLOT);
+        assertEqual(flip.getButtonAction(1), 'AT KW 12345');
     }
 
     async function testDecreaseSlotLength() {
         await flip.sendAtCmdWithResult('AT SA slot2');
         await flip.sendATCmd('AT LO', DEFAULT_SLOTNAME);
-        await flip.setButtonAction(C.BTN_MODE_BUTTON_1, 'AT KW 1234567890'); // button mode for Slot mouse
+        await flip.setButtonAction(1, 'AT KW 1234567890'); // button mode for Slot mouse
         await flip.sendATCmd('AT SA', DEFAULT_SLOTNAME);
         await flip.refreshConfig();
-        let slot2 = flip.getAllSlotConfigs()['slot2'];
-        let slotMouse = flip.getAllSlotConfigs()[DEFAULT_SLOTNAME];
-        assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID, C.BTN_MODE_BUTTON_1]});
-        assertEqual(slot2, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
-        assertEqual(flip.getConfig(C.BTN_MODE_BUTTON_1), 'AT KW 1234567890');
-        await flip.setButtonAction(C.BTN_MODE_BUTTON_1, 'AT KW 123'); // button mode for Slot mouse
+        let slot2 = flip.getSlotConfigs('slot2');
+        let slotMouse = flip.getSlotConfigs(DEFAULT_SLOTNAME);
+        assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
+        assertEqual(slot2, DEFAULT_SLOT);
+        assertEqual(flip.getButtonAction(1), 'AT KW 1234567890');
+        await flip.setButtonAction(1, 'AT KW 123'); // button mode for Slot mouse
         await flip.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
         await flip.refreshConfig();
-        assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID, C.BTN_MODE_BUTTON_1]});
-        assertEqual(slot2, DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
-        assertEqual(flip.getConfig(C.BTN_MODE_BUTTON_1), 'AT KW 123');
+        slot2 = flip.getSlotConfigs('slot2');
+        slotMouse = flip.getSlotConfigs(DEFAULT_SLOTNAME);
+        assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
+        assertEqual(slot2, DEFAULT_SLOT);
+        assertEqual(flip.getButtonAction(1), 'AT KW 123');
     }
 
     async function testDeleteSlot() {
@@ -179,9 +181,9 @@
         await flip.refreshConfig();
         assertTrue(flip.getSlots().includes(DEFAULT_SLOTNAME));
         assertEqual(flip.getSlots().length, 3);
-        assertEqual(flip.getAllSlotConfigs()['mouse'], DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
-        assertEqual(flip.getAllSlotConfigs()['slot1'], DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
-        assertEqual(flip.getAllSlotConfigs()['slot3'], DEFAULT_SLOT, {ignoreProperties: [flip.SLOT_ID]});
+        assertEqual(flip.getSlotConfigs('mouse'), DEFAULT_SLOT);
+        assertEqual(flip.getSlotConfigs('slot1'), DEFAULT_SLOT);
+        assertEqual(flip.getSlotConfigs('slot3'), DEFAULT_SLOT);
     }
 
     async function differentValuesInSlots() {
@@ -191,8 +193,8 @@
         await flip.sendATCmd('AT DX', 12);
         await flip.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
         await flip.refreshConfig();
-        assertEqual(flip.getConfig(flip.DEADZONE_X, 'slot2'), 123);
-        assertEqual(flip.getConfig(flip.DEADZONE_X, DEFAULT_SLOTNAME), 12);
+        assertEqual(flip.getConfig(C.AT_CMD_DEADZONE_X, 'slot2'), 123);
+        assertEqual(flip.getConfig(C.AT_CMD_DEADZONE_X, DEFAULT_SLOTNAME), 12);
     }
 
 

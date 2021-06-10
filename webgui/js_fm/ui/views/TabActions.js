@@ -23,21 +23,21 @@ class TabActions extends Component {
     }
 
     getLinkTitle(btnMode, slot) {
-        let modeValue = flip.getConfig(flip.FLIPMOUSE_MODE, slot);
+        let modeValue = flip.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot);
         if (modeValue !== C.FLIPMOUSE_MODE_ALT.value && btnMode.category === C.BTN_CAT_STICK) {
             return L.translate(btnMode.label);
         } else {
-            return L.translate(btnMode.label) + (flip.getConfig(btnMode.constant, slot) ? ': ' + flip.getConfig(btnMode.constant, slot) : '');
+            return L.translate(btnMode.label) + (flip.getButtonAction(btnMode.index, slot) ? ': ' + flip.getButtonAction(btnMode.index, slot) : '');
         }
     }
 
     getLinkLabel(btnMode, slot) {
-        let modeValue = flip.getConfig(flip.FLIPMOUSE_MODE, slot);
+        let modeValue = flip.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot);
         if (modeValue !== C.FLIPMOUSE_MODE_ALT.value && btnMode.category === C.BTN_CAT_STICK) {
             let mode = C.FLIPMOUSE_MODES.filter(mode => mode.value === modeValue)[0] || {};
             return L.translate(mode.label);
         } else {
-            return L.getReadableATCMD(flip.getConfig(btnMode.constant, slot));
+            return L.getReadableATCMD(flip.getButtonAction(btnMode.index, slot));
         }
     }
 
@@ -48,7 +48,7 @@ class TabActions extends Component {
     
     render() {
         let state = this.state;
-        let configs = flip.getAllSlotConfigs();
+        let slots = flip.getSlots();
         let btnModes = C.BTN_MODES2.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
         let modalOpen = !!state.modalBtnMode;
         if(modalOpen) {
@@ -68,12 +68,12 @@ class TabActions extends Component {
              <ul>
                 <li class="row d-none d-md-flex" aria-hidden="true" style="font-style: italic">
                     <span class="col-12 col-md">Bezeichnung</span>
-                    ${Object.keys(configs).map(slot => html`<span class="col-12 col-md ${this.getSlotStyle(slot)}">Slot "${slot}"</span>`)}
+                    ${slots.map(slot => html`<span class="col-12 col-md ${this.getSlotStyle(slot)}">Slot "${slot}"</span>`)}
                 </li>
                 ${btnModes.map((btnMode, index) => html`
                     <li class="row py-3 py-md-0" style="${index % 2 === 1 ? 'background-color: lightgray' : ''}">
                         <strong class="col-12 col-md">${L.translate(btnMode.label)}</strong>
-                        ${Object.keys(configs).map(slot => html`
+                        ${slots.map(slot => html`
                             <span class="col-12 col-md ${this.getSlotStyle(slot)}">
                                 <span class="d-md-none">Slot "${slot}": </span>
                                 <a href="javascript:;" title="${this.getLinkTitle(btnMode, slot)}" onclick="${() => this.setState({modalBtnMode: btnMode, modalSlot: slot})}">${this.getLinkLabel(btnMode, slot)}</a>

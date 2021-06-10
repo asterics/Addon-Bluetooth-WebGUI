@@ -60,8 +60,8 @@ class PositionVisualization extends Component {
         let maxY = data[flip.LIVE_MOV_Y_MAX];
         let minX = data[flip.LIVE_MOV_X_MIN];
         let minY = data[flip.LIVE_MOV_Y_MIN];
-        let deadX = flip.getConfig(flip.DEADZONE_X);
-        let deadY = flip.getConfig(flip.DEADZONE_Y);
+        let deadX = flip.getConfig(C.AT_CMD_DEADZONE_X);
+        let deadY = flip.getConfig(C.AT_CMD_DEADZONE_Y);
         this.state.maxPos = this.state.maxPosManual !== undefined ? this.state.maxPosManual : Math.max(maxX, maxY, Math.abs(minX), Math.abs(minY), Math.round(deadX * 1.1), Math.round(deadY * 1.1), this.state.maxPos);
         let percentageX = L.limitValue(L.getPercentage(x, -this.state.maxPos, this.state.maxPos), 0, 100);
         let percentageY = L.limitValue(L.getPercentage(y, -this.state.maxPos, this.state.maxPos), 0, 100);
@@ -70,8 +70,8 @@ class PositionVisualization extends Component {
             liveData: data,
             pX: percentageX,
             pY: percentageY,
-            pDzX: (L.getPercentage(flip.getConfig(flip.DEADZONE_X), 0, this.state.maxPos)),
-            pDzY: (L.getPercentage(flip.getConfig(flip.DEADZONE_Y), 0, this.state.maxPos)),
+            pDzX: (L.getPercentage(flip.getConfig(C.AT_CMD_DEADZONE_X), 0, this.state.maxPos)),
+            pDzY: (L.getPercentage(flip.getConfig(C.AT_CMD_DEADZONE_Y), 0, this.state.maxPos)),
             inDeadzone: x < deadX && x > -deadX && y < deadY && y > -deadY
         });
     }
@@ -85,7 +85,7 @@ class PositionVisualization extends Component {
         return html`<div id="posVis" aria-hidden="true">
                     <div class="relative center-div cursorPosWrapper">
                         <div style="display: ${this.state.showOrientation ? 'block' : 'none'}">
-                            <div id="orientationSign" class="back-layer full-height full-width" style="transform: rotate(${(flip.getConfig(flip.ORIENTATION_ANGLE)+90)%360}deg);">
+                            <div id="orientationSign" class="back-layer full-height full-width" style="transform: rotate(${(flip.getConfig(C.AT_CMD_ORIENTATION_ANGLE))%360}deg);">
                                 <div class="back-layer" style="top:100%; left: 35%; width: 30%; height: 10%; background-color: black; z-index: 2"></div>
                             </div>
                         </div>

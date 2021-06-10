@@ -47,10 +47,10 @@ class BtnSipPuffVisualization extends Component {
         let getColor = (btnNum) => data[flip.LIVE_BUTTONS] && data[flip.LIVE_BUTTONS][btnNum] ? 'orange' : 'transparent';
 
         let liveP = data[flip.LIVE_PRESSURE];
-        let sip = flip.getConfig(flip.SIP_THRESHOLD);
-        let puff = flip.getConfig(flip.PUFF_THRESHOLD);
-        let strongSip = flip.getConfig(flip.SIP_STRONG_THRESHOLD);
-        let strongPuff = flip.getConfig(flip.PUFF_STRONG_THRESHOLD);
+        let sip = flip.getConfig(C.AT_CMD_SIP_THRESHOLD);
+        let puff = flip.getConfig(C.AT_CMD_PUFF_THRESHOLD);
+        let strongSip = flip.getConfig(C.AT_CMD_SIP_STRONG_THRESHOLD);
+        let strongPuff = flip.getConfig(C.AT_CMD_PUFF_STRONG_THRESHOLD);
         let rangeDown = Math.max(strongSip - 50, 0);
         let rangeUp = Math.min(strongPuff + 50, 1024);
 
