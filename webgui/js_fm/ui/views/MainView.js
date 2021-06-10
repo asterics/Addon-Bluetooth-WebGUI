@@ -112,11 +112,13 @@ class MainView extends Component {
 
         return html`
         <div id="connectDiv" class="${state.showConnectionScreen ? '' : 'd-none'}">
-            <div id="connectContent">
-                <h1>FLipMouse Configuration</h1>
+            <div class="container-fluid" id="connectContent">
+                <h1>${L.translate('FLipMouse Configuration // FlipMouse Konfiguration')}</h1>
                 <div class="row">
-                    <button class="twelve columns" onclick="${() => this.initFlip()}">${L.translate("Connect to FLipMouse connected via USB // Verbinden zu FLipMouse (über USB angeschlossen)")}</button>
-                    <button class="twelve columns" onclick="${() => this.testMode()}">${L.translate("Use Test mode without real FLipMouse // Test-Modus ohne echte FLipMouse verwenden")}</button>
+                    <button class="col-12 col-md-8 offset-md-2" onclick="${() => this.initFlip()}">${L.translate("Connect to FLipMouse connected via USB // Verbinden zu FLipMouse (über USB angeschlossen)")}</button>
+                </div>
+                <div class="row">
+                    <button class="col-12 col-md-8 offset-md-2" onclick="${() => this.testMode()}">${L.translate("Use Test mode without real FLipMouse // Test-Modus ohne echte FLipMouse verwenden")}</button>
                 </div>
             </div>
         </div>
