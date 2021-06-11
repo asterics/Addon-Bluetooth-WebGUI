@@ -66,7 +66,7 @@ ATDevice.init = function (dontGetLiveValues) {
         _isInitialized = true;
         ATDevice.resetMinMaxLiveValues();
         return ATDevice.refreshConfig();
-    }).then((config) => {
+    }).then(() => {
         if (!dontGetLiveValues) {
             ATDevice.sendATCmd('AT SR');
             _communicator.setValueHandler(parseLiveValues);
@@ -130,7 +130,7 @@ ATDevice.sendATCmd = function (atCmd, param, timeout, onlyIfNotBusy, dontLog) {
         let waitTimeMs = C.GUI_IS_HOSTED ? 25 : 20;
         let timeoutSend = Math.max(0, waitTimeMs - (new Date().getTime() - _timestampLastAtCmd));
         setTimeout(function () {
-            if (!nextQueueElem.dontLog) console.log("sending to FlipMouse: " + nextQueueElem.cmd);
+            if (!nextQueueElem.dontLog) console.log("sending to device: " + nextQueueElem.cmd);
             _timestampLastAtCmd = new Date().getTime();
             _communicator.sendData(nextQueueElem.cmd, nextQueueElem.timeout, nextQueueElem.dontLog).then(nextQueueElem.resolveFn, nextQueueElem.rejectFn);
             nextQueueElem.promise.finally(() => {
@@ -219,18 +219,6 @@ ATDevice.save = async function () {
     return Promise.resolve();
 };
 
-ATDevice.calibrate = function () {
-    ATDevice.sendATCmd('AT CA');
-    return testConnection();
-};
-
-ATDevice.rotate = function () {
-    var currentOrientation = ATDevice.getConfig(C.AT_CMD_ORIENTATION_ANGLE);
-    ATDevice.setValue(C.AT_CMD_ORIENTATION_ANGLE, (currentOrientation + 90) % 360, 0);
-    ATDevice.sendATCmd('AT CA');
-    return testConnection();
-};
-
 ATDevice.setSlotChangeHandler = function (fn) {
     _slotChangeHandler = fn;
 }
@@ -316,7 +304,7 @@ ATDevice.createSlot = function (slotName) {
     if (_slotChangeHandler) {
         _slotChangeHandler();
     }
-    return testConnection();
+    return Promise.resolve();
 };
 
 ATDevice.deleteSlot = function (slotName) {
@@ -381,15 +369,6 @@ ATDevice.restoreDefaultConfiguration = function () {
     return promise;
 };
 
-ATDevice.setFlipmouseMode = function (index) {
-    index = parseInt(index);
-    if (!C.FLIPMOUSE_MODES.map(mode => mode.value).includes(index)) {
-        return;
-    }
-    ATDevice.setConfig(C.AT_CMD_FLIPMOUSE_MODE, index);
-    ATDevice.sendATCmd(C.AT_CMD_FLIPMOUSE_MODE, index);
-};
-
 ATDevice.setDeviceMode = function (modeNr, slot) {
     let originalSlot = _currentSlot;
     if (slot !== _currentSlot) {
@@ -415,19 +394,6 @@ ATDevice.getBTVersion = function () {
         return Promise.resolve(result.trim() ? L.formatVersion(result) : '');
     });
 }
-
-/**
- * tests the connection to the flipmouse
- *
- * @param onlyIfNotBusy only do test if FLipMouse is not busy currently
- * @return {Promise}
- */
-function testConnection(onlyIfNotBusy) {
-    return ATDevice.sendATCmd('AT', '', 3000, onlyIfNotBusy, false).then((response) => {
-        let connected = response && (response.indexOf(_AT_CMD_OK_RESPONSE) > -1 || response.indexOf(_AT_CMD_BUSY_RESPONSE) > -1) ? true : false;
-        return Promise.resolve(connected);
-    });
-};
 
 function parseLiveValues(data) {
     if (!data) {

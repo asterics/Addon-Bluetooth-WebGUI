@@ -4,6 +4,7 @@ import {PositionVisualization} from "../components/PositionVisualization.js";
 import {preactUtil} from "../../util/preactUtil.js";
 import {RadioFieldset} from "../components/RadioFieldset.js";
 import {ATDevice} from "../../../js/communication/ATDevice.js";
+import {FLipMouse} from "../../communication/FLipMouse.js";
 
 const html = htm.bind(h);
 
@@ -53,7 +54,7 @@ class TabStick extends Component {
             <span id="posLiveA11yLabel" class="sr-only">${L.translate('Current position of FLipMouse Stick // Aktuelle Position des Sticks der FLipMouse')}</span>
             <span id="posLiveA11y" aria-describedby="posLiveA11yLabel" class="onlyscreenreader" role="status" aria-live="off" accesskey="q" tabindex="-1"></span>
             <div class="mb-5">
-                ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => ATDevice.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${state.mouseMode}"/>`}
+                ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => FLipMouse.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${state.mouseMode}"/>`}
             </div>
             <div id="basic-SENSITIVITY-single" style="display: ${!state.splitSensitivity ? 'block' : 'none'}">
                 <label for="SENSITIVITY">${L.translate('Sensitivity: // Sensitivität:')}</label>
@@ -86,10 +87,10 @@ class TabStick extends Component {
                     <${PositionVisualization} mode="tabStick"/>
                 </div>
                 <div class="five columns">
-                    <button onclick="${() => ATDevice.calibrate()}">
+                    <button onclick="${() => FLipMouse.calibrate()}">
                         <span>${L.translate('Calibrate middle position // Mittelposition kalibrieren')}</span>
                     </button>
-                    <button onclick="${() => ATDevice.rotate()}">
+                    <button onclick="${() => FLipMouse.rotate()}">
                         <span>${L.translate('\u21BB Rotate right // \u21BB Nach rechts drehen')}</span>
                     </button>
                 </div>

@@ -4,6 +4,7 @@ import {InputKeyboard} from "../components/InputKeyboard.js";
 import {ManageIR} from "../components/ManageIR.js";
 import {RadioFieldset} from "../components/RadioFieldset.js";
 import {ATDevice} from "../../../js/communication/ATDevice.js";
+import {FLipMouse} from "../../communication/FLipMouse.js";
 
 const html = htm.bind(h);
 class ActionEditModal extends Component {
@@ -82,7 +83,7 @@ class ActionEditModal extends Component {
 
     save() {
         if (this.state.shouldChangeMode) {
-            ATDevice.setFlipmouseMode(C.FLIPMOUSE_MODE_ALT.value)
+            FLipMouse.setFlipmouseMode(C.FLIPMOUSE_MODE_ALT.value)
         }
         if (this.state.hasChanges) {
             let atCmd = this.state.atCmdSuffix ? this.state.atCmd.cmd + ' ' + this.state.atCmdSuffix : this.state.atCmd.cmd;
