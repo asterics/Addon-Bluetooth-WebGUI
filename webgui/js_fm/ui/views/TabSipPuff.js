@@ -1,5 +1,6 @@
 import { h, Component, render } from '../../../js/preact.min.js';
 import htm from '../../../js/htm.min.js';
+import {ATDevice} from "../../../js/communication/ATDevice.js";
 
 const html = htm.bind(h);
 class TabSipPuff extends Component {
@@ -31,18 +32,18 @@ class TabSipPuff extends Component {
     updateData(data) {
         let newState = {};
 
-        newState.minValue = data[flip.LIVE_PRESSURE_MIN];
-        newState.maxValue = data[flip.LIVE_PRESSURE_MAX];
-        newState.value = data[flip.LIVE_PRESSURE];
-        newState.SIP_THRESHOLD = flip.getConfig(C.AT_CMD_SIP_THRESHOLD);
-        newState.PUFF_THRESHOLD = flip.getConfig(C.AT_CMD_PUFF_THRESHOLD);
-        newState.SIP_STRONG_THRESHOLD = flip.getConfig(C.AT_CMD_SIP_STRONG_THRESHOLD);
-        newState.PUFF_STRONG_THRESHOLD = flip.getConfig(C.AT_CMD_PUFF_STRONG_THRESHOLD);
+        newState.minValue = data[ATDevice.LIVE_PRESSURE_MIN];
+        newState.maxValue = data[ATDevice.LIVE_PRESSURE_MAX];
+        newState.value = data[ATDevice.LIVE_PRESSURE];
+        newState.SIP_THRESHOLD = ATDevice.getConfig(C.AT_CMD_SIP_THRESHOLD);
+        newState.PUFF_THRESHOLD = ATDevice.getConfig(C.AT_CMD_PUFF_THRESHOLD);
+        newState.SIP_STRONG_THRESHOLD = ATDevice.getConfig(C.AT_CMD_SIP_STRONG_THRESHOLD);
+        newState.PUFF_STRONG_THRESHOLD = ATDevice.getConfig(C.AT_CMD_PUFF_STRONG_THRESHOLD);
 
         let border = (this.state.maxRange - this.state.minRange) * 0.1; // 10% space that is left and right of the min/max values on the sliders
         if (new Date().getTime() - this.lastSliderChangedTime > 500) {
-            this.state.minRange = Math.max(Math.min(newState.minValue - border, flip.getConfig(C.AT_CMD_SIP_THRESHOLD) - border, flip.getConfig(C.AT_CMD_SIP_STRONG_THRESHOLD) - border), 0);
-            this.state.maxRange = Math.min(Math.max(newState.maxValue + border, flip.getConfig(C.AT_CMD_PUFF_THRESHOLD) + border, flip.getConfig(C.AT_CMD_PUFF_STRONG_THRESHOLD) + border), 1023);
+            this.state.minRange = Math.max(Math.min(newState.minValue - border, ATDevice.getConfig(C.AT_CMD_SIP_THRESHOLD) - border, ATDevice.getConfig(C.AT_CMD_SIP_STRONG_THRESHOLD) - border), 0);
+            this.state.maxRange = Math.min(Math.max(newState.maxValue + border, ATDevice.getConfig(C.AT_CMD_PUFF_THRESHOLD) + border, ATDevice.getConfig(C.AT_CMD_PUFF_STRONG_THRESHOLD) + border), 1023);
         }
 
         newState.percent = L.getPercentage(newState.value, this.state.minRange, this.state.maxRange);
@@ -59,22 +60,22 @@ class TabSipPuff extends Component {
 
     sliderChanged(event, constant) {
         let newValue = parseInt(event.target.value);
-        let oldValue = flip.getConfig(constant);
-        let liveValue = flip.getLiveData(flip.LIVE_PRESSURE);
+        let oldValue = ATDevice.getConfig(constant);
+        let liveValue = ATDevice.getLiveData(ATDevice.LIVE_PRESSURE);
 
         let validPuff = (newValue > liveValue || newValue > oldValue);
         let validSip = (newValue < liveValue || newValue < oldValue);
 
         //only move slider if sip thresholds are below and puff thresholds are above the current live value and if strong-values are below/above normal values
-        if ((constant === C.AT_CMD_SIP_THRESHOLD && validSip && newValue > flip.getConfig(C.AT_CMD_SIP_STRONG_THRESHOLD)) ||
-            (constant === C.AT_CMD_SIP_STRONG_THRESHOLD && validSip && newValue < flip.getConfig(C.AT_CMD_SIP_THRESHOLD)) ||
-            (constant === C.AT_CMD_PUFF_THRESHOLD && validPuff && newValue < flip.getConfig(C.AT_CMD_PUFF_STRONG_THRESHOLD)) ||
-            (constant === C.AT_CMD_PUFF_STRONG_THRESHOLD && validPuff && newValue > flip.getConfig(C.AT_CMD_PUFF_THRESHOLD))) {
+        if ((constant === C.AT_CMD_SIP_THRESHOLD && validSip && newValue > ATDevice.getConfig(C.AT_CMD_SIP_STRONG_THRESHOLD)) ||
+            (constant === C.AT_CMD_SIP_STRONG_THRESHOLD && validSip && newValue < ATDevice.getConfig(C.AT_CMD_SIP_THRESHOLD)) ||
+            (constant === C.AT_CMD_PUFF_THRESHOLD && validPuff && newValue < ATDevice.getConfig(C.AT_CMD_PUFF_STRONG_THRESHOLD)) ||
+            (constant === C.AT_CMD_PUFF_STRONG_THRESHOLD && validPuff && newValue > ATDevice.getConfig(C.AT_CMD_PUFF_THRESHOLD))) {
             this.lastSliderChangedTime = new Date().getTime();
             let newState = {};
             newState[constant] = newValue;
             this.setState(newState);
-            flip.setValue(constant, newValue);
+            ATDevice.setValue(constant, newValue);
         } else {
             this.setState({});
         }

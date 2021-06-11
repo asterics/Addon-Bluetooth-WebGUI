@@ -1,5 +1,7 @@
 import { h, Component } from '../../../js/preact.min.js';
 import htm from '../../../js/htm.min.js';
+import {ATDevice} from "../../../js/communication/ATDevice.js";
+
 const html = htm.bind(h);
 
 class ManageIR extends Component {
@@ -17,7 +19,7 @@ class ManageIR extends Component {
 
     recordIrCmd() {
         this.setState({isRecording: true});
-        flip.recordIrCommand(this.state.irCmdName).then(success => {
+        ATDevice.recordIrCommand(this.state.irCmdName).then(success => {
             if (success) {
                 this.props.onchange(this.state.irCmdName);
                 this.setState({irCmdName: '', deleteIrName: this.state.irCmdName});
@@ -31,7 +33,7 @@ class ManageIR extends Component {
         if (!confirm(L.translate('Do you really want to delete IR command "{?}"? // Möchten Sie das IR Kommando "{?}" wirklich löschen?', deleteName))) {
             return;
         }
-        flip.sendATCmd(C.AT_CMD_IR_DELETE, deleteName);
+        ATDevice.sendATCmd(C.AT_CMD_IR_DELETE, deleteName);
         let remainingCmds = this.props.irCmds.filter(cmd => cmd !== deleteName);
         this.setState({
             deleteIrName: remainingCmds.length > 0 ? remainingCmds[0] : ''
@@ -43,7 +45,7 @@ class ManageIR extends Component {
         if (!confirm(L.translate('Do you really want to delete all IR commands? // Möchten Sie wirklich alle IR Kommandos löschen?'))) {
             return;
         }
-        flip.sendATCmd(C.AT_CMD_IR_WIPE);
+        ATDevice.sendATCmd(C.AT_CMD_IR_WIPE);
         this.props.onchange();
     }
 

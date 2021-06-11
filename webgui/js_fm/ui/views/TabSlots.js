@@ -1,5 +1,6 @@
 import { h, Component, render } from '../../../js/preact.min.js';
-import htm from '../../../js/htm.min.js';
+import htm from '../../../js/htm.min.js'
+import {ATDevice} from "../../../js/communication/ATDevice.js";
 
 const html = htm.bind(h);
 class TabSlots extends Component {
@@ -10,18 +11,18 @@ class TabSlots extends Component {
         TabSlots.instance = this;
         this.state = {
             newSlotName: '',
-            selectedSlot: flip.getCurrentSlot(),
-            slots: flip.getSlots()
+            selectedSlot: ATDevice.getCurrentSlot(),
+            slots: ATDevice.getSlots()
         }
     }
 
     createSlot() {
         let thiz = this;
-        flip.createSlot(this.state.newSlotName).then(function () {
+        ATDevice.createSlot(this.state.newSlotName).then(function () {
             thiz.setState({
                 newSlotName: '',
-                slots: flip.getSlots(),
-                selectedSlot: flip.getCurrentSlot()
+                slots: ATDevice.getSlots(),
+                selectedSlot: ATDevice.getCurrentSlot()
             });
         });
     }
@@ -32,10 +33,10 @@ class TabSlots extends Component {
         if (!window.confirm(confirmMessage)) {
             return;
         }
-        flip.deleteSlot(this.state.selectedSlot).then(function () {
+        ATDevice.deleteSlot(this.state.selectedSlot).then(function () {
             thiz.setState({
-                selectedSlot: flip.getCurrentSlot(),
-                slots: flip.getSlots()
+                selectedSlot: ATDevice.getCurrentSlot(),
+                slots: ATDevice.getSlots()
             })
         });
     };
@@ -48,21 +49,21 @@ class TabSlots extends Component {
         reader.readAsText(file[0]);
         reader.onloadend = function(e) {
             //TODO
-            //config = flip.parseConfig(e.target.result,true);
-            flip.createSlot(slotName,null);
+            //config = ATDevice.parseConfig(e.target.result,true);
+            ATDevice.createSlot(slotName,null);
         };
     };
 
     downloadSlot() {
         let d = new Date();
         let datestr = d.getDate() + "." + (d.getMonth() + 1) + "." + d.getFullYear()
-        L.downloadasTextFile(this.state.selectedSlot + "-" + datestr + ".set", flip.getSlotConfigText(this.state.selectedSlot));
+        L.downloadasTextFile(this.state.selectedSlot + "-" + datestr + ".set", ATDevice.getSlotConfigText(this.state.selectedSlot));
     };
 
     downloadAllSlots() {
         let configstr = "";
-        flip.getSlots().forEach(function (item) {
-            configstr = configstr + flip.getSlotConfigText(item) + "\n";
+        ATDevice.getSlots().forEach(function (item) {
+            configstr = configstr + ATDevice.getSlotConfigText(item) + "\n";
         });
         let d = new Date();
         let datestr = d.getDate() + "." + (d.getMonth() + 1) + "." + d.getFullYear()
@@ -74,10 +75,10 @@ class TabSlots extends Component {
         if(!window.confirm(confirmMessage)){
             return;
         }
-        flip.restoreDefaultConfiguration().then(() => {
+        ATDevice.restoreDefaultConfiguration().then(() => {
             this.setState({
-                slots: flip.getSlots(),
-                selectedSlot: flip.getCurrentSlot()
+                slots: ATDevice.getSlots(),
+                selectedSlot: ATDevice.getCurrentSlot()
             });
         });
     };
@@ -100,7 +101,7 @@ class TabSlots extends Component {
                
                 <div class="row">
                     <div class="col-md-6">
-                        <button onclick="${() => flip.setSlot(this.state.selectedSlot)}">${L.translate('Activate Slot // Slot aktivieren')}</button>
+                        <button onclick="${() => ATDevice.setSlot(this.state.selectedSlot)}">${L.translate('Activate Slot // Slot aktivieren')}</button>
                     </div>
                     <div class="col-md-6">
                         <button disabled="${slots.length <= 1}" onclick="${() => this.deleteSlot()}">

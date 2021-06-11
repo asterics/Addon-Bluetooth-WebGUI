@@ -3,6 +3,7 @@ import htm from '../../../js/htm.min.js';
 import {InputKeyboard} from "../components/InputKeyboard.js";
 import {ManageIR} from "../components/ManageIR.js";
 import {RadioFieldset} from "../components/RadioFieldset.js";
+import {ATDevice} from "../../../js/communication/ATDevice.js";
 
 const html = htm.bind(h);
 class ActionEditModal extends Component {
@@ -13,7 +14,7 @@ class ActionEditModal extends Component {
         ActionEditModal.instance = this;
         this.props = props;
 
-        let currentAtCmdString = flip.getButtonActionATCmd(props.buttonMode.index, props.slot) || C.AT_CMD_NO_CMD;
+        let currentAtCmdString = ATDevice.getButtonActionATCmd(props.buttonMode.index, props.slot) || C.AT_CMD_NO_CMD;
         let currentAtCmdObject = C.AT_CMDS_ACTIONS.filter(atCmd => currentAtCmdString === atCmd.cmd)[0] || C.AT_CMDS_ACTIONS[0];
         currentAtCmdString = currentAtCmdObject.cmd;
         let showCategory = currentAtCmdString && currentAtCmdString !== C.AT_CMD_NO_CMD ? C.AT_CMDS_ACTIONS.filter(atCmd => atCmd.cmd === currentAtCmdString)[0].category: null;
@@ -21,7 +22,7 @@ class ActionEditModal extends Component {
         this.state = {
             showCategory: showCategory,
             atCmd: currentAtCmdObject,
-            atCmdSuffix: flip.getButtonActionATCmdSuffix(props.buttonMode.index, props.slot),
+            atCmdSuffix: ATDevice.getButtonActionATCmdSuffix(props.buttonMode.index, props.slot),
             possibleAtCmds: possibleAtCmds,
             selectOptions: [],
             shouldChangeMode: false,
@@ -62,12 +63,7 @@ class ActionEditModal extends Component {
     updateSelect(atCmdObject) {
         atCmdObject = atCmdObject || this.state.atCmd;
         if (atCmdObject.optionsFn) {
-            let parts = atCmdObject.optionsFn.split('.');
-            let fn = window;
-            parts.forEach(part => {
-                fn = fn[part];
-            });
-            Promise.resolve(fn()).then(result => {
+            Promise.resolve(atCmdObject.optionsFn()).then(result => {
                 result = result || [];
                 this.setState({
                     selectOptions: result,
@@ -86,11 +82,11 @@ class ActionEditModal extends Component {
 
     save() {
         if (this.state.shouldChangeMode) {
-            flip.setFlipmouseMode(C.FLIPMOUSE_MODE_ALT.value)
+            ATDevice.setFlipmouseMode(C.FLIPMOUSE_MODE_ALT.value)
         }
         if (this.state.hasChanges) {
             let atCmd = this.state.atCmdSuffix ? this.state.atCmd.cmd + ' ' + this.state.atCmdSuffix : this.state.atCmd.cmd;
-            flip.setButtonAction(this.props.buttonMode.index, atCmd);
+            ATDevice.setButtonAction(this.props.buttonMode.index, atCmd);
         }
         this.props.closeHandler();
     }
@@ -100,8 +96,8 @@ class ActionEditModal extends Component {
         let btnMode = props.buttonMode;
         let categoryElements = C.AT_CMD_CATEGORIES.map(cat => {return {value: cat.constant, label: cat.label}});
         categoryElements = [{value: null, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
-        let showActionSelection = flip.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value || btnMode.category !== C.BTN_CAT_STICK || state.shouldChangeMode;
-        let mode = C.FLIPMOUSE_MODES.filter(mode => mode.value === flip.getConfig(C.AT_CMD_FLIPMOUSE_MODE, props.slot))[0];
+        let showActionSelection = ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value || btnMode.category !== C.BTN_CAT_STICK || state.shouldChangeMode;
+        let mode = C.FLIPMOUSE_MODES.filter(mode => mode.value === ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, props.slot))[0];
 
         return html`
             <div class="modal-mask">

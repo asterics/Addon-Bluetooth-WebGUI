@@ -2,6 +2,7 @@ import { h, Component, render } from '../../../js/preact.min.js';
 import htm from '../../../js/htm.min.js';
 import {ActionEditModal} from "../modals/ActionEditModal.js";
 import {RadioFieldset} from "../components/RadioFieldset.js";
+import {ATDevice} from "../../../js/communication/ATDevice.js";
 
 
 const html = htm.bind(h);
@@ -23,32 +24,32 @@ class TabActions extends Component {
     }
 
     getLinkTitle(btnMode, slot) {
-        let modeValue = flip.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot);
+        let modeValue = ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot);
         if (modeValue !== C.FLIPMOUSE_MODE_ALT.value && btnMode.category === C.BTN_CAT_STICK) {
             return L.translate(btnMode.label);
         } else {
-            return L.translate(btnMode.label) + (flip.getButtonAction(btnMode.index, slot) ? ': ' + flip.getButtonAction(btnMode.index, slot) : '');
+            return L.translate(btnMode.label) + (ATDevice.getButtonAction(btnMode.index, slot) ? ': ' + ATDevice.getButtonAction(btnMode.index, slot) : '');
         }
     }
 
     getLinkLabel(btnMode, slot) {
-        let modeValue = flip.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot);
+        let modeValue = ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot);
         if (modeValue !== C.FLIPMOUSE_MODE_ALT.value && btnMode.category === C.BTN_CAT_STICK) {
             let mode = C.FLIPMOUSE_MODES.filter(mode => mode.value === modeValue)[0] || {};
             return L.translate(mode.label);
         } else {
-            return L.getReadableATCMD(flip.getButtonAction(btnMode.index, slot));
+            return L.getReadableATCMD(ATDevice.getButtonAction(btnMode.index, slot));
         }
     }
 
     getSlotStyle(slot) {
-        let count = flip.getSlots().length;
-        return count > 1 && flip.getCurrentSlot() === slot ? 'font-weight-bold' : '';
+        let count = ATDevice.getSlots().length;
+        return count > 1 && ATDevice.getCurrentSlot() === slot ? 'font-weight-bold' : '';
     }
     
     render() {
         let state = this.state;
-        let slots = flip.getSlots();
+        let slots = ATDevice.getSlots();
         let btnModes = C.BTN_MODES2.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
         let modalOpen = !!state.modalBtnMode;
         if(modalOpen) {

@@ -1,6 +1,6 @@
 import { h, Component, render } from '../../../js/preact.min.js';
 import htm from '../../../js/htm.min.js';
-
+import {ATDevice} from "../../../js/communication/ATDevice.js";
 
 const html = htm.bind(h);
 let unknown = L.translate('(unknown) // (unbekannt)')
@@ -37,12 +37,12 @@ class TabGeneral extends Component {
                 newBtVersionUrl: result['html_url']
             });
         });
-        flip.getVersion().then(result => {
+        ATDevice.getVersion().then(result => {
             this.setState({
                 mainVersion: result
             });
         })
-        flip.getBTVersion().then(result => {
+        ATDevice.getBTVersion().then(result => {
             this.setState({
                 btVersion: result || unknown
             });
@@ -50,7 +50,7 @@ class TabGeneral extends Component {
     }
     
     render() {
-        let slots = flip.getSlots();
+        let slots = ATDevice.getSlots();
 
         return html`
         <h2>${L.translate('General settings // Allgemeine Einstellungen')}</h2>
@@ -60,7 +60,7 @@ class TabGeneral extends Component {
                 <div class="row">
                     <label class="col-md-4" for="${'devicemode' + slot}">${L.translate('Mode for Slot "{?}" // Modus für Slot "{?}"', slot)}</label>
                     <div class="col-md-6">
-                        <select class="col-12" id="${'devicemode' + slot}" onchange="${(event) => flip.setDeviceMode(event.target.value, slot)}">
+                        <select class="col-12" id="${'devicemode' + slot}" onchange="${(event) => ATDevice.setDeviceMode(event.target.value, slot)}">
                             <option value="1">USB</option>
                             <option value="2">Bluetooth</option>
                             <option value="3">USB + Bluetooth</option>

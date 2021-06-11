@@ -6,6 +6,7 @@ import {TabSipPuff} from "./TabSipPuff.js";
 import {TabSlots} from "./TabSlots.js";
 import {TabStick} from "./TabStick.js";
 import {TabVisualization} from "./TabVisualization.js";
+import {ATDevice} from "../../../js/communication/ATDevice.js";
 
 const html = htm.bind(h);
 
@@ -49,22 +50,21 @@ class MainView extends Component {
 
     initFlip() {
         let thiz = this;
-        window.flip = new FlipMouse();
-        flip.init().then(function () {
+        ATDevice.init().then(function () {
             thiz.toView();
             thiz.setState({
                 showConnectionScreen: false,
                 showMainScreen: true,
-                currentSlot: flip.getCurrentSlot(),
-                slots: flip.getSlots()
+                currentSlot: ATDevice.getCurrentSlot(),
+                slots: ATDevice.getSlots()
             });
-            flip.setSlotChangeHandler(() => {
+            ATDevice.setSlotChangeHandler(() => {
                 thiz.setState({
-                    currentSlot: flip.getCurrentSlot(),
-                    slots: flip.getSlots()
+                    currentSlot: ATDevice.getCurrentSlot(),
+                    slots: ATDevice.getSlots()
                 });
             });
-            flip.addConnectionTestCallback((isConnected) => {
+            ATDevice.addConnectionTestCallback((isConnected) => {
                 if (isConnected !== thiz.state.connected) {
                     thiz.setState({
                         connected: isConnected
@@ -97,9 +97,9 @@ class MainView extends Component {
             menuOpen: false
         });
         if (view.object.valueHandler) {
-            flip.startLiveValueListener(view.object.valueHandler);
+            ATDevice.startLiveValueListener(view.object.valueHandler);
         } else {
-            flip.stopLiveValueListener();
+            ATDevice.stopLiveValueListener();
         }
 
         window.location.hash = viewHash;
@@ -128,7 +128,7 @@ class MainView extends Component {
                 <div class="d-none d-md-inline-block col-md-3">
                     <label class="col-12" for="selectSlots">${L.translate('Select Slot // Slot auswählen')}</label>
                     <div class="col-12">
-                        <select id="selectSlots" class="col-12" value="${state.currentSlot}" onchange="${(event) => flip.setSlot(event.target.value)}">
+                        <select id="selectSlots" class="col-12" value="${state.currentSlot}" onchange="${(event) => ATDevice.setSlot(event.target.value)}">
                         ${state.slots.map((slot) => html`
                             <option value="${slot}">${slot}</option>
                         `)}

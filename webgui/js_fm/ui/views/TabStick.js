@@ -3,6 +3,7 @@ import htm from '../../../js/htm.min.js';
 import {PositionVisualization} from "../components/PositionVisualization.js";
 import {preactUtil} from "../../util/preactUtil.js";
 import {RadioFieldset} from "../components/RadioFieldset.js";
+import {ATDevice} from "../../../js/communication/ATDevice.js";
 
 const html = htm.bind(h);
 
@@ -11,19 +12,19 @@ class TabStick extends Component {
         super();
 
         this.state = {
-            splitSensitivity: flip.getConfig(C.AT_CMD_SENSITIVITY_X) !== flip.getConfig(C.AT_CMD_SENSITIVITY_Y),
-            splitDeadzone: flip.getConfig(C.AT_CMD_DEADZONE_X) !== flip.getConfig(C.AT_CMD_DEADZONE_Y),
-            mouseMode: flip.getConfig(C.AT_CMD_FLIPMOUSE_MODE)
+            splitSensitivity: ATDevice.getConfig(C.AT_CMD_SENSITIVITY_X) !== ATDevice.getConfig(C.AT_CMD_SENSITIVITY_Y),
+            splitDeadzone: ATDevice.getConfig(C.AT_CMD_DEADZONE_X) !== ATDevice.getConfig(C.AT_CMD_DEADZONE_Y),
+            mouseMode: ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)
         }
 
         let additionalState = {};
-        additionalState[C.AT_CMD_SENSITIVITY_X] = flip.getConfig(C.AT_CMD_SENSITIVITY_X);
-        additionalState[C.AT_CMD_SENSITIVITY_Y] = flip.getConfig(C.AT_CMD_SENSITIVITY_Y);
-        additionalState[C.AT_CMD_DEADZONE_X] = flip.getConfig(C.AT_CMD_DEADZONE_X);
-        additionalState[C.AT_CMD_DEADZONE_Y] = flip.getConfig(C.AT_CMD_DEADZONE_Y);
+        additionalState[C.AT_CMD_SENSITIVITY_X] = ATDevice.getConfig(C.AT_CMD_SENSITIVITY_X);
+        additionalState[C.AT_CMD_SENSITIVITY_Y] = ATDevice.getConfig(C.AT_CMD_SENSITIVITY_Y);
+        additionalState[C.AT_CMD_DEADZONE_X] = ATDevice.getConfig(C.AT_CMD_DEADZONE_X);
+        additionalState[C.AT_CMD_DEADZONE_Y] = ATDevice.getConfig(C.AT_CMD_DEADZONE_Y);
         this.setState(additionalState);
 
-        flip.resetMinMaxLiveValues();
+        ATDevice.resetMinMaxLiveValues();
     }
     
     sliderChanged(event, constants) {
@@ -34,7 +35,7 @@ class TabStick extends Component {
         let state = {};
         constants.forEach(constant => {
             state[constant] = value;
-            flip.setValue(constant, value);
+            ATDevice.setValue(constant, value);
         });
         this.setState(state);
     }
@@ -52,7 +53,7 @@ class TabStick extends Component {
             <span id="posLiveA11yLabel" class="sr-only">${L.translate('Current position of FLipMouse Stick // Aktuelle Position des Sticks der FLipMouse')}</span>
             <span id="posLiveA11y" aria-describedby="posLiveA11yLabel" class="onlyscreenreader" role="status" aria-live="off" accesskey="q" tabindex="-1"></span>
             <div class="mb-5">
-                ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => flip.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${state.mouseMode}"/>`}
+                ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => ATDevice.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${state.mouseMode}"/>`}
             </div>
             <div id="basic-SENSITIVITY-single" style="display: ${!state.splitSensitivity ? 'block' : 'none'}">
                 <label for="SENSITIVITY">${L.translate('Sensitivity: // Sensitivität:')}</label>
@@ -85,10 +86,10 @@ class TabStick extends Component {
                     <${PositionVisualization} mode="tabStick"/>
                 </div>
                 <div class="five columns">
-                    <button onclick="${() => flip.calibrate()}">
+                    <button onclick="${() => ATDevice.calibrate()}">
                         <span>${L.translate('Calibrate middle position // Mittelposition kalibrieren')}</span>
                     </button>
-                    <button onclick="${() => flip.rotate()}">
+                    <button onclick="${() => ATDevice.rotate()}">
                         <span>${L.translate('\u21BB Rotate right // \u21BB Nach rechts drehen')}</span>
                     </button>
                 </div>

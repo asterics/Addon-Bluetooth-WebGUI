@@ -1,3 +1,5 @@
+import {ATDevice} from "../js/communication/ATDevice.js";
+
 window.C = {};
 
 C.GUI_IS_HOSTED = window.location.href.indexOf('localhost') > -1 || window.location.href.indexOf('asterics.github.io') > -1 || window.location.href.indexOf('file://') > -1;
@@ -248,7 +250,7 @@ C.AT_CMDS_ACTIONS = [{
     label: 'Load slot by name // Slot per Name laden',
     category: C.AT_CMD_CAT_DEVICE,
     input: C.INPUTFIELD_TYPE_SELECT,
-    optionsFn: 'flip.getSlots'
+    optionsFn: ATDevice.getSlots
 }, {
     cmd: C.AT_CMD_CALIBRATION,
     label: 'Calibrate stick middle position // Stick-Mittelposition kalibrieren',
@@ -258,13 +260,13 @@ C.AT_CMDS_ACTIONS = [{
     label: 'Play infrared command // Infrarot-Kommando abspielen',
     category: C.AT_CMD_CAT_IR,
     input: C.INPUTFIELD_TYPE_SELECT,
-    optionsFn: 'flip.getIRCommands'
+    optionsFn: ATDevice.getIRCommands
 }, {
     cmd: C.AT_CMD_IR_HOLD,
     label: 'Hold infrared command // Infrarot-Kommando halten',
     category: C.AT_CMD_CAT_IR,
     input: C.INPUTFIELD_TYPE_SELECT,
-    optionsFn: 'flip.getIRCommands'
+    optionsFn: ATDevice.getIRCommands
 }, {
     cmd: C.AT_CMD_IR_STOP,
     label: 'Stop infrared command // Infrarot-Kommando stoppen',

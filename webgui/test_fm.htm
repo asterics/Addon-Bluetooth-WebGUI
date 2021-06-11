@@ -9,10 +9,10 @@
     
     <script src="lib/loglevel.min.js"></script>
 
-    <script src="js_fm/const.js"></script>
+    <script type="module" src="js/communication/ATDevice.js"></script>
+    <script type="module" src="js_fm/const.js"></script>
     <script src="js/lquery.js"></script>
     <script src="js/adapter/sercomm.js"></script>
-    <script src="js_fm/communication/flipcomm.js"></script>
 </head>
 <body>
 <div id="connectDiv">
@@ -31,7 +31,9 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import {ATDevice} from "./js/communication/ATDevice.js";
+
     let PRINT_DEBUG = false;
     let DEFAULT_CONFIG = "[{\"name\":\"mouse\",\"config\":{\"AT AX\":\"40\",\"AT AY\":\"40\",\"AT DX\":\"20\",\"AT DY\":\"20\",\"AT MS\":\"50\",\"AT AC\":\"20\",\"AT TS\":\"400\",\"AT TP\":\"600\",\"AT SP\":\"800\",\"AT SS\":\"10\",\"AT MM\":\"1\",\"AT GV\":\"40\",\"AT RV\":\"20\",\"AT RH\":\"20\",\"AT RO\":\"0\",\"AT BT\":\"1\",\"AT BM 1\":\"AT NE\",\"AT BM 2\":\"AT NC\",\"AT BM 3\":\"AT NC\",\"AT BM 4\":\"AT KP KEY_UP\",\"AT BM 5\":\"AT KP KEY_DOWN\",\"AT BM 6\":\"AT KP KEY_LEFT\",\"AT BM 7\":\"AT KP KEY_RIGHT\",\"AT BM 8\":\"AT HL\",\"AT BM 9\":\"AT NC\",\"AT BM 10\":\"AT CR\",\"AT BM 11\":\"AT CA\",\"AT BM 12\":\"AT NC\",\"AT BM 13\":\"AT NC\",\"AT BM 14\":\"AT NC\",\"AT BM 15\":\"AT NC\",\"AT BM 16\":\"AT NC\",\"AT BM 17\":\"AT NC\",\"AT BM 18\":\"AT NC\",\"AT BM 19\":\"AT NC\"}}]";
     let DEFAULT_SLOTNAME = "mouse";
@@ -73,135 +75,135 @@
     }];
 
     async function testDefaultConfig() {
-        let config = flip.getAllSlotObjects();
+        let config = ATDevice.getAllSlotObjects();
         log.info(JSON.stringify(config));
         assertEqual(config, DEFAULT_CONFIG);
     }
 
     async function testChangeValueDeadzone() {
-        await flip.sendATCmd('AT DX', 123);
-        await flip.sendATCmd('AT SA mouse');
-        await flip.refreshConfig();
-        assertEqual(flip.getConfig(C.AT_CMD_DEADZONE_X), 123);
+        await ATDevice.sendATCmd('AT DX', 123);
+        await ATDevice.sendATCmd('AT SA mouse');
+        await ATDevice.refreshConfig();
+        assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X), 123);
     }
 
     async function testSecondSlot() {
-        await flip.sendAtCmdWithResult('AT SA slot2');
-        await flip.refreshConfig();
-        assertEqual(flip.getSlotConfigs(DEFAULT_SLOTNAME), DEFAULT_SLOT);
-        assertEqual(flip.getSlotConfigs('slot2'), DEFAULT_SLOT);
+        await ATDevice.sendAtCmdWithResult('AT SA slot2');
+        await ATDevice.refreshConfig();
+        assertEqual(ATDevice.getSlotConfigs(DEFAULT_SLOTNAME), DEFAULT_SLOT);
+        assertEqual(ATDevice.getSlotConfigs('slot2'), DEFAULT_SLOT);
     }
 
     async function testIncreaseSlotLength() {
-        await flip.sendAtCmdWithResult('AT SA slot2');
-        await flip.sendATCmd('AT LO', DEFAULT_SLOTNAME);
-        await flip.setButtonAction(1, 'AT KW 123'); // button mode for Slot mouse
-        await flip.sendATCmd('AT SA', DEFAULT_SLOTNAME);
-        await flip.refreshConfig();
-        let slot2 = flip.getSlotConfigs('slot2');
-        let slotMouse = flip.getSlotConfigs(DEFAULT_SLOTNAME);
+        await ATDevice.sendAtCmdWithResult('AT SA slot2');
+        await ATDevice.sendATCmd('AT LO', DEFAULT_SLOTNAME);
+        await ATDevice.setButtonAction(1, 'AT KW 123'); // button mode for Slot mouse
+        await ATDevice.sendATCmd('AT SA', DEFAULT_SLOTNAME);
+        await ATDevice.refreshConfig();
+        let slot2 = ATDevice.getSlotConfigs('slot2');
+        let slotMouse = ATDevice.getSlotConfigs(DEFAULT_SLOTNAME);
         assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
         assertEqual(slot2, DEFAULT_SLOT);
-        assertEqual(flip.getButtonAction(1), 'AT KW 123');
-        await flip.setButtonAction(1, 'AT KW 12345'); // button mode for Slot mouse
-        await flip.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
-        await flip.refreshConfig();
-        slot2 = flip.getSlotConfigs('slot2');
-        slotMouse = flip.getSlotConfigs(DEFAULT_SLOTNAME);
+        assertEqual(ATDevice.getButtonAction(1), 'AT KW 123');
+        await ATDevice.setButtonAction(1, 'AT KW 12345'); // button mode for Slot mouse
+        await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
+        await ATDevice.refreshConfig();
+        slot2 = ATDevice.getSlotConfigs('slot2');
+        slotMouse = ATDevice.getSlotConfigs(DEFAULT_SLOTNAME);
         assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
         assertEqual(slot2, DEFAULT_SLOT);
-        assertEqual(flip.getButtonAction(1), 'AT KW 12345');
+        assertEqual(ATDevice.getButtonAction(1), 'AT KW 12345');
     }
 
     async function testDecreaseSlotLength() {
-        await flip.sendAtCmdWithResult('AT SA slot2');
-        await flip.sendATCmd('AT LO', DEFAULT_SLOTNAME);
-        await flip.setButtonAction(1, 'AT KW 1234567890'); // button mode for Slot mouse
-        await flip.sendATCmd('AT SA', DEFAULT_SLOTNAME);
-        await flip.refreshConfig();
-        let slot2 = flip.getSlotConfigs('slot2');
-        let slotMouse = flip.getSlotConfigs(DEFAULT_SLOTNAME);
+        await ATDevice.sendAtCmdWithResult('AT SA slot2');
+        await ATDevice.sendATCmd('AT LO', DEFAULT_SLOTNAME);
+        await ATDevice.setButtonAction(1, 'AT KW 1234567890'); // button mode for Slot mouse
+        await ATDevice.sendATCmd('AT SA', DEFAULT_SLOTNAME);
+        await ATDevice.refreshConfig();
+        let slot2 = ATDevice.getSlotConfigs('slot2');
+        let slotMouse = ATDevice.getSlotConfigs(DEFAULT_SLOTNAME);
         assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
         assertEqual(slot2, DEFAULT_SLOT);
-        assertEqual(flip.getButtonAction(1), 'AT KW 1234567890');
-        await flip.setButtonAction(1, 'AT KW 123'); // button mode for Slot mouse
-        await flip.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
-        await flip.refreshConfig();
-        slot2 = flip.getSlotConfigs('slot2');
-        slotMouse = flip.getSlotConfigs(DEFAULT_SLOTNAME);
+        assertEqual(ATDevice.getButtonAction(1), 'AT KW 1234567890');
+        await ATDevice.setButtonAction(1, 'AT KW 123'); // button mode for Slot mouse
+        await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
+        await ATDevice.refreshConfig();
+        slot2 = ATDevice.getSlotConfigs('slot2');
+        slotMouse = ATDevice.getSlotConfigs(DEFAULT_SLOTNAME);
         assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
         assertEqual(slot2, DEFAULT_SLOT);
-        assertEqual(flip.getButtonAction(1), 'AT KW 123');
+        assertEqual(ATDevice.getButtonAction(1), 'AT KW 123');
     }
 
     async function testDeleteSlot() {
-        await flip.sendAtCmdWithResult('AT SA newSlot');
-        await flip.refreshConfig();
-        assertTrue(flip.getSlots().includes(DEFAULT_SLOTNAME));
-        assertTrue(flip.getSlots().includes('newSlot'));
-        await flip.sendAtCmdWithResult('AT DE newSlot');
-        await flip.refreshConfig();
-        assertTrue(flip.getSlots().includes(DEFAULT_SLOTNAME));
-        assertFalse(flip.getSlots().includes('newSlot'));
+        await ATDevice.sendAtCmdWithResult('AT SA newSlot');
+        await ATDevice.refreshConfig();
+        assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
+        assertTrue(ATDevice.getSlots().includes('newSlot'));
+        await ATDevice.sendAtCmdWithResult('AT DE newSlot');
+        await ATDevice.refreshConfig();
+        assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
+        assertFalse(ATDevice.getSlots().includes('newSlot'));
     }
 
     async function addDelete5Slots() {
-        await flip.sendAtCmdWithResult('AT SA slot1');
-        await flip.sendAtCmdWithResult('AT SA slot2');
-        await flip.sendAtCmdWithResult('AT SA slot3');
-        await flip.sendAtCmdWithResult('AT SA slot4');
-        await flip.sendAtCmdWithResult('AT SA slot5');
-        await flip.refreshConfig();
-        assertTrue(flip.getSlots().includes(DEFAULT_SLOTNAME));
-        assertTrue(flip.getSlots().includes('slot1'));
-        assertTrue(flip.getSlots().includes('slot2'));
-        assertTrue(flip.getSlots().includes('slot3'));
-        assertTrue(flip.getSlots().includes('slot4'));
-        assertTrue(flip.getSlots().includes('slot5'));
-        await flip.sendAtCmdWithResult('AT DE slot1');
-        await flip.sendAtCmdWithResult('AT DE slot2');
-        await flip.sendAtCmdWithResult('AT DE slot3');
-        await flip.sendAtCmdWithResult('AT DE slot4');
-        await flip.sendAtCmdWithResult('AT DE slot5');
-        await flip.refreshConfig();
-        assertTrue(flip.getSlots().includes(DEFAULT_SLOTNAME));
-        assertEqual(flip.getSlots().length, 1);
+        await ATDevice.sendAtCmdWithResult('AT SA slot1');
+        await ATDevice.sendAtCmdWithResult('AT SA slot2');
+        await ATDevice.sendAtCmdWithResult('AT SA slot3');
+        await ATDevice.sendAtCmdWithResult('AT SA slot4');
+        await ATDevice.sendAtCmdWithResult('AT SA slot5');
+        await ATDevice.refreshConfig();
+        assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
+        assertTrue(ATDevice.getSlots().includes('slot1'));
+        assertTrue(ATDevice.getSlots().includes('slot2'));
+        assertTrue(ATDevice.getSlots().includes('slot3'));
+        assertTrue(ATDevice.getSlots().includes('slot4'));
+        assertTrue(ATDevice.getSlots().includes('slot5'));
+        await ATDevice.sendAtCmdWithResult('AT DE slot1');
+        await ATDevice.sendAtCmdWithResult('AT DE slot2');
+        await ATDevice.sendAtCmdWithResult('AT DE slot3');
+        await ATDevice.sendAtCmdWithResult('AT DE slot4');
+        await ATDevice.sendAtCmdWithResult('AT DE slot5');
+        await ATDevice.refreshConfig();
+        assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
+        assertEqual(ATDevice.getSlots().length, 1);
     }
 
     async function deleteMiddleSlot() {
-        await flip.sendAtCmdWithResult('AT SA slot1');
-        await flip.sendAtCmdWithResult('AT SA slot2');
-        await flip.sendAtCmdWithResult('AT SA slot3');
-        await flip.refreshConfig();
-        assertTrue(flip.getSlots().includes(DEFAULT_SLOTNAME));
-        assertTrue(flip.getSlots().includes('slot1'));
-        assertTrue(flip.getSlots().includes('slot2'));
-        assertTrue(flip.getSlots().includes('slot3'));
-        await flip.sendAtCmdWithResult('AT DE slot2');
-        await flip.refreshConfig();
-        assertTrue(flip.getSlots().includes(DEFAULT_SLOTNAME));
-        assertEqual(flip.getSlots().length, 3);
-        assertEqual(flip.getSlotConfigs('mouse'), DEFAULT_SLOT);
-        assertEqual(flip.getSlotConfigs('slot1'), DEFAULT_SLOT);
-        assertEqual(flip.getSlotConfigs('slot3'), DEFAULT_SLOT);
+        await ATDevice.sendAtCmdWithResult('AT SA slot1');
+        await ATDevice.sendAtCmdWithResult('AT SA slot2');
+        await ATDevice.sendAtCmdWithResult('AT SA slot3');
+        await ATDevice.refreshConfig();
+        assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
+        assertTrue(ATDevice.getSlots().includes('slot1'));
+        assertTrue(ATDevice.getSlots().includes('slot2'));
+        assertTrue(ATDevice.getSlots().includes('slot3'));
+        await ATDevice.sendAtCmdWithResult('AT DE slot2');
+        await ATDevice.refreshConfig();
+        assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
+        assertEqual(ATDevice.getSlots().length, 3);
+        assertEqual(ATDevice.getSlotConfigs('mouse'), DEFAULT_SLOT);
+        assertEqual(ATDevice.getSlotConfigs('slot1'), DEFAULT_SLOT);
+        assertEqual(ATDevice.getSlotConfigs('slot3'), DEFAULT_SLOT);
     }
 
     async function differentValuesInSlots() {
-        await flip.sendATCmd('AT DX', 123);
-        await flip.sendAtCmdWithResult('AT SA slot2');
-        await flip.sendATCmd('AT LO', DEFAULT_SLOTNAME);
-        await flip.sendATCmd('AT DX', 12);
-        await flip.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
-        await flip.refreshConfig();
-        assertEqual(flip.getConfig(C.AT_CMD_DEADZONE_X, 'slot2'), 123);
-        assertEqual(flip.getConfig(C.AT_CMD_DEADZONE_X, DEFAULT_SLOTNAME), 12);
+        await ATDevice.sendATCmd('AT DX', 123);
+        await ATDevice.sendAtCmdWithResult('AT SA slot2');
+        await ATDevice.sendATCmd('AT LO', DEFAULT_SLOTNAME);
+        await ATDevice.sendATCmd('AT DX', 12);
+        await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
+        await ATDevice.refreshConfig();
+        assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X, 'slot2'), 123);
+        assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X, DEFAULT_SLOTNAME), 12);
     }
 
 
     /////////////////////////
     // util functions
     /////////////////////////
-    async function doAllTests() {
+    window.doAllTests = async function() {
         if (isTesting) {
             return;
         }
@@ -212,12 +214,11 @@
         isTesting = false;
     }
 
-    async function initAndStart(runFn) {
-        if (window.flip) {
+    window.initAndStart = async function(runFn) {
+        if (ATDevice.isInitialized()) {
             return runFn();
         }
-        window.flip = new FlipMouse();
-        flip.init(true).then(function () {
+        ATDevice.init(true).then(function () {
             runFn();
         });
     }
@@ -245,9 +246,9 @@
         assertFails = 0;
         assertSuccess = 0;
         print(`Testing "${testName}"...`)
-        let value = await flip.sendAtCmdWithResult('AT RS');
+        let value = await ATDevice.sendAtCmdWithResult('AT RS');
         log.warn('done reset: ' + value);
-        await flip.refreshConfig();
+        await ATDevice.refreshConfig();
         await testFn();
         if (assertFails > 0) {
             printWarn(`Test "${testName}" failed with ${assertFails} assertion violations and ${assertSuccess} successful assertions!`)
