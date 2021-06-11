@@ -25,7 +25,7 @@ class TabStick extends Component {
         additionalState[C.AT_CMD_DEADZONE_Y] = ATDevice.getConfig(C.AT_CMD_DEADZONE_Y);
         this.setState(additionalState);
 
-        ATDevice.resetMinMaxLiveValues();
+        FLipMouse.resetMinMaxLiveValues();
     }
     
     sliderChanged(event, constants) {

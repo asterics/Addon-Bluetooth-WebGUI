@@ -7,6 +7,7 @@ import {TabSlots} from "./TabSlots.js";
 import {TabStick} from "./TabStick.js";
 import {TabVisualization} from "./TabVisualization.js";
 import {ATDevice} from "../../../js/communication/ATDevice.js";
+import {FLipMouse} from "../../communication/FLipMouse.js";
 
 const html = htm.bind(h);
 
@@ -97,9 +98,9 @@ class MainView extends Component {
             menuOpen: false
         });
         if (view.object.valueHandler) {
-            ATDevice.startLiveValueListener(view.object.valueHandler);
+            FLipMouse.startLiveValueListener(view.object.valueHandler);
         } else {
-            ATDevice.stopLiveValueListener();
+            FLipMouse.stopLiveValueListener();
         }
 
         window.location.hash = viewHash;

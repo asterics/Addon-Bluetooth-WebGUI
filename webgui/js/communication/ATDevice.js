@@ -1,29 +1,11 @@
 let ATDevice = {};
-
-ATDevice.LIVE_PRESSURE = 'LIVE_PRESSURE';
-ATDevice.LIVE_UP = 'LIVE_UP';
-ATDevice.LIVE_DOWN = 'LIVE_DOWN';
-ATDevice.LIVE_LEFT = 'LIVE_LEFT';
-ATDevice.LIVE_RIGHT = 'LIVE_RIGHT';
-ATDevice.LIVE_MOV_X = 'LIVE_MOV_X';
-ATDevice.LIVE_MOV_Y = 'LIVE_MOV_Y';
-ATDevice.LIVE_MOV_X_MIN = 'LIVE_MOV_X_MIN';
-ATDevice.LIVE_MOV_X_MAX = 'LIVE_MOV_X_MAX';
-ATDevice.LIVE_MOV_Y_MIN = 'LIVE_MOV_Y_MIN';
-ATDevice.LIVE_MOV_Y_MAX = 'LIVE_MOV_Y_MAX';
-ATDevice.LIVE_PRESSURE_MIN = 'LIVE_PRESSURE_MIN';
-ATDevice.LIVE_PRESSURE_MIN = 'LIVE_PRESSURE_MIN';
-ATDevice.LIVE_PRESSURE_MAX = 'LIVE_PRESSURE_MAX';
-ATDevice.LIVE_BUTTONS = 'LIVE_BUTTONS';
 ATDevice.inRawMode = false;
 
 let _slots = [];
-let _liveData = {};
 
 let debouncers = {};
 let _valueHandler = null;
-let _liveValueIntervall = null;
-let _liveValueLastParse = 0;
+let _liveValueLastUpdate = 0;
 let _slotChangeHandler = null;
 let _currentSlot = null;
 let _SLOT_CONSTANT = 'Slot:';
@@ -39,7 +21,6 @@ let _connectionTestIntervalHandler = null;
 let _connectionTestCallbacks = [];
 let _connected = true;
 let _AT_CMD_BUSY_RESPONSE = 'BUSY';
-let _AT_CMD_OK_RESPONSE = 'OK';
 
 /**
  * initializes the FLipMouse instance
@@ -64,12 +45,16 @@ ATDevice.init = function (dontGetLiveValues) {
 
     return promise.then(function () {
         _isInitialized = true;
-        ATDevice.resetMinMaxLiveValues();
         return ATDevice.refreshConfig();
     }).then(() => {
         if (!dontGetLiveValues) {
             ATDevice.sendATCmd('AT SR');
-            _communicator.setValueHandler(parseLiveValues);
+            _communicator.setValueHandler((data) => {
+                _liveValueLastUpdate = new Date().getTime();
+                if (_valueHandler) {
+                    _valueHandler(data);
+                }
+            });
         }
         ATDevice.startTestingConnection();
         return Promise.resolve();
@@ -168,7 +153,7 @@ ATDevice.startTestingConnection = function () {
     }
 
     function doTest() {
-        _connected = !_liveValueLastParse || new Date().getTime() - _liveValueLastParse < 1000;
+        _connected = !_liveValueLastUpdate || new Date().getTime() - _liveValueLastUpdate < 1000;
         _connectionTestCallbacks.forEach(fn => fn(_connected));
     }
 
@@ -223,12 +208,8 @@ ATDevice.setSlotChangeHandler = function (fn) {
     _slotChangeHandler = fn;
 }
 
-ATDevice.startLiveValueListener = function (handler) {
+ATDevice.setValueHandler = function (handler) {
     _valueHandler = handler;
-};
-
-ATDevice.stopLiveValueListener = function () {
-    _valueHandler = null;
 };
 
 ATDevice.getConfig = function (constant, slotName) {
@@ -280,10 +261,12 @@ ATDevice.getCurrentSlot = function () {
     return _currentSlot;
 };
 
-ATDevice.setSlot = function (slot) {
+ATDevice.setSlot = function (slot, dontSendToDevice) {
     if (ATDevice.getSlots().includes(slot)) {
         _currentSlot = slot;
-        ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, slot);
+        if (!dontSendToDevice) {
+            ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, slot);
+        }
     }
     if (_slotChangeHandler) {
         _slotChangeHandler();
@@ -323,22 +306,6 @@ ATDevice.deleteSlot = function (slotName) {
         _slotChangeHandler();
     }
     return Promise.resolve();
-};
-
-ATDevice.getLiveData = function (constant) {
-    if (constant) {
-        return _liveData[constant];
-    }
-    return _liveData;
-};
-
-ATDevice.resetMinMaxLiveValues = function () {
-    _liveData[ATDevice.LIVE_PRESSURE_MIN] = 1024;
-    _liveData[ATDevice.LIVE_MOV_X_MIN] = 1024;
-    _liveData[ATDevice.LIVE_MOV_Y_MIN] = 1024;
-    _liveData[ATDevice.LIVE_PRESSURE_MAX] = -1;
-    _liveData[ATDevice.LIVE_MOV_X_MAX] = -1;
-    _liveData[ATDevice.LIVE_MOV_Y_MAX] = -1;
 };
 
 ATDevice.setButtonAction = function (buttonModeIndex, atCmd) {
@@ -393,48 +360,6 @@ ATDevice.getBTVersion = function () {
         result = result || '';
         return Promise.resolve(result.trim() ? L.formatVersion(result) : '');
     });
-}
-
-function parseLiveValues(data) {
-    if (!data) {
-        console.log('error parsing live data: ' + data);
-        return;
-    }
-    _liveValueIntervall = _valueHandler ? null : 300;
-
-    if (!_liveValueIntervall || new Date().getTime() - _liveValueLastParse > _liveValueIntervall) {
-        _liveValueLastParse = new Date().getTime();
-        var valArray = data.split(':')[1].split(',');
-        _liveData[ATDevice.LIVE_PRESSURE] = parseInt(valArray[0]);
-        _liveData[ATDevice.LIVE_UP] = parseInt(valArray[1]);
-        _liveData[ATDevice.LIVE_DOWN] = parseInt(valArray[2]);
-        _liveData[ATDevice.LIVE_LEFT] = parseInt(valArray[3]);
-        _liveData[ATDevice.LIVE_RIGHT] = parseInt(valArray[4]);
-        _liveData[ATDevice.LIVE_MOV_X] = parseInt(valArray[5]);
-        _liveData[ATDevice.LIVE_MOV_Y] = parseInt(valArray[6]);
-        if (valArray[7]) {
-            _liveData[ATDevice.LIVE_BUTTONS] = valArray[7].split('').map(v => v === "1");
-        }
-        if (valArray[8]) {
-            let slot = ATDevice.getSlotName(parseInt(valArray[8]));
-            if (slot && slot !== _currentSlot) {
-                _currentSlot = slot;
-                if (_slotChangeHandler) {
-                    _slotChangeHandler();
-                }
-            }
-        }
-        _liveData[ATDevice.LIVE_PRESSURE_MIN] = Math.min(_liveData[ATDevice.LIVE_PRESSURE_MIN], _liveData[ATDevice.LIVE_PRESSURE]);
-        _liveData[ATDevice.LIVE_MOV_X_MIN] = Math.min(_liveData[ATDevice.LIVE_MOV_X_MIN], _liveData[ATDevice.LIVE_MOV_X]);
-        _liveData[ATDevice.LIVE_MOV_Y_MIN] = Math.min(_liveData[ATDevice.LIVE_MOV_Y_MIN], _liveData[ATDevice.LIVE_MOV_Y]);
-        _liveData[ATDevice.LIVE_PRESSURE_MAX] = Math.max(_liveData[ATDevice.LIVE_PRESSURE_MAX], _liveData[ATDevice.LIVE_PRESSURE]);
-        _liveData[ATDevice.LIVE_MOV_X_MAX] = Math.max(_liveData[ATDevice.LIVE_MOV_X_MAX], _liveData[ATDevice.LIVE_MOV_X]);
-        _liveData[ATDevice.LIVE_MOV_Y_MAX] = Math.max(_liveData[ATDevice.LIVE_MOV_Y_MAX], _liveData[ATDevice.LIVE_MOV_Y]);
-
-        if (L.isFunction(_valueHandler)) {
-            _valueHandler(_liveData);
-        }
-    }
 }
 
 function parseConfig(atCmdsString) {

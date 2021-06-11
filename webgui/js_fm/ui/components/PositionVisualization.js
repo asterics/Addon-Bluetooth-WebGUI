@@ -2,6 +2,7 @@ import { h, Component, render } from '../../../js/preact.min.js';
 import htm from '../../../js/htm.min.js';
 import {styleUtil} from '../../util/styleUtil.js';
 import {ATDevice} from "../../../js/communication/ATDevice.js";
+import {FLipMouse} from "../../communication/FLipMouse.js";
 
 const html = htm.bind(h);
 
@@ -56,12 +57,12 @@ class PositionVisualization extends Component {
     }
 
     updateData(data) {
-        let x = data[ATDevice.LIVE_MOV_X];
-        let y = data[ATDevice.LIVE_MOV_Y];
-        let maxX = data[ATDevice.LIVE_MOV_X_MAX];
-        let maxY = data[ATDevice.LIVE_MOV_Y_MAX];
-        let minX = data[ATDevice.LIVE_MOV_X_MIN];
-        let minY = data[ATDevice.LIVE_MOV_Y_MIN];
+        let x = data[FLipMouse.LIVE_MOV_X];
+        let y = data[FLipMouse.LIVE_MOV_Y];
+        let maxX = data[FLipMouse.LIVE_MOV_X_MAX];
+        let maxY = data[FLipMouse.LIVE_MOV_Y_MAX];
+        let minX = data[FLipMouse.LIVE_MOV_X_MIN];
+        let minY = data[FLipMouse.LIVE_MOV_Y_MIN];
         let deadX = ATDevice.getConfig(C.AT_CMD_DEADZONE_X);
         let deadY = ATDevice.getConfig(C.AT_CMD_DEADZONE_Y);
         this.state.maxPos = this.state.maxPosManual !== undefined ? this.state.maxPosManual : Math.max(maxX, maxY, Math.abs(minX), Math.abs(minY), Math.round(deadX * 1.1), Math.round(deadY * 1.1), this.state.maxPos);
@@ -97,23 +98,23 @@ class PositionVisualization extends Component {
                         </div>
                         <div style="display: ${this.state.showAnalogBars ? 'block' : 'none'}">
                             <div id="upPos" class="back-layer color-lightred"
-                                 style="top: ${(50 - (data[ATDevice.LIVE_UP] / 1024 * 100) / 2)}%; left: 48%; height: ${(data[ATDevice.LIVE_UP] / 1024 * 100) / 2}%; width: 4%;"></div>
+                                 style="top: ${(50 - (data[FLipMouse.LIVE_UP] / 1024 * 100) / 2)}%; left: 48%; height: ${(data[FLipMouse.LIVE_UP] / 1024 * 100) / 2}%; width: 4%;"></div>
                             <div id="downPos" class="back-layer color-lightred"
-                                 style="top: 50%; left: 48%; height: ${(data[ATDevice.LIVE_DOWN] / 1024 * 100) / 2}%; width: 4%;"></div>
+                                 style="top: 50%; left: 48%; height: ${(data[FLipMouse.LIVE_DOWN] / 1024 * 100) / 2}%; width: 4%;"></div>
                             <div id="leftPos" class="back-layer color-lightred"
-                                 style="top: 48%; left: ${(50 - (data[ATDevice.LIVE_LEFT] / 1024 * 100) / 2)}%; height: 4%; width: ${(data[ATDevice.LIVE_LEFT] / 1024 * 100) / 2}%;"></div>
+                                 style="top: 48%; left: ${(50 - (data[FLipMouse.LIVE_LEFT] / 1024 * 100) / 2)}%; height: 4%; width: ${(data[FLipMouse.LIVE_LEFT] / 1024 * 100) / 2}%;"></div>
                             <div id="rightPos" class="back-layer color-lightred"
-                                 style="top: 48%; left: 50%; height: 4%; width: ${(data[ATDevice.LIVE_RIGHT] / 1024 * 100) / 2}%;"></div>
+                                 style="top: 48%; left: 50%; height: 4%; width: ${(data[FLipMouse.LIVE_RIGHT] / 1024 * 100) / 2}%;"></div>
                         </div>
                         <div class="back-layer"
                              style="left: 50%; height: 100%; border-right-style: solid; border-right-width: thin;"></div>
                         <div class="back-layer"
                              style="top: 50%; width: 100%; border-bottom-style: solid; border-bottom-width: thin;"></div>
                         <div style="display: ${this.state.showAnalogValues ? 'block' : 'none'}">
-                            <div id="upPosVal" class="back-layer" style="top: 0%; left: 52%">${data[ATDevice.LIVE_UP]}</div>
-                            <div id="downPosVal" class="back-layer" style="top: 90%; left: 52%">${data[ATDevice.LIVE_DOWN]}</div>
-                            <div id="leftPosVal" class="back-layer" style="top: 38%; left: 1%;">${data[ATDevice.LIVE_LEFT]}</div>
-                            <div id="rightPosVal" class="back-layer" style="top: 38%; left: 88%">${data[ATDevice.LIVE_RIGHT]}</div>
+                            <div id="upPosVal" class="back-layer" style="top: 0%; left: 52%">${data[FLipMouse.LIVE_UP]}</div>
+                            <div id="downPosVal" class="back-layer" style="top: 90%; left: 52%">${data[FLipMouse.LIVE_DOWN]}</div>
+                            <div id="leftPosVal" class="back-layer" style="top: 38%; left: 1%;">${data[FLipMouse.LIVE_LEFT]}</div>
+                            <div id="rightPosVal" class="back-layer" style="top: 38%; left: 88%">${data[FLipMouse.LIVE_RIGHT]}</div>
                         </div>
                         <div style="display: ${this.state.showMaxPos ? 'block' : 'none'}">
                             <div id="cursorPosVal" class="back-layer" style="top: 90%; left: 2%;">${this.state.maxPos}</div>

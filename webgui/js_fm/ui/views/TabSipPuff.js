@@ -1,6 +1,7 @@
 import { h, Component, render } from '../../../js/preact.min.js';
 import htm from '../../../js/htm.min.js';
 import {ATDevice} from "../../../js/communication/ATDevice.js";
+import {FLipMouse} from "../../communication/FLipMouse.js";
 
 const html = htm.bind(h);
 class TabSipPuff extends Component {
@@ -27,14 +28,16 @@ class TabSipPuff extends Component {
             strongSipThreshold: 0,
             strongPuffThreshold: 0
         }
+
+        FLipMouse.resetMinMaxLiveValues();
     }
 
     updateData(data) {
         let newState = {};
 
-        newState.minValue = data[ATDevice.LIVE_PRESSURE_MIN];
-        newState.maxValue = data[ATDevice.LIVE_PRESSURE_MAX];
-        newState.value = data[ATDevice.LIVE_PRESSURE];
+        newState.minValue = data[FLipMouse.LIVE_PRESSURE_MIN];
+        newState.maxValue = data[FLipMouse.LIVE_PRESSURE_MAX];
+        newState.value = data[FLipMouse.LIVE_PRESSURE];
         newState.SIP_THRESHOLD = ATDevice.getConfig(C.AT_CMD_SIP_THRESHOLD);
         newState.PUFF_THRESHOLD = ATDevice.getConfig(C.AT_CMD_PUFF_THRESHOLD);
         newState.SIP_STRONG_THRESHOLD = ATDevice.getConfig(C.AT_CMD_SIP_STRONG_THRESHOLD);
@@ -61,7 +64,7 @@ class TabSipPuff extends Component {
     sliderChanged(event, constant) {
         let newValue = parseInt(event.target.value);
         let oldValue = ATDevice.getConfig(constant);
-        let liveValue = ATDevice.getLiveData(ATDevice.LIVE_PRESSURE);
+        let liveValue = FLipMouse.getLiveData(FLipMouse.LIVE_PRESSURE);
 
         let validPuff = (newValue > liveValue || newValue > oldValue);
         let validSip = (newValue < liveValue || newValue < oldValue);
