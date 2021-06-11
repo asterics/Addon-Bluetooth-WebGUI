@@ -365,3 +365,14 @@ L.debounce = function (fn, timeout, key) {
         fn();
     }, timeout);
 };
+
+/**
+ * clears any existing timeout created by "debounce()" before by given key
+ * @param key
+ */
+L.clearDebounce = function (key) {
+    key = key || 'DEFAULT';
+    if (L.timeoutHandlers[key]) {
+        clearTimeout(L.timeoutHandlers[key]);
+    }
+};

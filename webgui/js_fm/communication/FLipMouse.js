@@ -38,6 +38,7 @@ FLipMouse.rotate = function () {
     let currentOrientation = ATDevice.getConfig(C.AT_CMD_ORIENTATION_ANGLE);
     ATDevice.setConfig(C.AT_CMD_ORIENTATION_ANGLE, (currentOrientation + 90) % 360, 0);
     ATDevice.sendATCmd('AT CA');
+    ATDevice.planSaving();
 };
 
 FLipMouse.calibrate = function () {
@@ -50,6 +51,7 @@ FLipMouse.setFlipmouseMode = function (index) {
         return;
     }
     ATDevice.setConfig(C.AT_CMD_FLIPMOUSE_MODE, index, 0);
+    ATDevice.planSaving();
 };
 
 FLipMouse.startLiveValueListener = function (handler) {
@@ -115,7 +117,6 @@ function parseLiveData(data) {
             _liveValueHandler(_liveData);
         }
     }
-
 }
 
 ATDevice.setLiveValueHandler(parseLiveData);

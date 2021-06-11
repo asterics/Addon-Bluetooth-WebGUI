@@ -19,6 +19,8 @@ let _connectionTestCallbacks = [];
 let _connected = true;
 let _AT_CMD_BUSY_RESPONSE = 'BUSY';
 
+let _autoSaveTimeout = 10000;
+
 /**
  * initializes the FLipMouse instance
  * @param dontGetLiveValues if true, live values are not requested by default
@@ -192,7 +194,8 @@ ATDevice.setConfig = function (atCmd, value, debounceTimeout) {
     setConfigInternal(atCmd, value);
     L.debounce(function () {
         ATDevice.sendATCmd(atCmd, value);
-    }, debounceTimeout, atCmd)
+    }, debounceTimeout, atCmd);
+    ATDevice.planSaving();
 };
 
 ATDevice.refreshConfig = function () {
@@ -221,6 +224,7 @@ ATDevice.setButtonAction = function (buttonModeIndex, atCmd) {
     setConfigInternal(C.AT_CMD_BTN_MODE + " " + buttonModeIndex, atCmd);
     ATDevice.sendATCmd(C.AT_CMD_BTN_MODE, buttonModeIndex);
     ATDevice.sendATCmd(atCmd);
+    ATDevice.save();
 };
 
 ATDevice.getButtonActionATCmd = function (index, slot) {
@@ -234,9 +238,20 @@ ATDevice.getButtonActionATCmdSuffix = function (index, slot) {
 }
 
 ATDevice.save = async function () {
+    ATDevice.abortAutoSaving();
     ATDevice.sendATCmd('AT SA', _currentSlot);
     return Promise.resolve();
 };
+
+ATDevice.planSaving = function () {
+    L.debounce(() => {
+        ATDevice.save();
+    }, _autoSaveTimeout, 'ATDEVICE_SAVE');
+}
+
+ATDevice.abortAutoSaving = function () {
+    L.clearDebounce('ATDEVICE_SAVE');
+}
 
 ATDevice.getSlots = function () {
     return _slots.map(slotObject => slotObject.name);
@@ -276,11 +291,15 @@ ATDevice.getSlotConfigText = function (slotName) {
 }
 
 ATDevice.setSlot = function (slot, dontSendToDevice) {
+    if (slot === _currentSlot) {
+        return;
+    }
     if (ATDevice.getSlots().includes(slot)) {
-        _currentSlot = slot;
         if (!dontSendToDevice) {
+            ATDevice.save();
             ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, slot);
         }
+        _currentSlot = slot;
     }
     if (_slotChangeHandler) {
         _slotChangeHandler();
@@ -291,6 +310,7 @@ ATDevice.createSlot = function (slotName) {
     if (!slotName || ATDevice.getSlots().includes(slotName)) {
         console.warn('slot not saved because no slot name or slot already existing!');
     }
+    ATDevice.save();
     let slotConfig = ATDevice.getSlotConfig(_currentSlot);
     _slots.push({
         name: slotName,
@@ -396,5 +416,12 @@ function parseConfig(atCmdsString) {
     }
     return parsedSlots;
 }
+
+window.addEventListener('beforeunload', () => {
+    if (ATDevice.isInitialized()) {
+        log.info('saving config before closing...');
+        ATDevice.save();
+    }
+});
 
 export {ATDevice};

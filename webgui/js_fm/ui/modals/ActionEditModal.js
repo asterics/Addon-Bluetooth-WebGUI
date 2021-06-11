@@ -82,6 +82,7 @@ class ActionEditModal extends Component {
     }
 
     save() {
+        ATDevice.setSlot(this.props.slot);
         if (this.state.shouldChangeMode) {
             FLipMouse.setFlipmouseMode(C.FLIPMOUSE_MODE_ALT.value)
         }
