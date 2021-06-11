@@ -233,7 +233,7 @@ ATDevice.stopLiveValueListener = function () {
 
 ATDevice.getConfig = function (constant, slotName) {
     let slotConfig = ATDevice.getSlotConfigs(slotName || _currentSlot);
-    if (slotConfig[constant]) {
+    if (slotConfig[constant] !== undefined) {
         let value = slotConfig[constant] + '';
         let intValue = parseInt(value);
         return intValue + '' === value.trim() ? intValue : value;
