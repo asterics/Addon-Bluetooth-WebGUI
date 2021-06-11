@@ -19,6 +19,7 @@ FLipMouse.LIVE_BUTTONS = 'LIVE_BUTTONS';
 let _AT_CMD_IR_TIMEOUT_RESPONSE = 'IR_TIMEOUT';
 let _liveData = {};
 let _liveValueHandler = null;
+let _lastLiveValueParse = 0;
 
 FLipMouse.getIRCommands = function () {
     return ATDevice.sendAtCmdWithResult(C.AT_CMD_IR_LIST).then(result => {
@@ -80,35 +81,42 @@ function parseLiveData(data) {
     if (Object.keys(_liveData).length === 0) {
         FLipMouse.resetMinMaxLiveValues()
     }
-    if (!data || !_liveValueHandler) {
+    if (!data) {
         return;
     }
 
-    let valArray = data.split(':')[1].split(',');
-    _liveData[FLipMouse.LIVE_PRESSURE] = parseInt(valArray[0]);
-    _liveData[FLipMouse.LIVE_UP] = parseInt(valArray[1]);
-    _liveData[FLipMouse.LIVE_DOWN] = parseInt(valArray[2]);
-    _liveData[FLipMouse.LIVE_LEFT] = parseInt(valArray[3]);
-    _liveData[FLipMouse.LIVE_RIGHT] = parseInt(valArray[4]);
-    _liveData[FLipMouse.LIVE_MOV_X] = parseInt(valArray[5]);
-    _liveData[FLipMouse.LIVE_MOV_Y] = parseInt(valArray[6]);
-    if (valArray[7]) {
-        _liveData[FLipMouse.LIVE_BUTTONS] = valArray[7].split('').map(v => v === "1");
-    }
-    if (valArray[8]) {
-        let slot = ATDevice.getSlotName(parseInt(valArray[8]));
-        if (slot && slot !== ATDevice.getCurrentSlot()) {
-            ATDevice.setSlot(slot, true);
+    let interval = _liveValueHandler ? 0 : 300;
+    if (new Date().getTime() - _lastLiveValueParse > interval) {
+        _lastLiveValueParse = new Date().getTime();
+        let valArray = data.split(':')[1].split(',');
+        _liveData[FLipMouse.LIVE_PRESSURE] = parseInt(valArray[0]);
+        _liveData[FLipMouse.LIVE_UP] = parseInt(valArray[1]);
+        _liveData[FLipMouse.LIVE_DOWN] = parseInt(valArray[2]);
+        _liveData[FLipMouse.LIVE_LEFT] = parseInt(valArray[3]);
+        _liveData[FLipMouse.LIVE_RIGHT] = parseInt(valArray[4]);
+        _liveData[FLipMouse.LIVE_MOV_X] = parseInt(valArray[5]);
+        _liveData[FLipMouse.LIVE_MOV_Y] = parseInt(valArray[6]);
+        if (valArray[7]) {
+            _liveData[FLipMouse.LIVE_BUTTONS] = valArray[7].split('').map(v => v === "1");
+        }
+        if (valArray[8]) {
+            let slot = ATDevice.getSlotName(parseInt(valArray[8]));
+            if (slot && slot !== ATDevice.getCurrentSlot()) {
+                ATDevice.setSlot(slot, true);
+            }
+        }
+        _liveData[FLipMouse.LIVE_PRESSURE_MIN] = Math.min(_liveData[FLipMouse.LIVE_PRESSURE_MIN], _liveData[FLipMouse.LIVE_PRESSURE]);
+        _liveData[FLipMouse.LIVE_MOV_X_MIN] = Math.min(_liveData[FLipMouse.LIVE_MOV_X_MIN], _liveData[FLipMouse.LIVE_MOV_X]);
+        _liveData[FLipMouse.LIVE_MOV_Y_MIN] = Math.min(_liveData[FLipMouse.LIVE_MOV_Y_MIN], _liveData[FLipMouse.LIVE_MOV_Y]);
+        _liveData[FLipMouse.LIVE_PRESSURE_MAX] = Math.max(_liveData[FLipMouse.LIVE_PRESSURE_MAX], _liveData[FLipMouse.LIVE_PRESSURE]);
+        _liveData[FLipMouse.LIVE_MOV_X_MAX] = Math.max(_liveData[FLipMouse.LIVE_MOV_X_MAX], _liveData[FLipMouse.LIVE_MOV_X]);
+        _liveData[FLipMouse.LIVE_MOV_Y_MAX] = Math.max(_liveData[FLipMouse.LIVE_MOV_Y_MAX], _liveData[FLipMouse.LIVE_MOV_Y]);
+
+        if (_liveValueHandler) {
+            _liveValueHandler(_liveData);
         }
     }
-    _liveData[FLipMouse.LIVE_PRESSURE_MIN] = Math.min(_liveData[FLipMouse.LIVE_PRESSURE_MIN], _liveData[FLipMouse.LIVE_PRESSURE]);
-    _liveData[FLipMouse.LIVE_MOV_X_MIN] = Math.min(_liveData[FLipMouse.LIVE_MOV_X_MIN], _liveData[FLipMouse.LIVE_MOV_X]);
-    _liveData[FLipMouse.LIVE_MOV_Y_MIN] = Math.min(_liveData[FLipMouse.LIVE_MOV_Y_MIN], _liveData[FLipMouse.LIVE_MOV_Y]);
-    _liveData[FLipMouse.LIVE_PRESSURE_MAX] = Math.max(_liveData[FLipMouse.LIVE_PRESSURE_MAX], _liveData[FLipMouse.LIVE_PRESSURE]);
-    _liveData[FLipMouse.LIVE_MOV_X_MAX] = Math.max(_liveData[FLipMouse.LIVE_MOV_X_MAX], _liveData[FLipMouse.LIVE_MOV_X]);
-    _liveData[FLipMouse.LIVE_MOV_Y_MAX] = Math.max(_liveData[FLipMouse.LIVE_MOV_Y_MAX], _liveData[FLipMouse.LIVE_MOV_Y]);
 
-    _liveValueHandler(_liveData);
 }
 
 ATDevice.setValueHandler(parseLiveData);
