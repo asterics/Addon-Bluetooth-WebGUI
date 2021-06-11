@@ -38,7 +38,6 @@ let _timestampLastAtCmd = new Date().getTime();
 let _connectionTestIntervalHandler = null;
 let _connectionTestCallbacks = [];
 let _connected = true;
-let _AT_CMD_IR_TIMEOUT_RESPONSE = 'IR_TIMEOUT';
 let _AT_CMD_BUSY_RESPONSE = 'BUSY';
 let _AT_CMD_OK_RESPONSE = 'OK';
 
@@ -337,19 +336,6 @@ ATDevice.deleteSlot = function (slotName) {
     }
     return Promise.resolve();
 };
-
-ATDevice.getIRCommands = function () {
-    return ATDevice.sendAtCmdWithResult(C.AT_CMD_IR_LIST).then(result => {
-        return Promise.resolve(result.split('\n').map(elem => elem.split(':')[1]).filter(elem => !!elem).map(e => e.trim()));
-    });
-}
-
-ATDevice.recordIrCommand = function (name) {
-    return ATDevice.sendAtCmdWithResult(C.AT_CMD_IR_RECORD, name, 11000).then(result => {
-        let success = result && result.indexOf(_AT_CMD_IR_TIMEOUT_RESPONSE) === -1;
-        return Promise.resolve(success);
-    })
-}
 
 ATDevice.getLiveData = function (constant) {
     if (constant) {

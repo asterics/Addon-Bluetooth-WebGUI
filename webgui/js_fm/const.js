@@ -1,4 +1,5 @@
 import {ATDevice} from "../js/communication/ATDevice.js";
+import {FLipMouse} from "./communication/FLipMouse.js";
 
 window.C = {};
 
@@ -260,13 +261,13 @@ C.AT_CMDS_ACTIONS = [{
     label: 'Play infrared command // Infrarot-Kommando abspielen',
     category: C.AT_CMD_CAT_IR,
     input: C.INPUTFIELD_TYPE_SELECT,
-    optionsFn: ATDevice.getIRCommands
+    optionsFn: FLipMouse.getIRCommands
 }, {
     cmd: C.AT_CMD_IR_HOLD,
     label: 'Hold infrared command // Infrarot-Kommando halten',
     category: C.AT_CMD_CAT_IR,
     input: C.INPUTFIELD_TYPE_SELECT,
-    optionsFn: ATDevice.getIRCommands
+    optionsFn: FLipMouse.getIRCommands
 }, {
     cmd: C.AT_CMD_IR_STOP,
     label: 'Stop infrared command // Infrarot-Kommando stoppen',
