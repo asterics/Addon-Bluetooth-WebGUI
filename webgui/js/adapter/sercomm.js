@@ -26,7 +26,8 @@ function SerialCommunicator() {
             {usbVendorId: 0x2341, usbProductId: 0x0001}
         ];
 
-        _port = await navigator.serial.requestPort({filters}).catch((error) => {
+        //_port = await navigator.serial.requestPort({filters}).catch((error) => {
+        _port = await navigator.serial.requestPort().catch((error) => {
             console.log(error);
             return Promise.reject("User didn't allow serial port access.");
         });
