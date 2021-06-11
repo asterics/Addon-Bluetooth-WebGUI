@@ -65,7 +65,7 @@ class MainView extends Component {
                     slots: ATDevice.getSlots()
                 });
             });
-            ATDevice.addConnectionTestCallback((isConnected) => {
+            ATDevice.addConnectionTestHandler((isConnected) => {
                 if (isConnected !== thiz.state.connected) {
                     thiz.setState({
                         connected: isConnected

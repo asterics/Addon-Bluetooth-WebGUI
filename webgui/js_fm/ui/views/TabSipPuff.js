@@ -78,7 +78,7 @@ class TabSipPuff extends Component {
             let newState = {};
             newState[constant] = newValue;
             this.setState(newState);
-            ATDevice.setValue(constant, newValue);
+            ATDevice.setConfig(constant, newValue);
         } else {
             this.setState({});
         }

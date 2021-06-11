@@ -36,7 +36,7 @@ FLipMouse.recordIrCommand = function (name) {
 
 FLipMouse.rotate = function () {
     let currentOrientation = ATDevice.getConfig(C.AT_CMD_ORIENTATION_ANGLE);
-    ATDevice.setValue(C.AT_CMD_ORIENTATION_ANGLE, (currentOrientation + 90) % 360, 0);
+    ATDevice.setConfig(C.AT_CMD_ORIENTATION_ANGLE, (currentOrientation + 90) % 360, 0);
     ATDevice.sendATCmd('AT CA');
 };
 
@@ -49,8 +49,7 @@ FLipMouse.setFlipmouseMode = function (index) {
     if (!C.FLIPMOUSE_MODES.map(mode => mode.value).includes(index)) {
         return;
     }
-    ATDevice.setConfig(C.AT_CMD_FLIPMOUSE_MODE, index);
-    ATDevice.sendATCmd(C.AT_CMD_FLIPMOUSE_MODE, index);
+    ATDevice.setConfig(C.AT_CMD_FLIPMOUSE_MODE, index, 0);
 };
 
 FLipMouse.startLiveValueListener = function (handler) {
@@ -119,6 +118,6 @@ function parseLiveData(data) {
 
 }
 
-ATDevice.setValueHandler(parseLiveData);
+ATDevice.setLiveValueHandler(parseLiveData);
 
 export {FLipMouse};

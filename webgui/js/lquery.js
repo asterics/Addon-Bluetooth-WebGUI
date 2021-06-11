@@ -342,3 +342,26 @@ L.isVersionNewer = function (oldVersion, newVersion) {
     if (vOld.patch !== vNew.patch) return vNew.patch > vOld.patch;
     return false;
 }
+
+/**
+ * Calls the given function after a specified timeout. Another subsequent call cancels and restarts the timeout.
+ *
+ * @param fn the function to call
+ * @param timeout
+ * @param key for identifying the called function. If several functions are debounced at the same time, different keys
+ *        have to be specified for identifying them
+ */
+L.timeoutHandlers = {}
+L.debounce = function (fn, timeout, key) {
+    key = key || 'DEFAULT';
+    if (!fn && !timeout) {
+        log.warn('called util.debounce() without needed parameters. aborting.');
+        return;
+    }
+    if (L.timeoutHandlers[key]) {
+        clearTimeout(L.timeoutHandlers[key]);
+    }
+    L.timeoutHandlers[key] = setTimeout(function () {
+        fn();
+    }, timeout);
+};

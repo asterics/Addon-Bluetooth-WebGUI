@@ -90,8 +90,8 @@
     async function testSecondSlot() {
         await ATDevice.sendAtCmdWithResult('AT SA slot2');
         await ATDevice.refreshConfig();
-        assertEqual(ATDevice.getSlotConfigs(DEFAULT_SLOTNAME), DEFAULT_SLOT);
-        assertEqual(ATDevice.getSlotConfigs('slot2'), DEFAULT_SLOT);
+        assertEqual(ATDevice.getSlotConfig(DEFAULT_SLOTNAME), DEFAULT_SLOT);
+        assertEqual(ATDevice.getSlotConfig('slot2'), DEFAULT_SLOT);
     }
 
     async function testIncreaseSlotLength() {
@@ -100,16 +100,16 @@
         await ATDevice.setButtonAction(1, 'AT KW 123'); // button mode for Slot mouse
         await ATDevice.sendATCmd('AT SA', DEFAULT_SLOTNAME);
         await ATDevice.refreshConfig();
-        let slot2 = ATDevice.getSlotConfigs('slot2');
-        let slotMouse = ATDevice.getSlotConfigs(DEFAULT_SLOTNAME);
+        let slot2 = ATDevice.getSlotConfig('slot2');
+        let slotMouse = ATDevice.getSlotConfig(DEFAULT_SLOTNAME);
         assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
         assertEqual(slot2, DEFAULT_SLOT);
         assertEqual(ATDevice.getButtonAction(1), 'AT KW 123');
         await ATDevice.setButtonAction(1, 'AT KW 12345'); // button mode for Slot mouse
         await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
         await ATDevice.refreshConfig();
-        slot2 = ATDevice.getSlotConfigs('slot2');
-        slotMouse = ATDevice.getSlotConfigs(DEFAULT_SLOTNAME);
+        slot2 = ATDevice.getSlotConfig('slot2');
+        slotMouse = ATDevice.getSlotConfig(DEFAULT_SLOTNAME);
         assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
         assertEqual(slot2, DEFAULT_SLOT);
         assertEqual(ATDevice.getButtonAction(1), 'AT KW 12345');
@@ -121,16 +121,16 @@
         await ATDevice.setButtonAction(1, 'AT KW 1234567890'); // button mode for Slot mouse
         await ATDevice.sendATCmd('AT SA', DEFAULT_SLOTNAME);
         await ATDevice.refreshConfig();
-        let slot2 = ATDevice.getSlotConfigs('slot2');
-        let slotMouse = ATDevice.getSlotConfigs(DEFAULT_SLOTNAME);
+        let slot2 = ATDevice.getSlotConfig('slot2');
+        let slotMouse = ATDevice.getSlotConfig(DEFAULT_SLOTNAME);
         assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
         assertEqual(slot2, DEFAULT_SLOT);
         assertEqual(ATDevice.getButtonAction(1), 'AT KW 1234567890');
         await ATDevice.setButtonAction(1, 'AT KW 123'); // button mode for Slot mouse
         await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
         await ATDevice.refreshConfig();
-        slot2 = ATDevice.getSlotConfigs('slot2');
-        slotMouse = ATDevice.getSlotConfigs(DEFAULT_SLOTNAME);
+        slot2 = ATDevice.getSlotConfig('slot2');
+        slotMouse = ATDevice.getSlotConfig(DEFAULT_SLOTNAME);
         assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
         assertEqual(slot2, DEFAULT_SLOT);
         assertEqual(ATDevice.getButtonAction(1), 'AT KW 123');
@@ -183,9 +183,9 @@
         await ATDevice.refreshConfig();
         assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
         assertEqual(ATDevice.getSlots().length, 3);
-        assertEqual(ATDevice.getSlotConfigs('mouse'), DEFAULT_SLOT);
-        assertEqual(ATDevice.getSlotConfigs('slot1'), DEFAULT_SLOT);
-        assertEqual(ATDevice.getSlotConfigs('slot3'), DEFAULT_SLOT);
+        assertEqual(ATDevice.getSlotConfig('mouse'), DEFAULT_SLOT);
+        assertEqual(ATDevice.getSlotConfig('slot1'), DEFAULT_SLOT);
+        assertEqual(ATDevice.getSlotConfig('slot3'), DEFAULT_SLOT);
     }
 
     async function differentValuesInSlots() {

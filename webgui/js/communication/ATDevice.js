@@ -1,14 +1,11 @@
 let ATDevice = {};
-ATDevice.inRawMode = false;
 
 let _slots = [];
-
-let debouncers = {};
+let _currentSlot = null;
+let _slotChangeHandler = null;
+let _SLOT_CONSTANT = 'Slot:';
 let _valueHandler = null;
 let _liveValueLastUpdate = 0;
-let _slotChangeHandler = null;
-let _currentSlot = null;
-let _SLOT_CONSTANT = 'Slot:';
 
 let _communicator;
 let _isInitialized = false;
@@ -56,10 +53,27 @@ ATDevice.init = function (dontGetLiveValues) {
                 }
             });
         }
-        ATDevice.startTestingConnection();
+        startTestingConnection();
         return Promise.resolve();
     }).catch((error) => {
         console.warn(error);
+    });
+}
+
+ATDevice.isInitialized = function () {
+    return _isInitialized;
+}
+
+ATDevice.getVersion = function () {
+    return ATDevice.sendAtCmdWithResult(C.AT_CMD_VERSION).then(result => {
+        return Promise.resolve(L.formatVersion(result));
+    });
+}
+
+ATDevice.getBTVersion = function () {
+    return ATDevice.sendAtCmdWithResult(C.AT_BT_COMMAND, '$ID', 1000).then(result => {
+        result = result || '';
+        return Promise.resolve(result.trim() ? L.formatVersion(result) : '');
     });
 }
 
@@ -80,7 +94,7 @@ ATDevice.sendATCmd = function (atCmd, param, timeout, onlyIfNotBusy, dontLog) {
     if (!ATDevice.isInitialized()) {
         return Promise.reject('cannot send AT command if not initialized.');
     }
-    if ((onlyIfNotBusy && _atCmdQueue.length > 0) || ATDevice.inRawMode) {
+    if ((onlyIfNotBusy && _atCmdQueue.length > 0)) {
         if (!dontLog) console.log('did not send cmd: "' + atCmd + "' because another command is executing.");
         return Promise.resolve(_AT_CMD_BUSY_RESPONSE);
     }
@@ -147,38 +161,38 @@ ATDevice.sendRawData = function (data, timeout) {
     return _communicator.sendRawData(data, timeout);
 };
 
-ATDevice.startTestingConnection = function () {
-    if (_connectionTestIntervalHandler) {
-        return;
-    }
-
-    function doTest() {
-        _connected = !_liveValueLastUpdate || new Date().getTime() - _liveValueLastUpdate < 1000;
-        _connectionTestCallbacks.forEach(fn => fn(_connected));
-    }
-
-    doTest();
-    _connectionTestIntervalHandler = setInterval(doTest, 500);
-}
-
-ATDevice.addConnectionTestCallback = function (fn) {
+ATDevice.addConnectionTestHandler = function (fn) {
     _connectionTestCallbacks.push(fn);
     _connectionTestCallbacks.forEach(fn => fn(_connected));
 }
 
-ATDevice.isInitialized = function () {
-    return _isInitialized;
+ATDevice.setSlotChangeHandler = function (fn) {
+    _slotChangeHandler = fn;
 }
 
-ATDevice.setValue = function (atCmd, value, debounceTimeout) {
-    if (!debounceTimeout) {
+ATDevice.setLiveValueHandler = function (handler) {
+    _valueHandler = handler;
+};
+
+
+ATDevice.getConfig = function (constant, slotName) {
+    let slotConfig = ATDevice.getSlotConfig(slotName || _currentSlot);
+    if (slotConfig[constant] !== undefined) {
+        let value = slotConfig[constant] + '';
+        let intValue = parseInt(value);
+        return intValue + '' === value.trim() ? intValue : value;
+    }
+    return null;
+};
+
+ATDevice.setConfig = function (atCmd, value, debounceTimeout) {
+    if (debounceTimeout === undefined) {
         debounceTimeout = 300;
     }
-    ATDevice.setConfig(atCmd, parseInt(value));
-    clearInterval(debouncers[atCmd]);
-    debouncers[atCmd] = setTimeout(function () {
+    setConfigInternal(atCmd, value);
+    L.debounce(function () {
         ATDevice.sendATCmd(atCmd, value);
-    }, debounceTimeout);
+    }, debounceTimeout, atCmd)
 };
 
 ATDevice.refreshConfig = function () {
@@ -194,32 +208,19 @@ ATDevice.refreshConfig = function () {
     });
 };
 
-/**
- * saves the complete current configuration (all slots) to the FLipMouse
- *
- * @return {Promise}
- */
-ATDevice.save = async function () {
-    ATDevice.sendATCmd('AT SA', _currentSlot);
-    return Promise.resolve();
-};
-
-ATDevice.setSlotChangeHandler = function (fn) {
-    _slotChangeHandler = fn;
+ATDevice.getButtonAction = function (buttonModeIndex, slot) {
+    buttonModeIndex = parseInt(buttonModeIndex);
+    return ATDevice.getConfig(C.AT_CMD_BTN_MODE + " " + buttonModeIndex, slot);
 }
 
-ATDevice.setValueHandler = function (handler) {
-    _valueHandler = handler;
-};
-
-ATDevice.getConfig = function (constant, slotName) {
-    let slotConfig = ATDevice.getSlotConfigs(slotName || _currentSlot);
-    if (slotConfig[constant] !== undefined) {
-        let value = slotConfig[constant] + '';
-        let intValue = parseInt(value);
-        return intValue + '' === value.trim() ? intValue : value;
+ATDevice.setButtonAction = function (buttonModeIndex, atCmd) {
+    if (buttonModeIndex === undefined || !atCmd) {
+        return;
     }
-    return null;
+    buttonModeIndex = parseInt(buttonModeIndex);
+    setConfigInternal(C.AT_CMD_BTN_MODE + " " + buttonModeIndex, atCmd);
+    ATDevice.sendATCmd(C.AT_CMD_BTN_MODE, buttonModeIndex);
+    ATDevice.sendATCmd(atCmd);
 };
 
 ATDevice.getButtonActionATCmd = function (index, slot) {
@@ -232,11 +233,9 @@ ATDevice.getButtonActionATCmdSuffix = function (index, slot) {
     return action ? action.substring(C.LENGTH_ATCMD_PREFIX).trim() : null;
 }
 
-ATDevice.setConfig = function (constant, value, slotName) {
-    let slotConfig = ATDevice.getSlotConfigs(slotName || _currentSlot);
-    if (slotConfig) {
-        slotConfig[constant] = value;
-    }
+ATDevice.save = async function () {
+    ATDevice.sendATCmd('AT SA', _currentSlot);
+    return Promise.resolve();
 };
 
 ATDevice.getSlots = function () {
@@ -247,7 +246,7 @@ ATDevice.getAllSlotObjects = function () {
     return JSON.parse(JSON.stringify(_slots));
 }
 
-ATDevice.getSlotConfigs = function (slotName) {
+ATDevice.getSlotConfig = function (slotName) {
     let object = _slots.filter(slot => slot.name === slotName)[0];
     return object && object.config ? object.config : {};
 }
@@ -260,6 +259,21 @@ ATDevice.getSlotName = function (id) {
 ATDevice.getCurrentSlot = function () {
     return _currentSlot;
 };
+
+ATDevice.getSlotConfigText = function (slotName) {
+    let config = ATDevice.getSlotConfig(slotName);
+    let ret = "Slot:" + slotName + "\n";
+
+    Object.keys(config).forEach(function (key) {
+        if (key.indexOf(C.AT_CMD_BTN_MODE) > -1) {
+            ret = ret + key + '\n' + config[key] + "\n";
+        } else {
+            ret = ret + key + ' ' + config[key] + "\n";
+        }
+    });
+
+    return ret;
+}
 
 ATDevice.setSlot = function (slot, dontSendToDevice) {
     if (ATDevice.getSlots().includes(slot)) {
@@ -277,7 +291,7 @@ ATDevice.createSlot = function (slotName) {
     if (!slotName || ATDevice.getSlots().includes(slotName)) {
         console.warn('slot not saved because no slot name or slot already existing!');
     }
-    let slotConfig = ATDevice.getSlotConfigs(_currentSlot);
+    let slotConfig = ATDevice.getSlotConfig(_currentSlot);
     _slots.push({
         name: slotName,
         config: L.deepCopy(slotConfig)
@@ -308,21 +322,6 @@ ATDevice.deleteSlot = function (slotName) {
     return Promise.resolve();
 };
 
-ATDevice.setButtonAction = function (buttonModeIndex, atCmd) {
-    if (buttonModeIndex === undefined || !atCmd) {
-        return;
-    }
-    buttonModeIndex = parseInt(buttonModeIndex);
-    ATDevice.setConfig(C.AT_CMD_BTN_MODE + " " + buttonModeIndex, atCmd);
-    ATDevice.sendATCmd(C.AT_CMD_BTN_MODE, buttonModeIndex);
-    ATDevice.sendATCmd(atCmd);
-};
-
-ATDevice.getButtonAction = function (buttonModeIndex, slot) {
-    buttonModeIndex = parseInt(buttonModeIndex);
-    return ATDevice.getConfig(C.AT_CMD_BTN_MODE + " " + buttonModeIndex, slot);
-}
-
 ATDevice.restoreDefaultConfiguration = function () {
     ATDevice.sendATCmd('AT RS');
     _currentSlot = null;
@@ -349,17 +348,25 @@ ATDevice.setDeviceMode = function (modeNr, slot) {
     }
 }
 
-ATDevice.getVersion = function () {
-    return ATDevice.sendAtCmdWithResult(C.AT_CMD_VERSION).then(result => {
-        return Promise.resolve(L.formatVersion(result));
-    });
+function setConfigInternal(constant, value, slotName) {
+    let slotConfig = ATDevice.getSlotConfig(slotName || _currentSlot);
+    if (slotConfig) {
+        slotConfig[constant] = value;
+    }
 }
 
-ATDevice.getBTVersion = function () {
-    return ATDevice.sendAtCmdWithResult(C.AT_BT_COMMAND, '$ID', 1000).then(result => {
-        result = result || '';
-        return Promise.resolve(result.trim() ? L.formatVersion(result) : '');
-    });
+function startTestingConnection() {
+    if (_connectionTestIntervalHandler) {
+        return;
+    }
+
+    function doTest() {
+        _connected = !_liveValueLastUpdate || new Date().getTime() - _liveValueLastUpdate < 1000;
+        _connectionTestCallbacks.forEach(fn => fn(_connected));
+    }
+
+    doTest();
+    _connectionTestIntervalHandler = setInterval(doTest, 500);
 }
 
 function parseConfig(atCmdsString) {
@@ -388,21 +395,6 @@ function parseConfig(atCmdsString) {
         }
     }
     return parsedSlots;
-}
-
-ATDevice.getSlotConfigText = function (slotName) {
-    let config = ATDevice.getSlotConfigs(slotName);
-    let ret = "Slot:" + slotName + "\n";
-
-    Object.keys(config).forEach(function (key) {
-        if (key.indexOf(C.AT_CMD_BTN_MODE) > -1) {
-            ret = ret + key + '\n' + config[key] + "\n";
-        } else {
-            ret = ret + key + ' ' + config[key] + "\n";
-        }
-    });
-
-    return ret;
 }
 
 export {ATDevice};

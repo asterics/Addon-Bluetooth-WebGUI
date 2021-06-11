@@ -36,7 +36,7 @@ class TabStick extends Component {
         let state = {};
         constants.forEach(constant => {
             state[constant] = value;
-            ATDevice.setValue(constant, value);
+            ATDevice.setConfig(constant, value);
         });
         this.setState(state);
     }
