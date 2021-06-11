@@ -1,4 +1,4 @@
-#content{
+body {
     margin: 1.5em;
 }
 
@@ -206,29 +206,6 @@ button.selected, .custom-radio:checked ~ label {
     display: block !important;
     position: absolute;
     left:-9999px;
-}
-
-.connectedIndicator {
-    color: green;
-    display: inline;
-}
-
-.disconnectedIndicator {
-    color: red;
-    display: inline;
-}
-
-#menuButtons div {
-    width: 18.4%;
-}
-
-/* exclude first div */
-#menuButtons div + div {
-    margin-left: 2%;
-}
-
-.menubutton {
-    height: 90%;
 }
 
 .btnTransparent {

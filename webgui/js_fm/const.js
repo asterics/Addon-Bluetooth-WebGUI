@@ -1,3 +1,6 @@
+import {ATDevice} from "../js/communication/ATDevice.js";
+import {FLipMouse} from "./communication/FLipMouse.js";
+
 window.C = {};
 
 C.GUI_IS_HOSTED = window.location.href.indexOf('localhost') > -1 || window.location.href.indexOf('asterics.github.io') > -1 || window.location.href.indexOf('file://') > -1;
@@ -19,7 +22,6 @@ C.AT_CMD_KEYHOLD = 'AT KH';
 C.AT_CMD_KEYTOGGLE = 'AT KT';
 C.AT_CMD_KEYRELEASE = 'AT KR';
 C.AT_CMD_KEYRELEASEALL = 'AT RA';
-C.AT_CMD_BTN_MODE = 'AT BM';
 
 C.AT_CMD_CLICK_MOUSE_L = 'AT CL';
 C.AT_CMD_CLICK_MOUSE_R = 'AT CR';
@@ -42,6 +44,8 @@ C.AT_CMDS_MOUSE = [C.AT_CMD_CLICK_MOUSE_L, C.AT_CMD_CLICK_MOUSE_R, C.AT_CMD_CLIC
 C.AT_CMD_CALIBRATION = 'AT CA';
 C.AT_CMD_NEXT_SLOT = 'AT NE';
 C.AT_CMD_LOAD_SLOT = 'AT LO';
+C.AT_CMD_DELETE_SLOT = 'AT DE';
+C.AT_CMD_SAVE_SLOT = 'AT SA';
 C.AT_CMD_MAKRO = 'AT MA';
 C.AT_CMD_NO_CMD = 'AT NC';
 C.AT_CMD_UPGRADE_ADDON = 'AT UG';
@@ -63,14 +67,48 @@ C.AT_CMD_IR_PLAY = 'AT IP';
 C.AT_CMD_IR_HOLD = 'AT IH';
 C.AT_CMD_IR_STOP = 'AT IS';
 C.AT_CMD_IR_DELETE = 'AT IC';
+C.AT_CMD_IR_WIPE = 'AT IW';
 C.AT_CMD_IR_LIST = 'AT IL';
 
 C.AT_CMD_MQTT_BROKER = 'AT MH';
 C.AT_CMD_MQTT_DELIMITER = 'AT ML';
 C.AT_CMD_WIFI_NAME = 'AT WH';
 C.AT_CMD_WIFI_PASSWORD = 'AT WP';
+C.AT_CMD_VERSION = 'AT ID';
+C.AT_BT_COMMAND = 'AT BC';
 
-C.AT_CMDS_FLIP = [C.AT_CMD_CALIBRATION, C.AT_CMD_NEXT_SLOT, C.AT_CMD_LOAD_SLOT, C.AT_CMD_MQTT_PUBLISH, C.AT_CMD_REST, C.AT_CMD_NO_CMD];
+// generic settings
+C.AT_CMD_BTN_MODE = 'AT BM';
+C.AT_CMD_DEVICE_MODE = 'AT BT';
+
+//FM specific
+C.AT_CMD_SENSITIVITY_X = 'AT AX';
+C.AT_CMD_SENSITIVITY_Y = 'AT AY';
+C.AT_CMD_DEADZONE_X = 'AT DX';
+C.AT_CMD_DEADZONE_Y = 'AT DY';
+C.AT_CMD_MAX_SPEED = 'AT MS';
+C.AT_CMD_ACCELERATION = 'AT AC';
+C.AT_CMD_FLIPMOUSE_MODE = 'AT MM';
+
+C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP = 'AT GV';
+C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP = 'AT RV';
+C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP = 'AT RH';
+C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP = 'AT RH';
+
+C.AT_CMD_SIP_THRESHOLD = 'AT TS';
+C.AT_CMD_PUFF_THRESHOLD = 'AT TP';
+C.AT_CMD_PUFF_STRONG_THRESHOLD = 'AT SP';
+C.AT_CMD_SIP_STRONG_THRESHOLD = 'AT SS';
+
+C.AT_CMD_ORIENTATION_ANGLE = 'AT RO';
+
+// FABI-specific
+C.AT_CMD_SET_COLOR = 'AT SC';
+
+C.AT_CMDS_SETTINGS = [C.AT_CMD_BTN_MODE, C.AT_CMD_DEVICE_MODE, C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y, C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y,
+    C.AT_CMD_MAX_SPEED, C.AT_CMD_ACCELERATION, C.AT_CMD_FLIPMOUSE_MODE, C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP,
+    C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_SIP_THRESHOLD, C.AT_CMD_PUFF_THRESHOLD,
+    C.AT_CMD_PUFF_STRONG_THRESHOLD, C.AT_CMD_SIP_STRONG_THRESHOLD, C.AT_CMD_ORIENTATION_ANGLE, C.AT_CMD_SET_COLOR];
 
 C.AT_CMD_CAT_KEYBOARD = 'AT_CMD_CAT_KEYBOARD';
 C.AT_CMD_CAT_MOUSE = 'AT_CMD_CAT_MOUSE';
@@ -100,16 +138,23 @@ C.INPUTFIELD_TYPE_NUMBER = 'INPUTFIELD_TYPE_NUMBER';
 C.INPUTFIELD_TYPE_SELECT = 'INPUTFIELD_TYPE_SELECT';
 
 C.AT_CMDS_ACTIONS = [{
+    cmd: C.AT_CMD_NO_CMD,
+    label: 'No command // Keine Funktion',
+    category: C.AT_CMD_CAT_DEVICE
+}, {
     cmd: C.AT_CMD_HOLD_MOUSE_L,
     label: 'Hold left mouse button (as long as input action) // Linke Maustaste halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold left mouse button // Linke Maustaste halten',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_HOLD_MOUSE_R,
     label: 'Hold right mouse button (as long as input action) // Rechte Maustaste halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold right mouse button // Rechte Maustaste halten',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_HOLD_MOUSE_M,
     label: 'Hold middle mouse button (as long as input action) // Mittlere Maustaste halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold middle mouse button // Mittlere Maustaste halten',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_CLICK_MOUSE_L,
@@ -122,6 +167,7 @@ C.AT_CMDS_ACTIONS = [{
 }, {
     cmd: C.AT_CMD_CLICK_MOUSE_M,
     label: 'Click middle mouse button (wheel) // Klick mittlere Maustaste (Mausrad)',
+    shortLabel: 'Click middle mouse button // Klick mittlere Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_DOUBLECLICK_MOUSE_L,
@@ -130,14 +176,17 @@ C.AT_CMDS_ACTIONS = [{
 }, {
     cmd: C.AT_CMD_MOUSE_TOGGLE_L,
     label: 'Press or release left mouse button (toggle) // Drücken oder Loslassen linke Maustaste (wechseln)',
+    shortLabel: 'Press/release left mouse button // Drücken/Loslassen linke Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_MOUSE_TOGGLE_R,
     label: 'Press or release right mouse button (toggle) // Drücken oder Loslassen rechte Maustaste (wechseln)',
+    shortLabel: 'Press/release right mouse button // Drücken/Loslassen rechte Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_MOUSE_TOGGLE_M,
     label: 'Press or release middle mouse button (toggle) // Drücken oder Loslassen mittlere Maustaste (wechseln)',
+    shortLabel: 'Press/release middle mouse button // Drücken/Loslassen mittlere Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_RELEASE_MOUSE_L,
@@ -153,25 +202,28 @@ C.AT_CMDS_ACTIONS = [{
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_MOUSEWHEEL_UP,
-    label: 'Mouse wheel up // Mausrad nach oben',
+    label: 'Scroll down // Nach unten scrollen',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_MOUSEWHEEL_DOWN,
-    label: 'Mouse wheel down // Mausrad nach unten',
+    label: 'Scroll up // Nach oben scrollen',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_KEYHOLD,
     label: 'Hold key(s) (as long as input action) // Taste(n) halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold key(s) // Taste(n) halten',
     category: C.AT_CMD_CAT_KEYBOARD,
     input: C.INPUTFIELD_TYPE_KEYBOARD
 }, {
     cmd: C.AT_CMD_KEYPRESS,
     label: 'Press key(s) + release automatically // Taste(n) drücken + wieder loslassen',
+    shortLabel: 'Press key(s) // Taste(n) drücken',
     category: C.AT_CMD_CAT_KEYBOARD,
     input: C.INPUTFIELD_TYPE_KEYBOARD
 }, {
     cmd: C.AT_CMD_KEYTOGGLE,
     label: 'Press or release key(s) (toggle) // Taste(n) drücken oder auslassen (wechseln)',
+    shortLabel: 'Press/release key(s) // Taste(n) drücken/auslassen',
     category: C.AT_CMD_CAT_KEYBOARD,
     input: C.INPUTFIELD_TYPE_KEYBOARD
 }, {
@@ -182,11 +234,13 @@ C.AT_CMDS_ACTIONS = [{
 }, {
     cmd: C.AT_CMD_KEYRELEASE,
     label: 'Release specific key(s) // Spezifische Taste(n) auslassen',
+    shortLabel: 'Release key(s) // Taste(n) auslassen',
     category: C.AT_CMD_CAT_KEYBOARD,
     input: C.INPUTFIELD_TYPE_KEYBOARD
 }, {
     cmd: C.AT_CMD_KEYRELEASEALL,
     label: 'Release all key(s) // Alle Taste(n) auslassen',
+    shortLabel: 'Release key(s) // Taste(n) auslassen',
     category: C.AT_CMD_CAT_KEYBOARD
 }, {
     cmd: C.AT_CMD_NEXT_SLOT,
@@ -196,25 +250,24 @@ C.AT_CMDS_ACTIONS = [{
     cmd: C.AT_CMD_LOAD_SLOT,
     label: 'Load slot by name // Slot per Name laden',
     category: C.AT_CMD_CAT_DEVICE,
-    input: C.INPUTFIELD_TYPE_TEXT
+    input: C.INPUTFIELD_TYPE_SELECT,
+    optionsFn: ATDevice.getSlots
 }, {
     cmd: C.AT_CMD_CALIBRATION,
     label: 'Calibrate stick middle position // Stick-Mittelposition kalibrieren',
     category: C.AT_CMD_CAT_DEVICE
 }, {
-    cmd: C.AT_CMD_NO_CMD,
-    label: 'No command // Keine Funktion',
-    category: C.AT_CMD_CAT_DEVICE
-}, {
     cmd: C.AT_CMD_IR_PLAY,
     label: 'Play infrared command // Infrarot-Kommando abspielen',
     category: C.AT_CMD_CAT_IR,
-    input: C.INPUTFIELD_TYPE_SELECT
+    input: C.INPUTFIELD_TYPE_SELECT,
+    optionsFn: FLipMouse.getIRCommands
 }, {
     cmd: C.AT_CMD_IR_HOLD,
     label: 'Hold infrared command // Infrarot-Kommando halten',
     category: C.AT_CMD_CAT_IR,
-    input: C.INPUTFIELD_TYPE_SELECT
+    input: C.INPUTFIELD_TYPE_SELECT,
+    optionsFn: FLipMouse.getIRCommands
 }, {
     cmd: C.AT_CMD_IR_STOP,
     label: 'Stop infrared command // Infrarot-Kommando stoppen',
@@ -260,10 +313,6 @@ C.AT_CMDS_ACTIONS = [{
     category: C.AT_CMD_CAT_JOYSTICK,
     input: C.INPUTFIELD_TYPE_NUMBER
 }];
-
-C.ADDITIONAL_FIELD_TEXT = 'ADDITIONAL_FIELD_TEXT';
-C.ADDITIONAL_FIELD_SELECT = 'ADDITIONAL_FIELD_SELECT';
-C.ADDITIONAL_DATA_CMDS = [C.AT_CMD_LOAD_SLOT, C.AT_CMD_KEYPRESS, C.AT_CMD_WRITEWORD];
 
 C.KEYCODE_MAPPING = [];
 C.PRINTABLE_KEYCODES = [];
@@ -330,27 +379,6 @@ for (var i = 0; i < 300; i++) {
 C.DEFAULT_CONFIGURATION = ['AT AX 60', 'AT AY 60', 'AT DX 20', 'AT DY 20', 'AT MS 50', 'AT AC 50', 'AT TS 500', 'AT TP 525', 'AT WS 3', 'AT SP 700', 'AT SS 300', 'AT MM 1', 'AT GU 50', 'AT GD 50', 'AT GL 50', 'AT GR 50', 'AT RO 0', 'AT BT 1', 'AT BM 01', 'AT NE', 'AT BM 02', 'AT KP KEY_ESC', 'AT BM 03', 'AT NC', 'AT BM 04', 'AT KP KEY_UP', 'AT BM 05', 'AT KP KEY_DOWN', 'AT BM 06', 'AT KP KEY_LEFT', 'AT BM 07', 'AT KP KEY_RIGHT', 'AT BM 08', 'AT PL', 'AT BM 09', 'AT NC', 'AT BM 10', 'AT CR', 'AT BM 11', 'AT CA', 'AT BM 12', 'AT NC', 'AT BM 13', 'AT NC', 'AT BM 14', 'AT NC', 'AT BM 15', 'AT NC', 'AT BM 16', 'AT NC', 'AT BM 17', 'AT NC', 'AT BM 18', 'AT NC', 'AT BM 19', 'AT NC'];
 C.DEFAULT_SLOTNAME = 'mouse';
 
-C.BTN_MODE_BUTTON_1 = 'BTN_MODE_BUTTON_1';
-C.BTN_MODE_BUTTON_2 = 'BTN_MODE_BUTTON_2';
-C.BTN_MODE_BUTTON_3 = 'BTN_MODE_BUTTON_3';
-C.BTN_MODE_STICK_UP = 'BTN_MODE_STICK_UP';
-C.BTN_MODE_STICK_DOWN = 'BTN_MODE_STICK_DOWN';
-C.BTN_MODE_STICK_LEFT = 'BTN_MODE_STICK_LEFT';
-C.BTN_MODE_STICK_RIGHT = 'BTN_MODE_STICK_RIGHT';
-C.BTN_MODE_SIP = 'BTN_MODE_SIP';
-C.BTN_MODE_STRONG_SIP = 'BTN_MODE_STRONG_SIP';
-C.BTN_MODE_PUFF = 'BTN_MODE_PUFF';
-C.BTN_MODE_STRONG_PUFF = 'BTN_MODE_STRONG_PUFF';
-C.BTN_MODE_STRONG_SIP_UP = 'BTN_MODE_STRONG_SIP_UP';
-C.BTN_MODE_STRONG_SIP_DOWN = 'BTN_MODE_STRONG_SIP_DOWN';
-C.BTN_MODE_STRONG_SIP_LEFT = 'BTN_MODE_STRONG_SIP_LEFT';
-C.BTN_MODE_STRONG_SIP_RIGHT = 'BTN_MODE_STRONG_SIP_RIGHT';
-C.BTN_MODES = [C.BTN_MODE_BUTTON_1, C.BTN_MODE_BUTTON_2, C.BTN_MODE_BUTTON_3,
-    C.BTN_MODE_STICK_UP, C.BTN_MODE_STICK_DOWN, C.BTN_MODE_STICK_LEFT, C.BTN_MODE_STICK_RIGHT,
-    C.BTN_MODE_SIP, C.BTN_MODE_STRONG_SIP, C.BTN_MODE_PUFF, C.BTN_MODE_STRONG_PUFF];
-C.BTN_MODES_WITHOUT_STICK = [C.BTN_MODE_BUTTON_1, C.BTN_MODE_BUTTON_2, C.BTN_MODE_BUTTON_3,
-    C.BTN_MODE_SIP, C.BTN_MODE_STRONG_SIP, C.BTN_MODE_PUFF, C.BTN_MODE_STRONG_PUFF];
-
 C.BTN_CAT_BTN = 'BTN_CAT_BTN';
 C.BTN_CAT_STICK = 'BTN_CAT_STICK';
 C.BTN_CAT_SIPPUFF = 'BTN_CAT_SIPPUFF';
@@ -370,57 +398,46 @@ C.BTN_CATEGORIES = [{
 }]
 
 C.BTN_MODES2 = [{
-    constant: C.BTN_MODE_BUTTON_1,
     index: 1,
     label: 'Button 1',
     category: C.BTN_CAT_BTN
 }, {
-    constant: C.BTN_MODE_BUTTON_1,
     index: 2,
     label: 'Button 2',
     category: C.BTN_CAT_BTN
 }, {
-    constant: C.BTN_MODE_BUTTON_1,
     index: 3,
     label: 'Button 3',
     category: C.BTN_CAT_BTN
 }, {
-    constant: C.BTN_MODE_STICK_UP,
     index: 4,
     label: 'Stick Up // Stick nach oben',
     category: C.BTN_CAT_STICK
 }, {
-    constant: C.BTN_MODE_STICK_UP,
     index: 5,
     label: 'Stick Down // Stick nach unten',
     category: C.BTN_CAT_STICK
 }, {
-    constant: C.BTN_MODE_STICK_UP,
     index: 6,
     label: 'Stick Left // Stick nach links',
     category: C.BTN_CAT_STICK
 }, {
-    constant: C.BTN_MODE_STICK_UP,
     index: 7,
     label: 'Stick Right // Stick nach rechts',
     category: C.BTN_CAT_STICK
 }, {
-    constant: C.BTN_MODE_SIP,
     index: 8,
     label: 'Sip // Ansaugen',
     category: C.BTN_CAT_SIPPUFF
 }, {
-    constant: C.BTN_MODE_STRONG_SIP,
     index: 9,
     label: 'Strong sip // Stark ansaugen',
     category: C.BTN_CAT_SIPPUFF
 }, {
-    constant: C.BTN_MODE_STRONG_SIP,
     index: 10,
     label: 'Puff // Pusten',
     category: C.BTN_CAT_SIPPUFF
 }, {
-    constant: C.BTN_MODE_STRONG_SIP,
     index: 11,
     label: 'Strong Puff // Stark pusten',
     category: C.BTN_CAT_SIPPUFF
@@ -464,7 +481,24 @@ C.LEARN_CAT_IR = 'LEARN_CAT_IR';
 C.LEARN_CAT_FLIPACTIONS = 'LEARN_CAT_FLIPACTIONS';
 C.LEARN_CAT_CUSTOM = 'LEARN_CAT_CUSTOM';
 
-C.FLIPMOUSE_MODE_MOUSE = 'MODE_MOUSE';
-C.FLIPMOUSE_MODE_ALT = 'MODE_ALTERNATIVE';
-C.FLIPMOUSE_MODE_JOYSTICK= 'MODE_JOYSTICK';
-C.FLIPMOUSE_MODES = [C.FLIPMOUSE_MODE_ALT, C.FLIPMOUSE_MODE_MOUSE, C.FLIPMOUSE_MODE_JOYSTICK];
+C.FLIPMOUSE_MODE_MOUSE = {
+    value: 1,
+    label: 'Mouse movement // Mausbewegung'
+};
+C.FLIPMOUSE_MODE_ALT = {
+    value: 0,
+    label: 'Alternative actions // Alternative Aktionen',
+};
+C.FLIPMOUSE_MODE_JOYSTICK_XY = {
+    value: 2,
+    label: 'Joystick (XY) // Joystick (XY)',
+};
+C.FLIPMOUSE_MODE_JOYSTICK_ZR = {
+    value: 3,
+    label: 'Joystick (ZR) // Joystick (ZR)'
+};
+C.FLIPMOUSE_MODE_JOYSTICK_SLIDERS = {
+    value: 4,
+    label: 'Joystick (Slider) // Joystick (Slider)'
+};
+C.FLIPMOUSE_MODES = [C.FLIPMOUSE_MODE_MOUSE, C.FLIPMOUSE_MODE_ALT, C.FLIPMOUSE_MODE_JOYSTICK_XY, C.FLIPMOUSE_MODE_JOYSTICK_ZR, C.FLIPMOUSE_MODE_JOYSTICK_SLIDERS];

@@ -1,7 +1,10 @@
+import {ATDevice} from "../js/communication/ATDevice.js";
+import {FLipMouse} from "./communication/FLipMouse.js";
+
 window.addEventListener('keydown', event => {
     if (event.key === 'c' && event.ctrlKey) {
-        if (window.flip && window.flip.isInitialized()) {
-            window.flip.calibrate();
+        if (ATDevice.isInitialized()) {
+            FLipMouse.calibrate();
         }
     }
 })

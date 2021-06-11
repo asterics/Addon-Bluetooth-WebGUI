@@ -69,20 +69,28 @@ window.L.selectAsList = function (selector) {
 };
 
 window.L.addClass = function (selector, className) {
-    var list = L.selectAsList(selector);
-    list.forEach(function (elem) {
-        if(elem.className.indexOf(className) == -1) {
-            elem.className += ' ' + className;
-        }
-    });
+    L.toggleClass(selector, className, false, true);
 };
 
 window.L.removeClass = function (selector, className) {
-    var list = L.selectAsList(selector);
-    list.forEach(function (elem) {
-        elem.className = L.replaceAll(elem.className, className, '');
-    });
+    L.toggleClass(selector, className, true, false);
 };
+
+window.L.toggleClass = function (selector, className, dontAdd, dontRemove) {
+    let list = L.selectAsList(selector);
+    list.forEach(function (elem) {
+        let classes = elem.className.split(' ');
+        if (classes.indexOf(className) === -1) {
+            if (!dontAdd) {
+                elem.className += ' ' + className;
+                elem.className = elem.className.trim();
+            }
+        } else if (!dontRemove) {
+            classes = classes.filter(c => c.trim() !== className);
+            elem.className = classes.join(' ');
+        }
+    });
+}
 
 window.L.setSelected = function (selector, selected) {
     if(selected == undefined) selected = true;
@@ -222,10 +230,17 @@ window.L.getLang = function () {
  * @param translationKey the key to translate
  * @return {*}
  */
-window.L.translate = function(translationKey) {
-    var translated = i18n[translationKey] ? i18n[translationKey] : translationKey;
-    for(var i=1; i<arguments.length; i++) {
-        translated = translated.replace('{?}', arguments[i]);
+window.L.translate = function (translationKey) {
+    translationKey = translationKey || '';
+    let translated = '';
+    if (translationKey.indexOf(' // ') > -1) {
+        let translations = translationKey.split(' // ');
+        translated = 'en'.toUpperCase() === L.getLang().toUpperCase() ? translations[0] : translations[1];
+    } else {
+        translated = translationKey;
+    }
+    for (let i = 1; i < arguments.length; i++) {
+        translated = translated.replace('{?}', L.translate(arguments[i]));
     }
     return translated;
 };
@@ -261,4 +276,103 @@ window.L.loadScript = function (source, fallbackSource) {
         script.src = source;
         document.head.appendChild(script);
     });
+};
+
+//THX: https://phpcoder.tech/wp-content/cache/all/create-dynamically-generated-text-file-and-download-using-javascript/index.html
+L.downloadasTextFile = function (filename, text) {
+    let element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+}
+
+L.getReadableATCMD = function (atCmd) {
+    if (!atCmd) {
+        return L.translate(C.AT_CMD_NO_CMD);
+    }
+    let prefix = atCmd.substring(0, C.LENGTH_ATCMD_PREFIX - 1).trim();
+    let cmdObject = C.AT_CMDS_ACTIONS.filter(elem => elem.cmd === prefix)[0];
+    let label = cmdObject ? (cmdObject.shortLabel || cmdObject.label) : atCmd;
+    return L.translate(label);
+}
+
+L.HTTPRequest = function (url, method, responseType) {
+    let xhr = new XMLHttpRequest();
+    xhr.open(method, url, true);
+    xhr.responseType = responseType;
+    return new Promise((resolve, reject) => {
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                resolve(xhr.response);
+            } else {
+                reject();
+            }
+        };
+        xhr.send();
+    });
+}
+
+L.parseVersion = function (versionString) {
+    versionString = versionString.replace(/[^0-9.]/g, ''); //only digits and dots
+    if (!versionString) {
+        return {};
+    }
+    let versions = versionString.split('.');
+    return {
+        major: parseInt(versions[0]) || 0,
+        minor: parseInt(versions[1]) || 0,
+        patch: parseInt(versions[2]) || 0
+    }
+}
+
+L.formatVersion = function (versionString) {
+    let version = L.parseVersion(versionString);
+    return `${version.major}.${version.minor}.${version.patch}`;
+}
+
+L.isVersionNewer = function (oldVersion, newVersion) {
+    let vOld = L.parseVersion(oldVersion);
+    let vNew = L.parseVersion(newVersion);
+    if (vOld.major !== vNew.major) return vNew.major > vOld.major;
+    if (vOld.minor !== vNew.minor) return vNew.minor > vOld.minor;
+    if (vOld.patch !== vNew.patch) return vNew.patch > vOld.patch;
+    return false;
+}
+
+/**
+ * Calls the given function after a specified timeout. Another subsequent call cancels and restarts the timeout.
+ *
+ * @param fn the function to call
+ * @param timeout
+ * @param key for identifying the called function. If several functions are debounced at the same time, different keys
+ *        have to be specified for identifying them
+ */
+L.timeoutHandlers = {}
+L.debounce = function (fn, timeout, key) {
+    key = key || 'DEFAULT';
+    if (!fn && !timeout) {
+        log.warn('called util.debounce() without needed parameters. aborting.');
+        return;
+    }
+    if (L.timeoutHandlers[key]) {
+        clearTimeout(L.timeoutHandlers[key]);
+    }
+    L.timeoutHandlers[key] = setTimeout(function () {
+        fn();
+    }, timeout);
+};
+
+/**
+ * clears any existing timeout created by "debounce()" before by given key
+ * @param key
+ */
+L.clearDebounce = function (key) {
+    key = key || 'DEFAULT';
+    if (L.timeoutHandlers[key]) {
+        clearTimeout(L.timeoutHandlers[key]);
+    }
 };

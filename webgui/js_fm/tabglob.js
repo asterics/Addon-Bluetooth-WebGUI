@@ -3,6 +3,8 @@ var http = require('https');
 var tmp = require('temporary');
 var os = require('os');*/
 
+// TODO remove this file
+
 window.tabGlobal = {};
 
 window.tabGlobal.updateVersionTeensy = "";

@@ -1,6 +1,9 @@
-import { h, Component, render } from '../../js/preact.min.js';
-import htm from '../../js/htm.min.js';
-import {styleUtil} from '../stylutil.js'
+import { h, Component, render } from '../../../js/preact.min.js';
+import htm from '../../../js/htm.min.js';
+import {styleUtil} from '../../util/styleUtil.js'
+import {ATDevice} from "../../../js/communication/ATDevice.js";
+import {FLipMouse} from "../../communication/FLipMouse.js";
+
 const html = htm.bind(h);
 
 class BtnSipPuffVisualization extends Component {
@@ -8,7 +11,7 @@ class BtnSipPuffVisualization extends Component {
     constructor() {
         super();
 
-        window.BtnSipPuffVisualizationInstance = this;
+        BtnSipPuffVisualization.instance = this;
         this.stateListener = null;
         this.state = {
             liveData: {}
@@ -17,6 +20,9 @@ class BtnSipPuffVisualization extends Component {
 
     componentWillUnmount() {
         this.stateListener = null;
+        if (BtnSipPuffVisualization.instance === this) {
+            BtnSipPuffVisualization.instance = null;
+        }
     }
 
     updateState(options) {
@@ -41,13 +47,13 @@ class BtnSipPuffVisualization extends Component {
         let data = this.state.liveData;
         let circleRadius = 70;
         let fontStyle = `text-align: center; line-height: ${circleRadius}px; font-size: 30px`;
-        let getColor = (btnNum) => data[flip.LIVE_BUTTONS] && data[flip.LIVE_BUTTONS][btnNum] ? 'orange' : 'transparent';
+        let getColor = (btnNum) => data[FLipMouse.LIVE_BUTTONS] && data[FLipMouse.LIVE_BUTTONS][btnNum] ? 'orange' : 'transparent';
 
-        let liveP = data[flip.LIVE_PRESSURE];
-        let sip = flip.getConfig(flip.SIP_THRESHOLD);
-        let puff = flip.getConfig(flip.PUFF_THRESHOLD);
-        let strongSip = flip.getConfig(flip.SIP_STRONG_THRESHOLD);
-        let strongPuff = flip.getConfig(flip.PUFF_STRONG_THRESHOLD);
+        let liveP = data[FLipMouse.LIVE_PRESSURE];
+        let sip = ATDevice.getConfig(C.AT_CMD_SIP_THRESHOLD);
+        let puff = ATDevice.getConfig(C.AT_CMD_PUFF_THRESHOLD);
+        let strongSip = ATDevice.getConfig(C.AT_CMD_SIP_STRONG_THRESHOLD);
+        let strongPuff = ATDevice.getConfig(C.AT_CMD_PUFF_STRONG_THRESHOLD);
         let rangeDown = Math.max(strongSip - 50, 0);
         let rangeUp = Math.min(strongPuff + 50, 1024);
 
@@ -76,7 +82,7 @@ class BtnSipPuffVisualization extends Component {
                             <div class="back-layer" style="${styleUtil.getCircleStyle(circleRadius, getColor(2), 'medium solid')}; ${fontStyle}">3</div>
                         </div>
                         <div class="back-layer" style="top: 65%; left: 0; width: 100%; ${fontStyle}">
-                            Slot: ${flip.getCurrentSlot()}
+                            Slot: ${ATDevice.getCurrentSlot()}
                         </div>
                         <div class="back-layer" style="top: 30%; left: 100%; height: 40%; width: 350px; border: medium solid;">
                             <div class="relative" style="width: 100%; height: 100%">
