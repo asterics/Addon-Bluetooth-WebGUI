@@ -35,8 +35,8 @@
     import {ATDevice} from "./js/communication/ATDevice.js";
 
     let PRINT_DEBUG = false;
-    let DEFAULT_CONFIG = "[{\"name\":\"cursorkeys\",\"config\":{\"AT SC\":\"0x00a0c0\",\"AT TS\":\"0\",\"AT TP\":\"1023\",\"AT BT\":\"1\",\"AT BM 1\":\"AT KP KEY_UP\",\"AT BM 2\":\"AT KP KEY_DOWN\",\"AT BM 3\":\"AT KP KEY_LEFT\",\"AT BM 4\":\"AT KP KEY_RIGHT\",\"AT BM 5\":\"AT KP KEY_SPACE\",\"AT BM 6\":\"AT KP KEY_ENTER\",\"AT BM 7\":\"AT NE\",\"AT BM 8\":\"AT BM 9\",\"AT BM 9\":\"AT HR\",\"AT BM 10\":\"AT WU\",\"AT BM 11\":\"AT WD\"}}]";
-    let DEFAULT_SLOTNAME = "cursorkeys";
+    let DEFAULT_CONFIG = "[{\"name\":\"slot1\",\"config\":{\"AT SC\":\"0xffffff\",\"AT TS\":\"0\",\"AT TP\":\"1023\",\"AT BT\":\"1\",\"AT BM 1\":\"AT HL\",\"AT BM 2\":\"AT HL\",\"AT BM 3\":\"AT HL\",\"AT BM 4\":\"AT HL\",\"AT BM 5\":\"AT HL\",\"AT BM 6\":\"AT HL\",\"AT BM 7\":\"AT HL\",\"AT BM 8\":\"AT HL\",\"AT BM 9\":\"AT HL\",\"AT BM 10\":\"AT HL\",\"AT BM 11\":\"AT HL\"}}]";
+    let DEFAULT_SLOTNAME = "slot1";
     let DEFAULT_SLOT = JSON.parse(DEFAULT_CONFIG).filter(slot => slot.name === DEFAULT_SLOTNAME)[0].config;
     let assertFails = 0;
     let assertSuccess = 0;
@@ -48,6 +48,12 @@
     let tests = [{
         fn: testDefaultConfig,
         name: 'testDefaultConfig'
+    }, {
+        fn: changeConfigValue,
+        name: 'changeConfigValue'
+    },  {
+        fn: differentValuesInSlots,
+        name: 'differentValuesInSlots'
     }, {
         fn: testSecondSlot,
         name: 'testSecondSlot'
@@ -72,6 +78,27 @@
         let config = ATDevice.getAllSlotObjects();
         log.info(JSON.stringify(config));
         assertEqual(config, DEFAULT_CONFIG);
+    }
+
+    async function changeConfigValue() {
+        let color = '0x00ff00';
+        await ATDevice.sendATCmd(C.AT_CMD_SET_COLOR, color);
+        await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
+        await ATDevice.refreshConfig();
+        assertEqual(ATDevice.getConfig(C.AT_CMD_SET_COLOR), color);
+    }
+
+    async function differentValuesInSlots() {
+        let color = '0x00ff00';
+        let color2 = '0x00ffaa';
+        await ATDevice.sendATCmd(C.AT_CMD_SET_COLOR, color);
+        await ATDevice.sendAtCmdWithResult('AT SA', 'slot2');
+        await ATDevice.sendATCmd('AT LO', DEFAULT_SLOTNAME);
+        await ATDevice.sendATCmd(C.AT_CMD_SET_COLOR, color2);
+        await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
+        await ATDevice.refreshConfig();
+        assertEqual(ATDevice.getConfig(C.AT_CMD_SET_COLOR, 'slot2'), color);
+        assertEqual(ATDevice.getConfig(C.AT_CMD_SET_COLOR, DEFAULT_SLOTNAME), color2);
     }
 
     async function testSecondSlot() {
@@ -135,55 +162,44 @@
     }
 
     async function addDelete5Slots() {
-        await ATDevice.sendAtCmdWithResult('AT SA slot1');
-        await ATDevice.sendAtCmdWithResult('AT SA slot2');
-        await ATDevice.sendAtCmdWithResult('AT SA slot3');
-        await ATDevice.sendAtCmdWithResult('AT SA slot4');
-        await ATDevice.sendAtCmdWithResult('AT SA slot5');
+        await ATDevice.sendAtCmdWithResult('AT SA newslot1');
+        await ATDevice.sendAtCmdWithResult('AT SA newslot2');
+        await ATDevice.sendAtCmdWithResult('AT SA newslot3');
+        await ATDevice.sendAtCmdWithResult('AT SA newslot4');
+        await ATDevice.sendAtCmdWithResult('AT SA newslot5');
         await ATDevice.refreshConfig();
         assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
-        assertTrue(ATDevice.getSlots().includes('slot1'));
-        assertTrue(ATDevice.getSlots().includes('slot2'));
-        assertTrue(ATDevice.getSlots().includes('slot3'));
-        assertTrue(ATDevice.getSlots().includes('slot4'));
-        assertTrue(ATDevice.getSlots().includes('slot5'));
-        await ATDevice.sendAtCmdWithResult('AT DE slot1');
-        await ATDevice.sendAtCmdWithResult('AT DE slot2');
-        await ATDevice.sendAtCmdWithResult('AT DE slot3');
-        await ATDevice.sendAtCmdWithResult('AT DE slot4');
-        await ATDevice.sendAtCmdWithResult('AT DE slot5');
+        assertTrue(ATDevice.getSlots().includes('newslot1'));
+        assertTrue(ATDevice.getSlots().includes('newslot2'));
+        assertTrue(ATDevice.getSlots().includes('newslot3'));
+        assertTrue(ATDevice.getSlots().includes('newslot4'));
+        assertTrue(ATDevice.getSlots().includes('newslot5'));
+        await ATDevice.sendAtCmdWithResult('AT DE newslot1');
+        await ATDevice.sendAtCmdWithResult('AT DE newslot2');
+        await ATDevice.sendAtCmdWithResult('AT DE newslot3');
+        await ATDevice.sendAtCmdWithResult('AT DE newslot4');
+        await ATDevice.sendAtCmdWithResult('AT DE newslot5');
         await ATDevice.refreshConfig();
         assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
         assertEqual(ATDevice.getSlots().length, 1);
     }
 
     async function deleteMiddleSlot() {
-        await ATDevice.sendAtCmdWithResult('AT SA slot1');
-        await ATDevice.sendAtCmdWithResult('AT SA slot2');
-        await ATDevice.sendAtCmdWithResult('AT SA slot3');
+        await ATDevice.sendAtCmdWithResult('AT SA newslot1');
+        await ATDevice.sendAtCmdWithResult('AT SA newslot2');
+        await ATDevice.sendAtCmdWithResult('AT SA newslot3');
         await ATDevice.refreshConfig();
         assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
-        assertTrue(ATDevice.getSlots().includes('slot1'));
-        assertTrue(ATDevice.getSlots().includes('slot2'));
-        assertTrue(ATDevice.getSlots().includes('slot3'));
-        await ATDevice.sendAtCmdWithResult('AT DE slot2');
+        assertTrue(ATDevice.getSlots().includes('newslot1'));
+        assertTrue(ATDevice.getSlots().includes('newslot2'));
+        assertTrue(ATDevice.getSlots().includes('newslot3'));
+        await ATDevice.sendAtCmdWithResult('AT DE newslot2');
         await ATDevice.refreshConfig();
         assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
         assertEqual(ATDevice.getSlots().length, 3);
-        assertEqual(ATDevice.getSlotConfig('mouse'), DEFAULT_SLOT);
-        assertEqual(ATDevice.getSlotConfig('slot1'), DEFAULT_SLOT);
-        assertEqual(ATDevice.getSlotConfig('slot3'), DEFAULT_SLOT);
-    }
-
-    async function differentValuesInSlots() {
-        await ATDevice.sendATCmd('AT DX', 123);
-        await ATDevice.sendAtCmdWithResult('AT SA slot2');
-        await ATDevice.sendATCmd('AT LO', DEFAULT_SLOTNAME);
-        await ATDevice.sendATCmd('AT DX', 12);
-        await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
-        await ATDevice.refreshConfig();
-        assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X, 'slot2'), 123);
-        assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X, DEFAULT_SLOTNAME), 12);
+        assertEqual(ATDevice.getSlotConfig(DEFAULT_SLOTNAME), DEFAULT_SLOT);
+        assertEqual(ATDevice.getSlotConfig('newslot1'), DEFAULT_SLOT);
+        assertEqual(ATDevice.getSlotConfig('newslot3'), DEFAULT_SLOT);
     }
 
 
