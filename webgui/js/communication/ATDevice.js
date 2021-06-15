@@ -342,11 +342,6 @@ ATDevice.deleteSlot = function (slotName) {
     return Promise.resolve();
 };
 
-ATDevice.resetCurrentSlot = function () {
-    ATDevice.sendATCmd('AT RC');
-    return ATDevice.refreshConfig();
-};
-
 ATDevice.restoreDefaultConfiguration = function () {
     ATDevice.sendATCmd('AT RS');
     _currentSlot = null;

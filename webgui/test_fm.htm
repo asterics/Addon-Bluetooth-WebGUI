@@ -72,9 +72,6 @@
     }, {
         fn: differentValuesInSlots,
         name: 'differentValuesInSlots'
-    }, {
-        fn: testCommandRC,
-        name: 'testCommandRC'
     }];
 
     async function testDefaultConfig() {
@@ -200,22 +197,6 @@
         await ATDevice.refreshConfig();
         assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X, 'slot2'), 123);
         assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X, DEFAULT_SLOTNAME), 12);
-    }
-
-    async function testCommandRC() {
-        await ATDevice.sendATCmd('AT DX', 12);
-        await ATDevice.setButtonAction(1, 'AT KW 123')
-        await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
-        await ATDevice.sendAtCmdWithResult('AT SA', 'slot2');
-        await ATDevice.refreshConfig();
-        assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X, DEFAULT_SLOTNAME), 12);
-        assertEqual(ATDevice.getButtonAction(1), 'AT KW 123');
-        assertTrue(JSON.stringify(ATDevice.getSlotConfig(DEFAULT_SLOTNAME)) !== JSON.stringify(DEFAULT_SLOT));
-        await ATDevice.sendAtCmdWithResult('AT RC');
-        await ATDevice.refreshConfig();
-        assertEqual(ATDevice.getSlotConfig(DEFAULT_SLOTNAME), DEFAULT_SLOT);
-        assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X, 'slot2'), 12);
-        assertEqual(ATDevice.getButtonAction(1, 'slot2'), 'AT KW 123');
     }
 
 
