@@ -70,12 +70,25 @@ class TabSlots extends Component {
         L.downloadasTextFile("flipmouseconfig-" + datestr + ".set", configstr);
     };
 
-    resetConfig() {
-        let confirmMessage = L.translate('Do you really want to reset the FLipMouse to the default configuration? // Möchten Sie die FLipMouse wirklich auf die Standardeinstellungen zurücksetzen?');
+    resetDevice() {
+        let confirmMessage = L.translate('Do you really want to reset the FLipMouse to the default configuration? All current slots will be deleted. // Möchten Sie die FLipMouse wirklich auf die Standardeinstellungen zurücksetzen? Alle aktuellen Slots werden gelöscht.');
         if(!window.confirm(confirmMessage)){
             return;
         }
         ATDevice.restoreDefaultConfiguration().then(() => {
+            this.setState({
+                slots: ATDevice.getSlots(),
+                selectedSlot: ATDevice.getCurrentSlot()
+            });
+        });
+    };
+
+    resetCurrentSlot() {
+        let confirmMessage = L.translate('Do you really want to reset current slot "{?}" to the default configuration? // Möchten Sie den aktuellen Slot "{?}" wirklich auf die Standardeinstellungen zurücksetzen?', ATDevice.getCurrentSlot());
+        if(!window.confirm(confirmMessage)){
+            return;
+        }
+        ATDevice.resetCurrentSlot().then(() => {
             this.setState({
                 slots: ATDevice.getSlots(),
                 selectedSlot: ATDevice.getCurrentSlot()
@@ -154,9 +167,16 @@ class TabSlots extends Component {
                     <div class="col-12">
                         <label for="reset-slot-button">${L.translate('Reset to default configuration // Rücksetzen auf Defaulteinstellungen')}</label>
                     </div>
-                    <div class="col-12">
-                        <button onclick="${() => this.resetConfig()}" class="u-full-width">
-                            <span>${L.translate('Reset // Zurücksetzen')}</span>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <button onclick="${() => this.resetCurrentSlot()}" class="col-12">
+                            <span>${L.translate('Reset current slot // Aktuellen Slot zurücksetzen')}</span>
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button onclick="${() => this.resetDevice()}" class="col-12">
+                            <span>${L.translate('Reset device // Gerät zurücksetzen')}</span>
                         </button>
                     </div>
                 </div>
