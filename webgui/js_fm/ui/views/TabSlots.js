@@ -134,7 +134,7 @@ class TabSlots extends Component {
             <h2>${L.translate('Slot configuration // Slot Konfiguration')}</h2>
             <div class="container-fluid px-0">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-sm-12 col-md-10 col-lg-8">
                         <label for="selectSlots2">${L.translate('Select slot for action // Slot für Aktion auswählen')}</label>
                         <select id="selectSlots2" class="col-12" value="${state.selectedSlot}" onchange="${(event) => this.setState({selectedSlot: event.target.value})}">
                             ${slots.map(slot => html`<option value="${slot}">${slot}</option>`)}
@@ -143,10 +143,10 @@ class TabSlots extends Component {
                 </div>
                
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-sm-6 col-md-5 col-lg-4">
                         <button onclick="${() => ATDevice.setSlot(this.state.selectedSlot)}">${L.translate('Activate Slot // Slot aktivieren')}</button>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-sm-6 col-md-5 col-lg-4">
                         <button disabled="${slots.length <= 1}" onclick="${() => this.deleteSlot()}">
                             <span>${L.translate('Delete Slot // Slot löschen')}</span>
                         </button>
@@ -154,10 +154,10 @@ class TabSlots extends Component {
                 </div>
                 
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-sm-6 col-md-5 col-lg-4">
                         <button onclick="${() => this.downloadSlot()}">${L.translate('Download Slot // Slot herunterladen')}</button>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-sm-6 col-md-5 col-lg-4">
                         <button onclick="${() => this.downloadAllSlots()}">${L.translate('Download all Slots // Alle Slots herunterladen')}</button>
                     </div>
                 </div>
@@ -166,11 +166,14 @@ class TabSlots extends Component {
                     <div class="col-12">
                         <label for="newSlotLabel">${L.translate('Create new slot // Neuen Slot anlegen')}</label>
                     </div>
-                    <div class="col-12">
+                </div>
+                
+                <div class="row">
+                    <div class="col-sm-6 col-md-5 col-lg-4">
                         <input id="newSlotLabel" class="col-12" value="${state.newSlotName}" oninput="${(event) => this.setState({newSlotName: event.target.value})}" type="text" placeholder="${L.translate('insert name for new slot // Namen für neuen Slot eingeben')}" maxlength="15"/>
                     </div>
-                    <div class="col-12">
-                        <button disabled="${!state.newSlotName}" onclick="${() => this.createSlot()}" class="u-full-width">
+                    <div class="col-sm-6 col-md-5 col-lg-4">
+                        <button disabled="${!state.newSlotName || this.state.slots.includes(this.state.newSlotName)}" onclick="${() => this.createSlot()}" class="u-full-width">
                             <span>${L.translate('Create Slot // Slot anlegen')}</span>
                         </button>
                     </div>
@@ -192,7 +195,10 @@ class TabSlots extends Component {
                             </div>
                         `)}
                     </fieldset>
-                    <div class="col-12">
+                </div>
+                
+                <div class="row">
+                    <div class="col-sm-6 col-md-5 col-lg-4">
                         <button disabled="${state.selectedUploadSlots.length === 0}" onclick="${() => this.uploadSlots()}">
                             ${state.uploading ? L.translate('Uploading Slot(s) ... // Slot(s) hochladen ...') : L.translate('Upload Slot(s) // Slot(s) hochladen')}
                         </button>
@@ -203,7 +209,7 @@ class TabSlots extends Component {
                     <div class="col-12">
                         <label for="reset-slot-button">${L.translate('Reset to default configuration // Rücksetzen auf Defaulteinstellungen')}</label>
                     </div>
-                    <div class="col-12">
+                    <div class="col-sm-6 col-md-5 col-lg-4">
                         <button onclick="${() => this.resetConfig()}" class="u-full-width">
                             <span>${L.translate('Reset device // Gerät zurücksetzen')}</span>
                         </button>
