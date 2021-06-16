@@ -13,13 +13,14 @@ class ActionEditModal extends Component {
         super();
 
         ActionEditModal.instance = this;
-        this.props = props;
+        ActionEditModal.ALL_CATEGORIES = 'ALL_CATEGORIES';
 
+        this.props = props;
         let currentAtCmdString = ATDevice.getButtonActionATCmd(props.buttonMode.index, props.slot) || C.AT_CMD_NO_CMD;
         let currentAtCmdObject = C.AT_CMDS_ACTIONS.filter(atCmd => currentAtCmdString === atCmd.cmd)[0] || C.AT_CMDS_ACTIONS[0];
         currentAtCmdString = currentAtCmdObject.cmd;
-        let showCategory = currentAtCmdString && currentAtCmdString !== C.AT_CMD_NO_CMD ? C.AT_CMDS_ACTIONS.filter(atCmd => atCmd.cmd === currentAtCmdString)[0].category: null;
-        let possibleAtCmds = C.AT_CMDS_ACTIONS.filter(atCmd => !showCategory || atCmd.category === showCategory);
+        let showCategory = currentAtCmdString && currentAtCmdString !== C.AT_CMD_NO_CMD ? C.AT_CMDS_ACTIONS.filter(atCmd => atCmd.cmd === currentAtCmdString)[0].category: ActionEditModal.ALL_CATEGORIES;
+        let possibleAtCmds = C.AT_CMDS_ACTIONS.filter(atCmd => showCategory === ActionEditModal.ALL_CATEGORIES || atCmd.category === showCategory);
         this.state = {
             showCategory: showCategory,
             atCmd: currentAtCmdObject,
@@ -33,7 +34,7 @@ class ActionEditModal extends Component {
     }
 
     selectActionCategory(category) {
-        let possible = C.AT_CMDS_ACTIONS.filter(atCmd => !category || atCmd.category === category);
+        let possible = C.AT_CMDS_ACTIONS.filter(atCmd => category === ActionEditModal.ALL_CATEGORIES || atCmd.category === category);
         let atCmd = possible.includes(this.state.atCmd) ? this.state.atCmd : possible[0];
         this.setState({
             showCategory: category,
@@ -97,7 +98,7 @@ class ActionEditModal extends Component {
         let state = this.state;
         let btnMode = props.buttonMode;
         let categoryElements = C.AT_CMD_CATEGORIES.map(cat => {return {value: cat.constant, label: cat.label}});
-        categoryElements = [{value: null, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
+        categoryElements = [{value: ActionEditModal.ALL_CATEGORIES, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
         let showActionSelection = ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value || btnMode.category !== C.BTN_CAT_STICK || state.shouldChangeMode;
         let mode = C.FLIPMOUSE_MODES.filter(mode => mode.value === ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, props.slot))[0];
 
