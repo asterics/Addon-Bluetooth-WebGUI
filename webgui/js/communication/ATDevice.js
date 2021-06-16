@@ -47,7 +47,7 @@ ATDevice.init = function (dontGetLiveValues) {
         return ATDevice.refreshConfig();
     }).then(() => {
         if (!dontGetLiveValues) {
-            ATDevice.sendATCmd('AT SR');
+            ATDevice.sendATCmd(C.AT_CMD_START_REPORTING_LIVE);
             _communicator.setValueHandler((data) => {
                 _liveValueLastUpdate = new Date().getTime();
                 if (_valueHandler) {
@@ -73,7 +73,7 @@ ATDevice.getVersion = function () {
 }
 
 ATDevice.getBTVersion = function () {
-    return ATDevice.sendAtCmdWithResult(C.AT_BT_COMMAND, '$ID', 1000).then(result => {
+    return ATDevice.sendAtCmdWithResult(C.AT_CMD_ADDON_COMMAND, '$ID', 1000).then(result => {
         result = result || '';
         return Promise.resolve(result.trim() ? L.formatVersion(result) : '');
     });
@@ -200,7 +200,7 @@ ATDevice.setConfig = function (atCmd, value, debounceTimeout) {
 
 ATDevice.refreshConfig = function () {
     return new Promise(function (resolve, reject) {
-        ATDevice.sendAtCmdWithResult('AT LA').then(function (response) {
+        ATDevice.sendAtCmdWithResult(C.AT_CMD_LOAD_ALL).then(function (response) {
             _slots = ATDevice.parseConfig(response);
             _currentSlot = _currentSlot || _slots[0].name;
             resolve();
@@ -368,7 +368,7 @@ ATDevice.uploadSlots = async function (slotObjects) {
 }
 
 ATDevice.restoreDefaultConfiguration = function () {
-    ATDevice.sendATCmd('AT RS');
+    ATDevice.sendATCmd(C.AT_CMD_RESET_DEVICE);
     _currentSlot = null;
     _slots = [];
     let promise = ATDevice.refreshConfig();
