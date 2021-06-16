@@ -50,7 +50,7 @@ class TabActions extends Component {
     render() {
         let state = this.state;
         let slots = ATDevice.getSlots();
-        let btnModes = C.BTN_MODES2.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
+        let btnModes = C.BTN_MODES.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
         let modalOpen = !!state.modalBtnMode;
         if(modalOpen) {
             L.addClass('body', 'modal-open');
