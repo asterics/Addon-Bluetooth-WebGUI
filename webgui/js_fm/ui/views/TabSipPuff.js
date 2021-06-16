@@ -88,7 +88,7 @@ class TabSipPuff extends Component {
         let state = this.state;
 
         return html`
-            <h2>${L.translate('Sip/Puff Configuration // Konfiguration Saug-/Pustesteuerung')}</h2>
+            <h2>${L.translate('Sip/Puff configuration (slot "{?}") // Saug-/Pustesteuerung (Slot "{?}")', ATDevice.getCurrentSlot())}</h2>
             <span id="pressureLiveA11yLabel" class="sr-only">${L.translate('Current pressure value of FLipMouse // Aktueller Wert Druck der FLipMouse')}</span>
             <span id="pressureLiveA11y" aria-describedby="pressureLiveA11yLabel" class="onlyscreenreader" role="status" aria-live="off" accesskey="w" tabindex="-1">${state.valueA11y}</span>
             <div id="tab-puff-container" class="relative container-fluid">

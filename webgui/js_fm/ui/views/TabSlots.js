@@ -131,7 +131,7 @@ class TabSlots extends Component {
         let slots = state.slots;
 
         return html`
-            <h2>${L.translate('Slot configuration // Slot Konfiguration')}</h2>
+            <h2>${L.translate('Slot configuration // Slot-Konfiguration')}</h2>
             <div class="container-fluid px-0">
                 <div class="row">
                     <div class="col-sm-12 col-md-10 col-lg-8">

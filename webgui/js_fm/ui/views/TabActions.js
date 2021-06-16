@@ -61,7 +61,7 @@ class TabActions extends Component {
         categoryElements = [{value: null, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
 
         return html`<div id="tabActions">
-             <h2>${L.translate('Action configuration // Konfiguration Aktionen')}</h2>
+             <h2>${L.translate('Action configuration // Aktionen-Konfiguration')}</h2>
              <div class="d-md-none filter-buttons mb-3">
                 ${html`<${RadioFieldset} legend="Show categories: // Zeige Kategorien:" onchange="${(value) => this.setState({showCategory: value})}" elements="${categoryElements}" value="${state.showCategory}"/>`}
              </div>

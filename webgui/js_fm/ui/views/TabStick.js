@@ -50,7 +50,7 @@ class TabStick extends Component {
         let state = this.state;
 
         return html`
-            <h2>${L.translate('Stick Configuration // Stick-Konfiguration')}</h2>
+            <h2>${L.translate('Stick configuration (slot "{?}") // Stick-Konfiguration (Slot "{?}")', ATDevice.getCurrentSlot())}</h2>
             <span id="posLiveA11yLabel" class="sr-only">${L.translate('Current position of FLipMouse Stick // Aktuelle Position des Sticks der FLipMouse')}</span>
             <span id="posLiveA11y" aria-describedby="posLiveA11yLabel" class="onlyscreenreader" role="status" aria-live="off" accesskey="q" tabindex="-1"></span>
             <div class="mb-5">
