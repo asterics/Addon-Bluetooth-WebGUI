@@ -67,8 +67,8 @@
         fn: testDeleteSlot,
         name: 'testDeleteSlot'
     }, {
-        fn: addDelete5Slots,
-        name: 'addDelete5Slots'
+        fn: addDelete10Slots,
+        name: 'addDelete10Slots'
     }, {
         fn: deleteMiddleSlot,
         name: 'deleteMiddleSlot'
@@ -161,27 +161,24 @@
         assertFalse(ATDevice.getSlots().includes('newSlot'));
     }
 
-    async function addDelete5Slots() {
-        await ATDevice.sendAtCmdWithResult('AT SA newslot1');
-        await ATDevice.sendAtCmdWithResult('AT SA newslot2');
-        await ATDevice.sendAtCmdWithResult('AT SA newslot3');
-        await ATDevice.sendAtCmdWithResult('AT SA newslot4');
-        await ATDevice.sendAtCmdWithResult('AT SA newslot5');
+    async function addDelete10Slots() {
+        await ATDevice.sendATCmd('AT DE', DEFAULT_SLOTNAME);
+        let slotCount = 10;
+        for (let i = 1; i <= slotCount; i++) {
+            await ATDevice.sendAtCmdWithResult('AT SA slot' + i);
+        }
         await ATDevice.refreshConfig();
-        assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
-        assertTrue(ATDevice.getSlots().includes('newslot1'));
-        assertTrue(ATDevice.getSlots().includes('newslot2'));
-        assertTrue(ATDevice.getSlots().includes('newslot3'));
-        assertTrue(ATDevice.getSlots().includes('newslot4'));
-        assertTrue(ATDevice.getSlots().includes('newslot5'));
-        await ATDevice.sendAtCmdWithResult('AT DE newslot1');
-        await ATDevice.sendAtCmdWithResult('AT DE newslot2');
-        await ATDevice.sendAtCmdWithResult('AT DE newslot3');
-        await ATDevice.sendAtCmdWithResult('AT DE newslot4');
-        await ATDevice.sendAtCmdWithResult('AT DE newslot5');
+        for (let i = 1; i <= slotCount; i++) {
+            assertTrue(ATDevice.getSlots().includes('slot' + i));
+            assertEqual(ATDevice.getSlotConfig('slot' + i), DEFAULT_SLOT);
+        }
+        for (let i = 2; i <= slotCount; i++) {
+            await ATDevice.sendAtCmdWithResult('AT DE slot' + i);
+        }
         await ATDevice.refreshConfig();
-        assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
         assertEqual(ATDevice.getSlots().length, 1);
+        assertTrue(ATDevice.getSlots().includes('slot1'));
+        assertEqual(ATDevice.getSlotConfig('slot1'), DEFAULT_SLOT);
     }
 
     async function deleteMiddleSlot() {
