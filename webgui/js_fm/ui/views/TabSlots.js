@@ -12,7 +12,9 @@ class TabSlots extends Component {
         this.state = {
             newSlotName: '',
             selectedSlot: ATDevice.getCurrentSlot(),
-            slots: ATDevice.getSlots()
+            slots: ATDevice.getSlots(),
+            uploadedSlots: [],
+            selectedUploadSlots: []
         }
     }
 
@@ -41,17 +43,46 @@ class TabSlots extends Component {
         });
     };
 
-    uploadSlot() {
-        //TODO
-        var file = L('#selectSlotUpload').files;
-        var slotName = L('#uploadSlotLabelEn') ? L('#uploadSlotLabelEn').value : L('#uploadSlotLabelDe').value;
-        var reader=new FileReader();
-        reader.readAsText(file[0]);
+    fileUploadChanged(target) {
+        let thiz = this;
+        if (!target.files[0]) {
+            return thiz.setState({
+                uploadedSlots: [],
+                selectedUploadSlots: []
+            })
+        }
+        let reader = new FileReader();
+        reader.readAsText(target.files[0]);
         reader.onloadend = function(e) {
-            //TODO
-            //config = ATDevice.parseConfig(e.target.result,true);
-            ATDevice.createSlot(slotName,null);
+            let parsedSlots = ATDevice.parseConfig(e.target.result);
+            parsedSlots.forEach(slot => { //prevent duplicated names
+                let originalSlotname = slot.name;
+                let counter = 1;
+                while (thiz.state.slots.includes(slot.name)) {
+                    slot.name = `${originalSlotname} (${counter++})`
+                }
+            })
+            thiz.setState({
+                uploadedSlots: parsedSlots
+            })
         };
+    }
+
+    uploadSlots() {
+        let thiz = this;
+        thiz.setState({
+            uploading: true
+        })
+        ATDevice.uploadSlots(this.state.selectedUploadSlots).then(() => {
+            thiz.setState({
+                slots: ATDevice.getSlots(),
+                selectedSlot: ATDevice.getCurrentSlot(),
+                selectedUploadSlots: [],
+                uploadedSlots: [],
+                uploading: false
+            });
+            L('#fileInputSlotUpload').value = null;
+        });
     };
 
     downloadSlot() {
@@ -71,7 +102,7 @@ class TabSlots extends Component {
     };
 
     resetConfig() {
-        let confirmMessage = L.translate('Do you really want to reset the FLipMouse to the default configuration? // Möchten Sie die FLipMouse wirklich auf die Standardeinstellungen zurücksetzen?');
+        let confirmMessage = L.translate('Do you really want to reset the FLipMouse to the default configuration? All slots will be deleted. // Möchten Sie die FLipMouse wirklich auf die Standardeinstellungen zurücksetzen? Alle Slots werden gelöscht.');
         if(!window.confirm(confirmMessage)){
             return;
         }
@@ -82,6 +113,18 @@ class TabSlots extends Component {
             });
         });
     };
+
+    uploadCheckboxChanged(slot, selected) {
+        let currentList = this.state.selectedUploadSlots;
+        if (selected) {
+            currentList.push(slot);
+        } else {
+            currentList = currentList.filter(elem => elem !== slot);
+        }
+        this.setState({
+            selectedUploadSlots: [...new Set(currentList)]
+        });
+    }
 
     render() {
         let state = this.state;
@@ -135,17 +178,23 @@ class TabSlots extends Component {
                 
                 <div class="row mt-4">
                     <div class="col-12">
-                        <label for="selectSlotUpload">${L.translate('Upload Slot(s) // Slot(s) hochladen')}</label>
+                        <label for="fileInputSlotUpload">${L.translate('Upload Slot(s) // Slot(s) hochladen')}</label>
                     </div>
                     <div class="col-12">
-                        <input type=file id="selectSlotUpload" accept=".set"/>
+                        <input type=file id="fileInputSlotUpload" accept=".set" onchange="${(event) => this.fileUploadChanged(event.target)}"/>
                     </div>
+                    <fieldset class="col-12 ${this.state.uploadedSlots.length === 0 ? 'd-none' : ''}">
+                        <legend>${L.translate('Choose slots to upload // Wähle Slots zum Hochladen')}</legend>
+                        ${state.uploadedSlots.map(slot => html`
+                            <div>
+                                <input id="${slot.name + 'checkbox'}" type="checkbox" class="mr-2" onchange="${(event) => this.uploadCheckboxChanged(slot, event.target.checked)}"/>
+                                <label for="${slot.name + 'checkbox'}">${'Slot "' + slot.name + '"'}</label>
+                            </div>
+                        `)}
+                    </fieldset>
                     <div class="col-12">
-                        <input id="uploadSlotLabel" oninput="${(event) => this.setState({uploadSlotName: event.target.value})}"  type="text" class="col-12" placeholder="${L.translate('insert name for new slot // Namen für neuen Slot eingeben')}" maxlength="15"/>
-                    </div>
-                    <div class="col-12">
-                        <button id="upload-slot-button" disabled="${!state.uploadSlotName}" onclick="${() => this.uploadSlot()}" class="u-full-width" style="position: relative;">
-                            <span id="upload-slot-button-normal" style="position: relative">${L.translate('Upload Slot(s) // Slot(s) hochladen')}</span>
+                        <button disabled="${state.selectedUploadSlots.length === 0}" onclick="${() => this.uploadSlots()}">
+                            ${state.uploading ? L.translate('Uploading Slot(s) ... // Slot(s) hochladen ...') : L.translate('Upload Slot(s) // Slot(s) hochladen')}
                         </button>
                     </div>
                 </div>
@@ -156,7 +205,7 @@ class TabSlots extends Component {
                     </div>
                     <div class="col-12">
                         <button onclick="${() => this.resetConfig()}" class="u-full-width">
-                            <span>${L.translate('Reset // Zurücksetzen')}</span>
+                            <span>${L.translate('Reset device // Gerät zurücksetzen')}</span>
                         </button>
                     </div>
                 </div>

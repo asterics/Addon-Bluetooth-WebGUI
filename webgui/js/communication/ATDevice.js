@@ -201,7 +201,7 @@ ATDevice.setConfig = function (atCmd, value, debounceTimeout) {
 ATDevice.refreshConfig = function () {
     return new Promise(function (resolve, reject) {
         ATDevice.sendAtCmdWithResult('AT LA').then(function (response) {
-            _slots = parseConfig(response);
+            _slots = ATDevice.parseConfig(response);
             _currentSlot = _currentSlot || _slots[0].name;
             resolve();
         }, function () {
@@ -342,6 +342,31 @@ ATDevice.deleteSlot = function (slotName) {
     return Promise.resolve();
 };
 
+ATDevice.uploadSlots = async function (slotObjects) {
+    ATDevice.save();
+    let slotObject = null;
+    for (let i = 0; i < slotObjects.length; i++) {
+        slotObject = slotObjects[i];
+        Object.keys(slotObject.config).forEach(function (key) {
+            if (key.indexOf(C.AT_CMD_BTN_MODE) > -1) {
+                ATDevice.sendATCmd(key);
+                ATDevice.sendATCmd(slotObject.config[key]);
+            } else {
+                ATDevice.sendATCmd(key, slotObject.config[key]);
+            }
+        });
+        await ATDevice.sendAtCmdWithResult(C.AT_CMD_SAVE_SLOT, slotObject.name);
+        _slots.push(slotObject);
+    }
+    if (slotObject) {
+        ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, slotObject.name);
+        _currentSlot = slotObject.name;
+        if (_slotChangeHandler) {
+            _slotChangeHandler();
+        }
+    }
+}
+
 ATDevice.restoreDefaultConfiguration = function () {
     ATDevice.sendATCmd('AT RS');
     _currentSlot = null;
@@ -368,28 +393,7 @@ ATDevice.setDeviceMode = function (modeNr, slot) {
     }
 }
 
-function setConfigInternal(constant, value, slotName) {
-    let slotConfig = ATDevice.getSlotConfig(slotName || _currentSlot);
-    if (slotConfig) {
-        slotConfig[constant] = value;
-    }
-}
-
-function startTestingConnection() {
-    if (_connectionTestIntervalHandler) {
-        return;
-    }
-
-    function doTest() {
-        _connected = !_liveValueLastUpdate || new Date().getTime() - _liveValueLastUpdate < 1000;
-        _connectionTestCallbacks.forEach(fn => fn(_connected));
-    }
-
-    doTest();
-    _connectionTestIntervalHandler = setInterval(doTest, 500);
-}
-
-function parseConfig(atCmdsString) {
+ATDevice.parseConfig = function(atCmdsString) {
     atCmdsString = atCmdsString.replace(/\n\s*\n/g, '\n'); //replace doubled linebreaks with single one
     let elements = atCmdsString.split('\n');
     let parsedSlots = [];
@@ -416,6 +420,29 @@ function parseConfig(atCmdsString) {
     }
     return parsedSlots;
 }
+
+function setConfigInternal(constant, value, slotName) {
+    let slotConfig = ATDevice.getSlotConfig(slotName || _currentSlot);
+    if (slotConfig) {
+        slotConfig[constant] = value;
+    }
+}
+
+function startTestingConnection() {
+    if (_connectionTestIntervalHandler) {
+        return;
+    }
+
+    function doTest() {
+        _connected = !_liveValueLastUpdate || new Date().getTime() - _liveValueLastUpdate < 1000;
+        _connectionTestCallbacks.forEach(fn => fn(_connected));
+    }
+
+    doTest();
+    _connectionTestIntervalHandler = setInterval(doTest, 500);
+}
+
+
 
 window.addEventListener('beforeunload', () => {
     if (ATDevice.isInitialized()) {
