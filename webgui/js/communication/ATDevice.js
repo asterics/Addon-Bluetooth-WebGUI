@@ -59,6 +59,7 @@ ATDevice.init = function (dontGetLiveValues) {
         return Promise.resolve();
     }).catch((error) => {
         console.warn(error);
+        return Promise.reject();
     });
 }
 
