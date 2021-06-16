@@ -19,15 +19,9 @@ function SerialCommunicator() {
         }
 
         //filter for arduino/Teensy VID/PID and our own ones
-        const filters = [
-            {usbVendorId: 0x2341, usbProductId: 0x0043},
-            {usbVendorId: 0x16c0, usbProductId: 0x0483}, //teensy
-            {usbVendorId: 0x16c0, usbProductId: 0x0487}, //teensy
-            {usbVendorId: 0x2341, usbProductId: 0x0001}
-        ];
+        const filters = C.USB_DEVICE_FILTERS;
 
-        //_port = await navigator.serial.requestPort({filters}).catch((error) => {
-        _port = await navigator.serial.requestPort().catch((error) => {
+        _port = await navigator.serial.requestPort({filters}).catch((error) => {
             console.log(error);
             return Promise.reject("User didn't allow serial port access.");
         });

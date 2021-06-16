@@ -2,6 +2,10 @@ import {FLipMouse} from "./communication/FLipMouse.js";
 
 window.C = window.C || {};
 
+C.USB_DEVICE_FILTERS =  [
+    {usbVendorId: 0x16c0} // Teensy
+];
+
 C.AT_CMD_CATEGORIES = [{
     constant: C.AT_CMD_CAT_KEYBOARD,
     label: 'Keyboard // Tastatur'
