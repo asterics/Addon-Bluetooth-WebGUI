@@ -1,12 +1,19 @@
+window.logReceived = false;
+
 function SerialCommunicator() {
     //serial port instance
     var _port;
     var _portWriter;
+    var _textEncoder = new TextEncoder();
 
     //value handler for reported ADC/mouthpiece values
     var _valueHandler;
     //internal value handler function for the returned data for an AT command.
     var _internalValueFunction;
+    let _sendingRaw = false;
+
+    let _stringToReceive = null;
+    let _stringToReceiveResolve = null;
 
     this.setValueHandler = function (handler) {
         _valueHandler = handler;
@@ -31,27 +38,63 @@ function SerialCommunicator() {
             return Promise.reject("Serial port couldn't be opened.");
         });
         listenToPort();
-        var textEncoder = new TextEncoderStream();
-        textEncoder.readable.pipeTo(_port.writable);
-        _portWriter = textEncoder.writable.getWriter();
+        _portWriter = _port.writable.getWriter();
 
         return Promise.resolve();
     };
 
-    //send raw data without line endings (used for transferring binary data, e.g. updates)
-    this.sendRawData = async function (value, timeout) {
-        if (!value) return;
+    /**
+     * waits for a specific string to be received by serial port
+     * @param stringToReceive the string to wait for
+     * @param timeout timeout how long to wait
+     * @return {Promise<unknown>} Promise is resolved if string is received, otherwise rejected after given timeout
+     */
+    this.waitForReceiving = function (stringToReceive, timeout) {
+        timeout = timeout || 5000;
+        _stringToReceive = stringToReceive;
+        return new Promise((resolve, reject) => {
+            _stringToReceiveResolve = resolve;
+            setTimeout(() => {
+                _stringToReceive = null;
+                _stringToReceiveResolve = null;
+                reject(stringToReceive + ' not received.');
+            }, timeout);
+        });
+    }
+
+    /**
+     * sends raw data to serial port
+     * @param arrayBuffer the binary data to send in an ArrayBuffer
+     * @param progressCallback optional function that is called with current percentage value of progress (0-100)
+     * @return {Promise<void>}
+     */
+    this.sendRawData = async function (arrayBuffer, progressCallback) {
+        if (!arrayBuffer) return;
         if (!_port) {
             throw 'sercomm: port not initialized. call init() before sending data.';
         }
-        //send data via serial port
-        await _portWriter.write(value);
-        console.log('finished write');
+        _sendingRaw = true;
+        let array = new Int8Array(arrayBuffer);
+        let chunksize = 2048;
+        let sent = 0;
+        let lastProgress = null;
+        for (let i = 0; i < array.length; i += chunksize) {
+            sent += chunksize;
+            await _portWriter.write(array.slice(i, i + chunksize));
+            let progress = Math.floor((sent / array.length) * 100);
+            if (progressCallback && progress !== lastProgress) {
+                progressCallback(progress);
+                lastProgress = progress;
+                log.info(progress + '%');
+            }
+            await new Promise(resolve => setTimeout(() => resolve(), 50));
+        }
+        _sendingRaw = false;
     }
 
     //send data line based (for all AT commands)
     this.sendData = async function (value, timeout, dontLog) {
-        if (!value) return;
+        if (!value || _sendingRaw) return;
         if (!_port) {
             throw 'sercomm: port not initialized. call init() before sending data.';
         }
@@ -59,7 +102,7 @@ function SerialCommunicator() {
 
         //send data via serial port
         var output = value + "\r\n";
-        await _portWriter.write(output);
+        await _portWriter.write(_textEncoder.encode(output));
         //add NL/CR (not needed on websockets)
         //await _portWriter.write('\r\n');
 
@@ -107,23 +150,27 @@ function SerialCommunicator() {
                     break;
                 }
 
-                if (value.indexOf('\n') < 0) {
-                    chunk += value;
-                } else {
-                    value.split("").forEach((part) => {
-                        chunk = chunk + part;
-                        if (part === '\n') {
-                            if (chunk.length > 2 && chunk.indexOf(C.LIVE_VALUE_CONSTANT) > -1) {
-                                if (L.isFunction(_valueHandler)) {
-                                    _valueHandler(chunk.toString());
-                                }
-                            } else if (_internalValueFunction) {
-                                _internalValueFunction(chunk);
-                            }
-                            chunk = "";
-                        }
-                    });
+                if (window.logReceived) {
+                    log.info(value);
                 }
+                value.split("").forEach((part) => {
+                    chunk = chunk + part;
+                    if (_stringToReceive && chunk.indexOf(_stringToReceive.trim()) > -1) {
+                        _stringToReceiveResolve();
+                        _stringToReceive = null;
+                    }
+                    if (part === '\n') {
+                        if (chunk.length > 2 && chunk.indexOf(C.LIVE_VALUE_CONSTANT) > -1) {
+                            if (L.isFunction(_valueHandler)) {
+                                _valueHandler(chunk.toString());
+                            }
+                        } else if (_internalValueFunction) {
+                            _internalValueFunction(chunk);
+                        }
+                        chunk = "";
+                    }
+                });
+
             } catch (e) {
                 console.warn(e)
                 run = false;
