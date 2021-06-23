@@ -231,7 +231,7 @@ window.L.getLang = function () {
  * @return {*}
  */
 window.L.translate = function (translationKey) {
-    translationKey = translationKey || '';
+    translationKey = translationKey + '' || '';
     let translated = '';
     if (translationKey.indexOf(' // ') > -1) {
         let translations = translationKey.split(' // ');
