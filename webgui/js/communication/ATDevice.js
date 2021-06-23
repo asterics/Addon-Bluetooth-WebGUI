@@ -9,6 +9,7 @@ let _liveValueLastUpdate = 0;
 
 let _communicator;
 let _isInitialized = false;
+let _inRawMode = false;
 
 let _atCmdQueue = [];
 let _sendingAtCmds = false;
@@ -74,8 +75,9 @@ ATDevice.getVersion = function () {
 }
 
 ATDevice.getBTVersion = function () {
-    return ATDevice.sendAtCmdWithResult(C.AT_CMD_ADDON_COMMAND, '$ID', 1000).then(result => {
+    return ATDevice.sendAtCmdWithResult(C.AT_CMD_ADDON_COMMAND, '$ID').then(result => {
         result = result || '';
+        result = result.toUpperCase().replace('P32', ''); //remove ESP32 in order to prevent wrong version number parsing
         return Promise.resolve(result.trim() ? L.formatVersion(result) : '');
     });
 }
@@ -96,6 +98,10 @@ ATDevice.getBTVersion = function () {
 ATDevice.sendATCmd = function (atCmd, param, timeout, onlyIfNotBusy, dontLog) {
     if (!ATDevice.isInitialized()) {
         return Promise.reject('cannot send AT command if not initialized.');
+    }
+    if (_inRawMode) {
+        log.warn('not sending AT command because in raw mode.');
+        return Promise.reject();
     }
     if ((onlyIfNotBusy && _atCmdQueue.length > 0)) {
         if (!dontLog) console.log('did not send cmd: "' + atCmd + "' because another command is executing.");
@@ -143,6 +149,10 @@ ATDevice.sendATCmd = function (atCmd, param, timeout, onlyIfNotBusy, dontLog) {
 
     return promise;
 };
+window.sendATCmd = function (cmd) {
+    window.logReceived = true;
+    ATDevice.sendATCmd(cmd);
+}
 
 /**
  * Sends the given AT command to the FLipMouse and waits for a response, details @see sendATCmd()
@@ -160,9 +170,32 @@ ATDevice.sendAtCmdWithResult = function (atCmd, param, timeout, onlyIfNotBusy, d
     return promise;
 }
 
-ATDevice.sendRawData = function (data, timeout) {
-    return _communicator.sendRawData(data, timeout);
-};
+ATDevice.upgradeBTAddon = async function (firmwareArrayBuffer, progressCallback) {
+    if (!_communicator.sendRawData) {
+        log.warn('upgrade not supported by communicator!')
+        return;
+    }
+    stopTestingConnection();
+    ATDevice.sendATCmd(C.AT_CMD_STOP_REPORTING_LIVE);
+    ATDevice.sendATCmd(C.AT_CMD_UPGRADE_ADDON);
+    _inRawMode = true;
+    return _communicator.waitForReceiving('OTA:ready', 15000).then(() => {
+        log.info('starting sending raw data');
+        return _communicator.sendRawData(firmwareArrayBuffer, progressCallback);
+    }).then(() => {
+        return _communicator.waitForReceiving('OTA:$FIN', 15000);
+    }).then(() => {
+        log.info('bluetooth upgrade successful!');
+        return Promise.resolve();
+    }).catch((error) => {
+        log.warn('BT addon update failed because: ' + error);
+        return Promise.reject();
+    }).finally(() => {
+        _inRawMode = false;
+        ATDevice.sendATCmd(C.AT_CMD_START_REPORTING_LIVE);
+        startTestingConnection();
+    });
+}
 
 ATDevice.addConnectionTestHandler = function (fn) {
     _connectionTestCallbacks.push(fn);
@@ -441,6 +474,10 @@ function startTestingConnection() {
 
     doTest();
     _connectionTestIntervalHandler = setInterval(doTest, 500);
+}
+
+function stopTestingConnection() {
+    clearInterval(_connectionTestIntervalHandler);
 }
 
 
