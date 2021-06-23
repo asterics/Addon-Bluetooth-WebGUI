@@ -16,7 +16,8 @@ class TabGeneral extends Component {
             newMainVersionUrl: '',
             btVersion: unknown,
             newBtVersion: unknown,
-            newBtVersionUrl: ''
+            newBtVersionUrl: '',
+            btUpgradeProgress: null
         }
 
         this.getVersions();
@@ -24,19 +25,23 @@ class TabGeneral extends Component {
 
     getVersions() {
         L.HTTPRequest('https://api.github.com/repos/asterics/FLipMouse/releases/latest', 'GET', 'json').then(result => {
-            log.warn(result)
             this.setState({
                 newMainVersion: L.formatVersion(result['tag_name']),
                 newMainVersionUrl: result['html_url']
             });
         });
         L.HTTPRequest('https://api.github.com/repos/asterics/esp32_mouse_keyboard/releases/latest', 'GET', 'json').then(result => {
-            log.warn(result['tag_name']);
+            let binaryAsset = result.assets.filter(asset => asset.name.indexOf('.bin') > -1)[0];
             this.setState({
                 newBtVersion: L.formatVersion(result['tag_name']),
-                newBtVersionUrl: result['html_url']
+                newBtVersionUrl: result['html_url'],
+                newBtVersionDownloadUrl: binaryAsset.browser_download_url
             });
         });
+        this.getDeviceVersions();
+    }
+
+    getDeviceVersions() {
         ATDevice.getVersion().then(result => {
             this.setState({
                 mainVersion: result
@@ -48,9 +53,29 @@ class TabGeneral extends Component {
             });
         })
     }
+
+    updateBTFirmware() {
+        let thiz = this;
+        if (!confirm(L.translate('Do you want to update the firmware version of the BT-Addon to version {?}? // Möchten Sie die Version des BT-Addons auf Version {?} aktualisieren?', this.state.newBtVersion))) {
+            return;
+        }
+        let url = 'https://proxy.asterics-foundation.org/proxybase64url.php?csurl=' + encodeURIComponent(btoa(this.state.newBtVersionDownloadUrl));
+        L.HTTPRequest(url, 'GET', 'arraybuffer').then(result => {
+            thiz.setState({btUpgradeProgress: 1});
+            ATDevice.upgradeBTAddon(result, (progress) => {
+                thiz.setState({btUpgradeProgress: progress || 1});
+            }).then(() => {
+                thiz.setState({btUpgradeProgress: null});
+                setTimeout(() => {
+                    thiz.getDeviceVersions();
+                }, 1000);
+            });
+        });
+    }
     
     render() {
         let slots = ATDevice.getSlots();
+        let state = this.state;
 
         return html`
         <h2>${L.translate('General settings // Allgemeine Einstellungen')}</h2>
@@ -97,8 +122,11 @@ class TabGeneral extends Component {
             <div class="row">
                 <span class="col col-md-4">${L.translate('Available version // Verfügbare Version')}</span>   
                 <a href="${this.state.newBtVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newBtVersion}</a>   
-                <div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.btVersion, this.state.newBtVersion) ? '' : 'd-none'}">
-                    <button class="col-12" disabled="${!L.isVersionNewer(this.state.btVersion, this.state.newBtVersion)}"><span class="sr-only">Bluetooth-Addon: </span>${L.translate('Update firmware // Firmware aktualisieren')}</button>   
+                <div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.btVersion, this.state.newBtVersion) ? '' : 'd-none2'}">
+                    <button class="col-12" onclick="${() => this.updateBTFirmware()}" disabled="${this.state.btUpgradeProgress || !L.isVersionNewer(this.state.btVersion, this.state.newBtVersion)}">
+                        <span class="${this.state.btUpgradeProgress ? 'd-none' : ''}"><span class="sr-only">Bluetooth-Addon: </span>${L.translate('Update firmware // Firmware aktualisieren')}</span>
+                        <span class="${this.state.btUpgradeProgress ? '' : 'd-none'}"><span class="sr-only">Bluetooth-Addon: </span>${L.translate('Updating... {?}% // Aktualisiere... {?}%', state.btUpgradeProgress)}</span>
+                    </button>   
                 </div>
                 <div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.btVersion, this.state.newBtVersion) || this.state.btVersion === unknown ? 'd-none' : ''}">
                     <span style="color: green">${L.translate('Bluetooth-Addon firmware is up-to-date! // Bluetooth-Addon Firmware ist aktuell!')}</span>
