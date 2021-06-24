@@ -122,3 +122,4 @@ function parseLiveData(data) {
 ATDevice.setLiveValueHandler(parseLiveData);
 
 export {FLipMouse};
+export default FLipMouse;

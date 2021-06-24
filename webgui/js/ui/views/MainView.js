@@ -1,13 +1,6 @@
-import {h, Component, render} from '../../../js/preact.min.js';
-import htm from '../../../js/htm.min.js';
-import {TabActions} from "./TabActions.js";
-import {TabGeneral} from "./TabGeneral.js";
-import {TabSipPuff} from "./TabSipPuff.js";
-import {TabSlots} from "./TabSlots.js";
-import {TabStick} from "./TabStick.js";
-import {TabVisualization} from "./TabVisualization.js";
-import {ATDevice} from "../../../js/communication/ATDevice.js";
-import {FLipMouse} from "../../communication/FLipMouse.js";
+import {h, Component, render} from '../../preact.min.js';
+import htm from '../../htm.min.js';
+import {ATDevice} from "../../communication/ATDevice.js";
 
 const html = htm.bind(h);
 
@@ -27,16 +20,14 @@ class MainView extends Component {
             connected: true,
             menuOpen: false
         }
-        this.addView('#tabStick', TabStick, 'Stick-Config');
-        this.addView('#tabPuff', TabSipPuff, 'Sip and Puff // Saug-Puste-Steuerung');
-        this.addView('#tabSlots', TabSlots, 'Slots // Slots');
-        this.addView('#tabActions', TabActions, 'Actions // Aktionen');
-        this.addView('#tabGeneral', TabGeneral, 'General // Allgemein');
-        this.addView('#tabVis', TabVisualization, 'Visualization // Visualisierung');
+
+        C.VIEWS.forEach(view => {
+            this.addView(view.hash, view.object, view.label);
+        });
 
         L('html')[0].lang = L.getLang();
         if (C.GUI_IS_MOCKED_VERSION || C.GUI_IS_ON_DEVICE) {
-            this.initFlip();
+            this.initATDevice();
         } else {
             this.setState({
                 showConnectionScreen: true
@@ -46,10 +37,10 @@ class MainView extends Component {
 
     testMode() {
         C.GUI_IS_MOCKED_VERSION = true;
-        this.initFlip();
+        this.initATDevice();
     }
 
-    initFlip() {
+    initATDevice() {
         let thiz = this;
         ATDevice.init().then(function () {
             thiz.toView();
@@ -97,11 +88,15 @@ class MainView extends Component {
             currentView: view,
             menuOpen: false
         });
-        if (view.object.valueHandler) {
-            FLipMouse.startLiveValueListener(view.object.valueHandler);
-        } else {
-            FLipMouse.stopLiveValueListener();
-        }
+
+        let deviceClassPath = C.CURRENT_DEVICE === C.AT_DEVICE_FLIPMOUSE ? '../../../js_fm/communication/FLipMouse.js' : '../../../js_fabi/communication/FABI.js';
+        import(deviceClassPath).then(module => {
+            if (view.object.valueHandler && module.default.startLiveValueListener) {
+                module.default.startLiveValueListener(view.object.valueHandler);
+            } else if (module.default.stopLiveValueListener) {
+                module.default.stopLiveValueListener();
+            }
+        });
 
         window.location.hash = viewHash;
         document.body.scrollTop = 0;
@@ -114,18 +109,18 @@ class MainView extends Component {
         return html`
         <div id="connectDiv" class="${state.showConnectionScreen ? '' : 'd-none'}">
             <div class="container-fluid" id="connectContent">
-                <h1>${L.translate('FLipMouse Configuration // FlipMouse Konfiguration')}</h1>
+                <h1>${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
                 <div class="row">
-                    <button class="col-12 col-md-8 offset-md-2" onclick="${() => this.initFlip()}">${L.translate("Connect to FLipMouse connected via USB // Verbinden zu FLipMouse (über USB angeschlossen)")}</button>
+                    <button class="col-12 col-md-8 offset-md-2" onclick="${() => this.initATDevice()}">${L.translate("Connect to {?} connected via USB // Verbinden zu {?} (über USB angeschlossen)", C.CURRENT_DEVICE)}</button>
                 </div>
                 <div class="row">
-                    <button class="col-12 col-md-8 offset-md-2" onclick="${() => this.testMode()}">${L.translate("Use Test mode without real FLipMouse // Test-Modus ohne echte FLipMouse verwenden")}</button>
+                    <button class="col-12 col-md-8 offset-md-2" onclick="${() => this.testMode()}">${L.translate("Use Test mode without real {?} // Test-Modus ohne {?} verwenden", C.CURRENT_DEVICE)}</button>
                 </div>
             </div>
         </div>
         <header class="container-fluid p-0 ${state.showMainScreen ? '' : 'd-none'}" role="banner">
             <div class="row">
-                <h1 id="mainHeading" tabindex="-1" class="col col-md-6">${L.translate('FLipMouse Configuration // FLipMouse Konfiguration')}</h1>
+                <h1 id="mainHeading" tabindex="-1" class="col col-md-6">${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
                 <div class="d-none d-md-inline-block col-md-3">
                     <label class="col-12" for="selectSlots">${L.translate('Select Slot // Slot auswählen')}</label>
                     <div class="col-12">

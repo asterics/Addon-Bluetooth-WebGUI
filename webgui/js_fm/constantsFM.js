@@ -1,10 +1,43 @@
 import {FLipMouse} from "./communication/FLipMouse.js";
+import {TabStick} from "./ui/views/TabStick.js";
+import {TabSipPuff} from "./ui/views/TabSipPuff.js";
+import {TabSlots} from "./ui/views/TabSlots.js";
+import {TabActions} from "./ui/views/TabActions.js";
+import {TabGeneral} from "./ui/views/TabGeneral.js";
+import {TabVisualization} from "./ui/views/TabVisualization.js";
 
 window.C = window.C || {};
 
+C.CURRENT_DEVICE = C.AT_DEVICE_FLIPMOUSE;
 C.USB_DEVICE_FILTERS =  [
     {usbVendorId: 0x16c0} // Teensy
 ];
+
+C.VIEWS = [{
+    object: TabStick,
+    hash: '#tabStick',
+    label: 'Stick-Config'
+}, {
+    object: TabSipPuff,
+    hash: '#tabPuff',
+    label: 'Sip and Puff // Saug-Puste-Steuerung'
+}, {
+    object: TabSlots,
+    hash: '#tabSlots',
+    label: 'Slots // Slots'
+}, {
+    object: TabActions,
+    hash: '#tabActions',
+    label: 'Actions // Aktionen'
+}, {
+    object: TabGeneral,
+    hash: '#tabGeneral',
+    label: 'General // Allgemein'
+}, {
+    object: TabVisualization,
+    hash: '#tabVis',
+    label: 'Visualization // Visualisierung'
+}];
 
 C.AT_CMD_CATEGORIES = [{
     constant: C.AT_CMD_CAT_KEYBOARD,

@@ -24,7 +24,7 @@ let _autoSaveTimeout = 10000;
 let _dontGetLiveValues = false;
 
 /**
- * initializes the FLipMouse instance
+ * initializes the instance of the device
  * @param dontGetLiveValues if true, live values are not requested by default
  * @return {Promise<* | void>} promise resolving with config of the current slot
  */
@@ -88,7 +88,7 @@ ATDevice.getBTVersion = function () {
 }
 
 /**
- * Sends the given AT command to the FLipMouse. If sending of the last command is not completed yet, the given AT command
+ * Sends the given AT command to the device. If sending of the last command is not completed yet, the given AT command
  * is added to a queue and will be sent later.
  * The order of sending the commands is always equal to the order of calls to this function.
  *
@@ -160,7 +160,7 @@ window.sendATCmd = function (cmd) {
 }
 
 /**
- * Sends the given AT command to the FLipMouse and waits for a response, details @see sendATCmd()
+ * Sends the given AT command to the device and waits for a response, details @see sendATCmd()
  *
  * @param atCmd
  * @param param
