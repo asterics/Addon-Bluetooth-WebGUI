@@ -21,6 +21,7 @@ let _connected = true;
 let _AT_CMD_BUSY_RESPONSE = 'BUSY';
 
 let _autoSaveTimeout = 10000;
+let _dontGetLiveValues = false;
 
 /**
  * initializes the FLipMouse instance
@@ -28,6 +29,7 @@ let _autoSaveTimeout = 10000;
  * @return {Promise<* | void>} promise resolving with config of the current slot
  */
 ATDevice.init = function (dontGetLiveValues) {
+    _dontGetLiveValues = dontGetLiveValues;
     let promise = Promise.resolve().then(() => {
         if (C.GUI_IS_MOCKED_VERSION) {
             _communicator = new MockCommunicator();
@@ -47,7 +49,7 @@ ATDevice.init = function (dontGetLiveValues) {
         _isInitialized = true;
         return ATDevice.refreshConfig();
     }).then(() => {
-        if (!dontGetLiveValues) {
+        if (!_dontGetLiveValues) {
             ATDevice.sendATCmd(C.AT_CMD_START_REPORTING_LIVE);
             _communicator.setValueHandler((data) => {
                 _liveValueLastUpdate = new Date().getTime();
@@ -75,10 +77,13 @@ ATDevice.getVersion = function () {
 }
 
 ATDevice.getBTVersion = function () {
+    ATDevice.sendATCmd(C.AT_CMD_STOP_REPORTING_LIVE);
     return ATDevice.sendAtCmdWithResult(C.AT_CMD_ADDON_COMMAND, '$ID').then(result => {
         result = result || '';
         result = result.toUpperCase().replace('P32', ''); //remove ESP32 in order to prevent wrong version number parsing
         return Promise.resolve(result.trim() ? L.formatVersion(result) : '');
+    }).finally(() => {
+        if (!_dontGetLiveValues) ATDevice.sendATCmd(C.AT_CMD_START_REPORTING_LIVE);
     });
 }
 
@@ -192,7 +197,7 @@ ATDevice.upgradeBTAddon = async function (firmwareArrayBuffer, progressCallback)
         return Promise.reject();
     }).finally(() => {
         _inRawMode = false;
-        ATDevice.sendATCmd(C.AT_CMD_START_REPORTING_LIVE);
+        if (!_dontGetLiveValues) ATDevice.sendATCmd(C.AT_CMD_START_REPORTING_LIVE);
         startTestingConnection();
     });
 }
@@ -234,6 +239,7 @@ ATDevice.setConfig = function (atCmd, value, debounceTimeout) {
 
 ATDevice.refreshConfig = function () {
     return new Promise(function (resolve, reject) {
+        ATDevice.sendATCmd(C.AT_CMD_STOP_REPORTING_LIVE);
         ATDevice.sendAtCmdWithResult(C.AT_CMD_LOAD_ALL).then(function (response) {
             _slots = ATDevice.parseConfig(response);
             _currentSlot = _currentSlot || _slots[0].name;
@@ -241,6 +247,8 @@ ATDevice.refreshConfig = function () {
         }, function () {
             console.log("could not get config!");
             reject();
+        }).finally(() => {
+            if (!_dontGetLiveValues) ATDevice.sendATCmd(C.AT_CMD_START_REPORTING_LIVE);
         });
     });
 };
@@ -486,6 +494,7 @@ window.addEventListener('beforeunload', () => {
     if (ATDevice.isInitialized()) {
         log.info('saving config before closing...');
         ATDevice.save();
+        ATDevice.sendATCmd(C.AT_CMD_STOP_REPORTING_LIVE);
     }
 });
 
