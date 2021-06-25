@@ -1,8 +1,8 @@
-import { h, Component, render } from '../../../js/preact.min.js';
-import htm from '../../../js/htm.min.js';
+import { h, Component, render } from '../../preact.min.js';
+import htm from '../../htm.min.js';
 import {ActionEditModal} from "../modals/ActionEditModal.js";
-import {RadioFieldset} from "../components/RadioFieldset.js";
-import {ATDevice} from "../../../js/communication/ATDevice.js";
+import {RadioFieldset} from "../../../js_fm/ui/components/RadioFieldset.js";
+import {ATDevice} from "../../communication/ATDevice.js";
 
 
 const html = htm.bind(h);

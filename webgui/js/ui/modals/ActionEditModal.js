@@ -1,9 +1,9 @@
-import { h, Component, render } from '../../../js/preact.min.js';
-import htm from '../../../js/htm.min.js';
-import {InputKeyboard} from "../components/InputKeyboard.js";
-import {ManageIR} from "../components/ManageIR.js";
-import {RadioFieldset} from "../components/RadioFieldset.js";
-import {ATDevice} from "../../../js/communication/ATDevice.js";
+import { h, Component, render } from '../../preact.min.js';
+import htm from '../../htm.min.js';
+import {InputKeyboard} from "../../../js_fm/ui/components/InputKeyboard.js";
+import {ManageIR} from "../../../js_fm/ui/components/ManageIR.js";
+import {RadioFieldset} from "../../../js_fm/ui/components/RadioFieldset.js";
+import {ATDevice} from "../../communication/ATDevice.js";
 
 const html = htm.bind(h);
 class ActionEditModal extends Component {
