@@ -3,7 +3,7 @@ import {TabStick} from "./ui/views/TabStick.js";
 import {TabSipPuff} from "./ui/views/TabSipPuff.js";
 import {TabSlots} from "./ui/views/TabSlots.js";
 import {TabActions} from "../js/ui/views/TabActions.js";
-import {TabGeneral} from "./ui/views/TabGeneral.js";
+import {TabGeneral} from "../js/ui/views/TabGeneral.js";
 import {TabVisualization} from "./ui/views/TabVisualization.js";
 
 window.C = window.C || {};
