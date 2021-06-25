@@ -13,14 +13,20 @@ To adjust settings on your assistive device, please:
 
 
 ## Please select your device
-* [FLipMouse](https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fm.htm)
-  <a href="https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fm.htm" style="border: 1px solid">
-  <img src="https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fm_lowres.png" alt="FLipMouse logo" width="300"/>
-  </a>
-* [FABI](https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fabi.htm)
-<a href="https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fabi.htm" style="border: 1px solid; margin-bottom: 1.5em">
-<img src="https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fabi_lowres.png" alt="FABI logo" width="300"/>
-</a>
+<ul>
+    <li>
+        <a href="https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fm.htm" style="border: 1px solid; margin-bottom: 1em">
+            <span>FLipMouse</span>
+            <img src="https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fm_lowres.png" alt="FLipMouse logo" width="300"/>
+        </a>
+    </li>
+    <li>
+        <a href="https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fabi.htm" style="border: 1px solid">
+            <span>FABI</span>
+            <img src="https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fabi_lowres.png" alt="FLipMouse logo" width="300"/>
+        </a>
+    </li>
+</ul>
   
 ## Developer information
 
