@@ -9,6 +9,8 @@ import {TabVisualization} from "./ui/views/TabVisualization.js";
 window.C = window.C || {};
 
 C.CURRENT_DEVICE = C.AT_DEVICE_FLIPMOUSE;
+C.DEVICE_IS_FABI = false;
+C.DEVICE_IS_FM = true;
 C.USB_DEVICE_FILTERS =  [
     {usbVendorId: 0x16c0} // Teensy
 ];
