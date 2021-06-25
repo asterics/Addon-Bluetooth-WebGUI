@@ -18,7 +18,8 @@ class MainView extends Component {
             currentSlot: null,
             slots: [],
             connected: true,
-            menuOpen: false
+            menuOpen: false,
+            errorCode: null
         }
 
         C.VIEWS.forEach(view => {
@@ -42,6 +43,9 @@ class MainView extends Component {
 
     initATDevice() {
         let thiz = this;
+        this.setState({
+            errorCode: null
+        });
         ATDevice.init().then(function () {
             thiz.toView();
             thiz.setState({
@@ -62,6 +66,10 @@ class MainView extends Component {
                         connected: isConnected
                     });
                 }
+            });
+        }).catch(error => {
+            this.setState({
+                errorCode: error
             });
         });
     }
@@ -112,6 +120,21 @@ class MainView extends Component {
                 </div>
                 <div class="row">
                     <button class="col-12 col-md-8 offset-md-2" onclick="${() => this.testMode()}">${L.translate("Use Test mode without real {?} // Test-Modus ohne {?} verwenden", C.CURRENT_DEVICE)}</button>
+                </div>
+                <div class="row" class="${state.errorCode ? '' : 'd-none'}" style="color: darkred">
+                    <strong>${L.translate('Error: // Fehler:')}</strong><span> </span>
+                    ${(() => {
+                        switch (state.errorCode) {
+                            case C.ERROR_SERIAL_DENIED: 
+                                return html`<span>${L.translate('Connecting to device not allowed or failed! // Verbindung zum Gerät nicht zugelassen oder fehlgeschlagen!')}</span>`;
+                           case C.ERROR_FIRMWARE_OUTDATED: 
+                                return html`
+                                    <span>${L.translate('Firmware of device is outdated! // Firmware des Gerätes ist veraltet!')}</span>
+                                    <div>${L.translate('Please download and install the latest firmware from: // Bitte aktuelle Firmware herunterladen und installieren:')}</div>
+                                    <div><a href="https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest" target="_blank">https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest</a></div>
+                                `;
+                        }
+                    })()}
                 </div>
             </div>
         </div>

@@ -56,6 +56,12 @@ ATDevice.init = function (dontGetLiveValues) {
         }
     }).then(function () {
         _isInitialized = true;
+        return ATDevice.getVersion();
+    }).then((versionString) => {
+        if (!L.isVersionNewer(C.MIN_FIRMWARE_VERSION, versionString) && !L.isVersionEqual(C.MIN_FIRMWARE_VERSION, versionString)) {
+            if (_communicator.close) _communicator.close();
+            return Promise.reject(C.ERROR_FIRMWARE_OUTDATED);
+        }
         return ATDevice.refreshConfig();
     }).then(() => {
         if (!_dontGetLiveValues) {
@@ -71,7 +77,7 @@ ATDevice.init = function (dontGetLiveValues) {
         return Promise.resolve();
     }).catch((error) => {
         console.warn(error);
-        return Promise.reject();
+        return Promise.reject(error);
     });
 }
 
