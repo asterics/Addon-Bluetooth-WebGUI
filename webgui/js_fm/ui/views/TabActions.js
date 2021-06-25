@@ -25,7 +25,8 @@ class TabActions extends Component {
 
     getLinkTitle(btnMode, slot) {
         let modeValue = ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot);
-        if (modeValue !== C.FLIPMOUSE_MODE_ALT.value && btnMode.category === C.BTN_CAT_STICK) {
+        let isFMNonAltMode = C.DEVICE_IS_FM && btnMode.category === C.BTN_CAT_STICK && modeValue !== C.FLIPMOUSE_MODE_ALT.value;
+        if (isFMNonAltMode) {
             return L.translate(btnMode.label);
         } else {
             return L.translate(btnMode.label) + (ATDevice.getButtonAction(btnMode.index, slot) ? ': ' + ATDevice.getButtonAction(btnMode.index, slot) : '');
@@ -34,7 +35,8 @@ class TabActions extends Component {
 
     getLinkLabel(btnMode, slot) {
         let modeValue = ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot);
-        if (modeValue !== C.FLIPMOUSE_MODE_ALT.value && btnMode.category === C.BTN_CAT_STICK) {
+        let isFMNonAltMode = C.DEVICE_IS_FM && btnMode.category === C.BTN_CAT_STICK && modeValue !== C.FLIPMOUSE_MODE_ALT.value;
+        if (isFMNonAltMode) {
             let mode = C.FLIPMOUSE_MODES.filter(mode => mode.value === modeValue)[0] || {};
             return L.translate(mode.label);
         } else {
