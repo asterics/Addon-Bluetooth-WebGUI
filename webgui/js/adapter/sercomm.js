@@ -5,6 +5,8 @@ function SerialCommunicator() {
     var _port;
     var _portWriter;
     var _textEncoder = new TextEncoder();
+    let _runReader = true;
+    let _portReader = null;
 
     //value handler for reported ADC/mouthpiece values
     var _valueHandler;
@@ -30,18 +32,28 @@ function SerialCommunicator() {
 
         _port = await navigator.serial.requestPort({filters}).catch((error) => {
             console.log(error);
-            return Promise.reject("User didn't allow serial port access.");
+            return Promise.reject(C.ERROR_SERIAL_DENIED);
         });
 
         // Wait for the serial port to open.
         await _port.open({baudRate: 115200}).catch(() => {
-            return Promise.reject("Serial port couldn't be opened.");
+            return Promise.reject(C.ERROR_SERIAL_DENIED);
         });
         listenToPort();
         _portWriter = _port.writable.getWriter();
 
         return Promise.resolve();
     };
+
+    this.close = function () {
+        _runReader = false;
+        if (_portReader) _portReader.cancel();
+        if (_portWriter) _portWriter.close();
+        if (_portWriter) _portWriter.releaseLock();
+        setTimeout(() => {
+            if (_port) _port.close();
+        }, 200);
+    }
 
     /**
      * waits for a specific string to be received by serial port
@@ -138,14 +150,14 @@ function SerialCommunicator() {
     async function listenToPort() {
         const textDecoder = new TextDecoderStream();
         _port.readable.pipeTo(textDecoder.writable);
-        const reader = textDecoder.readable.getReader();
+        _portReader = textDecoder.readable.getReader();
 
         // Listen to data coming from the serial device.
-        var run = true;
+        _runReader = true;
         var chunk = "";
-        while (run) {
+        while (_runReader) {
             try {
-                const {value, done} = await reader.read();
+                const {value, done} = await _portReader.read();
                 if (done) {
                     break;
                 }
@@ -173,9 +185,9 @@ function SerialCommunicator() {
 
             } catch (e) {
                 console.warn(e)
-                run = false;
+                _runReader = false;
             }
         }
-        reader.releaseLock();
+        _portReader.releaseLock();
     }
 }
