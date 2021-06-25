@@ -4,7 +4,6 @@ import {InputKeyboard} from "../components/InputKeyboard.js";
 import {ManageIR} from "../components/ManageIR.js";
 import {RadioFieldset} from "../components/RadioFieldset.js";
 import {ATDevice} from "../../../js/communication/ATDevice.js";
-import {FLipMouse} from "../../communication/FLipMouse.js";
 
 const html = htm.bind(h);
 class ActionEditModal extends Component {
@@ -84,8 +83,8 @@ class ActionEditModal extends Component {
 
     save() {
         ATDevice.setSlot(this.props.slot);
-        if (this.state.shouldChangeMode) {
-            FLipMouse.setFlipmouseMode(C.FLIPMOUSE_MODE_ALT.value)
+        if (this.state.shouldChangeMode && ATDevice.Specific.setFlipmouseMode) {
+            ATDevice.Specific.setFlipmouseMode(C.FLIPMOUSE_MODE_ALT.value)
         }
         if (this.state.hasChanges) {
             let atCmd = this.state.atCmdSuffix ? this.state.atCmd.cmd + ' ' + this.state.atCmdSuffix : this.state.atCmd.cmd;
@@ -99,8 +98,8 @@ class ActionEditModal extends Component {
         let btnMode = props.buttonMode;
         let categoryElements = C.AT_CMD_CATEGORIES.map(cat => {return {value: cat.constant, label: cat.label}});
         categoryElements = [{value: ActionEditModal.ALL_CATEGORIES, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
-        let showActionSelection = ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value || btnMode.category !== C.BTN_CAT_STICK || state.shouldChangeMode;
-        let mode = C.FLIPMOUSE_MODES.filter(mode => mode.value === ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, props.slot))[0];
+        let showActionSelection = C.DEVICE_IS_FABI || ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value || btnMode.category !== C.BTN_CAT_STICK || state.shouldChangeMode;
+        let modeLabel = C.DEVICE_IS_FM ? C.FLIPMOUSE_MODES.filter(mode => mode.value === ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, props.slot))[0].label : '';
 
         return html`
             <div class="modal-mask">
@@ -118,10 +117,10 @@ class ActionEditModal extends Component {
                         <div class="modal-body container-fluid p-0">
                             <div class="${showActionSelection ? 'd-none' : ''}">
                                 <span class="pr-2">${L.translate('Stick is currently used for: // Stick wird derzeit verwendet für:')}</span>
-                                <strong>${L.translate(mode.label)}</strong>
+                                <strong>${L.translate(modeLabel)}</strong>
                                 <div>
                                     <a href="javascript:;" onclick="${() => this.setState({shouldChangeMode: true})}">
-                                        <span>${L.translate('Deactivate {?} mode for defining an action // {?} deaktivieren um Aktion zu konfigurieren', mode.label)}</span>
+                                        <span>${L.translate('Deactivate {?} mode for defining an action // {?} deaktivieren um Aktion zu konfigurieren', modeLabel)}</span>
                                     </a>
                                 </div>
                             </div>
