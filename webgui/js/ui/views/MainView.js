@@ -89,14 +89,11 @@ class MainView extends Component {
             menuOpen: false
         });
 
-        let deviceClassPath = C.CURRENT_DEVICE === C.AT_DEVICE_FLIPMOUSE ? '../../../js_fm/communication/FLipMouse.js' : '../../../js_fabi/communication/FABI.js';
-        import(deviceClassPath).then(module => {
-            if (view.object.valueHandler && module.default.startLiveValueListener) {
-                module.default.startLiveValueListener(view.object.valueHandler);
-            } else if (module.default.stopLiveValueListener) {
-                module.default.stopLiveValueListener();
-            }
-        });
+        if (view.object.valueHandler && ATDevice.Specific.startLiveValueListener) {
+            ATDevice.Specific.startLiveValueListener(view.object.valueHandler);
+        } else if (ATDevice.Specific.stopLiveValueListener) {
+            ATDevice.Specific.stopLiveValueListener();
+        }
 
         window.location.hash = viewHash;
         document.body.scrollTop = 0;

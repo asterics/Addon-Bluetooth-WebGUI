@@ -1,3 +1,9 @@
+/**
+ * ATDevice implements all functionality that is generic for both FLipMouse and FABI devices.
+ * Specific functionality is implemented in modules FLipMouse and FABI.
+ * ATDevice holds a reference to the current specific class (FLipMouse or FABI) in ATDevice.Specific
+ */
+
 let ATDevice = {};
 
 let _slots = [];
@@ -30,7 +36,12 @@ let _dontGetLiveValues = false;
  */
 ATDevice.init = function (dontGetLiveValues) {
     _dontGetLiveValues = dontGetLiveValues;
-    let promise = Promise.resolve().then(() => {
+    let deviceClassPath = C.CURRENT_DEVICE === C.AT_DEVICE_FLIPMOUSE ? '../../js_fm/communication/FLipMouse.js' : '../../js_fabi/communication/FABI.js';
+    return import(deviceClassPath).then(module => {
+        //set ATDevice.Specific to instance of either FLipMouse or FABI class
+        ATDevice.Specific = module.default;
+        return Promise.resolve();
+    }).then(() => {
         if (C.GUI_IS_MOCKED_VERSION) {
             _communicator = new MockCommunicator();
             return Promise.resolve();
@@ -43,9 +54,7 @@ ATDevice.init = function (dontGetLiveValues) {
                 return Promise.resolve();
             });
         }
-    });
-
-    return promise.then(function () {
+    }).then(function () {
         _isInitialized = true;
         return ATDevice.refreshConfig();
     }).then(() => {
