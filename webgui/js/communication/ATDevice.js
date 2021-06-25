@@ -508,8 +508,10 @@ function stopTestingConnection() {
 window.addEventListener('beforeunload', () => {
     if (ATDevice.isInitialized()) {
         log.info('saving config before closing...');
-        ATDevice.save();
-        ATDevice.sendATCmd(C.AT_CMD_STOP_REPORTING_LIVE);
+        //sending in one command because two are not possible in beforeunload
+        ATDevice.sendATCmd('AT SA ' + _currentSlot + '\n' + C.AT_CMD_STOP_REPORTING_LIVE);
+        //ATDevice.save();
+        //ATDevice.sendATCmd(C.AT_CMD_STOP_REPORTING_LIVE);
     }
 });
 
