@@ -24,7 +24,8 @@ class TabGeneral extends Component {
     }
 
     getVersions() {
-        L.HTTPRequest('https://api.github.com/repos/asterics/FLipMouse/releases/latest', 'GET', 'json').then(result => {
+        let mainDeviceURL = `https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/releases/latest`
+        L.HTTPRequest(mainDeviceURL, 'GET', 'json').then(result => {
             this.setState({
                 newMainVersion: L.formatVersion(result['tag_name']),
                 newMainVersionUrl: result['html_url']
@@ -96,7 +97,7 @@ class TabGeneral extends Component {
             `)}
         </div>
         <h2>${L.translate('Firmware versions // Firmware-Versionen')}</h2>
-        <h3>FLipMouse Firmware</h3>
+        <h3>${C.CURRENT_DEVICE} Firmware</h3>
         <div class="container-fluid p-0">
             <div class="row">
                 <span class="col col-md-4">${L.translate('Installed version // Installierte Version')}</span>   
@@ -106,10 +107,10 @@ class TabGeneral extends Component {
                 <span class="col col-md-4">${L.translate('Available version // Verfügbare Version')}</span>   
                 <a href="${this.state.newMainVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newMainVersion}</a>   
                 <!-- TODO div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.mainVersion, this.state.newMainVersion) ? '' : 'd-none'}">
-                    <button class="col-12" disabled="${!L.isVersionNewer(this.state.mainVersion, this.state.newMainVersion)}"><span class="sr-only">FLipMouse: </span>${L.translate('Update firmware // Firmware aktualisieren')}</button>   
+                    <button class="col-12" disabled="${!L.isVersionNewer(this.state.mainVersion, this.state.newMainVersion)}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Update firmware // Firmware aktualisieren')}</button>   
                 </div-->
                 <div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.mainVersion, this.state.newMainVersion) || this.state.mainVersion === unknown ? 'd-none' : ''}">
-                    <span style="color: green">${L.translate('FLipMouse firmware is up-to-date! // FLipMouse Firmware ist aktuell!')}</span>
+                    <span style="color: green">${L.translate('{?} firmware is up-to-date! // {?} Firmware ist aktuell!', C.CURRENT_DEVICE)}</span>
                 </div>
             </div>
         </div>
