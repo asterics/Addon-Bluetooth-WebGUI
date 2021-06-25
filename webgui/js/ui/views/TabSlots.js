@@ -1,6 +1,6 @@
-import { h, Component, render } from '../../../js/preact.min.js';
-import htm from '../../../js/htm.min.js'
-import {ATDevice} from "../../../js/communication/ATDevice.js";
+import { h, Component, render } from '../../preact.min.js';
+import htm from '../../htm.min.js'
+import {ATDevice} from "../../communication/ATDevice.js";
 
 const html = htm.bind(h);
 class TabSlots extends Component {
@@ -87,8 +87,8 @@ class TabSlots extends Component {
 
     downloadSlot() {
         let d = new Date();
-        let datestr = d.getDate() + "." + (d.getMonth() + 1) + "." + d.getFullYear()
-        L.downloadasTextFile(this.state.selectedSlot + "-" + datestr + ".set", ATDevice.getSlotConfigText(this.state.selectedSlot));
+        let datestr = new Date().toISOString().substr(0, 10);
+        L.downloadasTextFile(`${C.CURRENT_DEVICE}-slot-${this.state.selectedSlot}-${datestr}.set`, ATDevice.getSlotConfigText(this.state.selectedSlot));
     };
 
     downloadAllSlots() {
@@ -97,12 +97,12 @@ class TabSlots extends Component {
             configstr = configstr + ATDevice.getSlotConfigText(item) + "\n";
         });
         let d = new Date();
-        let datestr = d.getDate() + "." + (d.getMonth() + 1) + "." + d.getFullYear()
-        L.downloadasTextFile("flipmouseconfig-" + datestr + ".set", configstr);
+        let datestr = new Date().toISOString().substr(0, 10);
+        L.downloadasTextFile(`${C.CURRENT_DEVICE}-config-${datestr}.set`, configstr);
     };
 
     resetConfig() {
-        let confirmMessage = L.translate('Do you really want to reset the FLipMouse to the default configuration? All slots will be deleted. // Möchten Sie die FLipMouse wirklich auf die Standardeinstellungen zurücksetzen? Alle Slots werden gelöscht.');
+        let confirmMessage = L.translate('Do you really want to reset the device to the default configuration? All slots will be deleted. // Möchten Sie das Gerät wirklich auf die Standardeinstellungen zurücksetzen? Alle Slots werden gelöscht.');
         if(!window.confirm(confirmMessage)){
             return;
         }
