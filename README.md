@@ -16,12 +16,11 @@ To adjust settings on your assistive device, please:
 
 ### [FABI](https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fabi.htm)
 
-[![FABI logo](https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fabi_lowres.png)](https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fabi.htm)
-
+<img src="https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fabi_lowres.png" alt="FABI logo" width="400"/>
 
 ### [FLipMouse](https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fm.htm)
 
-[![FLipMouse logo](https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fm_lowres.png)](https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fm.htm)
+<img src="https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fm_lowres.png" alt="FLipMouse logo" width="400"/> 
 
 ## Developer information
 
