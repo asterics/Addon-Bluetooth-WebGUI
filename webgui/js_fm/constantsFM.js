@@ -11,6 +11,8 @@ window.C = window.C || {};
 C.CURRENT_DEVICE = C.AT_DEVICE_FLIPMOUSE;
 C.DEVICE_IS_FABI = false;
 C.DEVICE_IS_FM = true;
+C.MIN_FIRMWARE_VERSION = '2.11.0';
+
 C.USB_DEVICE_FILTERS =  [
     {usbVendorId: 0x16c0} // Teensy
 ];
