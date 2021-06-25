@@ -6,11 +6,8 @@ You can configure your FLipMouse or FABI device via this page.
 
 To adjust settings on your assistive device, please:
 
-1. Connect your device to the PC (mobile devices are not supported)
-2. Windows only: install drivers from here (TODO: add link to .inf file for Teensy, Arduino and our VID/PID)
-3. Select your device from below
-4. Click connect
-
+1. Connect your device to the PC
+2. Select your device from below to go to the configuration page
 
 ## Please select your device
 <ul>
