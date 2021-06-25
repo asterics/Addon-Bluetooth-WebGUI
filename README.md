@@ -27,7 +27,12 @@ To adjust settings on your assistive device, please:
         </a>
     </li>
 </ul>
-  
+
+## Test suites
+There are automatic test suites for testing correct function of the AT command API for a device:
+* [FLipMouse tests](https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/test_fm.htm)
+* [FABI tests](https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/test_fabi.htm)
+
 ## Developer information
 
 This project here has two purposes:
