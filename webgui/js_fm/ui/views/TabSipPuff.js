@@ -1,5 +1,5 @@
-import { h, Component, render } from '../../../js/preact.min.js';
-import htm from '../../../js/htm.min.js';
+import { h, Component, render } from '../../../lib/preact.min.js';
+import htm from '../../../lib/htm.min.js';
 import {ATDevice} from "../../../js/communication/ATDevice.js";
 import {FLipMouse} from "../../communication/FLipMouse.js";
 

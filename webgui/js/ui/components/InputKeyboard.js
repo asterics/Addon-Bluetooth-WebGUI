@@ -1,5 +1,5 @@
-import { h, Component } from '../../preact.min.js';
-import htm from '../../htm.min.js';
+import { h, Component } from '../../../lib/preact.min.js';
+import htm from '../../../lib/htm.min.js';
 const html = htm.bind(h);
 
 class InputKeyboard extends Component {

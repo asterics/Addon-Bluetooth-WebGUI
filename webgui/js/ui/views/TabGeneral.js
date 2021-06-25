@@ -1,5 +1,5 @@
-import { h, Component, render } from '../../preact.min.js';
-import htm from '../../htm.min.js';
+import { h, Component, render } from '../../../lib/preact.min.js';
+import htm from '../../../lib/htm.min.js';
 import {ATDevice} from "../../communication/ATDevice.js";
 
 const html = htm.bind(h);
