@@ -1,7 +1,7 @@
 import { h, Component, render } from '../../preact.min.js';
 import htm from '../../htm.min.js';
 import {ActionEditModal} from "../modals/ActionEditModal.js";
-import {RadioFieldset} from "../../../js_fm/ui/components/RadioFieldset.js";
+import {RadioFieldset} from "../components/RadioFieldset.js";
 import {ATDevice} from "../../communication/ATDevice.js";
 
 

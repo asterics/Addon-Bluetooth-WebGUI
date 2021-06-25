@@ -1,5 +1,5 @@
-import { h, Component } from '../../../js/preact.min.js';
-import htm from '../../../js/htm.min.js';
+import { h, Component } from '../../preact.min.js';
+import htm from '../../htm.min.js';
 const html = htm.bind(h);
 
 class RadioFieldset extends Component {
