@@ -343,6 +343,12 @@ L.isVersionNewer = function (oldVersion, newVersion) {
     return false;
 }
 
+L.isVersionEqual = function (oldVersion, newVersion) {
+    let vOld = L.parseVersion(oldVersion);
+    let vNew = L.parseVersion(newVersion);
+    return vOld.major === vNew.major && vOld.minor === vNew.minor && vOld.patch === vNew.patch;
+}
+
 /**
  * Calls the given function after a specified timeout. Another subsequent call cancels and restarts the timeout.
  *
