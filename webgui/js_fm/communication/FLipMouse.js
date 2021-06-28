@@ -106,12 +106,12 @@ function parseLiveData(data) {
                 ATDevice.setSlot(slot, true);
             }
         }
-        _liveData[FLipMouse.LIVE_PRESSURE_MIN] = Math.min(_liveData[FLipMouse.LIVE_PRESSURE_MIN], _liveData[FLipMouse.LIVE_PRESSURE]);
-        _liveData[FLipMouse.LIVE_MOV_X_MIN] = Math.min(_liveData[FLipMouse.LIVE_MOV_X_MIN], _liveData[FLipMouse.LIVE_MOV_X]);
-        _liveData[FLipMouse.LIVE_MOV_Y_MIN] = Math.min(_liveData[FLipMouse.LIVE_MOV_Y_MIN], _liveData[FLipMouse.LIVE_MOV_Y]);
-        _liveData[FLipMouse.LIVE_PRESSURE_MAX] = Math.max(_liveData[FLipMouse.LIVE_PRESSURE_MAX], _liveData[FLipMouse.LIVE_PRESSURE]);
-        _liveData[FLipMouse.LIVE_MOV_X_MAX] = Math.max(_liveData[FLipMouse.LIVE_MOV_X_MAX], _liveData[FLipMouse.LIVE_MOV_X]);
-        _liveData[FLipMouse.LIVE_MOV_Y_MAX] = Math.max(_liveData[FLipMouse.LIVE_MOV_Y_MAX], _liveData[FLipMouse.LIVE_MOV_Y]);
+        _liveData[FLipMouse.LIVE_PRESSURE_MIN] = L.robustMin(_liveData[FLipMouse.LIVE_PRESSURE_MIN], _liveData[FLipMouse.LIVE_PRESSURE]);
+        _liveData[FLipMouse.LIVE_MOV_X_MIN] = L.robustMin(_liveData[FLipMouse.LIVE_MOV_X_MIN], _liveData[FLipMouse.LIVE_MOV_X]);
+        _liveData[FLipMouse.LIVE_MOV_Y_MIN] = L.robustMin(_liveData[FLipMouse.LIVE_MOV_Y_MIN], _liveData[FLipMouse.LIVE_MOV_Y]);
+        _liveData[FLipMouse.LIVE_PRESSURE_MAX] = L.robustMax(_liveData[FLipMouse.LIVE_PRESSURE_MAX], _liveData[FLipMouse.LIVE_PRESSURE]);
+        _liveData[FLipMouse.LIVE_MOV_X_MAX] = L.robustMax(_liveData[FLipMouse.LIVE_MOV_X_MAX], _liveData[FLipMouse.LIVE_MOV_X]);
+        _liveData[FLipMouse.LIVE_MOV_Y_MAX] = L.robustMax(_liveData[FLipMouse.LIVE_MOV_Y_MAX], _liveData[FLipMouse.LIVE_MOV_Y]);
 
         if (_liveValueHandler) {
             _liveValueHandler(_liveData);

@@ -382,3 +382,32 @@ L.clearDebounce = function (key) {
         clearTimeout(L.timeoutHandlers[key]);
     }
 };
+
+/**
+ * returns minimum of both values, or the non-NaN value of one value is NaN
+ * @param val1
+ * @param val2
+ * @return {*|number}
+ */
+L.robustMin = function (val1, val2) {
+    return robustExtremeFn(Math.min, val1, val2);
+}
+
+/**
+ * returns maximum of both values, or the non-NaN value of one value is NaN
+ * @param val1
+ * @param val2
+ * @return {*|number}
+ */
+L.robustMax = function (val1, val2) {
+    return robustExtremeFn(Math.max, val1, val2);
+}
+
+function robustExtremeFn(extremeFn, val1, val2) {
+    val1 = parseInt(val1);
+    val2 = parseInt(val2);
+    if (!isNaN(val1) && !isNaN(val2)) {
+        return extremeFn(val1, val2);
+    }
+    return isNaN(val1) ? val2 : val1;
+}

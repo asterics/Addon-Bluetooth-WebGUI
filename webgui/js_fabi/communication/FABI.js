@@ -52,8 +52,8 @@ function parseLiveData(data) {
                 ATDevice.setSlot(slot, true);
             }
         }
-        _liveData[FABI.LIVE_PRESSURE_MIN] = Math.min(_liveData[FABI.LIVE_PRESSURE_MIN], _liveData[FABI.LIVE_PRESSURE]);
-        _liveData[FABI.LIVE_PRESSURE_MAX] = Math.max(_liveData[FABI.LIVE_PRESSURE_MAX], _liveData[FABI.LIVE_PRESSURE]);
+        _liveData[FABI.LIVE_PRESSURE_MIN] = L.robustMin(_liveData[FABI.LIVE_PRESSURE_MIN], _liveData[FABI.LIVE_PRESSURE]);
+        _liveData[FABI.LIVE_PRESSURE_MAX] = L.robustMax(_liveData[FABI.LIVE_PRESSURE_MAX], _liveData[FABI.LIVE_PRESSURE]);
 
         if (_liveValueHandler) {
             _liveValueHandler(_liveData);
