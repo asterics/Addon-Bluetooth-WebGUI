@@ -203,7 +203,7 @@ ATDevice.upgradeBTAddon = async function (firmwareArrayBuffer, progressCallback)
         log.info('starting sending raw data');
         return _communicator.sendRawData(firmwareArrayBuffer, progressCallback);
     }).then(() => {
-        return _communicator.waitForReceiving('OTA:$FIN', 15000);
+        return _communicator.waitForReceiving('OTA:$FIN', 20000);
     }).then(() => {
         log.info('bluetooth upgrade successful!');
         return Promise.resolve();
