@@ -42,6 +42,8 @@ C.AT_CMD_MOUSE_TOGGLE_M = 'AT TM';
 C.AT_CMD_MOUSEWHEEL_UP = 'AT WU';
 C.AT_CMD_MOUSEWHEEL_DOWN = 'AT WD';
 
+C.AT_CMD_MOUSE_MOVEX = 'AT MX';
+C.AT_CMD_MOUSE_MOVEY = 'AT MY';
 C.AT_CMD_ORIENTATION_ANGLE = 'AT RO';
 
 C.AT_CMD_JOYSTICK_X = 'AT JX';
@@ -195,6 +197,18 @@ C.AT_CMDS_ACTIONS = [{
     cmd: C.AT_CMD_MOUSEWHEEL_DOWN,
     label: 'Scroll up // Nach oben scrollen',
     category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_MOUSE_MOVEX,
+    label: 'Move mouse horizontally (x-axis) // Maus horizontal bewegen (x-Achse)',
+    shortLabel: 'Move mouse x-axis // Mausbewegung x-Achse',
+    category: C.AT_CMD_CAT_MOUSE,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_MOUSE_MOVEY,
+    label: 'Move mouse vertically (y-axis) // Maus vertikal bewegen (y-Achse)',
+    shortLabel: 'Move mouse x-axis // Mausbewegung y-Achse',
+    category: C.AT_CMD_CAT_MOUSE,
+    input: C.INPUTFIELD_TYPE_NUMBER
 }, {
     cmd: C.AT_CMD_KEYHOLD,
     label: 'Hold key(s) (as long as input action) // Taste(n) halten (für Dauer der Eingabe-Aktion)',
