@@ -61,6 +61,10 @@ C.AT_CMD_CATEGORIES = [{
 }];
 
 C.AT_CMDS_ACTIONS = C.AT_CMDS_ACTIONS.concat([{
+    cmd: C.AT_CMD_CALIBRATION,
+    label: 'Calibrate stick middle position // Stick-Mittelposition kalibrieren',
+    category: C.AT_CMD_CAT_DEVICE
+}, {
     cmd: C.AT_CMD_IR_PLAY,
     label: 'Play infrared command // Infrarot-Kommando abspielen',
     category: C.AT_CMD_CAT_IR,
@@ -76,7 +80,7 @@ C.AT_CMDS_ACTIONS = C.AT_CMDS_ACTIONS.concat([{
     cmd: C.AT_CMD_IR_STOP,
     label: 'Stop infrared command // Infrarot-Kommando stoppen',
     category: C.AT_CMD_CAT_IR
-}])
+}]);
 
 C.BTN_CAT_BTN = 'BTN_CAT_BTN';
 C.BTN_CAT_STICK = 'BTN_CAT_STICK';

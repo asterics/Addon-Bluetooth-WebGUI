@@ -254,10 +254,6 @@ C.AT_CMDS_ACTIONS = [{
     input: C.INPUTFIELD_TYPE_SELECT,
     optionsFn: ATDevice.getSlots
 }, {
-    cmd: C.AT_CMD_CALIBRATION,
-    label: 'Calibrate stick middle position // Stick-Mittelposition kalibrieren',
-    category: C.AT_CMD_CAT_DEVICE
-}, {
     cmd: C.AT_CMD_JOYSTICK_X,
     label: 'Joystick set x-axis // Joystick x-Achse setzen',
     category: C.AT_CMD_CAT_JOYSTICK,
