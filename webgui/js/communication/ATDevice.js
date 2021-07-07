@@ -355,7 +355,9 @@ ATDevice.setSlot = function (slot, dontSendToDevice) {
         if (!dontSendToDevice) {
             ATDevice.save();
             ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, slot);
-            ATDevice.sendATCmd(C.AT_CMD_CALIBRATION);
+            if (C.DEVICE_IS_FM) {
+                ATDevice.sendATCmd(C.AT_CMD_CALIBRATION);
+            }
         }
         _currentSlot = slot;
     }
