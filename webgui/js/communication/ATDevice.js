@@ -377,7 +377,7 @@ ATDevice.createSlot = function (slotName) {
         config: L.deepCopy(slotConfig)
     });
     ATDevice.sendATCmd(C.AT_CMD_SAVE_SLOT, slotName);
-    ATDevice.setSlot(slotName);
+    ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, slotName);
     if (_slotChangeHandler) {
         _slotChangeHandler();
     }
