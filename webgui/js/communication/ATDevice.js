@@ -246,10 +246,13 @@ ATDevice.setConfig = function (atCmd, value, debounceTimeout) {
         debounceTimeout = 300;
     }
     setConfigInternal(atCmd, value);
-    L.debounce(function () {
-        ATDevice.sendATCmd(atCmd, value);
-    }, debounceTimeout, atCmd);
-    ATDevice.planSaving();
+    return new Promise(resolve => {
+        L.debounce(function () {
+            ATDevice.sendATCmd(atCmd, value);
+            resolve();
+        }, debounceTimeout, atCmd);
+        ATDevice.planSaving();
+    });
 };
 
 ATDevice.refreshConfig = function () {
@@ -441,16 +444,14 @@ ATDevice.restoreDefaultConfiguration = function () {
 };
 
 ATDevice.setDeviceMode = function (modeNr, slot) {
-    let originalSlot = _currentSlot;
     if (slot !== _currentSlot) {
         ATDevice.save();
         ATDevice.setSlot(slot);
     }
-    ATDevice.sendATCmd(C.AT_CMD_DEVICE_MODE, modeNr);
-    ATDevice.save();
-    if (originalSlot !== _currentSlot) {
-        ATDevice.setSlot(originalSlot);
-    }
+    ATDevice.setConfig(C.AT_CMD_DEVICE_MODE, modeNr, 0).then(() => {
+        ATDevice.save();
+        ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, _currentSlot);
+    });
 }
 
 ATDevice.parseConfig = function(atCmdsString) {

@@ -86,7 +86,7 @@ class TabGeneral extends Component {
                 <div class="row">
                     <label class="col-md-4" for="${'devicemode' + slot}">${L.translate('Mode for Slot "{?}" // Modus für Slot "{?}"', slot)}</label>
                     <div class="col-md-6">
-                        <select class="col-12" id="${'devicemode' + slot}" onchange="${(event) => ATDevice.setDeviceMode(event.target.value, slot)}">
+                        <select class="col-12" id="${'devicemode' + slot}" onchange="${(event) => ATDevice.setDeviceMode(event.target.value, slot)}" value="${ATDevice.getConfig(C.AT_CMD_DEVICE_MODE, slot)}">
                             <option value="1">USB</option>
                             <option value="2">Bluetooth</option>
                             <option value="3">USB + Bluetooth</option>
