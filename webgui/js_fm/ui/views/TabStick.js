@@ -3,6 +3,7 @@ import htm from '../../../lib/htm.min.js';
 import {PositionVisualization} from "../components/PositionVisualization.js";
 import {preactUtil} from "../../util/preactUtil.js";
 import {RadioFieldset} from "../../../js/ui/components/RadioFieldset.js";
+import {Slider} from "../../../js/ui/components/Slider.js";
 import {ATDevice} from "../../../js/communication/ATDevice.js";
 import {FLipMouse} from "../../communication/FLipMouse.js";
 
@@ -23,13 +24,11 @@ class TabStick extends Component {
         additionalState[C.AT_CMD_SENSITIVITY_Y] = ATDevice.getConfig(C.AT_CMD_SENSITIVITY_Y);
         additionalState[C.AT_CMD_DEADZONE_X] = ATDevice.getConfig(C.AT_CMD_DEADZONE_X);
         additionalState[C.AT_CMD_DEADZONE_Y] = ATDevice.getConfig(C.AT_CMD_DEADZONE_Y);
+        additionalState[C.AT_CMD_MAX_SPEED] = ATDevice.getConfig(C.AT_CMD_MAX_SPEED);
+        additionalState[C.AT_CMD_ACCELERATION] = ATDevice.getConfig(C.AT_CMD_ACCELERATION);
         this.setState(additionalState);
 
         FLipMouse.resetMinMaxLiveValues();
-    }
-    
-    sliderChanged(event, constants) {
-        this.valueChanged(event.target.value, constants);
     }
 
     valueChanged(value, constants) {
@@ -53,36 +52,11 @@ class TabStick extends Component {
             <h2>${L.translate('Stick configuration (slot "{?}") // Stick-Konfiguration (Slot "{?}")', ATDevice.getCurrentSlot())}</h2>
             <span id="posLiveA11yLabel" class="sr-only">${L.translate('Current position of FLipMouse Stick // Aktuelle Position des Sticks der FLipMouse')}</span>
             <span id="posLiveA11y" aria-describedby="posLiveA11yLabel" class="onlyscreenreader" role="status" aria-live="off" accesskey="q" tabindex="-1"></span>
+
             <div class="mb-5">
                 ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => FLipMouse.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${state.mouseMode}"/>`}
             </div>
-            <div id="basic-SENSITIVITY-single" style="display: ${!state.splitSensitivity ? 'block' : 'none'}">
-                <label for="SENSITIVITY">${L.translate('Sensitivity: // Sensitivität:')}</label>
-                <a aria-hidden="true" class="u-pull-right" href="javascript:;" onclick="${() => this.toggleState('splitSensitivity', [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_X])}">${L.translate('show x/y separately // zeige x/y getrennt')}</a>
-                <div class="row">
-                    <span aria-hidden="true" id="SENSITIVITY_VAL" class="text-center one column">${state[C.AT_CMD_SENSITIVITY_X]}</span>
-                    <input type="range" value="${state[C.AT_CMD_SENSITIVITY_X]}" oninput="${(event) => this.sliderChanged(event, [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y])}"
-                           id="SENSITIVITY" min="0" max="255" class="eleven columns" accesskey="a"/>
-                </div>
-            </div>
-            <div id="basic-SENSITIVITY-xy" style="display: ${state.splitSensitivity ? 'block' : 'none'}">
-                <label for="SENSITIVITY_X">${L.translate('Horizontal Sensitivity: // Sensitivität horizontal:')}</label>
-                <a aria-hidden="true" class="u-pull-right" href="javascript:;" onclick="${() => this.toggleState('splitSensitivity', [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y])}">${L.translate('hide separate x/y // zeige  x/y gemeinsam')}</a>
-                <div class="row">
-                    <span id="SENSITIVITY_X_VAL" class="text-center one column">${state[C.AT_CMD_SENSITIVITY_X]}</span>
-                    <input type="range" value="${state[C.AT_CMD_SENSITIVITY_X]}" oninput="${(event) => this.sliderChanged(event, [C.AT_CMD_SENSITIVITY_X])}"
-                           id="SENSITIVITY_X" min="0" max="255" class="eleven columns"/>
-                </div>
-                <label for="SENSITIVITY_Y">${L.translate('Vertical Sensitivity: // Sensitivität vertikal:')}</label>
-                <div class="row">
-                    <span id="SENSITIVITY_Y_VAL" class="text-center one column">${state[C.AT_CMD_SENSITIVITY_Y]}</span>
-                    <input type="range" value="${state[C.AT_CMD_SENSITIVITY_Y]}" oninput="${(event) => this.sliderChanged(event, [C.AT_CMD_SENSITIVITY_Y])}"
-                           id="SENSITIVITY_Y" min="0" max="255" class="eleven columns"/>
-                </div>
-            </div>
-
-            <br/>
-            <div class="row">
+            <div class="row mt-3 mb-5">
                 <div id="posVisBasic" class="six columns">
                     <${PositionVisualization} mode="tabStick"/>
                 </div>
@@ -95,29 +69,42 @@ class TabStick extends Component {
                     </button>
                 </div>
             </div>
-
-            <br/>
-            <div id="basic-DEADZONE-single" style="display: ${!state.splitDeadzone ? 'block' : 'none'}">
-                <label lang="en" for="DEADZONE">Deadzone:</label>
-                <a aria-hidden="true" class="u-pull-right" href="javascript:;" onclick="${() => this.toggleState('splitDeadzone', [C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y])}">${L.translate('show x/y separately // zeige x/y getrennt')}</a>
-                <div class="row">
-                    <span aria-hidden="true" id="DEADZONE_VAL" class="text-center one column">${state[C.AT_CMD_DEADZONE_X]}</span>
-                    <input type="range" value="${state[C.AT_CMD_DEADZONE_X]}" oninput="${(event) => this.sliderChanged(event, [C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y])}" id="DEADZONE" min="0" max="650" class="eleven columns" accesskey="s"/>
+            
+            <div style="display: ${!state.splitSensitivity ? 'block' : 'none'}">
+                ${html`<${Slider} label="Sensitivity: // Sensitivität:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_X]}"
+                        min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y]}"
+                        toggleFn="${() => this.toggleState('splitSensitivity', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`}
+            </div>
+            <div style="display: ${state.splitSensitivity ? 'block' : 'none'}">
+                ${html`<${Slider} label="Horizontal Sensitivity: // Sensitivität horizontal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_X]}"
+                        min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_X]}"
+                        toggleFn="${() => this.toggleState('splitSensitivity', [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>`}
+                ${html`<${Slider} label="Vertical Sensitivity: // Sensitivität vertikal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_Y]}"
+                        min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_Y]}"/>`}
+            </div>
+            <div class="mt-4">
+                <div  style="display: ${!state.splitDeadzone ? 'block' : 'none'}">
+                    ${html`<${Slider} label="Deadzone:" lang="en" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
+                        min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y]}"
+                        toggleFn="${() => this.toggleState('splitDeadzone', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`}
+                </div>
+                <div style="display: ${state.splitDeadzone ? 'block' : 'none'}">
+                    ${html`<${Slider} label="Horizontal Deadzone: // Deadzone horizontal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
+                        min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_X]}"
+                        toggleFn="${() => this.toggleState('splitDeadzone', [C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>`}
+                    ${html`<${Slider} label="Vertical Deadzone: // Deadzone vertikal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_Y]}"
+                        min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_Y]}"/>`}
                 </div>
             </div>
-            <div id="basic-DEADZONE-xy" style="display: ${state.splitDeadzone ? 'block' : 'none'}">
-                <label for="DEADZONE_X">Horizontal Deadzone:</label>
-                <a aria-hidden="true" class="u-pull-right" href="javascript:;" onclick="${() => this.toggleState('splitDeadzone', [C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y])}">${L.translate('hide separate x/y // zeige x/y gemeinsam')}</a>
-                <div class="row">
-                    <span id="DEADZONE_X_VAL" class="text-center one column">${state[C.AT_CMD_DEADZONE_X]}</span>
-                    <input type="range" value="${state[C.AT_CMD_DEADZONE_X]}" oninput="${(event) => this.sliderChanged(event, [C.AT_CMD_DEADZONE_X])}" id="DEADZONE_X" min="0" max="650" class="eleven columns"/>
-                </div>
-                <label for="DEADZONE_Y">Vertical Deadzone:</label>
-                <div class="row">
-                    <span id="DEADZONE_Y_VAL" class="text-center one column">${state[C.AT_CMD_DEADZONE_Y]}</span>
-                    <input type="range" value="${state[C.AT_CMD_DEADZONE_Y]}" oninput="${(event) => this.sliderChanged(event, [C.AT_CMD_DEADZONE_Y])}" id="DEADZONE_Y" min="0" max="650" class="eleven columns"/>
-                </div>
-            </div>`;
+            <div class="mt-4">
+                ${html`<${Slider} label="Maximum speed: // Maximale Geschwindigkeit:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_MAX_SPEED]}"
+                    min="0" max="100" updateConstants="${[C.AT_CMD_MAX_SPEED]}"/>`}
+            </div>
+            <div class="mt-4">
+                ${html`<${Slider} label="Acceleration: // Beschleunigung:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_ACCELERATION]}"
+                    min="0" max="100" updateConstants="${[C.AT_CMD_ACCELERATION]}"/>`}
+            </div>
+            `;
     }
 }
 
