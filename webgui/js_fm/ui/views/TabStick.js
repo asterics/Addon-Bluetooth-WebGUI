@@ -84,15 +84,15 @@ class TabStick extends Component {
             </div>
             <div class="mt-4">
                 <div  style="display: ${!state.splitDeadzone ? 'block' : 'none'}">
-                    ${html`<${Slider} label="Deadzone:" lang="en" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
+                    ${html`<${Slider} label="<span lang="en">Deadzone:</span>" lang="en" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
                         min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y]}"
                         toggleFn="${() => this.toggleState('splitDeadzone', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`}
                 </div>
                 <div style="display: ${state.splitDeadzone ? 'block' : 'none'}">
-                    ${html`<${Slider} label="Horizontal Deadzone: // Deadzone horizontal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
+                    ${html`<${Slider} label="Horizontal Deadzone: // <span lang="en">Deadzone:</span> horizontal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
                         min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_X]}"
                         toggleFn="${() => this.toggleState('splitDeadzone', [C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>`}
-                    ${html`<${Slider} label="Vertical Deadzone: // Deadzone vertikal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_Y]}"
+                    ${html`<${Slider} label="Vertical Deadzone: // <span lang="en">Deadzone:</span> vertikal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_Y]}"
                         min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_Y]}"/>`}
                 </div>
             </div>

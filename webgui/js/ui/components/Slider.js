@@ -16,7 +16,7 @@ class Slider extends Component {
         let id = props.updateConstants[0];
         return html`
             <div class="d-flex justify-content-between">
-                <label for="${id}" lang="${props.lang}">${L.translate(props.label)}</label>
+                <label for="${id}" lang="${props.lang}" dangerouslySetInnerHTML="${{__html: L.translate(props.label)}}"></label>
                 <a href="javascript:;" onclick="${() => props.toggleFn()}">${L.translate(props.toggleFnLabel)}</a>
             </div>
             <div class="row">
