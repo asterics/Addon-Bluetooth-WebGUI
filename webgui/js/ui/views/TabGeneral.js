@@ -4,6 +4,7 @@ import {ATDevice} from "../../communication/ATDevice.js";
 
 const html = htm.bind(h);
 let unknown = L.translate('(unknown) // (unbekannt)')
+window.showUpgradeButton = false;
 class TabGeneral extends Component {
 
     constructor() {
@@ -123,7 +124,7 @@ class TabGeneral extends Component {
             <div class="row">
                 <span class="col col-md-4">${L.translate('Available version // Verfügbare Version')}</span>   
                 <a href="${this.state.newBtVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newBtVersion}</a>   
-                <div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.btVersion, this.state.newBtVersion) ? '' : 'd-none'}">
+                <div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.btVersion, this.state.newBtVersion) || window.showUpgradeButton ? '' : 'd-none'}">
                     <button class="col-12" onclick="${() => this.updateBTFirmware()}" disabled="${this.state.btUpgradeProgress}">
                         <span class="${this.state.btUpgradeProgress ? 'd-none' : ''}"><span class="sr-only">Bluetooth-Addon: </span>${L.translate('Update firmware // Firmware aktualisieren')}</span>
                         <span class="${this.state.btUpgradeProgress ? '' : 'd-none'}"><span class="sr-only">Bluetooth-Addon: </span>${L.translate('Updating... {?}% // Aktualisiere... {?}%', state.btUpgradeProgress)}</span>
