@@ -58,6 +58,9 @@ C.AT_CMD_CATEGORIES = [{
 }, {
     constant: C.AT_CMD_CAT_IR,
     label: 'Infrared // Infrarot'
+}, {
+    constant: C.AT_CMD_CAT_MACRO,
+    label: 'Macro // Makro'
 }];
 
 C.AT_CMDS_ACTIONS = C.AT_CMDS_ACTIONS.concat([{

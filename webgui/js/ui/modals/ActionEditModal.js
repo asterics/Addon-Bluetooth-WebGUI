@@ -4,6 +4,7 @@ import {InputKeyboard} from "../components/InputKeyboard.js";
 import {ManageIR} from "../../../js_fm/ui/components/ManageIR.js";
 import {RadioFieldset} from "../components/RadioFieldset.js";
 import {ATDevice} from "../../communication/ATDevice.js";
+import {InputMacro} from "../components/InputMacro.js";
 
 const html = htm.bind(h);
 class ActionEditModal extends Component {
@@ -167,6 +168,8 @@ class ActionEditModal extends Component {
                                                 </div>`;
                                         case C.INPUTFIELD_TYPE_KEYBOARD:
                                             return html`<${InputKeyboard} value="${state.atCmdSuffix}"  onchange="${(value) => this.setAtCmdSuffix(value)}"/>`;
+                                        case C.INPUTFIELD_TYPE_MACRO:
+                                            return html`<${InputMacro} value="${state.atCmdSuffix}"  onchange="${(value) => this.setAtCmdSuffix(value)}"/>`;
                                     }
                                 })()}
                                 ${(() => {

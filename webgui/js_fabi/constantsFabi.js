@@ -39,6 +39,9 @@ C.AT_CMD_CATEGORIES = [{
 }, {
     constant: C.AT_CMD_CAT_DEVICE,
     label: 'Device // Gerät'
+}, {
+    constant: C.AT_CMD_CAT_MACRO,
+    label: 'Macro // Makro'
 }];
 
 C.BTN_CAT_BTN = 'BTN_CAT_BTN';
