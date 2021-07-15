@@ -1,6 +1,7 @@
 import {TabSlots} from "../js/ui/views/TabSlots.js";
 import {TabActions} from "../js/ui/views/TabActions.js";
 import {TabGeneral} from "../js/ui/views/TabGeneral.js";
+import {TabTimings} from "./ui/views/TabTimings.js";
 
 window.C = window.C || {};
 
@@ -17,6 +18,10 @@ C.VIEWS = [{
     object: TabActions,
     hash: '#tabActions',
     label: 'Actions // Aktionen'
+}, {
+    object: TabTimings,
+    hash: '#tabTimings',
+    label: 'Timings'
 }, {
     object: TabSlots,
     hash: '#tabSlots',
