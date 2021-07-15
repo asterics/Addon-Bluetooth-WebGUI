@@ -130,7 +130,7 @@ class InputMacro extends Component {
                 <div class="col-md-8">
                     <ol style="list-style-type: none">
                         ${state.commandList.map((atCmd, index) => {
-                            let atCmdObject = this.getAtCmdObject('AT ' + atCmd);
+                            let atCmdObject = this.getAtCmdObject('AT ' + atCmd.trim());
                             let title = L.translate(atCmdObject ? atCmdObject.label : '');
                             return html`<li>
                                 <span title="${title}" class="${C.IS_TOUCH_DEVICE ? 'd-none' : ''}">\u24D8 </span>
