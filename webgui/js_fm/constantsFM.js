@@ -66,6 +66,7 @@ C.AT_CMD_CATEGORIES = [{
 C.AT_CMDS_ACTIONS = C.AT_CMDS_ACTIONS.concat([{
     cmd: C.AT_CMD_CALIBRATION,
     label: 'Calibrate stick middle position // Stick-Mittelposition kalibrieren',
+    shortLabel: 'Calibrate stick // Stick kalibrieren',
     category: C.AT_CMD_CAT_DEVICE
 }, {
     cmd: C.AT_CMD_IR_PLAY,

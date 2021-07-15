@@ -166,21 +166,22 @@ C.AT_CMDS_ACTIONS = [{
 }, {
     cmd: C.AT_CMD_DOUBLECLICK_MOUSE_L,
     label: 'Double click left mouse button // Doppelklick linke Maustaste',
+    shortLabel: 'Double click mouse left // Doppelklick linke Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_MOUSE_TOGGLE_L,
     label: 'Press or release left mouse button (toggle) // Drücken oder Loslassen linke Maustaste (wechseln)',
-    shortLabel: 'Press/release left mouse button // Drücken/Loslassen linke Maustaste',
+    shortLabel: 'Toggle left mouse button // Umschalten linke Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_MOUSE_TOGGLE_R,
     label: 'Press or release right mouse button (toggle) // Drücken oder Loslassen rechte Maustaste (wechseln)',
-    shortLabel: 'Press/release right mouse button // Drücken/Loslassen rechte Maustaste',
+    shortLabel: 'Toggle right mouse button // Umschalten rechte Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_MOUSE_TOGGLE_M,
     label: 'Press or release middle mouse button (toggle) // Drücken oder Loslassen mittlere Maustaste (wechseln)',
-    shortLabel: 'Press/release middle mouse button // Drücken/Loslassen mittlere Maustaste',
+    shortLabel: 'Toggle middle mouse button // Umschalten mittlere Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_RELEASE_MOUSE_L,
@@ -295,7 +296,7 @@ C.AT_CMDS_ACTIONS = [{
     input: C.INPUTFIELD_TYPE_NUMBER
 }, {
     cmd: C.AT_CMD_JOYSTICK_HAT_POS,
-    label: 'Set hat switch position // Joystick Rundblickschalter-Position setzen',
+    label: 'Set joystick hat position // Joystick Hat-Position setzen',
     category: C.AT_CMD_CAT_JOYSTICK,
     input: C.INPUTFIELD_TYPE_NUMBER
 }, {
