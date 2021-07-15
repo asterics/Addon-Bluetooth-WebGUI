@@ -59,6 +59,9 @@ class MainView extends Component {
                     currentSlot: ATDevice.getCurrentSlot(),
                     slots: ATDevice.getSlots()
                 });
+                if (thiz.state.currentView && thiz.state.currentView.object && thiz.state.currentView.object.slotChangeHandler) {
+                    thiz.state.currentView.object.slotChangeHandler();
+                }
             });
             ATDevice.addConnectionTestHandler((isConnected) => {
                 if (isConnected !== thiz.state.connected) {
