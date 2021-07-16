@@ -384,6 +384,34 @@ L.clearDebounce = function (key) {
 };
 
 /**
+ * Throttles a high call rate on a given function.
+ *
+ * @param fn the function to call
+ * @param minPauseMs minimum pause in milliseconds between two function calls of the same function. If last call
+ *        was more than minPausMs ago, the given function is called, otherwise the function call is discarded.
+ * @param key unique key to identify the given function (optional)
+ */
+L._throttleHistory = {};
+L.throttle = function (fn, minPauseMs, key) {
+    if (!fn || !fn.apply) {
+        return;
+    }
+    minPauseMs = minPauseMs || 500;
+    let historyKey = key || fn;
+    let lastCall = L._throttleHistory[historyKey];
+    if (!lastCall || new Date().getTime() - lastCall > minPauseMs) {
+        fn.apply(null, []);
+        L._throttleHistory[historyKey] = new Date().getTime();
+        L.clearDebounce(key);
+    } else {
+        L.debounce(() => {
+            L._throttleHistory[historyKey] = new Date().getTime();
+            fn();
+        }, minPauseMs, key)
+    }
+};
+
+/**
  * returns minimum of both values, or the non-NaN value of one value is NaN
  * @param val1
  * @param val2

@@ -6,6 +6,7 @@ import {RadioFieldset} from "../../../js/ui/components/RadioFieldset.js";
 import {Slider} from "../../../js/ui/components/Slider.js";
 import {ATDevice} from "../../../js/communication/ATDevice.js";
 import {FLipMouse} from "../../communication/FLipMouse.js";
+import {SlotsSelector} from "../../../js/ui/components/SlotsSelector.js";
 
 const html = htm.bind(h);
 
@@ -16,7 +17,8 @@ class TabStick extends Component {
         this.state = {
             splitSensitivity: ATDevice.getConfig(C.AT_CMD_SENSITIVITY_X) !== ATDevice.getConfig(C.AT_CMD_SENSITIVITY_Y),
             splitDeadzone: ATDevice.getConfig(C.AT_CMD_DEADZONE_X) !== ATDevice.getConfig(C.AT_CMD_DEADZONE_Y),
-            mouseMode: ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)
+            mouseMode: ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE),
+            applySlots: ATDevice.getSlots()
         }
 
         this.atCmds = [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y, C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y, C.AT_CMD_MAX_SPEED, C.AT_CMD_ACCELERATION];
@@ -33,7 +35,8 @@ class TabStick extends Component {
         let state = {};
         constants.forEach(constant => {
             state[constant] = value;
-            ATDevice.setConfig(constant, value);
+            let values = this.atCmds.map(atCmd => state[atCmd] || this.state[atCmd]);
+            ATDevice.setConfigForSlots(this.atCmds, values, this.state.applySlots, 5000);
         });
         this.setState(state);
     }
@@ -45,24 +48,19 @@ class TabStick extends Component {
     
     render() {
         let state = this.state;
+        let disable = state.applySlots.length === 0;
 
         return html`
-            <h2>${L.translate('Stick configuration (slot "{?}") // Stick-Konfiguration (Slot "{?}")', ATDevice.getCurrentSlot())}</h2>
-            <span id="posLiveA11yLabel" class="sr-only">${L.translate('Current position of FLipMouse Stick // Aktuelle Position des Sticks der FLipMouse')}</span>
-            <span id="posLiveA11y" aria-describedby="posLiveA11yLabel" class="onlyscreenreader" role="status" aria-live="off" accesskey="q" tabindex="-1"></span>
-
-            <div class="mb-5">
-                ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => FLipMouse.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${state.mouseMode}"/>`}
-            </div>
-            <div class="row mt-3 mb-5">
+            <h2>${L.translate('Stick configuration // Stick-Konfiguration')}</h2>
+            <div class="row mt-5 mb-5">
                 <div id="posVisBasic" class="six columns">
                     <${PositionVisualization} mode="tabStick"/>
                 </div>
                 <div class="five columns">
-                    <button onclick="${() => FLipMouse.calibrate()}">
+                    <button onclick="${() => FLipMouse.calibrate()}" disabled="${disable}">
                         <span>${L.translate('Calibrate middle position // Mittelposition kalibrieren')}</span>
                     </button>
-                    <button onclick="${() => FLipMouse.rotate()}">
+                    <button onclick="${() => FLipMouse.rotate()}" disabled="${disable}">
                         <span>${L.translate('\u21BB Rotate right // \u21BB Nach rechts drehen')}</span>
                     </button>
                 </div>
@@ -70,38 +68,40 @@ class TabStick extends Component {
             
             <div style="display: ${!state.splitSensitivity ? 'block' : 'none'}">
                 ${html`<${Slider} label="Sensitivity: // Sensitivität:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_X]}"
-                        min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y]}"
+                        min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y]}" disabled="${disable}"
                         toggleFn="${() => this.toggleState('splitSensitivity', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`}
             </div>
             <div style="display: ${state.splitSensitivity ? 'block' : 'none'}">
                 ${html`<${Slider} label="Horizontal Sensitivity: // Sensitivität horizontal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_X]}"
-                        min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_X]}"
+                        min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_X]}" disabled="${disable}"
                         toggleFn="${() => this.toggleState('splitSensitivity', [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>`}
                 ${html`<${Slider} label="Vertical Sensitivity: // Sensitivität vertikal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_Y]}"
-                        min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_Y]}"/>`}
+                        min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_Y]}" disabled="${disable}"/>`}
             </div>
             <div class="mt-4">
                 <div  style="display: ${!state.splitDeadzone ? 'block' : 'none'}">
                     ${html`<${Slider} label="<span lang="en">Deadzone:</span>" lang="en" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
-                        min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y]}"
-                        toggleFn="${() => this.toggleState('splitDeadzone', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`}
+                        min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y]}" disabled="${disable}"
+                        toggleFn="${() => this.toggleState('splitDeadzone', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt" disabled="${disable}"/>`}
                 </div>
                 <div style="display: ${state.splitDeadzone ? 'block' : 'none'}">
                     ${html`<${Slider} label="Horizontal Deadzone: // <span lang="en">Deadzone:</span> horizontal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
-                        min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_X]}"
+                        min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_X]}" disabled="${disable}" disabled="${disable}"
                         toggleFn="${() => this.toggleState('splitDeadzone', [C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>`}
                     ${html`<${Slider} label="Vertical Deadzone: // <span lang="en">Deadzone:</span> vertikal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_Y]}"
-                        min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_Y]}"/>`}
+                        min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_Y]}" disabled="${disable}"/>`}
                 </div>
             </div>
             <div class="mt-4">
                 ${html`<${Slider} label="Maximum speed: // Maximale Geschwindigkeit:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_MAX_SPEED]}"
-                    min="0" max="100" updateConstants="${[C.AT_CMD_MAX_SPEED]}"/>`}
+                    min="0" max="100" updateConstants="${[C.AT_CMD_MAX_SPEED]}" disabled="${disable}"/>`}
             </div>
             <div class="mt-4">
                 ${html`<${Slider} label="Acceleration: // Beschleunigung:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_ACCELERATION]}"
-                    min="0" max="100" updateConstants="${[C.AT_CMD_ACCELERATION]}"/>`}
+                    min="0" max="100" updateConstants="${[C.AT_CMD_ACCELERATION]}" disabled="${disable}"/>`}
             </div>
+
+            ${html`<${SlotsSelector} onchange="${(selectedSlots => this.setState({applySlots: selectedSlots}))}"/>`}
             `;
     }
 }

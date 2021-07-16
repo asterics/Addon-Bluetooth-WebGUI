@@ -97,6 +97,22 @@ class TabGeneral extends Component {
                 </div>
             `)}
         </div>
+        <div class="container-fluid p-0 ${C.DEVICE_IS_FM ? '' : 'd-none'}">
+            <h3>${L.translate('Usage of stick // Stick-Verwendung')}</h3>
+            ${slots.map(slot => html`
+                <div class="row">
+                    <label class="col-md-4" for="${'mousemode' + slot}">${L.translate('Stick usage for Slot "{?}" // Stick-Verwendung für Slot "{?}"', slot)}</label>
+                    <div class="col-md-6">
+                        <select class="col-12" id="${'mousemode' + slot}" onchange="${(event) => ATDevice.Specific.setFlipmouseMode(event.target.value, slot)}" value="${ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot)}">
+                            ${C.FLIPMOUSE_MODES.map(mode => html`
+                                <option value="${mode.value}">${L.translate(mode.label)}</option>
+                            `)}
+                        </select>
+                    </div>
+                    
+                </div>
+            `)}
+        </div>
         <h2>${L.translate('Firmware versions // Firmware-Versionen')}</h2>
         <h3>${C.CURRENT_DEVICE} Firmware</h3>
         <div class="container-fluid p-0">
