@@ -9,6 +9,7 @@ let ATDevice = {};
 let _slots = [];
 let _currentSlot = null;
 let _slotChangeHandler = null;
+let _lastSlotChangeTime = 0;
 let _SLOT_CONSTANT = 'Slot:';
 let _valueHandler = null;
 let _liveValueLastUpdate = 0;
@@ -128,7 +129,7 @@ ATDevice.sendATCmd = function (atCmd, param, timeout, onlyIfNotBusy, dontLog) {
         return Promise.resolve(_AT_CMD_BUSY_RESPONSE);
     }
     if (_atCmdQueue.length > 0) {
-        if (!dontLog) console.log("adding cmd to queue: " + atCmd);
+        if (!dontLog) log.debug("adding cmd to queue: " + atCmd);
     }
     let queueElem = null;
     let cmd = param !== undefined ? atCmd + ' ' + param : atCmd;
@@ -242,9 +243,7 @@ ATDevice.getConfig = function (constant, slotName) {
 };
 
 ATDevice.setConfig = function (atCmd, value, debounceTimeout) {
-    if (debounceTimeout === undefined) {
-        debounceTimeout = 300;
-    }
+    debounceTimeout = debounceTimeout === undefined ? 300 : debounceTimeout;
     setConfigInternal(atCmd, value);
     return new Promise(resolve => {
         L.debounce(function () {
@@ -299,8 +298,7 @@ ATDevice.getButtonActionATCmdSuffix = function (index, slot) {
 
 ATDevice.save = async function () {
     ATDevice.abortAutoSaving();
-    ATDevice.sendATCmd('AT SA', _currentSlot);
-    return Promise.resolve();
+    return ATDevice.sendAtCmdWithResult('AT SA', _currentSlot);
 };
 
 ATDevice.planSaving = function () {
@@ -351,22 +349,22 @@ ATDevice.getSlotConfigText = function (slotName) {
 }
 
 ATDevice.setSlot = function (slot, dontSendToDevice) {
+    let promise = Promise.resolve();
     if (slot === _currentSlot) {
-        return;
+        return Promise.resolve();
     }
     if (ATDevice.getSlots().includes(slot)) {
         if (!dontSendToDevice) {
             ATDevice.save();
-            ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, slot);
+            promise = ATDevice.sendAtCmdWithResult(C.AT_CMD_LOAD_SLOT, slot);
             if (C.DEVICE_IS_FM) {
                 ATDevice.sendATCmd(C.AT_CMD_CALIBRATION);
             }
         }
         _currentSlot = slot;
     }
-    if (_slotChangeHandler) {
-        _slotChangeHandler();
-    }
+    emitSlotChange();
+    return promise;
 };
 
 ATDevice.createSlot = function (slotName) {
@@ -381,9 +379,7 @@ ATDevice.createSlot = function (slotName) {
     });
     ATDevice.sendATCmd(C.AT_CMD_SAVE_SLOT, slotName);
     ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, slotName);
-    if (_slotChangeHandler) {
-        _slotChangeHandler();
-    }
+    emitSlotChange();
     return Promise.resolve();
 };
 
@@ -399,9 +395,7 @@ ATDevice.deleteSlot = function (slotName) {
             ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, _currentSlot);
         }
     }
-    if (_slotChangeHandler) {
-        _slotChangeHandler();
-    }
+    emitSlotChange();
     return Promise.resolve();
 };
 
@@ -424,9 +418,7 @@ ATDevice.uploadSlots = async function (slotObjects) {
     if (slotObject) {
         ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, slotObject.name);
         _currentSlot = slotObject.name;
-        if (_slotChangeHandler) {
-            _slotChangeHandler();
-        }
+        emitSlotChange();
     }
 }
 
@@ -436,9 +428,7 @@ ATDevice.restoreDefaultConfiguration = function () {
     _slots = [];
     let promise = ATDevice.refreshConfig();
     promise.then(() => {
-        if (_slotChangeHandler) {
-            _slotChangeHandler();
-        }
+        emitSlotChange();
     })
     return promise;
 };
@@ -482,11 +472,21 @@ ATDevice.parseConfig = function(atCmdsString) {
     return parsedSlots;
 }
 
-function setConfigInternal(constant, value, slotName) {
-    let slotConfig = ATDevice.getSlotConfig(slotName || _currentSlot);
-    if (slotConfig) {
-        slotConfig[constant] = value;
+function emitSlotChange() {
+    if (_slotChangeHandler && new Date().getTime() - _lastSlotChangeTime > 200) {
+        _lastSlotChangeTime = new Date().getTime();
+        _slotChangeHandler();
     }
+}
+
+function setConfigInternal(constant, value, slots) {
+    slots = slots || [_currentSlot];
+    slots.forEach(slot => {
+        let slotConfig = ATDevice.getSlotConfig(slot);
+        if (slotConfig) {
+            slotConfig[constant] = parseInt(value);
+        }
+    });
 }
 
 function startTestingConnection() {
