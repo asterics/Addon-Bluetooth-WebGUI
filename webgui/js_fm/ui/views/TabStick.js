@@ -19,13 +19,11 @@ class TabStick extends Component {
             mouseMode: ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)
         }
 
+        this.atCmds = [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y, C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y, C.AT_CMD_MAX_SPEED, C.AT_CMD_ACCELERATION];
         let additionalState = {};
-        additionalState[C.AT_CMD_SENSITIVITY_X] = ATDevice.getConfig(C.AT_CMD_SENSITIVITY_X);
-        additionalState[C.AT_CMD_SENSITIVITY_Y] = ATDevice.getConfig(C.AT_CMD_SENSITIVITY_Y);
-        additionalState[C.AT_CMD_DEADZONE_X] = ATDevice.getConfig(C.AT_CMD_DEADZONE_X);
-        additionalState[C.AT_CMD_DEADZONE_Y] = ATDevice.getConfig(C.AT_CMD_DEADZONE_Y);
-        additionalState[C.AT_CMD_MAX_SPEED] = ATDevice.getConfig(C.AT_CMD_MAX_SPEED);
-        additionalState[C.AT_CMD_ACCELERATION] = ATDevice.getConfig(C.AT_CMD_ACCELERATION);
+        this.atCmds.forEach(atCmd => {
+            additionalState[atCmd] = ATDevice.getConfig(atCmd);
+        });
         this.setState(additionalState);
 
         FLipMouse.resetMinMaxLiveValues();
