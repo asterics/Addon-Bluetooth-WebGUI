@@ -45,18 +45,13 @@ FLipMouse.calibrate = function () {
     ATDevice.sendATCmd('AT CA');
 };
 
-FLipMouse.setFlipmouseMode = function (index, slot) {
+FLipMouse.setFlipmouseMode = function (index) {
     index = parseInt(index);
     if (!C.FLIPMOUSE_MODES.map(mode => mode.value).includes(index)) {
         return;
     }
-    if (slot !== ATDevice.getCurrentSlot()) {
-        ATDevice.setSlot(slot); //saves automatically
-    }
-    ATDevice.setConfig(C.AT_CMD_FLIPMOUSE_MODE, index, 0).then(() => {
-        ATDevice.save();
-        ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, ATDevice.getCurrentSlot());
-    });
+    ATDevice.setConfig(C.AT_CMD_FLIPMOUSE_MODE, index, 0);
+    ATDevice.planSaving();
 };
 
 FLipMouse.startLiveValueListener = function (handler) {

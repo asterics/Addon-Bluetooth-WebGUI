@@ -254,46 +254,6 @@ ATDevice.setConfig = function (atCmd, value, debounceTimeout) {
     });
 };
 
-ATDevice.setConfigForSlots = function(atCmds, values, slots, debounceTimeout) {
-    if (slots.length === 0 || atCmds.length === 0) {
-        return;
-    }
-    slots = slots.sort((a, b) => {
-        if (a === _currentSlot) return -1;
-        if (b === _currentSlot) return 1;
-        return 0;
-    });
-    // directly set config for testing
-    L.throttle(function () {
-        atCmds.forEach((atCmd, index) => {
-            if (ATDevice.getConfig(atCmd) !== parseInt(values[index])) {
-                ATDevice.sendATCmd(atCmd, values[index]);
-            }
-            setConfigInternal(atCmd, values[index]);
-        });
-    }, 500, 'setConfigForSlots-direct');
-    debounceTimeout = debounceTimeout === undefined ? 300 : debounceTimeout;
-    return new Promise(resolve => {
-        L.debounce(async function () {
-            for(const slot of slots) {
-                await ATDevice.setSlot(slot); // saves automatically
-                atCmds.forEach((atCmd, index) => {
-                    if (ATDevice.getConfig(atCmd, slot) !== parseInt(values[index])) {
-                        ATDevice.sendATCmd(atCmd, values[index]);
-                    }
-                });
-            }
-            atCmds.forEach((atCmd, index) => {
-                setConfigInternal(atCmd, values[index], slots);
-            });
-            ATDevice.save().then(() => {
-                log.warn('finished!')
-                resolve();
-            });
-        }, debounceTimeout, 'setConfigForSlots');
-    });
-}
-
 ATDevice.refreshConfig = function () {
     return new Promise(function (resolve, reject) {
         ATDevice.sendATCmd(C.AT_CMD_STOP_REPORTING_LIVE);

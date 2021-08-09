@@ -13,25 +13,23 @@ class Slider extends Component {
         props.updateConstants = props.updateConstants || [];
         props.toggleFn = props.toggleFn || (() => {});
         props.toggleFnLabel = props.toggleFnLabel || '';
-        props.disabled = props.disabled !== undefined ? props.disabled : false;
         let id = props.updateConstants[0];
         return html`
             <div class="d-flex justify-content-between">
                 <label for="${id}" lang="${props.lang}" dangerouslySetInnerHTML="${{__html: L.translate(props.label)}}"></label>
-                <a class="${this.props.disabled ? 'd-none' : ''}" href="javascript:;" onclick="${() => props.toggleFn()}">${L.translate(props.toggleFnLabel)}</a>
-                <span class="${this.props.disabled ? '' : 'd-none'}">${L.translate(props.toggleFnLabel)}</span>
+                <a href="javascript:;" onclick="${() => props.toggleFn()}">${L.translate(props.toggleFnLabel)}</a>
             </div>
-            <div class="row slider">
+            <div class="row">
                 <span aria-hidden="true" class="col-sm-1">${props.value}</span>
                 <input type="range" value="${props.value}" oninput="${(event) => props.oninput(event.target.value, props.updateConstants)}"
-                       id="${id}" min="${props.min}" max="${props.max}" class="col-sm-11" disabled="${this.props.disabled}" title="${this.props.disabled ? L.translate('Please select at least one slot below // Bitte unten mindestens einen Slot auswählen') : ''}"/>
+                       id="${id}" min="${props.min}" max="${props.max}" class="col-sm-11"/>
             </div>
             ${Slider.style}`;
     }
 }
 
 Slider.style = html`<style>
-    .slider
+
 </style>`
 
 export {Slider};
