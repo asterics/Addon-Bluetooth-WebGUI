@@ -130,10 +130,16 @@ class MainView extends Component {
                         switch (state.errorCode) {
                             case C.ERROR_SERIAL_DENIED: 
                                 return html`<span>${L.translate('Connecting to device not allowed or failed! // Verbindung zum Gerät nicht zugelassen oder fehlgeschlagen!')}</span>`;
-                           case C.ERROR_FIRMWARE_OUTDATED: 
+                            case C.ERROR_FIRMWARE_OUTDATED: 
                                 return html`
                                     <span>${L.translate('Firmware of device is outdated! // Firmware des Gerätes ist veraltet!')}</span>
                                     <div>${L.translate('Please download and install the latest firmware from: // Bitte aktuelle Firmware herunterladen und installieren:')}</div>
+                                    <div><a href="https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest" target="_blank">https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest</a></div>
+                                `;
+                            case C.ERROR_SERIAL_NOT_SUPPORTED:
+                                return html`
+                                    <span>${L.translate("Connecting to real device not supported by current browser! // Verbindung zu echtem Gerät wird von akuellem Browser nicht unterstützt!")}</span>
+                                    <div>${L.translate('Please try a different browser (Chrome) or use the offline configuration tool from: // Bitte verwenden Sie einen anderen Browser (Chrome) oder verwenden Sie das offline Konfigurations-Tool von:')}</div>
                                     <div><a href="https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest" target="_blank">https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest</a></div>
                                 `;
                         }

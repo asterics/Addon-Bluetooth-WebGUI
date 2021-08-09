@@ -22,9 +22,9 @@ function SerialCommunicator() {
     };
 
     this.init = async function () {
-        if (!("serial" in navigator)) {
+        if (!navigator.serial) {
             console.warn("Browser not supported, please use Chromium, Vivaldi, Edge or Chrome");
-            return Promise.reject("Browser does not support serial API");
+            return Promise.reject(C.ERROR_SERIAL_NOT_SUPPORTED);
         }
 
         //filter for arduino/Teensy VID/PID and our own ones
