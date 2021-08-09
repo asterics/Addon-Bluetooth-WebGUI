@@ -115,7 +115,7 @@ class MainView extends Component {
         let state = this.state;
 
         return html`
-        <div id="connectDiv" class="${state.showConnectionScreen ? '' : 'd-none'}">
+        <div class="top-layer-center ${state.showConnectionScreen? '' : 'd-none'}">
             <div class="container-fluid" id="connectContent">
                 <h1>${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
                 <div class="row">
