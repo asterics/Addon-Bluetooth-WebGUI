@@ -79,6 +79,9 @@ FLipMouse.resetMinMaxLiveValues = function () {
 };
 
 function parseLiveData(data) {
+    if (!ATDevice.parseLiveData) {
+        return;
+    }
     if (Object.keys(_liveData).length === 0) {
         FLipMouse.resetMinMaxLiveValues()
     }

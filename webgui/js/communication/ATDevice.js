@@ -5,6 +5,7 @@
  */
 
 let ATDevice = {};
+ATDevice.parseLiveData = true;
 
 let _slots = [];
 let _currentSlot = null;
@@ -355,8 +356,10 @@ ATDevice.setSlot = function (slot, dontSendToDevice) {
     }
     if (ATDevice.getSlots().includes(slot)) {
         if (!dontSendToDevice) {
+            ATDevice.parseLiveData = false; //prevent to parse old slot from live values before new slot applied on device
             ATDevice.save();
             promise = ATDevice.sendAtCmdWithResult(C.AT_CMD_LOAD_SLOT, slot);
+            promise.finally(() => ATDevice.parseLiveData = true);
             if (C.DEVICE_IS_FM) {
                 ATDevice.sendATCmd(C.AT_CMD_CALIBRATION);
             }

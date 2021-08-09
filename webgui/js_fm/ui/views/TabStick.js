@@ -13,19 +13,23 @@ class TabStick extends Component {
     constructor() {
         super();
 
-        this.state = {
+        TabStick.instance = this;
+        this.state = {};
+        this.initValues();
+    }
+
+    initValues() {
+        this.atCmds = [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y, C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y, C.AT_CMD_MAX_SPEED, C.AT_CMD_ACCELERATION];
+        this.setState({
             splitSensitivity: ATDevice.getConfig(C.AT_CMD_SENSITIVITY_X) !== ATDevice.getConfig(C.AT_CMD_SENSITIVITY_Y),
             splitDeadzone: ATDevice.getConfig(C.AT_CMD_DEADZONE_X) !== ATDevice.getConfig(C.AT_CMD_DEADZONE_Y),
             mouseMode: ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)
-        }
-
-        this.atCmds = [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y, C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y, C.AT_CMD_MAX_SPEED, C.AT_CMD_ACCELERATION];
+        });
         let additionalState = {};
         this.atCmds.forEach(atCmd => {
             additionalState[atCmd] = ATDevice.getConfig(atCmd);
         });
         this.setState(additionalState);
-
         FLipMouse.resetMinMaxLiveValues();
     }
 
@@ -109,6 +113,12 @@ class TabStick extends Component {
 TabStick.valueHandler = function (data) {
     if (PositionVisualization.instance) {
         PositionVisualization.instance.updateData(data);
+    }
+};
+
+TabStick.slotChangeHandler = function (data) {
+    if (TabStick.instance) {
+        TabStick.instance.initValues();
     }
 };
 
