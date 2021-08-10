@@ -6,6 +6,7 @@ import {RadioFieldset} from "../../../js/ui/components/RadioFieldset.js";
 import {Slider} from "../../../js/ui/components/Slider.js";
 import {ATDevice} from "../../../js/communication/ATDevice.js";
 import {FLipMouse} from "../../communication/FLipMouse.js";
+import {ActionButton} from "../../../js/ui/components/ActionButton.js";
 
 const html = htm.bind(h);
 
@@ -15,15 +16,14 @@ class TabStick extends Component {
 
         TabStick.instance = this;
         this.state = {};
+        this.atCmds = [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y, C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y, C.AT_CMD_MAX_SPEED, C.AT_CMD_ACCELERATION];
         this.initValues();
     }
 
     initValues() {
-        this.atCmds = [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y, C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y, C.AT_CMD_MAX_SPEED, C.AT_CMD_ACCELERATION];
         this.setState({
             splitSensitivity: ATDevice.getConfig(C.AT_CMD_SENSITIVITY_X) !== ATDevice.getConfig(C.AT_CMD_SENSITIVITY_Y),
-            splitDeadzone: ATDevice.getConfig(C.AT_CMD_DEADZONE_X) !== ATDevice.getConfig(C.AT_CMD_DEADZONE_Y),
-            mouseMode: ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)
+            splitDeadzone: ATDevice.getConfig(C.AT_CMD_DEADZONE_X) !== ATDevice.getConfig(C.AT_CMD_DEADZONE_Y)
         });
         let additionalState = {};
         this.atCmds.forEach(atCmd => {
@@ -56,7 +56,7 @@ class TabStick extends Component {
             <span id="posLiveA11y" aria-describedby="posLiveA11yLabel" class="onlyscreenreader" role="status" aria-live="off" accesskey="q" tabindex="-1"></span>
 
             <div class="mb-5">
-                ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => FLipMouse.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${state.mouseMode}"/>`}
+                ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => FLipMouse.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)}"/>`}
             </div>
             <div class="row mt-3 mb-5">
                 <div id="posVisBasic" class="six columns">
@@ -105,6 +105,18 @@ class TabStick extends Component {
             <div class="mt-4">
                 ${html`<${Slider} label="Acceleration: // Beschleunigung:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_ACCELERATION]}"
                     min="0" max="100" updateConstants="${[C.AT_CMD_ACCELERATION]}"/>`}
+            </div>
+            <div class="row" style="margin-top: 4em">
+                <div class="col">
+                    ${html`<${ActionButton} onclick="${() => ATDevice.copyConfigToAllSlots(this.atCmds)}"
+                                        label="Copy slider values to all slots // Regler-Werte auf alle Slots anwenden"
+                                        progressLabel="Applying to all slots... // Anwenden auf alle Slots..."/>`}
+                </div>
+                <div class="col">
+                    ${html`<${ActionButton} onclick="${() => ATDevice.copyConfigToAllSlots([C.AT_CMD_FLIPMOUSE_MODE])}"
+                                        label="Copy stick usage to all slots // Stick-Verwendung auf alle Slots anwenden"
+                                        progressLabel="Applying to all slots... // Anwenden auf alle Slots..."/>`}
+                </div>
             </div>
             `;
     }

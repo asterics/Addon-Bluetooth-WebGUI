@@ -2,6 +2,7 @@ import { h, Component } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
 import {Slider} from "../../../js/ui/components/Slider.js";
 import {ATDevice} from "../../../js/communication/ATDevice.js";
+import {ActionButton} from "../../../js/ui/components/ActionButton.js";
 
 const html = htm.bind(h);
 
@@ -11,17 +12,15 @@ class TabTimings extends Component {
 
         TabTimings.instance = this;
         this.state = {};
+        this.atCmds = [C.AT_CMD_THRESHOLD_LONGPRESS, C.AT_CMD_THRESHOLD_DOUBLEPRESS, C.AT_CMD_THRESHOLD_AUTODWELL, C.AT_CMD_ANTITREMOR_PRESS, C.AT_CMD_ANTITREMOR_RELEASE, C.AT_CMD_ANTITREMOR_IDLE];
         this.updateState();
     }
     
     updateState() {
         let state = {};
-        state[C.AT_CMD_THRESHOLD_LONGPRESS] = ATDevice.getConfig(C.AT_CMD_THRESHOLD_LONGPRESS);
-        state[C.AT_CMD_THRESHOLD_DOUBLEPRESS] = ATDevice.getConfig(C.AT_CMD_THRESHOLD_DOUBLEPRESS);
-        state[C.AT_CMD_THRESHOLD_AUTODWELL] = ATDevice.getConfig(C.AT_CMD_THRESHOLD_AUTODWELL);
-        state[C.AT_CMD_ANTITREMOR_PRESS] = ATDevice.getConfig(C.AT_CMD_ANTITREMOR_PRESS);
-        state[C.AT_CMD_ANTITREMOR_RELEASE] = ATDevice.getConfig(C.AT_CMD_ANTITREMOR_RELEASE);
-        state[C.AT_CMD_ANTITREMOR_IDLE] = ATDevice.getConfig(C.AT_CMD_ANTITREMOR_IDLE);
+        for (let atCmd of this.atCmds) {
+            state[atCmd] = ATDevice.getConfig(atCmd);
+        }
         this.setState(state);
     }
 
@@ -54,6 +53,11 @@ class TabTimings extends Component {
                         min="0" max="9999" updateConstants="${[C.AT_CMD_THRESHOLD_DOUBLEPRESS]}"/>`}
             ${html`<${Slider} label="Threshold automatic left click: // Schwellenwert für automatischen Linksklick:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_THRESHOLD_AUTODWELL]}"
                         min="0" max="5000" updateConstants="${[C.AT_CMD_THRESHOLD_AUTODWELL]}"/>`}
+            <div style="margin-top: 4em">
+                ${html`<${ActionButton} onclick="${() => ATDevice.copyConfigToAllSlots(this.atCmds)}"
+                                        label="Copy config to all slots // Konfiguration auf alle Slots anwenden"
+                                        progressLabel="Applying to all slots... // Anwenden auf alle Slots..."/>`}
+            </div>
         `;
     }
 }

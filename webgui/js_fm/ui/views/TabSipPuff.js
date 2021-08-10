@@ -2,6 +2,7 @@ import { h, Component, render } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
 import {ATDevice} from "../../../js/communication/ATDevice.js";
 import {FLipMouse} from "../../communication/FLipMouse.js";
+import {ActionButton} from "../../../js/ui/components/ActionButton.js";
 
 const html = htm.bind(h);
 class TabSipPuff extends Component {
@@ -144,6 +145,11 @@ class TabSipPuff extends Component {
                     <input type="range" value="${state.PUFF_STRONG_THRESHOLD}" oninput="${(event) => this.sliderChanged(event, C.AT_CMD_PUFF_STRONG_THRESHOLD)}"
                            id="PUFF_STRONG_THRESHOLD" min="${state.minRange}" max="${state.maxRange}" class="ten columns" accesskey="v"/>
                 </div>
+            </div>
+            <div style="margin-top: 4em">
+                ${html`<${ActionButton} onclick="${() => ATDevice.copyConfigToAllSlots([C.AT_CMD_SIP_THRESHOLD, C.AT_CMD_SIP_STRONG_THRESHOLD, C.AT_CMD_PUFF_THRESHOLD, C.AT_CMD_PUFF_STRONG_THRESHOLD])}"
+                                        label="Copy config to all slots // Konfiguration auf alle Slots anwenden"
+                                        progressLabel="Applying to all slots... // Anwenden auf alle Slots..."/>`}
             </div>`;
     }
 }

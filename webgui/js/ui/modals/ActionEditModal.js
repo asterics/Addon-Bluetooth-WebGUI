@@ -5,6 +5,7 @@ import {ManageIR} from "../../../js_fm/ui/components/ManageIR.js";
 import {RadioFieldset} from "../components/RadioFieldset.js";
 import {ATDevice} from "../../communication/ATDevice.js";
 import {InputMacro} from "../components/InputMacro.js";
+import {ActionButton} from "../components/ActionButton.js";
 
 const html = htm.bind(h);
 class ActionEditModal extends Component {
@@ -82,7 +83,7 @@ class ActionEditModal extends Component {
         })
     }
 
-    save() {
+    async save(forAllSlots) {
         ATDevice.setSlot(this.props.slot);
         if (this.state.shouldChangeMode && ATDevice.Specific.setFlipmouseMode) {
             ATDevice.Specific.setFlipmouseMode(C.FLIPMOUSE_MODE_ALT.value)
@@ -90,6 +91,13 @@ class ActionEditModal extends Component {
         if (this.state.hasChanges) {
             let atCmd = this.state.atCmdSuffix ? this.state.atCmd.cmd + ' ' + this.state.atCmdSuffix : this.state.atCmd.cmd;
             ATDevice.setButtonAction(this.props.buttonMode.index, atCmd);
+        }
+        if (forAllSlots) {
+            let constants = [C.AT_CMD_BTN_MODE + " " + this.props.buttonMode.index];
+            if (C.DEVICE_IS_FM && this.props.buttonMode.category === C.BTN_CAT_STICK) {
+                constants.push(C.AT_CMD_FLIPMOUSE_MODE)
+            }
+            await ATDevice.copyConfigToAllSlots(constants, this.props.slot, true);
         }
         this.props.closeHandler();
     }
@@ -189,6 +197,13 @@ class ActionEditModal extends Component {
                                 </div>
                                 <div class="col">
                                     <button onclick="${() => this.save()}" disabled="${this.state.atCmd.input && !this.state.atCmdSuffix}" class="button-primary">${L.translate('Save // Speichern')}</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 offset-6">
+                                    ${html`<${ActionButton} onclick="${() => this.save(true)}"
+                                        label="Save for alls slots // Für alle Slots speichern"
+                                        progressLabel="Saving to all slots... // Speichern für alle Slots..."/>`}
                                 </div>
                             </div>
                         </div>
