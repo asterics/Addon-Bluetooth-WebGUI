@@ -3,6 +3,7 @@
  * Specific functionality is implemented in modules FLipMouse and FABI.
  * ATDevice holds a reference to the current specific class (FLipMouse or FABI) in ATDevice.Specific
  */
+import {SerialCommunicator} from "../adapter/sercomm.js";
 
 let ATDevice = {};
 ATDevice.parseLiveData = true;

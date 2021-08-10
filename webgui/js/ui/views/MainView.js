@@ -36,6 +36,13 @@ class MainView extends Component {
         }
     }
 
+    toConnectionScreen() {
+        this.setState({
+            showMainScreen: false,
+            showConnectionScreen: true
+        });
+    }
+
     testMode() {
         C.GUI_IS_MOCKED_VERSION = true;
         this.initATDevice();

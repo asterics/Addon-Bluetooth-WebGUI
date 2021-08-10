@@ -1,3 +1,5 @@
+import {MainView} from "../ui/views/MainView.js";
+
 window.logReceived = false;
 
 function SerialCommunicator() {
@@ -186,8 +188,11 @@ function SerialCommunicator() {
             } catch (e) {
                 console.warn(e)
                 _runReader = false;
+                if (MainView.instance) MainView.instance.toConnectionScreen();
             }
         }
         _portReader.releaseLock();
     }
 }
+
+export {SerialCommunicator};
