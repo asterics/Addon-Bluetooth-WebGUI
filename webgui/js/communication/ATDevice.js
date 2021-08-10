@@ -488,7 +488,7 @@ function setConfigInternal(constant, value, slots) {
     slots.forEach(slot => {
         let slotConfig = ATDevice.getSlotConfig(slot);
         if (slotConfig) {
-            slotConfig[constant] = parseInt(value);
+            slotConfig[constant] = value;
         }
     });
 }
