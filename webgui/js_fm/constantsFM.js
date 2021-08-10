@@ -26,13 +26,13 @@ C.VIEWS = [{
     hash: '#tabPuff',
     label: 'Sip and Puff // Saug-Puste-Steuerung'
 }, {
-    object: TabSlots,
-    hash: '#tabSlots',
-    label: 'Slots // Slots'
-}, {
     object: TabActions,
     hash: '#tabActions',
     label: 'Actions // Aktionen'
+}, {
+    object: TabSlots,
+    hash: '#tabSlots',
+    label: 'Slots // Slots'
 }, {
     object: TabGeneral,
     hash: '#tabGeneral',
