@@ -39,7 +39,8 @@ class MainView extends Component {
     toConnectionScreen() {
         this.setState({
             showMainScreen: false,
-            showConnectionScreen: true
+            showConnectionScreen: true,
+            errorCode: C.ERROR_CONNECTION_LOST
         });
     }
 
@@ -149,6 +150,8 @@ class MainView extends Component {
                                     <div>${L.translate('Please try a different browser (Chrome) or use the offline configuration tool from: // Bitte verwenden Sie einen anderen Browser (Chrome) oder verwenden Sie das offline Konfigurations-Tool von:')}</div>
                                     <div><a href="https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest" target="_blank">https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest</a></div>
                                 `;
+                            case C.ERROR_CONNECTION_LOST:
+                                return html`<span>${L.translate('Connection to device lost! Please try to reconnect. // Verbindung zum Gerät verloren! Bitte versuchen Sie sich wieder zu verbinden.')}</span>`;
                         }
                     })()}
                 </div>
