@@ -101,19 +101,6 @@ class TabSlots extends Component {
         L.downloadasTextFile(`${C.CURRENT_DEVICE}-config-${datestr}.set`, configstr);
     };
 
-    resetConfig() {
-        let confirmMessage = L.translate('Do you really want to reset the device to the default configuration? All slots will be deleted. // Möchten Sie das Gerät wirklich auf die Standardeinstellungen zurücksetzen? Alle Slots werden gelöscht.');
-        if(!window.confirm(confirmMessage)){
-            return;
-        }
-        ATDevice.restoreDefaultConfiguration().then(() => {
-            this.setState({
-                slots: ATDevice.getSlots(),
-                selectedSlot: ATDevice.getCurrentSlot()
-            });
-        });
-    };
-
     uploadCheckboxChanged(slot, selected) {
         let currentList = this.state.selectedUploadSlots;
         if (selected) {
@@ -204,18 +191,8 @@ class TabSlots extends Component {
                         </button>
                     </div>
                 </div>
-    
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <label for="reset-slot-button">${L.translate('Reset to default configuration // Rücksetzen auf Defaulteinstellungen')}</label>
-                    </div>
-                    <div class="col-sm-6 col-md-5 col-lg-4">
-                        <button onclick="${() => this.resetConfig()}" class="u-full-width">
-                            <span>${L.translate('Reset device // Gerät zurücksetzen')}</span>
-                        </button>
-                    </div>
-                </div>
-            </div>`;
+            </div>
+            ${TabSlots.style}`;
     }
 }
 

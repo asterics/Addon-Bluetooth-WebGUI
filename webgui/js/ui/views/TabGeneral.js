@@ -74,6 +74,19 @@ class TabGeneral extends Component {
             });
         });
     }
+
+    resetConfig() {
+        let confirmMessage = L.translate('Do you really want to reset the device to the default configuration? All slots will be deleted. // Möchten Sie das Gerät wirklich auf die Standardeinstellungen zurücksetzen? Alle Slots werden gelöscht.');
+        if(!window.confirm(confirmMessage)){
+            return;
+        }
+        ATDevice.restoreDefaultConfiguration().then(() => {
+            this.setState({
+                slots: ATDevice.getSlots(),
+                selectedSlot: ATDevice.getCurrentSlot()
+            });
+        });
+    };
     
     render() {
         let slots = ATDevice.getSlots();
@@ -133,6 +146,14 @@ class TabGeneral extends Component {
                 <div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.btVersion, this.state.newBtVersion) || this.state.btVersion === unknown ? 'd-none' : ''}">
                     <span style="color: green">${L.translate('Bluetooth-Addon firmware is up-to-date! // Bluetooth-Addon Firmware ist aktuell!')}</span>
                 </div>
+            </div>
+        </div>
+        <h2 class="mt-5">${L.translate('Reset to default configuration // Rücksetzen auf Defaulteinstellungen')}</h2>
+        <div class="row mt-2">
+            <div class="col-12 col-md-4">
+                <button onclick="${() => this.resetConfig()}">
+                    <span>${L.translate('Reset device // Gerät zurücksetzen')}</span>
+                </button>
             </div>
         </div>
         `;
