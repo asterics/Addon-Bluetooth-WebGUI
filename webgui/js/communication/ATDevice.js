@@ -256,6 +256,49 @@ ATDevice.setConfig = function (atCmd, value, debounceTimeout) {
     });
 };
 
+/**
+ * copies config values from one slot to all other slots
+ * @param configConstants an array of config constants which values should be copied to all slots
+ * @param sourceSlot (optional) the source slot to copy the values from, default: current slot
+ * @param skipInitialSave if true the current slot is not saved (because already saved)
+ */
+ATDevice.copyConfigToAllSlots = async function (configConstants, sourceSlot, skipInitialSave) {
+    if (!configConstants || configConstants.length === 0) {
+        return;
+    }
+    let originalSlot = ATDevice.getCurrentSlot();
+    sourceSlot = sourceSlot || ATDevice.getCurrentSlot();
+    let sourceSlotObject = _slots.filter(slotObject => slotObject.name === sourceSlot)[0];
+    if (!skipInitialSave) {
+        ATDevice.save();
+    }
+    ATDevice.parseLiveData = false;
+    for (let slotObject of _slots) {
+        if (slotObject.name !== sourceSlot) {
+            await ATDevice.sendAtCmdWithResult(C.AT_CMD_LOAD_SLOT, slotObject.name);
+            let slotChanged = false;
+            for (let constant of configConstants) {
+                if (slotObject.config[constant] !== sourceSlotObject.config[constant]) {
+                    slotChanged = true;
+                    slotObject.config[constant] = sourceSlotObject.config[constant];
+                    if (constant.indexOf(C.AT_CMD_BTN_MODE) !== -1) {
+                        ATDevice.sendATCmd(constant);
+                        ATDevice.sendATCmd(sourceSlotObject.config[constant]);
+                    } else {
+                        ATDevice.sendATCmd(constant, sourceSlotObject.config[constant]);
+                    }
+                }
+            }
+            if (slotChanged) {
+                await ATDevice.sendAtCmdWithResult('AT SA', slotObject.name);
+            }
+        }
+    }
+    await ATDevice.sendAtCmdWithResult(C.AT_CMD_LOAD_SLOT, originalSlot);
+    ATDevice.parseLiveData = true;
+    return Promise.resolve();
+}
+
 ATDevice.refreshConfig = function () {
     return new Promise(function (resolve, reject) {
         ATDevice.sendATCmd(C.AT_CMD_STOP_REPORTING_LIVE);
