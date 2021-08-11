@@ -38,8 +38,9 @@ function SerialCommunicator() {
         });
 
         // Wait for the serial port to open.
-        await _port.open({baudRate: 115200}).catch(() => {
-            return Promise.reject(C.ERROR_SERIAL_DENIED);
+        await _port.open({baudRate: 115200}).catch((error) => {
+            console.log(error);
+            return Promise.reject(C.ERROR_SERIAL_BUSY);
         });
         listenToPort();
         _portWriter = _port.writable.getWriter();

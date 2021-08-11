@@ -137,7 +137,9 @@ class MainView extends Component {
                     ${(() => {
                         switch (state.errorCode) {
                             case C.ERROR_SERIAL_DENIED: 
-                                return html`<span>${L.translate('Connecting to device not allowed or failed! // Verbindung zum Gerät nicht zugelassen oder fehlgeschlagen!')}</span>`;
+                                return html`<span>${L.translate('Connecting to device not allowed by user, please try again! // Verbindung zum Gerät nicht zugelassen, bitte erneut versuchen!')}</span>`;
+                            case C.ERROR_SERIAL_BUSY: 
+                                return html`<span>${L.translate("Connecting to device not possible, maybe it's used by another program?! // Verbindung zum Gerät nicht möglich, vielleicht wird es von einem anderen Programm verwendet?!")}</span>`;
                             case C.ERROR_FIRMWARE_OUTDATED: 
                                 return html`
                                     <span>${L.translate('Firmware of device is outdated! // Firmware des Gerätes ist veraltet!')}</span>
