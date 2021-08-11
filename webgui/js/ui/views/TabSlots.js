@@ -1,6 +1,7 @@
 import { h, Component, render } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js'
 import {ATDevice} from "../../communication/ATDevice.js";
+import {FaIcon} from "../components/FaIcon.js";
 
 const html = htm.bind(h);
 class TabSlots extends Component {
@@ -11,7 +12,6 @@ class TabSlots extends Component {
         TabSlots.instance = this;
         this.state = {
             newSlotName: '',
-            selectedSlot: ATDevice.getCurrentSlot(),
             slots: ATDevice.getSlots(),
             uploadedSlots: [],
             selectedUploadSlots: []
@@ -23,21 +23,19 @@ class TabSlots extends Component {
         ATDevice.createSlot(this.state.newSlotName).then(function () {
             thiz.setState({
                 newSlotName: '',
-                slots: ATDevice.getSlots(),
-                selectedSlot: ATDevice.getCurrentSlot()
+                slots: ATDevice.getSlots()
             });
         });
     }
 
-    deleteSlot() {
+    deleteSlot(slot) {
         let thiz = this;
-        let confirmMessage = L.translate('Do you really want to delete the slot "{?}"? // Möchten Sie den Slot "{?}" wirklich löschen?', this.state.selectedSlot);
+        let confirmMessage = L.translate('Do you really want to delete the slot "{?}"? // Möchten Sie den Slot "{?}" wirklich löschen?', slot);
         if (!window.confirm(confirmMessage)) {
             return;
         }
-        ATDevice.deleteSlot(this.state.selectedSlot).then(function () {
+        ATDevice.deleteSlot(slot).then(function () {
             thiz.setState({
-                selectedSlot: ATDevice.getCurrentSlot(),
                 slots: ATDevice.getSlots()
             })
         });
@@ -48,7 +46,8 @@ class TabSlots extends Component {
         if (!target.files[0]) {
             return thiz.setState({
                 uploadedSlots: [],
-                selectedUploadSlots: []
+                selectedUploadSlots: [],
+                selectedFile: ''
             })
         }
         let reader = new FileReader();
@@ -58,12 +57,14 @@ class TabSlots extends Component {
             parsedSlots.forEach(slot => { //prevent duplicated names
                 let originalSlotname = slot.name;
                 let counter = 1;
-                while (thiz.state.slots.includes(slot.name)) {
+                let otherSlotNames = parsedSlots.filter(s => s !== slot).map(slot => slot.name);
+                while (thiz.state.slots.includes(slot.name) || otherSlotNames.includes(slot.name)) {
                     slot.name = `${originalSlotname} (${counter++})`
                 }
             })
             thiz.setState({
-                uploadedSlots: parsedSlots
+                uploadedSlots: parsedSlots,
+                selectedFile: target.files[0].name
             })
         };
     }
@@ -76,19 +77,20 @@ class TabSlots extends Component {
         ATDevice.uploadSlots(this.state.selectedUploadSlots).then(() => {
             thiz.setState({
                 slots: ATDevice.getSlots(),
-                selectedSlot: ATDevice.getCurrentSlot(),
                 selectedUploadSlots: [],
                 uploadedSlots: [],
                 uploading: false
             });
             L('#fileInputSlotUpload').value = null;
+            this.setState({
+                selectedFile: ''
+            })
         });
     };
 
-    downloadSlot() {
-        let d = new Date();
+    downloadSlot(slot) {
         let datestr = new Date().toISOString().substr(0, 10);
-        L.downloadasTextFile(`${C.CURRENT_DEVICE}-slot-${this.state.selectedSlot}-${datestr}.set`, ATDevice.getSlotConfigText(this.state.selectedSlot));
+        L.downloadasTextFile(`${C.CURRENT_DEVICE}-slot-${slot}-${datestr}.set`, ATDevice.getSlotConfigText(slot));
     };
 
     downloadAllSlots() {
@@ -113,6 +115,16 @@ class TabSlots extends Component {
         });
     }
 
+    colorChanged(slot, event) {
+        ATDevice.setSlot(slot);
+        ATDevice.setConfig(C.AT_CMD_SET_COLOR, event.target.value.replace('#', '0x'));
+        this.forceUpdate();
+        L.debounce(() => {
+            ATDevice.save();
+            ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, ATDevice.getCurrentSlot());
+        }, 500, "setcolordebounce");
+    }
+
     render() {
         let state = this.state;
         let slots = state.slots;
@@ -120,33 +132,34 @@ class TabSlots extends Component {
         return html`
             <h2>${L.translate('Slot configuration // Slot-Konfiguration')}</h2>
             <div class="container-fluid px-0">
+                <h3>${L.translate('Current slots // Aktuelle slots')}</h3>
                 <div class="row">
-                    <div class="col-sm-12 col-md-10 col-lg-8">
-                        <label for="selectSlots2">${L.translate('Select slot for action // Slot für Aktion auswählen')}</label>
-                        <select id="selectSlots2" class="col-12" value="${state.selectedSlot}" onchange="${(event) => this.setState({selectedSlot: event.target.value})}">
-                            ${slots.map(slot => html`<option value="${slot}">${slot}</option>`)}
-                        </select>
-                    </div>
-                </div>
-               
-                <div class="row">
-                    <div class="col-sm-6 col-md-5 col-lg-4">
-                        <button onclick="${() => ATDevice.setSlot(this.state.selectedSlot)}">${L.translate('Activate Slot // Slot aktivieren')}</button>
-                    </div>
-                    <div class="col-sm-6 col-md-5 col-lg-4">
-                        <button disabled="${slots.length <= 1}" onclick="${() => this.deleteSlot()}">
-                            <span>${L.translate('Delete Slot // Slot löschen')}</span>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="row">
-                    <div class="col-sm-6 col-md-5 col-lg-4">
-                        <button onclick="${() => this.downloadSlot()}">${L.translate('Download Slot // Slot herunterladen')}</button>
-                    </div>
-                    <div class="col-sm-6 col-md-5 col-lg-4">
-                        <button onclick="${() => this.downloadAllSlots()}">${L.translate('Download all Slots // Alle Slots herunterladen')}</button>
-                    </div>
+                    <ol class="col-sm-12 col-lg-10">
+                        ${slots.map(slot => html`
+                            <li>
+                                <div class="row d-flex align-items-center">
+                                    <a title="${slot === ATDevice.getCurrentSlot() ? L.translate('Current slot // Aktiver slot') : L.translate('Click to activate slot // Klicken um Slot zu aktivieren')}" 
+                                       href="javascript:;" onclick="${() => ATDevice.setSlot(slot)}" class="col-4" style="${slot === ATDevice.getCurrentSlot() ? 'font-weight: bold' : ''}">
+                                        <span class="mr-2 px-3 ${C.DEVICE_IS_FM ? 'd-none' : ''}" style="background-color: ${ATDevice.getConfig(C.AT_CMD_SET_COLOR, slot).replace('0x', '#')}; border: 1px solid"></span>
+                                        <span>${slot}</span>
+                                    </a>
+                                    <div class="col-8">
+                                        <div class="row d-flex">
+                                            <div class="col">
+                                                 <label for="colorinput${slot}" class="small-button button py-2 py-md-0 ${C.DEVICE_IS_FM ? 'd-none' : ''}">${html`<${FaIcon} icon="fas palette" style="fill: #0f6674"/>`}<span class="d-none d-sm-inline">${L.translate('Set color // Farbe wählen')}</span></label>
+                                                <input id="colorinput${slot}" type="color" class="sr-only" oninput="${(event) => this.colorChanged(slot, event)}"/>
+                                            </div>
+                                            <div class="col d-flex">
+                                                <button onclick="${() => this.deleteSlot(slot)}" disabled="${this.state.slots.length <= 1}" class="small-button py-2 py-md-0">${html`<${FaIcon} icon="fas trash-alt"/>`}<span class="d-none d-sm-inline">${L.translate('Delete // Löschen')}</span></button>
+                                            </div>
+                                            <div class="col d-flex">
+                                                <button onclick="${() => this.downloadSlot(slot)}" class="small-button py-2 py-md-0">${html`<${FaIcon} icon="fas download"/>`}<span class="d-none d-sm-inline">${L.translate('Download')}</span></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>`)}
+                    </ol>
                 </div>
             
                 <div class="row mt-4">
@@ -156,24 +169,26 @@ class TabSlots extends Component {
                 </div>
                 
                 <div class="row">
-                    <div class="col-sm-6 col-md-5 col-lg-4">
+                    <div class="col-sm-6 col-lg-5">
                         <input id="newSlotLabel" class="col-12" value="${state.newSlotName}" oninput="${(event) => this.setState({newSlotName: event.target.value})}" type="text" placeholder="${L.translate('insert name for new slot // Namen für neuen Slot eingeben')}" maxlength="15"/>
                     </div>
-                    <div class="col-sm-6 col-md-5 col-lg-4">
-                        <button disabled="${!state.newSlotName || this.state.slots.includes(this.state.newSlotName)}" onclick="${() => this.createSlot()}" class="u-full-width">
+                    <div class="col-sm-6 col-lg-5">
+                        <button disabled="${!state.newSlotName || this.state.slots.includes(this.state.newSlotName)}" onclick="${() => this.createSlot()}">
                             <span>${L.translate('Create Slot // Slot anlegen')}</span>
                         </button>
                     </div>
                 </div>
                 
+                <h3 class="mt-5">${L.translate('Upload slots from file // Slots aus Datei hochladen')}</h3>
                 <div class="row mt-4">
-                    <div class="col-12">
-                        <label for="fileInputSlotUpload">${L.translate('Upload Slot(s) // Slot(s) hochladen')}</label>
+                    <div class="col-sm-6 col-lg-5">
+                        <label class="button" for="fileInputSlotUpload">${L.translate('Select file // Datei auswählen')}</label>
+                        <input class="sr-only" type=file id="fileInputSlotUpload" accept=".set" onchange="${(event) => this.fileUploadChanged(event.target)}"/>
                     </div>
-                    <div class="col-12">
-                        <input type=file id="fileInputSlotUpload" accept=".set" onchange="${(event) => this.fileUploadChanged(event.target)}"/>
+                    <div class="col-sm-6 col-lg-5">
+                        <span>${L.translate('Selected file: // Gewählte Datei:')}</span> <span>${this.state.selectedFile || L.translate('(none) // (keine)')}</span>
                     </div>
-                    <fieldset class="col-12 ${this.state.uploadedSlots.length === 0 ? 'd-none' : ''}">
+                    <fieldset class="mt-3 col-12 ${this.state.uploadedSlots.length === 0 ? 'd-none' : ''}">
                         <legend>${L.translate('Choose slots to upload // Wähle Slots zum Hochladen')}</legend>
                         ${state.uploadedSlots.map(slot => html`
                             <div>
@@ -185,9 +200,18 @@ class TabSlots extends Component {
                 </div>
                 
                 <div class="row">
-                    <div class="col-sm-6 col-md-5 col-lg-4">
-                        <button disabled="${state.selectedUploadSlots.length === 0}" onclick="${() => this.uploadSlots()}">
+                    <div class="col-sm-6 col-lg-5 ${!state.selectedFile ? 'd-none' : ''}">
+                        <button disabled="${state.selectedUploadSlots.length === 0 || state.uploading}" onclick="${() => this.uploadSlots()}">
                             ${state.uploading ? L.translate('Uploading Slot(s) ... // Slot(s) hochladen ...') : L.translate('Upload Slot(s) // Slot(s) hochladen')}
+                        </button>
+                    </div>
+                </div>
+
+                <h3 class="mt-5">${L.translate('Download all slots // Alle Slots herunterladen')}</h3>
+                <div class="row mt-4">
+                    <div class="col-sm-6 col-lg-5">
+                        <button onclick="${() => this.downloadAllSlots()}">
+                            ${L.translate('Download all slots // Alle Slots herunterladen')}
                         </button>
                     </div>
                 </div>
@@ -195,5 +219,19 @@ class TabSlots extends Component {
             ${TabSlots.style}`;
     }
 }
+
+TabSlots.style = html`<style>
+    .small-button {
+        display: inline-block;
+        padding: 0 5px;
+        line-height: unset;
+        width: 100%;
+        text-transform: none;
+    }
+    
+    ol {
+       list-style-type: none; 
+    }
+</style>`;
 
 export {TabSlots};
