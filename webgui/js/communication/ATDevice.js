@@ -241,7 +241,7 @@ ATDevice.getConfig = function (constant, slotName) {
         let intValue = parseInt(value);
         return intValue + '' === value.trim() ? intValue : value;
     }
-    return null;
+    return '';
 };
 
 ATDevice.setConfig = function (atCmd, value, debounceTimeout) {
