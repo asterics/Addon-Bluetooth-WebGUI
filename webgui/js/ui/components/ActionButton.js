@@ -1,5 +1,6 @@
 import { h, Component } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
+import {FaIcon} from "./FaIcon.js";
 const html = htm.bind(h);
 
 class ActionButton extends Component {
@@ -29,8 +30,10 @@ class ActionButton extends Component {
         props.label = props.label || '';
         props.progressLabel = props.progressLabel || this.props.label;
         props.disabled = props.disabled || false;
+        props.faIcon = props.faIcon || '';
         return html`
             <button onclick="${() => this.doAction()}" disabled="${this.state.actionPerforming || props.disabled}">
+                ${html`<${FaIcon} icon="${this.props.faIcon}"/>`}
                 ${L.translate(this.state.actionPerforming ? props.progressLabel : props.label)}
             </button>`;
     }

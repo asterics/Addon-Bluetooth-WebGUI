@@ -7,6 +7,7 @@ import {Slider} from "../../../js/ui/components/Slider.js";
 import {ATDevice} from "../../../js/communication/ATDevice.js";
 import {FLipMouse} from "../../communication/FLipMouse.js";
 import {ActionButton} from "../../../js/ui/components/ActionButton.js";
+import {FaIcon} from "../../../js/ui/components/FaIcon.js";
 
 const html = htm.bind(h);
 
@@ -64,10 +65,12 @@ class TabStick extends Component {
                 </div>
                 <div class="five columns">
                     <button onclick="${() => FLipMouse.calibrate()}">
+                        ${html`<${FaIcon} icon="far dot-circle"/>`}
                         <span>${L.translate('Calibrate middle position // Mittelposition kalibrieren')}</span>
                     </button>
                     <button onclick="${() => FLipMouse.rotate()}">
-                        <span>${L.translate('\u21BB Rotate right // \u21BB Nach rechts drehen')}</span>
+                        ${html`<${FaIcon} icon="fas redo"/>`}
+                        <span>${L.translate('Rotate right // Nach rechts drehen')}</span>
                     </button>
                 </div>
             </div>
@@ -110,12 +113,12 @@ class TabStick extends Component {
                 <div class="col">
                     ${html`<${ActionButton} onclick="${() => ATDevice.copyConfigToAllSlots(this.atCmds)}"
                                         label="Copy slider values to all slots // Regler-Werte auf alle Slots anwenden"
-                                        progressLabel="Applying to all slots... // Anwenden auf alle Slots..."/>`}
+                                        progressLabel="Applying to all slots... // Anwenden auf alle Slots..." faIcon="far clone"/>`}
                 </div>
                 <div class="col">
                     ${html`<${ActionButton} onclick="${() => ATDevice.copyConfigToAllSlots([C.AT_CMD_FLIPMOUSE_MODE])}"
                                         label="Copy stick usage to all slots // Stick-Verwendung auf alle Slots anwenden"
-                                        progressLabel="Applying to all slots... // Anwenden auf alle Slots..."/>`}
+                                        progressLabel="Applying to all slots... // Anwenden auf alle Slots..." faIcon="far clone"/>`}
                 </div>
             </div>
             `;

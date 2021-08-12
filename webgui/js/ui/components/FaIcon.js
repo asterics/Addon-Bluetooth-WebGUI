@@ -9,7 +9,11 @@ class FaIcon extends Component {
         let folder = props.icon.split(' ')[0];
         let icon = props.icon.split(' ')[1];
         let path = `./lib/fa-svgs/${folder}/${icon}.svg`;
-        return html`<img src="${path}" style="display: inline-block; height: 1.2em; margin: 0 0.5em; vertical-align: middle"/>`;
+        if (!this.props.icon) {
+            return '';
+        }
+        return html`<img src="${path}"
+                         style="display: inline-block; height: 1.2em; margin: 0 0.5em; vertical-align: middle; ${this.props.invert ? 'filter: invert(1);' : ''}"/>`;
     }
 }
 

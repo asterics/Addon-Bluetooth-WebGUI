@@ -6,6 +6,7 @@ import {RadioFieldset} from "../components/RadioFieldset.js";
 import {ATDevice} from "../../communication/ATDevice.js";
 import {InputMacro} from "../components/InputMacro.js";
 import {ActionButton} from "../components/ActionButton.js";
+import {FaIcon} from "../components/FaIcon.js";
 
 const html = htm.bind(h);
 class ActionEditModal extends Component {
@@ -192,11 +193,15 @@ class ActionEditModal extends Component {
                             <div class="row">
                                 <div class="col">
                                     <button onclick="${() => props.closeHandler()}">
+                                        ${html`<${FaIcon} icon="fas times"/>`}
                                         ${L.translate('Cancel // Abbrechen')}
                                     </button>
                                 </div>
                                 <div class="col">
-                                    <button onclick="${() => this.save()}" disabled="${this.state.atCmd.input && !this.state.atCmdSuffix}" class="button-primary">${L.translate('Save // Speichern')}</button>
+                                    <button onclick="${() => this.save()}" disabled="${this.state.atCmd.input && !this.state.atCmdSuffix}" class="button-primary">
+                                        ${html`<${FaIcon} icon="fas save" invert="true"/>`}
+                                        ${L.translate('Save // Speichern')}
+                                    </button>
                                 </div>
                             </div>
                             <div class="row">
@@ -204,7 +209,8 @@ class ActionEditModal extends Component {
                                     ${html`<${ActionButton} onclick="${() => this.save(true)}"
                                         label="Save for alls slots // Für alle Slots speichern"
                                         progressLabel="Saving to all slots... // Speichern für alle Slots..." 
-                                        disabled="${this.state.atCmd.input && !this.state.atCmdSuffix}"/>`}
+                                        disabled="${this.state.atCmd.input && !this.state.atCmdSuffix}"
+                                        faIcon="far clone"/>`}
                                 </div>
                             </div>
                         </div>

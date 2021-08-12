@@ -157,7 +157,7 @@ class TabSipPuff extends Component {
             <div style="margin-top: 4em">
                 ${html`<${ActionButton} onclick="${() => ATDevice.copyConfigToAllSlots([C.AT_CMD_SIP_THRESHOLD, C.AT_CMD_SIP_STRONG_THRESHOLD, C.AT_CMD_PUFF_THRESHOLD, C.AT_CMD_PUFF_STRONG_THRESHOLD])}"
                                         label="Copy config to all slots // Konfiguration auf alle Slots anwenden"
-                                        progressLabel="Applying to all slots... // Anwenden auf alle Slots..."/>`}
+                                        progressLabel="Applying to all slots... // Anwenden auf alle Slots..." faIcon="far clone"/>`}
             </div>`;
     }
 }

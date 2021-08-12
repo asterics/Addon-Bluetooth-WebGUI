@@ -82,7 +82,8 @@ class TabTimings extends Component {
                 <div class="col col-lg-6">
                     ${html`<${ActionButton}  onclick="${() => ATDevice.copyConfigToAllSlots(this.atCmds)}"
                                     label="Copy config to all slots // Konfiguration auf alle Slots anwenden"
-                                    progressLabel="Applying to all slots... // Anwenden auf alle Slots..."/>`}
+                                    progressLabel="Applying to all slots... // Anwenden auf alle Slots..."
+                                    faIcon="far clone"/>`}
                 </div>
             </div>
         `;

@@ -163,8 +163,7 @@ class TabSlots extends Component {
                                             <div class="col d-flex">
                                                 <button onclick="${() => this.deleteSlot(slot)}"
                                                         disabled="${this.state.slots.length <= 1}"
-                                                        class="small-button py-2 py-md-0">${html`
-                                                    <${FaIcon} icon="fas trash-alt"/>`}<span class="d-none d-sm-inline">${L.translate('Delete // Löschen')}</span>
+                                                        class="small-button py-2 py-md-0">${html`<${FaIcon} icon="fas trash-alt"/>`}<span class="d-none d-sm-inline">${L.translate('Delete // Löschen')}</span>
                                                 </button>
                                             </div>
                                             <div class="col d-flex">
@@ -193,6 +192,7 @@ class TabSlots extends Component {
                     </div>
                     <div class="col-sm-6 col-lg-5">
                         <button disabled="${!state.newSlotName || this.state.slots.includes(this.state.newSlotName)}" onclick="${() => this.createSlot()}">
+                            ${html`<${FaIcon} icon="fas plus-circle"/>`}
                             <span>${L.translate('Create Slot // Slot anlegen')}</span>
                         </button>
                     </div>
@@ -201,7 +201,7 @@ class TabSlots extends Component {
                 <h3 class="mt-5">${L.translate('Upload slots from file // Slots aus Datei hochladen')}</h3>
                 <div class="row mt-4">
                     <div class="col-sm-6 col-lg-5">
-                        <label class="button" for="fileInputSlotUpload">${L.translate('Select file // Datei auswählen')}</label>
+                        <label class="button" for="fileInputSlotUpload">${html`<${FaIcon} icon="fas file"/>`} ${L.translate('Select file // Datei auswählen')}</label>
                         <input class="sr-only" type=file id="fileInputSlotUpload" accept=".set" onchange="${(event) => this.fileUploadChanged(event.target)}"/>
                     </div>
                     <div class="col-sm-6 col-lg-5">
@@ -230,6 +230,7 @@ class TabSlots extends Component {
                 <div class="row mt-4">
                     <div class="col-sm-6 col-lg-5">
                         <button onclick="${() => this.downloadAllSlots()}">
+                            ${html`<${FaIcon} icon="fas download"/>`}
                             ${L.translate('Download all slots // Alle Slots herunterladen')}
                         </button>
                     </div>

@@ -1,6 +1,7 @@
 import { h, Component, render } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
 import {ATDevice} from "../../communication/ATDevice.js";
+import {FaIcon} from "../components/FaIcon.js";
 
 const html = htm.bind(h);
 let unknown = L.translate('(unknown) // (unbekannt)')
@@ -152,6 +153,7 @@ class TabGeneral extends Component {
         <div class="row mt-2">
             <div class="col-12 col-md-4">
                 <button onclick="${() => this.resetConfig()}">
+                    ${html`<${FaIcon} icon="fas star-of-life"/>`}
                     <span>${L.translate('Reset device // Gerät zurücksetzen')}</span>
                 </button>
             </div>
