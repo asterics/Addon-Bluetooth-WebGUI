@@ -50,9 +50,25 @@ C.AT_CMD_CATEGORIES = [{
 }];
 
 C.BTN_CAT_BTN = 'BTN_CAT_BTN';
+C.BTN_CAT_BTN_LONGPRESS = 'BTN_CAT_BTN_LONGPRESS';
+C.BTN_CAT_SIPPUFF = 'BTN_CAT_SIPPUFF';
 C.BTN_CATEGORIES = [{
     constant: C.BTN_CAT_BTN,
     label: 'Buttons'
+}, {
+    constant: C.BTN_CAT_SIPPUFF,
+    label: 'Sip/Puff // Ansaugen/Pusten'
+}]
+
+C.BTN_CATEGORIES_LONGPRESS = [{
+    constant: C.BTN_CAT_BTN,
+    label: 'Buttons'
+}, {
+    constant: C.BTN_CAT_BTN_LONGPRESS,
+    label: 'Buttons long press // Buttons lange drücken'
+}, {
+    constant: C.BTN_CAT_SIPPUFF,
+    label: 'Sip/Puff // Ansaugen/Pusten'
 }]
 
 C.BTN_MODES = [{
@@ -87,4 +103,58 @@ C.BTN_MODES = [{
     index: 8,
     label: 'Button 8',
     category: C.BTN_CAT_BTN
-}, ];
+}, {
+    index: 10,
+    label: 'Sip // Ansaugen',
+    category: C.BTN_CAT_SIPPUFF
+}, {
+    index: 11,
+    label: 'Puff // Pusten',
+    category: C.BTN_CAT_SIPPUFF
+}];
+
+C.BTN_MODES_LONGPRESS = [{
+    index: 1,
+    label: 'Button 1',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 2,
+    label: 'Button 2',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 3,
+    label: 'Button 3',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 4,
+    label: 'Button 4',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 5,
+    label: 'Button 5',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 6,
+    label: 'Button 6',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 7,
+    label: 'Button 1 long press // Button 1 lange drücken',
+    category: C.BTN_CAT_BTN_LONGPRESS
+}, {
+    index: 8,
+    label: 'Button 2 long press // Button 2 lange drücken',
+    category: C.BTN_CAT_BTN_LONGPRESS
+},  {
+    index: 9,
+    label: 'Button 3 long press // Button 3 lange drücken',
+    category: C.BTN_CAT_BTN_LONGPRESS
+}, {
+    index: 10,
+    label: 'Sip // Ansaugen',
+    category: C.BTN_CAT_SIPPUFF
+}, {
+    index: 11,
+    label: 'Puff // Pusten',
+    category: C.BTN_CAT_SIPPUFF
+}];

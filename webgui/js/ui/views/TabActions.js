@@ -78,14 +78,16 @@ class TabActions extends Component {
         let slots = ATDevice.getSlots();
         let mobileView = slots.length > this.getMaxPrintableSlots();
 
-        let btnModes = C.BTN_MODES.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
+        let useBtnModes = C.DEVICE_IS_FABI && parseInt(ATDevice.getConfig(C.AT_CMD_THRESHOLD_LONGPRESS)) > 0 ? C.BTN_MODES_LONGPRESS : C.BTN_MODES;
+        let btnModes = useBtnModes.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
         let modalOpen = !!state.modalBtnMode;
         if(modalOpen) {
             L.addClass('body', 'modal-open');
         } else {
             L.removeClass('body', 'modal-open');
         }
-        let categoryElements = C.BTN_CATEGORIES.map(cat => {return {value: cat.constant, label: cat.label}});
+        let useCategories = C.DEVICE_IS_FABI && parseInt(ATDevice.getConfig(C.AT_CMD_THRESHOLD_LONGPRESS)) > 0 ? C.BTN_CATEGORIES_LONGPRESS : C.BTN_CATEGORIES;
+        let categoryElements = useCategories.map(cat => {return {value: cat.constant, label: cat.label}});
         categoryElements = [{value: null, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
 
         return html`<div id="tabActions">
