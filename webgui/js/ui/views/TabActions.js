@@ -100,7 +100,7 @@ class TabActions extends Component {
                     ${slots.map(slot => html`<span class="${mobileView ? 'col-12' : 'col'} ${this.getSlotStyle(slot)}">Slot "${slot}"</span>`)}
                 </li>
                 ${btnModes.map((btnMode, index) => html`
-                    <li class="row ${mobileView ? 'py-3' : 'py-0'}" style="${index % 2 === 1 ? 'background-color: lightgray' : ''}">
+                    <li class="row ${mobileView ? 'py-3' : 'py-0'}" style="${index % 2 === 0 ? 'background-color: rgb(224 224 224)' : ''}">
                         <strong class="${mobileView ? 'col-12' : 'col'}">${L.translate(btnMode.label)}</strong>
                         ${slots.map(slot => html`
                             <span class="${mobileView ? 'col-12' : 'col'} ${this.getSlotStyle(slot)}">

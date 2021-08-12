@@ -38,11 +38,19 @@ button, .button {
     width: 100%;
     white-space: normal;
     padding: 0 !important;
+    color: black;
+    border-color: gray;
+    background-color: #ebf2f5;
 }
 
 button:disabled, button:disabled div{
-    border-color: darkgray;
-    color: lightgray;
+    border-color: lightgray;
+    color: gray;
+    background-color: whitesmoke;
+}
+
+button:disabled img {
+    filter: invert(0.5);
 }
 
 .special-key {

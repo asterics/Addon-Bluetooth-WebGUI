@@ -135,25 +135,44 @@ class TabSlots extends Component {
                 <h3>${L.translate('Current slots // Aktuelle slots')}</h3>
                 <div class="row">
                     <ol class="col-sm-12 col-lg-10">
-                        ${slots.map(slot => html`
-                            <li>
+                        ${slots.map((slot, index) => html`
+                            <li class="my-2" style="${index % 2 === 0 ? 'background-color: rgb(224 224 224)' : ''}">
                                 <div class="row d-flex align-items-center">
-                                    <a title="${slot === ATDevice.getCurrentSlot() ? L.translate('Current slot // Aktiver slot') : L.translate('Click to activate slot // Klicken um Slot zu aktivieren')}" 
-                                       href="javascript:;" onclick="${() => ATDevice.setSlot(slot)}" class="col-4" style="${slot === ATDevice.getCurrentSlot() ? 'font-weight: bold' : ''}">
-                                        <span class="mr-2 px-3 ${C.DEVICE_IS_FM ? 'd-none' : ''}" style="background-color: ${ATDevice.getConfig(C.AT_CMD_SET_COLOR, slot).replace('0x', '#')}; border: 1px solid"></span>
-                                        <span>${slot}</span>
-                                    </a>
+                                    <div class="col-4">
+                                        <span class="mr-2 px-3 ${C.DEVICE_IS_FM ? 'd-none' : ''}"
+                                              style="background-color: ${ATDevice.getConfig(C.AT_CMD_SET_COLOR, slot).replace('0x', '#')}; border: 1px solid"></span>
+                                        <a title="${L.translate('Slot "{?}": click to activate // Slot "{?}": zum Aktivieren klicken', slot)}"
+                                           href="javascript:;" onclick="${() => ATDevice.setSlot(slot)}"
+                                           class="${slot === ATDevice.getCurrentSlot() ? 'd-none' : ''}">
+                                            <span>${slot}</span>
+                                        </a>
+                                        <span class="${slot === ATDevice.getCurrentSlot() ? 'd-inline-block' : 'd-none'}"
+                                              style="font-weight: bold"><span
+                                                class="sr-only">Slot: </span>${slot}</span>
+                                    </div>
                                     <div class="col-8">
                                         <div class="row d-flex">
                                             <div class="col">
-                                                 <label for="colorinput${slot}" class="small-button button py-2 py-md-0 ${C.DEVICE_IS_FM ? 'd-none' : ''}">${html`<${FaIcon} icon="fas palette" style="fill: #0f6674"/>`}<span class="d-none d-sm-inline">${L.translate('Set color // Farbe wählen')}</span></label>
-                                                <input id="colorinput${slot}" type="color" class="sr-only" oninput="${(event) => this.colorChanged(slot, event)}"/>
+                                                <label for="colorinput${slot}"
+                                                       class="small-button button py-2 py-md-0 ${C.DEVICE_IS_FM ? 'd-none' : ''}">${html`
+                                                    <${FaIcon} icon="fas palette"/>`}<span
+                                                        class="d-none d-sm-inline">${L.translate('Set color // Farbe wählen')}</span></label>
+                                                <input id="colorinput${slot}" type="color" class="sr-only"
+                                                       oninput="${(event) => this.colorChanged(slot, event)}"/>
                                             </div>
                                             <div class="col d-flex">
-                                                <button onclick="${() => this.deleteSlot(slot)}" disabled="${this.state.slots.length <= 1}" class="small-button py-2 py-md-0">${html`<${FaIcon} icon="fas trash-alt"/>`}<span class="d-none d-sm-inline">${L.translate('Delete // Löschen')}</span></button>
+                                                <button onclick="${() => this.deleteSlot(slot)}"
+                                                        disabled="${this.state.slots.length <= 1}"
+                                                        class="small-button py-2 py-md-0">${html`
+                                                    <${FaIcon} icon="fas trash-alt"/>`}<span class="d-none d-sm-inline">${L.translate('Delete // Löschen')}</span>
+                                                </button>
                                             </div>
                                             <div class="col d-flex">
-                                                <button onclick="${() => this.downloadSlot(slot)}" class="small-button py-2 py-md-0">${html`<${FaIcon} icon="fas download"/>`}<span class="d-none d-sm-inline">${L.translate('Download')}</span></button>
+                                                <button onclick="${() => this.downloadSlot(slot)}"
+                                                        class="small-button py-2 py-md-0">${html`
+                                                    <${FaIcon} icon="fas download"/>`}<span
+                                                        class="d-none d-sm-inline">${L.translate('Download')}</span>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -227,6 +246,7 @@ TabSlots.style = html`<style>
         line-height: unset;
         width: 100%;
         text-transform: none;
+        margin: 0 !important;
     }
     
     ol {
