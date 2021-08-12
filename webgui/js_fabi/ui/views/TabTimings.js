@@ -47,16 +47,18 @@ class TabTimings extends Component {
                         min="1" max="500" updateConstants="${[C.AT_CMD_ANTITREMOR_IDLE]}"/>`}
             
             <h3 class="mt-5">${L.translate('Timings for special functions // Schwellenwerte für Spezialfunktionen')}</h3>
-            ${html`<${Slider} label="Threshold for long press: // Schwellenwert für langes Drücken:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_THRESHOLD_LONGPRESS]}"
+            ${html`<${Slider} label="Threshold for long press (0=disalbe): // Schwellenwert für langes Drücken (0=deaktivieren):" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_THRESHOLD_LONGPRESS]}"
                         min="0" max="9999" updateConstants="${[C.AT_CMD_THRESHOLD_LONGPRESS]}"/>`}
-            ${html`<${Slider} label="Threshold for double press: // Schwellenwert für doppeltes Drücken:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_THRESHOLD_DOUBLEPRESS]}"
+            ${html`<${Slider} label="Threshold for double press (0=disalbe): // Schwellenwert für doppeltes Drücken (0=deaktivieren):" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_THRESHOLD_DOUBLEPRESS]}"
                         min="0" max="9999" updateConstants="${[C.AT_CMD_THRESHOLD_DOUBLEPRESS]}"/>`}
-            ${html`<${Slider} label="Threshold automatic left click: // Schwellenwert für automatischen Linksklick:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_THRESHOLD_AUTODWELL]}"
+            ${html`<${Slider} label="Threshold automatic left click (0=disalbe): // Schwellenwert für automatischen Linksklick (0=deaktivieren):" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_THRESHOLD_AUTODWELL]}"
                         min="0" max="5000" updateConstants="${[C.AT_CMD_THRESHOLD_AUTODWELL]}"/>`}
-            <div style="margin-top: 4em">
-                ${html`<${ActionButton} onclick="${() => ATDevice.copyConfigToAllSlots(this.atCmds)}"
-                                        label="Copy config to all slots // Konfiguration auf alle Slots anwenden"
-                                        progressLabel="Applying to all slots... // Anwenden auf alle Slots..."/>`}
+            <div class="row" style="margin-top: 4em">
+                <div class="col col-lg-6">
+                    ${html`<${ActionButton}  onclick="${() => ATDevice.copyConfigToAllSlots(this.atCmds)}"
+                                    label="Copy config to all slots // Konfiguration auf alle Slots anwenden"
+                                    progressLabel="Applying to all slots... // Anwenden auf alle Slots..."/>`}
+                </div>
             </div>
         `;
     }
