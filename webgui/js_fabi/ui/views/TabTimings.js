@@ -26,18 +26,6 @@ class TabTimings extends Component {
 
     valueChanged(value, constants) {
         let state = {};
-        let intVal = parseInt(value);
-
-        //prevent both double press and long press to be set
-        if (constants.includes(C.AT_CMD_THRESHOLD_LONGPRESS) && intVal > 0) {
-            state[C.AT_CMD_THRESHOLD_DOUBLEPRESS] = 0;
-            ATDevice.setConfig(C.AT_CMD_THRESHOLD_DOUBLEPRESS, 0);
-        }
-        if (constants.includes(C.AT_CMD_THRESHOLD_DOUBLEPRESS) && intVal > 0) {
-            state[C.AT_CMD_THRESHOLD_LONGPRESS] = 0;
-            ATDevice.setConfig(C.AT_CMD_THRESHOLD_LONGPRESS, 0);
-        }
-
         constants.forEach(constant => {
             state[constant] = value;
             ATDevice.setConfig(constant, value);
