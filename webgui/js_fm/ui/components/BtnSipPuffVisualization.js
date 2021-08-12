@@ -49,7 +49,7 @@ class BtnSipPuffVisualization extends Component {
         let fontStyle = `text-align: center; line-height: ${circleRadius}px; font-size: 30px`;
         let getColor = (btnNum) => data[FLipMouse.LIVE_BUTTONS] && data[FLipMouse.LIVE_BUTTONS][btnNum] ? 'orange' : 'transparent';
 
-        let liveP = data[FLipMouse.LIVE_PRESSURE];
+        let liveP = data[C.LIVE_PRESSURE];
         let sip = ATDevice.getConfig(C.AT_CMD_SIP_THRESHOLD);
         let puff = ATDevice.getConfig(C.AT_CMD_PUFF_THRESHOLD);
         let strongSip = ATDevice.getConfig(C.AT_CMD_SIP_STRONG_THRESHOLD);
