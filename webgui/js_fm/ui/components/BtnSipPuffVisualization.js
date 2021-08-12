@@ -45,7 +45,7 @@ class BtnSipPuffVisualization extends Component {
         }
         let state = this.state;
         let data = this.state.liveData;
-        let circleRadius = 70;
+        let circleRadius = Math.min(70, window.innerWidth / 7);
         let fontStyle = `text-align: center; line-height: ${circleRadius}px; font-size: 30px`;
         let getColor = (btnNum) => data[FLipMouse.LIVE_BUTTONS] && data[FLipMouse.LIVE_BUTTONS][btnNum] ? 'orange' : 'transparent';
 
@@ -71,7 +71,7 @@ class BtnSipPuffVisualization extends Component {
         }
 
         return html`<div aria-hidden="true">
-                    <div class="relative" name="fmRect" style="border: medium solid; height: 200px; width: 350px;">
+                    <div class="relative" name="fmRect" style="border: medium solid; height: 200px; width: 350px; max-width: 45vw">
                         <div class="back-layer" style="top: 40%; left: 18%;">
                             <div class="back-layer" style="${styleUtil.getCircleStyle(circleRadius, getColor(0), 'medium solid')}; ${fontStyle}">1</div>
                         </div>
@@ -82,9 +82,9 @@ class BtnSipPuffVisualization extends Component {
                             <div class="back-layer" style="${styleUtil.getCircleStyle(circleRadius, getColor(2), 'medium solid')}; ${fontStyle}">3</div>
                         </div>
                         <div class="back-layer" style="top: 65%; left: 0; width: 100%; ${fontStyle}">
-                            Slot: ${ATDevice.getCurrentSlot()}
+                            <span class="d-none d-sm-inline">Slot: </span>${ATDevice.getCurrentSlot()}
                         </div>
-                        <div class="back-layer" style="top: 30%; left: 100%; height: 40%; width: 350px; border: medium solid;">
+                        <div class="back-layer" style="top: 30%; left: 100%; height: 40%; width: 350px; ; max-width: 45vw; border: medium solid;">
                             <div class="relative" style="width: 100%; height: 100%">
                                 <div class="back-layer" style="top: 0; left: 0; height: 100%; width: ${sipLivePercentage}%; background-color: ${pressureColor}">
                                 </div>
