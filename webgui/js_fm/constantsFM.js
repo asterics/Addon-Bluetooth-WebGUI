@@ -1,6 +1,6 @@
 import {FLipMouse} from "./communication/FLipMouse.js";
 import {TabStick} from "./ui/views/TabStick.js";
-import {TabSipPuff} from "./ui/views/TabSipPuff.js";
+import {TabSipPuff} from "../js/ui/views/TabSipPuff.js";
 import {TabSlots} from "../js/ui/views/TabSlots.js";
 import {TabActions} from "../js/ui/views/TabActions.js";
 import {TabGeneral} from "../js/ui/views/TabGeneral.js";

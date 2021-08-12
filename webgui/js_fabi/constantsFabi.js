@@ -2,6 +2,7 @@ import {TabSlots} from "../js/ui/views/TabSlots.js";
 import {TabActions} from "../js/ui/views/TabActions.js";
 import {TabGeneral} from "../js/ui/views/TabGeneral.js";
 import {TabTimings} from "./ui/views/TabTimings.js";
+import {TabSipPuff} from "../js/ui/views/TabSipPuff.js";
 
 window.C = window.C || {};
 
@@ -22,6 +23,10 @@ C.VIEWS = [{
     object: TabTimings,
     hash: '#tabTimings',
     label: 'Timings'
+}, {
+    object: TabSipPuff,
+    hash: '#tabPuff',
+    label: 'Sip and Puff // Saug-Puste-Steuerung'
 }, {
     object: TabSlots,
     hash: '#tabSlots',
