@@ -28,8 +28,9 @@ class ActionButton extends Component {
     render(props) {
         props.label = props.label || '';
         props.progressLabel = props.progressLabel || this.props.label;
+        props.disabled = props.disabled || false;
         return html`
-            <button onclick="${() => this.doAction()}" disabled="${this.state.actionPerforming}">
+            <button onclick="${() => this.doAction()}" disabled="${this.state.actionPerforming || props.disabled}">
                 ${L.translate(this.state.actionPerforming ? props.progressLabel : props.label)}
             </button>`;
     }

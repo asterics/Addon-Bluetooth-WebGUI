@@ -203,7 +203,8 @@ class ActionEditModal extends Component {
                                 <div class="col-6 offset-6">
                                     ${html`<${ActionButton} onclick="${() => this.save(true)}"
                                         label="Save for alls slots // Für alle Slots speichern"
-                                        progressLabel="Saving to all slots... // Speichern für alle Slots..."/>`}
+                                        progressLabel="Saving to all slots... // Speichern für alle Slots..." 
+                                        disabled="${this.state.atCmd.input && !this.state.atCmdSuffix}"/>`}
                                 </div>
                             </div>
                         </div>
