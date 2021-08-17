@@ -9,6 +9,12 @@
     
     <script src="lib/loglevel.min.js"></script>
 
+    <script>
+        window.C = window.C || {}; //set those 2 constants here in order to get dynamic import in ATDevice working
+        C.DEVICE_IS_FABI = false;
+        C.DEVICE_IS_FM = true;
+    </script>
+
     <script type="module" src="js/communication/ATDevice.js"></script>
     <script type="module" src="js/constantsGeneric.js"></script>
     <script type="module" src="js_fm/constantsFM.js"></script>
@@ -17,7 +23,7 @@
 </head>
 <body>
 <div class="top-layer-center">
-    <div id="connectContent">
+    <div class="top-layer-content">
         <h1>FLipMouse Test</h1>
         <button onclick="initAndStart(doAllTests)">Start All Tests</button>
         <br/>

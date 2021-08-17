@@ -8,6 +8,12 @@ import {SerialCommunicator} from "../adapter/sercomm.js";
 let ATDevice = {};
 ATDevice.parseLiveData = true;
 
+let deviceClassPath = C.DEVICE_IS_FM ? '../../js_fm/communication/FLipMouse.js' : '../../js_fabi/communication/FABI.js';
+import(deviceClassPath).then(module => {
+    //set ATDevice.Specific to instance of either FLipMouse or FABI class
+    ATDevice.Specific = module.default;
+});
+
 let _slots = [];
 let _currentSlot = null;
 let _slotChangeHandler = null;
@@ -39,12 +45,7 @@ let _dontGetLiveValues = false;
  */
 ATDevice.init = function (dontGetLiveValues) {
     _dontGetLiveValues = dontGetLiveValues;
-    let deviceClassPath = C.DEVICE_IS_FM ? '../../js_fm/communication/FLipMouse.js' : '../../js_fabi/communication/FABI.js';
-    return import(deviceClassPath).then(module => {
-        //set ATDevice.Specific to instance of either FLipMouse or FABI class
-        ATDevice.Specific = module.default;
-        return Promise.resolve();
-    }).then(() => {
+    return Promise.resolve().then(() => {
         if (C.GUI_IS_MOCKED_VERSION) {
             _communicator = new MockCommunicator();
             return Promise.resolve();
