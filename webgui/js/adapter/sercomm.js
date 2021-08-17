@@ -23,6 +23,10 @@ function SerialCommunicator() {
         _valueHandler = handler;
     };
 
+    this.getSerialPort = function() {
+        return _port;
+    }
+
     this.init = async function () {
         if (!navigator.serial) {
             console.warn("Browser not supported, please use Chromium, Vivaldi, Edge or Chrome");
@@ -48,14 +52,24 @@ function SerialCommunicator() {
         return Promise.resolve();
     };
 
-    this.close = function () {
+    this.cancel = function () {
         _runReader = false;
         if (_portReader) _portReader.cancel();
         if (_portWriter) _portWriter.close();
+        if (_portReader) _portReader.releaseLock();
         if (_portWriter) _portWriter.releaseLock();
-        setTimeout(() => {
-            if (_port) _port.close();
-        }, 200);
+    }
+
+    this.close = function () {
+        return new Promise(resolve => {
+            this.cancel();
+            setTimeout(() => {
+                if (_port) _port.close();
+                setTimeout(() => {
+                    resolve();
+                }, 200);
+            }, 200);
+        });
     }
 
     /**
