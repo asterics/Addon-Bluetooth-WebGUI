@@ -1,4 +1,6 @@
 import {ATDevice} from "../../js/communication/ATDevice.js";
+import {TeensyFirmwareUpdater} from "./TeensyFirmwareUpdater.js";
+import {localStorageService} from "../../js/localStorageService.js";
 
 let FLipMouse = {};
 FLipMouse.LIVE_UP = 'LIVE_UP';
@@ -74,6 +76,20 @@ FLipMouse.resetMinMaxLiveValues = function () {
     _liveData[FLipMouse.LIVE_MOV_X_MAX] = -1;
     _liveData[FLipMouse.LIVE_MOV_Y_MAX] = -1;
 };
+
+FLipMouse.updateFirmware = async function (url, progressHandler, dontReset) {
+    localStorageService.setFirmwareDownloadUrl(url);
+    L.HTTPRequest(url, 'GET', 'text').then(async result => {
+        let serialCommunicator = ATDevice.getCommunicator();
+        if (!dontReset) {
+            await serialCommunicator.close();
+            await TeensyFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
+        }
+        await TeensyFirmwareUpdater.uploadFirmware(result);
+        localStorageService.setFirmwareDownloadUrl('');
+        window.location.reload();
+    });
+}
 
 function parseLiveData(data) {
     if (!ATDevice.parseLiveData) {

@@ -520,6 +520,10 @@ ATDevice.parseConfig = function(atCmdsString) {
     return parsedSlots;
 }
 
+ATDevice.getCommunicator = function () {
+    return _communicator;
+}
+
 function emitSlotChange() {
     if (_slotChangeHandler && new Date().getTime() - _lastSlotChangeTime > 200) {
         _lastSlotChangeTime = new Date().getTime();
