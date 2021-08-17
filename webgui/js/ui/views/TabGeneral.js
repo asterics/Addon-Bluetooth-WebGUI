@@ -81,7 +81,9 @@ class TabGeneral extends Component {
 
     updateFirmware() {
         let thiz = this;
-        if (!confirm(L.translate('Do you want to update the firmware to version {?}? After confirming this message you have to re-select the device ("unknown device") in a browser popup. // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung müssen Sie das Gerät erneut in einem Browser-Popup auswählen ("Unbekanntes Gerät").', this.state.newMainVersion))) {
+        let message = 'Do you want to update the firmware to version {?}? After confirming this message you have to re-select the device ("{?}") in a browser popup. // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung müssen Sie das Gerät erneut in einem Browser-Popup auswählen ("{?}").';
+        let deviceName = C.DEVICE_IS_FM ? L.translate('Unknown device // Unbekanntes Gerät') : 'Arduino Leonardo';
+        if (!confirm(L.translate(message, this.state.newMainVersion, deviceName))) {
             return;
         }
 
@@ -160,7 +162,7 @@ class TabGeneral extends Component {
                 <a href="${this.state.newBtVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newBtVersion}</a>   
                 <div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.btVersion, this.state.newBtVersion) || window.showUpgradeButton ? '' : 'd-none'}">
                     <button class="col-12" onclick="${() => this.updateBTFirmware()}" disabled="${this.state.btUpgradeProgress}">
-                        <span class="${this.state.btUpgradeProgress ? 'd-none' : ''}"><span class="sr-only">Bluetooth-Addon: </span>${L.translate('Update firmware // Firmware aktualisieren')}</span>
+                        <span class="${this.state.btUpgradeProgress ? 'd-none' : ''}"><span class="sr-only">Bluetooth-Addon: </span>${L.translate('Update bluetooth firmware // Bluetooth-Firmware aktualisieren')}</span>
                         <span class="${this.state.btUpgradeProgress ? '' : 'd-none'}"><span class="sr-only">Bluetooth-Addon: </span>${L.translate('Updating... {?}% // Aktualisiere... {?}%', state.btUpgradeProgress)}</span>
                     </button>   
                 </div>

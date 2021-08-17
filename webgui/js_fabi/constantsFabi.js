@@ -12,7 +12,7 @@ C.DEVICE_IS_FM = false;
 C.MIN_FIRMWARE_VERSION = '2.5.0';
 
 C.USB_DEVICE_FILTERS =  [
-    {usbVendorId: 0x2341} // Arduino Pro Micro
+    {usbVendorId: 0x2341, usbProductId: 0x8037} // Arduino Pro Micro
 ];
 
 C.VIEWS = [{

@@ -1,4 +1,6 @@
 import {ATDevice} from "../../js/communication/ATDevice.js";
+import {localStorageService} from "../../js/localStorageService.js";
+import {ProMicroFirmwareUpdater} from "./ProMicroFirmwareUpdater.js";
 
 let FABI = {};
 FABI.LIVE_PRESSURE = 'LIVE_PRESSURE';
@@ -29,6 +31,20 @@ FABI.resetMinMaxLiveValues = function () {
     _liveData[FABI.LIVE_PRESSURE_MIN] = 1024;
     _liveData[FABI.LIVE_PRESSURE_MAX] = -1;
 };
+
+FABI.updateFirmware = async function (url, progressHandler, dontReset) {
+    localStorageService.setFirmwareDownloadUrl('');
+    L.HTTPRequest(url, 'GET', 'text').then(async result => {
+        let serialCommunicator = ATDevice.getCommunicator();
+        if (!dontReset) {
+            await serialCommunicator.close();
+            await ProMicroFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
+        }
+        await ProMicroFirmwareUpdater.uploadFirmware(result, progressHandler);
+        window.location.href = window.location.href + '?' + C.SUCCESS_FIRMWAREUPDATE;
+        window.location.reload();
+    });
+}
 
 function parseLiveData(data) {
     if (!ATDevice.parseLiveData) {
