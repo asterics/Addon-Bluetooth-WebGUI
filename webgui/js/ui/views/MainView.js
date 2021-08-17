@@ -1,8 +1,16 @@
 import {h, Component, render} from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
 import {ATDevice} from "../../communication/ATDevice.js";
+import {localStorageService} from "../../localStorageService.js";
+import {FaIcon} from "../components/FaIcon.js";
 
 const html = htm.bind(h);
+
+const SCREENS = {
+    CONNECTION: 'CONNECTION',
+    MAIN: 'MAIN',
+    FIRMWARE_CONTINUE: 'FIRMWARE_CONTINUE'
+}
 
 class MainView extends Component {
 
@@ -13,8 +21,7 @@ class MainView extends Component {
         this.state = {
             views: [],
             currentView: {},
-            showConnectionScreen: false,
-            showMainScreen: false,
+            showScreen: SCREENS.CONNECTION,
             currentSlot: null,
             slots: [],
             connected: true,
@@ -29,17 +36,20 @@ class MainView extends Component {
         L('html')[0].lang = L.getLang();
         if (C.GUI_IS_MOCKED_VERSION || C.GUI_IS_ON_DEVICE) {
             this.initATDevice();
+        } else if(localStorageService.getFirmwareDownloadUrl()) {
+            this.setState({
+                showScreen: SCREENS.FIRMWARE_CONTINUE,
+            });
         } else {
             this.setState({
-                showConnectionScreen: true
+                showScreen: SCREENS.CONNECTION,
             });
         }
     }
 
     toConnectionScreen() {
         this.setState({
-            showMainScreen: false,
-            showConnectionScreen: true,
+            showScreen: SCREENS.CONNECTION,
             errorCode: C.ERROR_CONNECTION_LOST
         });
     }
@@ -57,8 +67,7 @@ class MainView extends Component {
         ATDevice.init().then(function () {
             thiz.toView();
             thiz.setState({
-                showConnectionScreen: false,
-                showMainScreen: true,
+                showScreen: SCREENS.MAIN,
                 currentSlot: ATDevice.getCurrentSlot(),
                 slots: ATDevice.getSlots()
             });
@@ -119,12 +128,29 @@ class MainView extends Component {
         document.documentElement.scrollTop = 0;
     }
 
+    restartFirmwareUpdate() {
+        ATDevice.Specific.updateFirmware(localStorageService.getFirmwareDownloadUrl(), null, true);
+    }
+
     render() {
         let state = this.state;
 
         return html`
-        <div class="top-layer-center ${state.showConnectionScreen? '' : 'd-none'}">
-            <div class="container-fluid" id="connectContent">
+        <div class="top-layer-center ${state.showScreen === SCREENS.FIRMWARE_CONTINUE? '' : 'd-none'}">
+            <div class="container-fluid top-layer-content">
+                <h1>${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
+                <div class="row mb-5">
+                    <div class="col-12 col-md-8 offset-md-2">
+                        ${html`<${FaIcon} icon="fas exclamation-triangle"/>`}
+                        <span>${L.translate('The last firmware update was cancelled. Restart it in order to be able to use your device. // Das letzte Firmware-Update wurde abgebrochen. Starten Sie es erneut um das Gerät weiter verwenden zu können.')}</span>
+                    </div>
+                </div><div class="row">
+                    <button class="col-12 col-md-8 offset-md-2" onclick="${() => this.restartFirmwareUpdate()}">${L.translate("Restart firmware update // Firmware-Update erneut starten", C.CURRENT_DEVICE)}</button>
+                </div>
+            </div>
+        </div>
+        <div class="top-layer-center ${state.showScreen === SCREENS.CONNECTION? '' : 'd-none'}">
+            <div class="container-fluid top-layer-content">
                 <h1>${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
                 <div class="row">
                     <button class="col-12 col-md-8 offset-md-2" onclick="${() => this.initATDevice()}">${L.translate("Connect to {?} connected via USB // Verbinden zu {?} (über USB angeschlossen)", C.CURRENT_DEVICE)}</button>
@@ -159,7 +185,7 @@ class MainView extends Component {
                 </div>
             </div>
         </div>
-        <header class="container-fluid p-0 ${state.showMainScreen ? '' : 'd-none'}" role="banner">
+        <header class="container-fluid p-0 ${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}" role="banner">
             <div class="row">
                 <h1 id="mainHeading" tabindex="-1" class="col col-md-6">${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
                 <div class="d-none d-md-inline-block col-md-3">
