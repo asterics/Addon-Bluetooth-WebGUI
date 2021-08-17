@@ -26,7 +26,9 @@ class MainView extends Component {
             slots: [],
             connected: true,
             menuOpen: false,
-            errorCode: null
+            errorCode: null,
+            showSuccessMsg: window.location.href.indexOf(C.SUCCESS_FIRMWAREUPDATE) > -1,
+            updateProgress: null
         }
 
         C.VIEWS.forEach(view => {
@@ -50,7 +52,8 @@ class MainView extends Component {
     toConnectionScreen() {
         this.setState({
             showScreen: SCREENS.CONNECTION,
-            errorCode: C.ERROR_CONNECTION_LOST
+            errorCode: C.ERROR_CONNECTION_LOST,
+            showSuccessMsg: false
         });
     }
 
@@ -62,7 +65,8 @@ class MainView extends Component {
     initATDevice() {
         let thiz = this;
         this.setState({
-            errorCode: null
+            errorCode: null,
+            showSuccessMsg: false
         });
         ATDevice.init().then(function () {
             thiz.toView();
@@ -129,7 +133,10 @@ class MainView extends Component {
     }
 
     restartFirmwareUpdate() {
-        ATDevice.Specific.updateFirmware(localStorageService.getFirmwareDownloadUrl(), null, true);
+        let thiz = this;
+        ATDevice.Specific.updateFirmware(localStorageService.getFirmwareDownloadUrl(), (progress) => {
+            thiz.setState({updateProgress: progress});
+        }, true);
     }
 
     render() {
@@ -145,7 +152,10 @@ class MainView extends Component {
                         <span>${L.translate('The last firmware update was cancelled. Restart it in order to be able to use your device. // Das letzte Firmware-Update wurde abgebrochen. Starten Sie es erneut um das Gerät weiter verwenden zu können.')}</span>
                     </div>
                 </div><div class="row">
-                    <button class="col-12 col-md-8 offset-md-2" onclick="${() => this.restartFirmwareUpdate()}">${L.translate("Restart firmware update // Firmware-Update erneut starten", C.CURRENT_DEVICE)}</button>
+                    <button class="col-12 col-md-8 offset-md-2" onclick="${() => this.restartFirmwareUpdate()}" disabled="${this.state.updateProgress}">
+                        <span class="${state.updateProgress ? 'd-none' : ''}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Restart firmware update // Firmware-Update erneut starten')}</span>
+                        <span class="${state.updateProgress ? '' : 'd-none'}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Updating... {?}% // Aktualisiere... {?}%', state.updateProgress)}</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -182,6 +192,10 @@ class MainView extends Component {
                                 return html`<span>${L.translate('Connection to device lost! Please try to reconnect. // Verbindung zum Gerät verloren! Bitte versuchen Sie sich wieder zu verbinden.')}</span>`;
                         }
                     })()}
+                </div>
+                <div class="row" class="${!state.errorCode && state.showSuccessMsg ? '' : 'd-none'}" style="color: darkgreen">
+                    <strong>${L.translate('Success: // Erfolg:')}</strong><span> </span>
+                    <span>${L.translate('Firmware update was successful! Please reconnect. // Firmwareupdate erfolgreich abgeschlossen! Bitte erneut verbinden.')}</span>
                 </div>
             </div>
         </div>

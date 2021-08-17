@@ -21,7 +21,6 @@ const EMPTY_VALUE = 0xFF;
 TeensyFirmwareUpdater.resetDevice = async function (existingOpenPort) {
     let filters = [
         {usbVendorId: 0x16C0, usbProductId: 0x0487}
-        //TODO: I think there are more possible PIDs...
     ];
     let port = existingOpenPort || await navigator.serial.requestPort({filters});
 
@@ -37,7 +36,7 @@ TeensyFirmwareUpdater.resetDevice = async function (existingOpenPort) {
 /****************/
 // 2.) open the new bootloader USB-RAW HID (new USB-PID!); user interaction required
 /****************/
-TeensyFirmwareUpdater.uploadFirmware = async function (filecontents) {
+TeensyFirmwareUpdater.uploadFirmware = async function (filecontents, progressFn) {
     if (!("hid" in navigator)) {
         log.warn("Web HID API not supported, please use Chromium based browsers!");
     }
@@ -48,7 +47,6 @@ TeensyFirmwareUpdater.uploadFirmware = async function (filecontents) {
     let filters = [
         {vendorId: 0x16C0, productId: 0x0478}
     ];
-
     try {
         const [port] = await navigator.hid.requestDevice({filters});
         //open & close
@@ -60,6 +58,9 @@ TeensyFirmwareUpdater.uploadFirmware = async function (filecontents) {
         let block_size = 512;
         let txx = null;
         for (let addr = 0; addr < flashData.data.length; addr += block_size) {
+            if (progressFn) {
+                progressFn(Math.min(100, Math.round(addr / flashData.data.length * 100)));
+            }
             //create addr array
             let cmd = new Uint8Array(64); //this is the address block, TODO: size depends on device
             cmd.fill(0); // clear array
@@ -90,9 +91,11 @@ TeensyFirmwareUpdater.uploadFirmware = async function (filecontents) {
             }
             //wait 0.5s for each block
             await wait(50);
-
         }
 
+        if (progressFn) {
+            progressFn(100);
+        }
         //reboot by setting first 3 bytes to 0xFF
         let cmd = new Uint8Array(64 + block_size); //this is the address block, TODO: size depends on device
         cmd.fill(0); // clear array

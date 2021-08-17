@@ -80,12 +80,16 @@ class TabGeneral extends Component {
     }
 
     updateFirmware() {
+        let thiz = this;
         if (!confirm(L.translate('Do you want to update the firmware to version {?}? After confirming this message you have to re-select the device ("unknown device") in a browser popup. // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung müssen Sie das Gerät erneut in einem Browser-Popup auswählen ("Unbekanntes Gerät").', this.state.newMainVersion))) {
             return;
         }
 
         let url = 'https://proxy.asterics-foundation.org/proxybase64url.php?csurl=' + encodeURIComponent(btoa(this.state.newMainVersionDownloadUrl));
-        ATDevice.Specific.updateFirmware(url);
+        thiz.setState({mainUpgradeProgress: 1});
+        ATDevice.Specific.updateFirmware(url, (progress) => {
+            thiz.setState({mainUpgradeProgress: progress || 1});
+        });
     }
 
 
@@ -135,7 +139,7 @@ class TabGeneral extends Component {
                 <span class="col col-md-4">${L.translate('Available version // Verfügbare Version')}</span>   
                 <a href="${this.state.newMainVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newMainVersion}</a>   
                 <div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.mainVersion, this.state.newMainVersion) || window.showUpgradeButton ? '' : 'd-none'}">
-                    <button class="col-12" onclick="${() => this.updateFirmware()}">
+                    <button class="col-12" onclick="${() => this.updateFirmware()}" disabled="${this.state.mainUpgradeProgress}">
                         <span class="${this.state.mainUpgradeProgress ? 'd-none' : ''}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Update firmware // Firmware aktualisieren')}</span>
                         <span class="${this.state.mainUpgradeProgress ? '' : 'd-none'}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Updating... {?}% // Aktualisiere... {?}%', state.mainUpgradeProgress)}</span>
                     </button>   

@@ -85,8 +85,9 @@ FLipMouse.updateFirmware = async function (url, progressHandler, dontReset) {
             await serialCommunicator.close();
             await TeensyFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
         }
-        await TeensyFirmwareUpdater.uploadFirmware(result);
+        await TeensyFirmwareUpdater.uploadFirmware(result, progressHandler);
         localStorageService.setFirmwareDownloadUrl('');
+        window.location.href = window.location.href + '?' + C.SUCCESS_FIRMWAREUPDATE;
         window.location.reload();
     });
 }
