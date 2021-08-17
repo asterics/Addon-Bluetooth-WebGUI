@@ -19,6 +19,7 @@ class TabGeneral extends Component {
             btVersion: unknown,
             newBtVersion: unknown,
             newBtVersionUrl: '',
+            mainUpgradeProgress: null,
             btUpgradeProgress: null
         }
 
@@ -28,9 +29,11 @@ class TabGeneral extends Component {
     getVersions() {
         let mainDeviceURL = `https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/releases/latest`
         L.HTTPRequest(mainDeviceURL, 'GET', 'json').then(result => {
+            let binaryAsset = result.assets.filter(asset => asset.name.indexOf('.hex') > -1)[0];
             this.setState({
                 newMainVersion: L.formatVersion(result['tag_name']),
-                newMainVersionUrl: result['html_url']
+                newMainVersionUrl: result['html_url'],
+                newMainVersionDownloadUrl: binaryAsset.browser_download_url
             });
         });
         L.HTTPRequest('https://api.github.com/repos/asterics/esp32_mouse_keyboard/releases/latest', 'GET', 'json').then(result => {
@@ -75,6 +78,16 @@ class TabGeneral extends Component {
             });
         });
     }
+
+    updateFirmware() {
+        if (!confirm(L.translate('Do you want to update the firmware to version {?}? After confirming this message you have to re-select the device ("unknown device") in a browser popup. // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung müssen Sie das Gerät erneut in einem Browser-Popup auswählen ("Unbekanntes Gerät").', this.state.newMainVersion))) {
+            return;
+        }
+
+        let url = 'https://proxy.asterics-foundation.org/proxybase64url.php?csurl=' + encodeURIComponent(btoa(this.state.newMainVersionDownloadUrl));
+        ATDevice.Specific.updateFirmware(url);
+    }
+
 
     resetConfig() {
         let confirmMessage = L.translate('Do you really want to reset the device to the default configuration? All slots will be deleted. // Möchten Sie das Gerät wirklich auf die Standardeinstellungen zurücksetzen? Alle Slots werden gelöscht.');
@@ -121,9 +134,12 @@ class TabGeneral extends Component {
             <div class="row">
                 <span class="col col-md-4">${L.translate('Available version // Verfügbare Version')}</span>   
                 <a href="${this.state.newMainVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newMainVersion}</a>   
-                <!-- TODO div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.mainVersion, this.state.newMainVersion) ? '' : 'd-none'}">
-                    <button class="col-12" disabled="${!L.isVersionNewer(this.state.mainVersion, this.state.newMainVersion)}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Update firmware // Firmware aktualisieren')}</button>   
-                </div-->
+                <div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.mainVersion, this.state.newMainVersion) || window.showUpgradeButton ? '' : 'd-none'}">
+                    <button class="col-12" onclick="${() => this.updateFirmware()}">
+                        <span class="${this.state.mainUpgradeProgress ? 'd-none' : ''}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Update firmware // Firmware aktualisieren')}</span>
+                        <span class="${this.state.mainUpgradeProgress ? '' : 'd-none'}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Updating... {?}% // Aktualisiere... {?}%', state.mainUpgradeProgress)}</span>
+                    </button>   
+                </div>
                 <div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.mainVersion, this.state.newMainVersion) || this.state.mainVersion === unknown ? 'd-none' : ''}">
                     <span style="color: green">${L.translate('{?} firmware is up-to-date! // {?} Firmware ist aktuell!', C.CURRENT_DEVICE)}</span>
                 </div>
