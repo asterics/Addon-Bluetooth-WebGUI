@@ -12,18 +12,25 @@ To adjust settings on your assistive device, please:
 ## Please select your device
 <ul>
     <li>
-        <a href="https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fm.htm" style="border: 1px solid; margin-bottom: 1em">
+        <a href="https://flipmouse.asterics.eu" style="border: 1px solid; margin-bottom: 1em">
             <span>FLipMouse</span>
             <div style="border: 1px solid"><img src="https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fm_lowres.png" alt="FLipMouse logo" width="300"/></div>
         </a>
     </li>
     <li>
-        <a href="https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fabi.htm" style="border: 1px solid">
+        <a href="https://fabi.asterics.eu" style="border: 1px solid">
             <span>FABI</span>
             <div style="border: 1px solid"><img src="https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fabi_lowres.png" alt="FABI logo" width="300"/></div>
         </a>
     </li>
 </ul>
+
+## Run WebGUI locally
+To run the WebGUIs locally you need to download this repository and start a local webserver to serve the data. Do the following steps:
+1. Clone the repository with `git clone https://github.com/asterics/Addon-Bluetooth-WebGUI.git`
+2. Install any local webserver, e.g. [http-server from npm](https://www.npmjs.com/package/http-server) with `npm install --global http-server`
+3. Start the local webserver to serve documents from the webgui folder e.g. with `cd Addon-Bluetooth-WebGUI/webgui` and starting `http-server` in this directory
+4. Open `http://localhost:8080/index_fm.htm` or `http://localhost:8080/index_fabi.htm` in your browser
 
 ## Test suites
 There are automatic test suites for testing correct function of the AT command API for a device:
