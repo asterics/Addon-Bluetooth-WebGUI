@@ -62,7 +62,7 @@ class TabGeneral extends Component {
 
     updateBTFirmware() {
         let thiz = this;
-        if (!confirm(L.translate('Do you want to update the firmware version of the BT-Addon to version {?}? // Möchten Sie die Version des BT-Addons auf Version {?} aktualisieren?', this.state.newBtVersion))) {
+        if (!confirm(L.translate('Do you want to update the firmware version of the BT-Addon to version {?}? Hint: keep this tab open and in foreground while updating! // Möchten Sie die Version des BT-Addons auf Version {?} aktualisieren? Hinweis: lassen Sie diesen Tab während dem Update im Vordergrund geöffnet!', this.state.newBtVersion))) {
             return;
         }
         let url = 'https://proxy.asterics-foundation.org/proxybase64url.php?csurl=' + encodeURIComponent(btoa(this.state.newBtVersionDownloadUrl));
@@ -81,7 +81,7 @@ class TabGeneral extends Component {
 
     updateFirmware() {
         let thiz = this;
-        let message = 'Do you want to update the firmware to version {?}? After confirming this message you have to re-select the device ("{?}") in a browser popup. // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung müssen Sie das Gerät erneut in einem Browser-Popup auswählen ("{?}").';
+        let message = 'Do you want to update the firmware to version {?}? After confirming this message you have to re-select the device ("{?}") in a browser popup. Keep this tab open and in foreground while updating! // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung müssen Sie das Gerät erneut in einem Browser-Popup auswählen ("{?}"). Lassen Sie diesen Tab während dem Update im Vordergrund geöffnet!';
         let deviceName = C.DEVICE_IS_FM ? L.translate('Unknown device // Unbekanntes Gerät') : 'Arduino Leonardo';
         if (!confirm(L.translate(message, this.state.newMainVersion, deviceName))) {
             return;
