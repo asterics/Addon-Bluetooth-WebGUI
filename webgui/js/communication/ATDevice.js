@@ -173,9 +173,8 @@ ATDevice.sendATCmd = function (atCmd, param, timeout, onlyIfNotBusy, dontLog) {
 
     return promise;
 };
-window.sendATCmd = function (cmd) {
-    window.logReceived = true;
-    ATDevice.sendATCmd(cmd);
+window.sendATCmd = (cmd) => {
+    ATDevice.sendAtCmdWithResult(cmd);
 }
 
 /**
