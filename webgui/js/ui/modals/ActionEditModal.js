@@ -161,7 +161,7 @@ class ActionEditModal extends Component {
                                                 <div class="row">
                                                     <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
                                                     <div class="col-md-8">
-                                                        <input id="inputText" value="${parseInt(state.atCmdSuffix)}" type="number" oninput="${(event) => this.setAtCmdSuffix(parseInt(event.target.value))}" placeholder="${L.translate('Input number // Zahl eingeben')}" class="col-12"/>
+                                                        <input id="inputText" value="${state.atCmdSuffix}" type="number" oninput="${(event) => this.setAtCmdSuffix(event.target.value)}" placeholder="${L.translate('Input number // Zahl eingeben')}" class="col-12"/>
                                                     </div>
                                                 </div>`;
                                         case C.INPUTFIELD_TYPE_SELECT:
