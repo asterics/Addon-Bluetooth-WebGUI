@@ -10,6 +10,7 @@ C.CURRENT_DEVICE = C.AT_DEVICE_FABI;
 C.DEVICE_IS_FABI = true;
 C.DEVICE_IS_FM = false;
 C.MIN_FIRMWARE_VERSION = '2.5.0';
+C.MAX_NUMBER_SLOTS = 11;
 
 C.USB_DEVICE_FILTERS =  [
     {usbVendorId: 0x2341, usbProductId: 0x8037} // Arduino Pro Micro

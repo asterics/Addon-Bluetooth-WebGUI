@@ -74,6 +74,9 @@ class TabSlots extends Component {
         thiz.setState({
             uploading: true
         })
+        while (this.state.selectedUploadSlots.length + this.state.slots.length > C.MAX_NUMBER_SLOTS) {
+            this.state.selectedUploadSlots.pop();
+        }
         ATDevice.uploadSlots(this.state.selectedUploadSlots).then(() => {
             thiz.setState({
                 slots: ATDevice.getSlots(),
@@ -128,6 +131,7 @@ class TabSlots extends Component {
     render() {
         let state = this.state;
         let slots = state.slots;
+        let maxSlotsReached = this.state.slots.length === C.MAX_NUMBER_SLOTS;
 
         return html`
             <h2>${L.translate('Slot configuration // Slot-Konfiguration')}</h2>
@@ -188,10 +192,11 @@ class TabSlots extends Component {
                 
                 <div class="row">
                     <div class="col-sm-6 col-lg-5">
-                        <input id="newSlotLabel" class="col-12" value="${state.newSlotName}" oninput="${(event) => this.setState({newSlotName: event.target.value})}" type="text" placeholder="${L.translate('insert name for new slot // Namen für neuen Slot eingeben')}" maxlength="15"/>
+                        <input disabled="${maxSlotsReached}" id="newSlotLabel" class="col-12" value="${state.newSlotName}" oninput="${(event) => this.setState({newSlotName: event.target.value})}" type="text" 
+                               placeholder="${!maxSlotsReached ? L.translate('insert name for new slot // Namen für neuen Slot eingeben') : L.translate('Storage full, no space for more slots. // Speicher voll, kein Platz für weitere Slots.')}" maxlength="15"/>
                     </div>
                     <div class="col-sm-6 col-lg-5">
-                        <button disabled="${!state.newSlotName || this.state.slots.includes(this.state.newSlotName)}" onclick="${() => this.createSlot()}">
+                        <button disabled="${!state.newSlotName || this.state.slots.includes(this.state.newSlotName) || maxSlotsReached}" onclick="${() => this.createSlot()}">
                             ${html`<${FaIcon} icon="fas plus-circle"/>`}
                             <span>${L.translate('Create Slot // Slot anlegen')}</span>
                         </button>
@@ -201,8 +206,8 @@ class TabSlots extends Component {
                 <h3 class="mt-5">${L.translate('Upload slots from file // Slots aus Datei hochladen')}</h3>
                 <div class="row mt-4">
                     <div class="col-sm-6 col-lg-5">
-                        <label class="button" for="fileInputSlotUpload">${html`<${FaIcon} icon="fas file"/>`} ${L.translate('Select file // Datei auswählen')}</label>
-                        <input class="sr-only" type=file id="fileInputSlotUpload" accept=".set" onchange="${(event) => this.fileUploadChanged(event.target)}"/>
+                        <label title="${maxSlotsReached ? L.translate('Storage full, no space for more slots. // Speicher voll, kein Platz für weitere Slots.') : ''}" class="button ${maxSlotsReached ? 'disabled' : ''}" for="fileInputSlotUpload">${html`<${FaIcon} icon="fas file"/>`} ${L.translate('Select file // Datei auswählen')}</label>
+                        <input disabled="${maxSlotsReached}" class="sr-only" type=file id="fileInputSlotUpload" accept=".set" onchange="${(event) => this.fileUploadChanged(event.target)}"/>
                     </div>
                     <div class="col-sm-6 col-lg-5">
                         <span>${L.translate('Selected file: // Gewählte Datei:')}</span> <span>${this.state.selectedFile || L.translate('(none) // (keine)')}</span>

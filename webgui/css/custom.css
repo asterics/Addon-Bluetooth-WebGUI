@@ -43,13 +43,13 @@ button, .button {
     background-color: #ebf2f5;
 }
 
-button:disabled, button:disabled div{
+button:disabled, button:disabled div, label.disabled{
     border-color: lightgray;
     color: gray;
     background-color: whitesmoke;
 }
 
-button:disabled img {
+button:disabled img, label.disabled img {
     filter: invert(0.5);
 }
 
