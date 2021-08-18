@@ -1,5 +1,6 @@
 let localStorageService = {};
 let KEY_FRIMWARE_DOWNLOAD_URL = 'FMFABI_WEBGUI_KEY_FRIMWARE_DOWNLOAD_URL';
+let KEY_CONFIG_TAB_ACTIONS = 'FMFABI_KEY_CONFIG_TAB_ACTIONS';
 let storage = null;
 
 if (typeof (Storage) !== "undefined") {
@@ -37,6 +38,15 @@ localStorageService.getFirmwareDownloadUrl = function () {
 
 localStorageService.setFirmwareDownloadUrl = function (downloadUrl) {
     return localStorageService.save(KEY_FRIMWARE_DOWNLOAD_URL, downloadUrl);
+};
+
+localStorageService.getTabActionConfig = function () {
+    let value = localStorageService.get(KEY_CONFIG_TAB_ACTIONS);
+    return value ? JSON.parse(value) : {};
+};
+
+localStorageService.setTabActionConfig = function (value) {
+    return localStorageService.save(KEY_CONFIG_TAB_ACTIONS, JSON.stringify(value));
 };
 
 export {localStorageService};

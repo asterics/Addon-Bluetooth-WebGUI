@@ -3,6 +3,7 @@ import htm from '../../../lib/htm.min.js';
 import {ActionEditModal} from "../modals/ActionEditModal.js";
 import {RadioFieldset} from "../components/RadioFieldset.js";
 import {ATDevice} from "../../communication/ATDevice.js";
+import {localStorageService} from "../../localStorageService.js";
 
 
 const html = htm.bind(h);
@@ -14,6 +15,7 @@ class TabActions extends Component {
         TabActions.instance = this;
         this.state = {
             showCategory: null,
+            showAllSlots: localStorageService.getTabActionConfig().showAllSlots !== undefined ? localStorageService.getTabActionConfig().showAllSlots : true,
             modalBtnMode: null,
             modalSlot: null,
             widthEm: window.innerWidth / parseFloat(getComputedStyle(document.querySelector('body'))['font-size'])
@@ -72,12 +74,17 @@ class TabActions extends Component {
         if (em >= 35) return 1;
         return 0;
     }
+
+    setShowAllSlots(value) {
+        this.setState({showAllSlots: value});
+        localStorageService.setTabActionConfig({showAllSlots: value});
+    }
     
     render() {
         let state = this.state;
-        let slots = ATDevice.getSlots();
+        let slots = state.showAllSlots ? ATDevice.getSlots(): [ATDevice.getCurrentSlot()];
         let mobileView = slots.length > this.getMaxPrintableSlots();
-
+        
         let useBtnModes = C.DEVICE_IS_FABI && parseInt(ATDevice.getConfig(C.AT_CMD_THRESHOLD_LONGPRESS)) > 0 ? C.BTN_MODES_LONGPRESS : C.BTN_MODES;
         let btnModes = useBtnModes.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
         let modalOpen = !!state.modalBtnMode;
@@ -89,10 +96,14 @@ class TabActions extends Component {
         let useCategories = C.DEVICE_IS_FABI && parseInt(ATDevice.getConfig(C.AT_CMD_THRESHOLD_LONGPRESS)) > 0 ? C.BTN_CATEGORIES_LONGPRESS : C.BTN_CATEGORIES;
         let categoryElements = useCategories.map(cat => {return {value: cat.constant, label: cat.label}});
         categoryElements = [{value: null, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
+        let slotElements = [{value: true, label: 'All slots // Alle Slots'}, {value: false, label: 'Current slot // Aktueller Slot'}];
 
         return html`<div id="tabActions">
              <h2>${L.translate('Action configuration // Aktionen-Konfiguration')}</h2>
-             <div class="${mobileView ? '' : 'd-none'} filter-buttons mb-3">
+            <div class="filter-buttons mb-3">
+                ${html`<${RadioFieldset} legend="Show slots: // Zeige Slots:" onchange="${(value) => this.setShowAllSlots(value === 'true')}" elements="${slotElements}" value="${state.showAllSlots}"/>`}
+            </div> 
+            <div class="${mobileView ? '' : 'd-none'} filter-buttons mb-3">
                 ${html`<${RadioFieldset} legend="Show categories: // Zeige Kategorien:" onchange="${(value) => this.setState({showCategory: value})}" elements="${categoryElements}" value="${state.showCategory}"/>`}
              </div>
              
