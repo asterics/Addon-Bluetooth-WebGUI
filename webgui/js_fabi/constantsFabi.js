@@ -16,10 +16,6 @@ C.USB_DEVICE_FILTERS =  [
 ];
 
 C.VIEWS = [{
-    object: TabActions,
-    hash: '#tabActions',
-    label: 'Actions // Aktionen'
-}, {
     object: TabTimings,
     hash: '#tabTimings',
     label: 'Timings'
@@ -27,6 +23,10 @@ C.VIEWS = [{
     object: TabSipPuff,
     hash: '#tabPuff',
     label: 'Sip and Puff // Saug-Puste-Steuerung'
+}, {
+    object: TabActions,
+    hash: '#tabActions',
+    label: 'Actions // Aktionen'
 }, {
     object: TabSlots,
     hash: '#tabSlots',
@@ -36,6 +36,7 @@ C.VIEWS = [{
     hash: '#tabGeneral',
     label: 'General // Allgemein'
 }];
+C.VIEW_START_HASH = '#tabActions';
 
 C.AT_CMD_CATEGORIES = [{
     constant: C.AT_CMD_CAT_KEYBOARD,

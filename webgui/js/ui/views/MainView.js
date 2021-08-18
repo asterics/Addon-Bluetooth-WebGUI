@@ -113,7 +113,7 @@ class MainView extends Component {
     toView(viewHash) {
         let viewHashes = this.state.views.map(el => el.hash);
         viewHash = viewHash || window.location.hash;
-        viewHash = viewHashes.includes(viewHash) ? viewHash : viewHashes[0];
+        viewHash = viewHashes.includes(viewHash) ? viewHash : C.VIEW_START_HASH || viewHashes[0];
         let view = this.state.views.filter(el => el.hash === viewHash)[0];
 
         this.setState({
