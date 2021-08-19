@@ -34,6 +34,9 @@ ProMicroFirmwareUpdater.uploadFirmware = async function (url, progressFn) {
         const port = await navigator.serial.requestPort({filters});
         await port.open({baudRate: 57600});
 
+        if (progressFn) {
+            progressFn(1);
+        }
         // retrieve firmware after opening port in order to prevent "no user interaction" error on opening port
         let result = await L.CachedHTTPRequest(url, 'GET', 'text', 'FABI_FIRMWARE');
         let flashData = firmwareUtil.parseIntelHex(result, MAX_WORDS_PROMICRO);
