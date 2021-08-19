@@ -1,7 +1,9 @@
 //very lightweight replacement for jquery,
 //see https://blog.garstasio.com/you-dont-need-jquery/selectors/#multiple-selectors
-window.L = function (selector) {
-    if(selector instanceof Node) {
+import {localStorageService} from "./localStorageService.js";
+
+let L = function (selector) {
+    if (selector instanceof Node) {
         return selector;
     }
     var selectorType = 'querySelectorAll';
@@ -14,13 +16,13 @@ window.L = function (selector) {
     return document[selectorType](selector);
 };
 
-window.L.toggle = function () {
+L.toggle = function () {
     var args = Array.prototype.slice.call(arguments);
     args.unshift("block");
     toggleInternal(args);
 };
 
-window.L.toggleInline = function () {
+L.toggleInline = function () {
     var args = Array.prototype.slice.call(arguments);
     args.unshift("inline");
     toggleInternal(args);
@@ -44,15 +46,15 @@ function toggleInternal(args) {
     }
 }
 
-window.L.isVisible = function (selector) {
+L.isVisible = function (selector) {
     var x = L(selector);
     return !(x.style && x.style.display === "none");
 };
 
-window.L.setVisible = function (selector, visible, visibleClass) {
+L.setVisible = function (selector, visible, visibleClass) {
     var elems = L.selectAsList(selector);
     elems.forEach(function (x) {
-        if(visible == false) {
+        if (visible == false) {
             x.style.display = "none";
         } else {
             x.style.display = visibleClass ? visibleClass : "block";
@@ -60,23 +62,23 @@ window.L.setVisible = function (selector, visible, visibleClass) {
     });
 };
 
-window.L.selectAsList = function (selector) {
+L.selectAsList = function (selector) {
     var result = L(selector);
-    if(result && result.length > 0) {
+    if (result && result.length > 0) {
         return result;
     }
-    return result && !(result instanceof NodeList) ? [result]: [];
+    return result && !(result instanceof NodeList) ? [result] : [];
 };
 
-window.L.addClass = function (selector, className) {
+L.addClass = function (selector, className) {
     L.toggleClass(selector, className, false, true);
 };
 
-window.L.removeClass = function (selector, className) {
+L.removeClass = function (selector, className) {
     L.toggleClass(selector, className, true, false);
 };
 
-window.L.toggleClass = function (selector, className, dontAdd, dontRemove) {
+L.toggleClass = function (selector, className, dontAdd, dontRemove) {
     let list = L.selectAsList(selector);
     list.forEach(function (elem) {
         let classes = elem.className.split(' ');
@@ -92,11 +94,11 @@ window.L.toggleClass = function (selector, className, dontAdd, dontRemove) {
     });
 }
 
-window.L.setSelected = function (selector, selected) {
-    if(selected == undefined) selected = true;
+L.setSelected = function (selector, selected) {
+    if (selected == undefined) selected = true;
     var list = L.selectAsList(selector);
     list.forEach(function (elem) {
-        if(selected) {
+        if (selected) {
             L.addClass(elem, 'selected');
         } else {
             L.removeClass(elem, 'selected');
@@ -105,20 +107,20 @@ window.L.setSelected = function (selector, selected) {
     });
 };
 
-window.L.setValue = function (selector, value) {
+L.setValue = function (selector, value) {
     var list = L.selectAsList(selector);
     list.forEach(function (elem) {
-        if(elem.value) {
+        if (elem.value) {
             elem.value = value;
         }
     });
 };
 
-L.hasFocus = function(selector) {
+L.hasFocus = function (selector) {
     return L(selector) == document.activeElement;
 };
 
-window.L.val2key = function (val, array) {
+L.val2key = function (val, array) {
     for (var key in array) {
         if (array[key] == val) {
             return key;
@@ -127,32 +129,32 @@ window.L.val2key = function (val, array) {
     return false;
 };
 
-window.L.isFunction = function (functionToCheck) {
+L.isFunction = function (functionToCheck) {
     var getType = {};
     return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
 };
 
-window.L.getIDSelector = function (id) {
+L.getIDSelector = function (id) {
     return '#' + id;
 };
 
-window.L.getPercentage = function (value, minRange, maxRange) {
+L.getPercentage = function (value, minRange, maxRange) {
     return (Math.round(((value - minRange) / (maxRange - minRange) * 100) * 1000) / 1000)
 };
 
-window.L.limitValue = function (value, min, max) {
+L.limitValue = function (value, min, max) {
     return Math.max(Math.min(value, max), min);
 }
 
-window.L.getMs = function () {
+L.getMs = function () {
     return new Date().getTime();
 };
 
-window.L.deepCopy = function (object) {
+L.deepCopy = function (object) {
     return JSON.parse(JSON.stringify(object));
 };
 
-window.L.removeAllChildren = function (selector) {
+L.removeAllChildren = function (selector) {
     var elm = L(selector);
     elm = elm instanceof NodeList ? elm : [elm];
     elm.forEach(function (elem) {
@@ -162,7 +164,7 @@ window.L.removeAllChildren = function (selector) {
     });
 };
 
-window.L.createElement = function (tagName, className, inner, style) {
+L.createElement = function (tagName, className, inner, style) {
     var e = document.createElement(tagName);
     e.className = className;
     e.style.cssText = style || '';
@@ -210,14 +212,14 @@ L.createSelectItems = function (listValues, listHtml, defaultOption) {
 /**
  * returns true if the current browser language contains the given localeString
  */
-window.L.isLang = function (localeString) {
+L.isLang = function (localeString) {
     var lang = window.navigator.userLanguage || window.navigator.language;
     return lang.indexOf(localeString) > -1;
 };
 
-window.L.getLang = function () {
+L.getLang = function () {
     var lang = window.navigator.userLanguage || window.navigator.language;
-    return lang.substring(0,2);
+    return lang.substring(0, 2);
 };
 
 /**
@@ -230,7 +232,7 @@ window.L.getLang = function () {
  * @param translationKey the key to translate
  * @return {*}
  */
-window.L.translate = function (translationKey) {
+L.translate = function (translationKey) {
     translationKey = translationKey + '' || '';
     let translated = '';
     if (translationKey.indexOf(' // ') > -1) {
@@ -245,19 +247,19 @@ window.L.translate = function (translationKey) {
     return translated;
 };
 
-window.L.getLastElement = function(array) {
+L.getLastElement = function (array) {
     return array.slice(-1)[0];
 };
 
-window.L.replaceAll = function(string, search, replace) {
+L.replaceAll = function (string, search, replace) {
     return string.replace(new RegExp(search, 'g'), replace);
 };
 
-window.L.equalIgnoreCase = function (str1, str2) {
+L.equalIgnoreCase = function (str1, str2) {
     return str1.toUpperCase() === str2.toUpperCase();
 };
 
-window.L.loadScript = function (source, fallbackSource) {
+L.loadScript = function (source, fallbackSource) {
     console.log("loading script: " + source);
     var script = document.createElement('script');
     return new Promise(function (resolve) {
@@ -267,7 +269,7 @@ window.L.loadScript = function (source, fallbackSource) {
         };
         script.onerror = function () {
             console.log("error loading: " + source);
-            if(fallbackSource) {
+            if (fallbackSource) {
                 L.loadScript(fallbackSource).then(resolve);
             } else {
                 resolve(false);
@@ -314,6 +316,48 @@ L.HTTPRequest = function (url, method, responseType) {
         };
         xhr.send();
     });
+}
+
+/**
+ * Starts a HTTP request or returns a cached version of the result if it was already executed before.
+ * @param url
+ * @param method HTTP method, e.g. GET
+ * @param responseType e.g. 'text', 'json' or 'arraybuffer'
+ * @param storeKey (optional) key to store/cache the result in local storage
+ * @param timeToLive (optional) time in milliseconds the cached version is valid
+ * @return {Promise<unknown>|Promise<ArrayBuffer>} promise resolving to the result of the request
+ */
+L.CachedHTTPRequest = function (url, method, responseType, storeKey, timeToLive) {
+    let PREKEY = 'FMFABI_CACHEDREQ_';
+    let requestId = url + method + responseType;
+    storeKey = storeKey || requestId;
+    let key = PREKEY + storeKey;
+    timeToLive = timeToLive !== undefined ? timeToLive : 3600 * 1000; // 1 hour
+    let stored = localStorageService.get(key);
+    let storedObject = stored ? JSON.parse(stored) : null;
+    let storedRequestId = storedObject ? storedObject.requestId : null;
+    if (storedObject && new Date().getTime() - storedObject.time < timeToLive && requestId === storedRequestId) {
+        log.info('using cache for request...')
+        let data = storedObject.data;
+        if (responseType === 'arraybuffer') {
+            let byteArray = new Uint8Array(storedObject.data);
+            data = byteArray.buffer;
+        }
+        return Promise.resolve(data);
+    }
+    let promise = L.HTTPRequest(url, method, responseType);
+    promise.then(result => {
+        if (responseType === 'arraybuffer') {
+            window.result = result;
+            result = Array.from(new Uint8Array(result));
+        }
+        localStorageService.save(key, JSON.stringify({
+            data: result,
+            time: new Date().getTime(),
+            requestId: requestId
+        }))
+    });
+    return promise;
 }
 
 L.parseVersion = function (versionString) {
@@ -411,3 +455,7 @@ function robustExtremeFn(extremeFn, val1, val2) {
     }
     return isNaN(val1) ? val2 : val1;
 }
+
+window.L = L;
+
+export {L}
