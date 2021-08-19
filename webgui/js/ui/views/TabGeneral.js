@@ -2,6 +2,7 @@ import { h, Component, render } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
 import {ATDevice} from "../../communication/ATDevice.js";
 import {FaIcon} from "../components/FaIcon.js";
+import {L} from "../../lquery.js";
 
 const html = htm.bind(h);
 let unknown = L.translate('(unknown) // (unbekannt)')
@@ -28,7 +29,7 @@ class TabGeneral extends Component {
 
     getVersions() {
         let mainDeviceURL = `https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/releases/latest`
-        L.HTTPRequest(mainDeviceURL, 'GET', 'json').then(result => {
+        L.CachedHTTPRequest(mainDeviceURL, 'GET', 'json').then(result => {
             let binaryAsset = result.assets.filter(asset => asset.name.indexOf('.hex') > -1)[0];
             this.setState({
                 newMainVersion: L.formatVersion(result['tag_name']),
@@ -36,7 +37,7 @@ class TabGeneral extends Component {
                 newMainVersionDownloadUrl: binaryAsset.browser_download_url
             });
         });
-        L.HTTPRequest('https://api.github.com/repos/asterics/esp32_mouse_keyboard/releases/latest', 'GET', 'json').then(result => {
+        L.CachedHTTPRequest('https://api.github.com/repos/asterics/esp32_mouse_keyboard/releases/latest', 'GET', 'json').then(result => {
             let binaryAsset = result.assets.filter(asset => asset.name.indexOf('.bin') > -1)[0];
             this.setState({
                 newBtVersion: L.formatVersion(result['tag_name']),
@@ -66,7 +67,7 @@ class TabGeneral extends Component {
             return;
         }
         let url = 'https://proxy.asterics-foundation.org/proxybase64url.php?csurl=' + encodeURIComponent(btoa(this.state.newBtVersionDownloadUrl));
-        L.HTTPRequest(url, 'GET', 'arraybuffer').then(result => {
+        L.CachedHTTPRequest(url, 'GET', 'arraybuffer', 'BT_FIRMWARE').then(result => {
             thiz.setState({btUpgradeProgress: 1});
             ATDevice.upgradeBTAddon(result, (progress) => {
                 thiz.setState({btUpgradeProgress: progress || 1});
@@ -81,13 +82,12 @@ class TabGeneral extends Component {
 
     updateFirmware() {
         let thiz = this;
+        let url = 'https://proxy.asterics-foundation.org/proxybase64url.php?csurl=' + encodeURIComponent(btoa(this.state.newMainVersionDownloadUrl));
         let message = 'Do you want to update the firmware to version {?}? After confirming this message you have to re-select the device ("{?}") in a browser popup. Keep this tab open and in foreground while updating! // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung müssen Sie das Gerät erneut in einem Browser-Popup auswählen ("{?}"). Lassen Sie diesen Tab während dem Update im Vordergrund geöffnet!';
         let deviceName = C.DEVICE_IS_FM ? L.translate('Unknown device // Unbekanntes Gerät') : 'Arduino Leonardo';
         if (!confirm(L.translate(message, this.state.newMainVersion, deviceName))) {
             return;
         }
-
-        let url = 'https://proxy.asterics-foundation.org/proxybase64url.php?csurl=' + encodeURIComponent(btoa(this.state.newMainVersionDownloadUrl));
         thiz.setState({mainUpgradeProgress: 1});
         ATDevice.Specific.updateFirmware(url, (progress) => {
             thiz.setState({mainUpgradeProgress: progress || 1});
