@@ -289,7 +289,7 @@ class TabSlots extends Component {
                                 ${state.demoSettings.filter(s => s.name.indexOf('.set') > -1).map(setting => html`<option value="${setting.sha}">${setting.name}</option>`)}
                             </select>
                         </div>
-                        <div class="col-sm-6 col-lg-5 ${state.demoSettingSlots.length > 0 ? '' : 'd-none'}">
+                        <div class="col-sm-6 col-lg-5 mb-4 ${state.demoSettingSlots.length > 0 ? '' : 'd-none'}">
                             <span>${state.demoSettingSlots.length} Slots: </span>
                             <ol class="d-inline">
                                 ${state.demoSettingSlots.map((slot, index) => html`
