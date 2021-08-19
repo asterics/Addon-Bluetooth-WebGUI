@@ -3,6 +3,7 @@ import htm from '../../../lib/htm.min.js'
 import {ATDevice} from "../../communication/ATDevice.js";
 import {FaIcon} from "../components/FaIcon.js";
 import {ActionButton} from "../components/ActionButton.js";
+import {TextModal} from "../modals/TextModal.js";
 
 const html = htm.bind(h);
 class TabSlots extends Component {
@@ -17,8 +18,10 @@ class TabSlots extends Component {
             uploadedSlots: [],
             selectedUploadSlots: [],
             demoSettingSlots: [],
-            demoSettingSelected: null,
-            demoSettings: []
+            demoSettingSelected: {},
+            demoSettingSelectedText: {},
+            demoSettings: [],
+            showDemoDescription: false
         }
 
         L.CachedHTTPRequest(`https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/contents/Settings`, 'GET', 'json').then(result => {
@@ -139,12 +142,14 @@ class TabSlots extends Component {
     }
 
     demoSettingChanged(settingSha) {
-        let setting = this.state.demoSettings.filter(setting => setting.sha === settingSha)[0];
+        let setting = this.state.demoSettings.filter(s => s.sha === settingSha)[0];
+        let settingText = this.state.demoSettings.filter(s => L.equalIgnoreCase(setting.name.replace('.set', ''), s.name.replace('.md', '')))[0];
         L.CachedHTTPRequest(setting.download_url, 'GET', 'text').then(result => {
             let parsedSlots = ATDevice.parseConfig(result);
             this.setState({
                 demoSettingSlots: parsedSlots,
-                demoSettingSelected: setting
+                demoSettingSelected: setting,
+                demoSettingSelectedText: settingText || {}
             });
         });
     }
@@ -176,14 +181,14 @@ class TabSlots extends Component {
                             <li class="my-2" style="${index % 2 === 0 ? 'background-color: rgb(224 224 224)' : ''}">
                                 <div class="row d-flex align-items-center">
                                     <div class="col-4">
-                                        <span class="mr-2 px-3 ${C.DEVICE_IS_FM ? 'd-none' : ''}"
+                                        <span class="mx-2 px-3 ${C.DEVICE_IS_FM ? 'd-none' : ''}"
                                               style="background-color: ${ATDevice.getConfig(C.AT_CMD_SET_COLOR, slot).replace('0x', '#')}; border: 1px solid"></span>
                                         <a title="${L.translate('Slot "{?}": click to activate // Slot "{?}": zum Aktivieren klicken', slot)}"
                                            href="javascript:;" onclick="${() => ATDevice.setSlot(slot)}"
-                                           class="${slot === ATDevice.getCurrentSlot() ? 'd-none' : ''}">
+                                           class="mx-2 ${slot === ATDevice.getCurrentSlot() ? 'd-none' : ''}">
                                             <span>${slot}</span>
                                         </a>
-                                        <span class="${slot === ATDevice.getCurrentSlot() ? 'd-inline-block' : 'd-none'}"
+                                        <span class="mx-2 ${slot === ATDevice.getCurrentSlot() ? 'd-inline-block' : 'd-none'}"
                                               style="font-weight: bold"><span
                                                 class="sr-only">Slot: </span>${slot}</span>
                                     </div>
@@ -299,6 +304,14 @@ class TabSlots extends Component {
                                 </li>
                             `)}
                             </ol>
+                        </div>
+                    </div>
+                    <div class="row ${state.demoSettingSelectedText.name ? '' : 'd-none'}">
+                        <div class="col mb-4">
+                            <a href="javascript:;" onclick="${() => this.setState({showDemoDescription: true})}">${L.translate('Show description for "{?}" // Zeige Beschreibung für "{?}"', state.demoSettingSelected.name)}</a>
+                            <div class="${state.showDemoDescription ? '' : 'd-none'}">
+                                ${html`<${TextModal} close="${() => this.setState({showDemoDescription: false})}" header="${L.translate('Details for "{?}" // Details für "{?}"', state.demoSettingSelected.name)}" textUrl="${state.demoSettingSelectedText.download_url}"/>`}
+                            </div>
                         </div>
                     </div>
                     <div class="row">
