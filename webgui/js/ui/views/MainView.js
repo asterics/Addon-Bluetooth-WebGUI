@@ -237,7 +237,7 @@ class MainView extends Component {
             </div>
         </header>
         <main role="main">
-            <div id="viewContainer">
+            <div id="viewContainer" style="margin-bottom: 15em;">
                 ${this.state.currentView ? html`<${this.state.currentView.object}/>` : ''}
             </div>
         </main>
