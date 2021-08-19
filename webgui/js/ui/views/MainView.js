@@ -53,7 +53,8 @@ class MainView extends Component {
         this.setState({
             showScreen: SCREENS.CONNECTION,
             errorCode: C.ERROR_CONNECTION_LOST,
-            showSuccessMsg: false
+            showSuccessMsg: false,
+            currentView: {}
         });
     }
 
