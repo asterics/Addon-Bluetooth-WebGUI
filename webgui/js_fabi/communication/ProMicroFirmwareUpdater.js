@@ -24,13 +24,7 @@ ProMicroFirmwareUpdater.resetDevice = async function (existingPort) {
 /****************/
 // 2.) open the new bootloader USB-RAW HID (new USB-PID!); user interaction required
 /****************/
-ProMicroFirmwareUpdater.uploadFirmware = async function (filecontents, progressFn) {
-
-    //parse intel hex
-    let flashData = firmwareUtil.parseIntelHex(filecontents, MAX_WORDS_PROMICRO);
-
-    //open & close
-    // Wait for the serial port to open.
+ProMicroFirmwareUpdater.uploadFirmware = async function (url, progressFn) {
     let filters = [
         {usbVendorId: 0x2341, usbProductId: 0x0036}
         //TODO: I think there are more possible PIDs...
@@ -40,6 +34,9 @@ ProMicroFirmwareUpdater.uploadFirmware = async function (filecontents, progressF
         const port = await navigator.serial.requestPort({filters});
         await port.open({baudRate: 57600});
 
+        // retrieve firmware after opening port in order to prevent "no user interaction" error on opening port
+        let result = await L.CachedHTTPRequest(url, 'GET', 'text', 'FABI_FIRMWARE');
+        let flashData = firmwareUtil.parseIntelHex(result, MAX_WORDS_PROMICRO);
 
         //open writing facilities (with text encoder -> not good!)
         /*const textEncoder = new TextEncoderStream();

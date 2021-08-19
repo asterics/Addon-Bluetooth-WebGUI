@@ -34,16 +34,14 @@ FABI.resetMinMaxLiveValues = function () {
 
 FABI.updateFirmware = async function (url, progressHandler, dontReset) {
     localStorageService.setFirmwareDownloadUrl('');
-    L.HTTPRequest(url, 'GET', 'text').then(async result => {
-        let serialCommunicator = ATDevice.getCommunicator();
-        if (!dontReset) {
-            await serialCommunicator.close();
-            await ProMicroFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
-        }
-        await ProMicroFirmwareUpdater.uploadFirmware(result, progressHandler);
-        window.location.href = window.location.href + '?' + C.SUCCESS_FIRMWAREUPDATE;
-        window.location.reload();
-    });
+    let serialCommunicator = ATDevice.getCommunicator();
+    if (!dontReset) {
+        await serialCommunicator.close();
+        await ProMicroFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
+    }
+    await ProMicroFirmwareUpdater.uploadFirmware(url, progressHandler);
+    window.location.href = window.location.href + '?' + C.SUCCESS_FIRMWAREUPDATE;
+    window.location.reload();
 }
 
 function parseLiveData(data) {

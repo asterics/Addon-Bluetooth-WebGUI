@@ -79,17 +79,15 @@ FLipMouse.resetMinMaxLiveValues = function () {
 
 FLipMouse.updateFirmware = async function (url, progressHandler, dontReset) {
     localStorageService.setFirmwareDownloadUrl(url);
-    L.HTTPRequest(url, 'GET', 'text').then(async result => {
-        let serialCommunicator = ATDevice.getCommunicator();
-        if (!dontReset) {
-            await serialCommunicator.close();
-            await TeensyFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
-        }
-        await TeensyFirmwareUpdater.uploadFirmware(result, progressHandler);
-        localStorageService.setFirmwareDownloadUrl('');
-        window.location.href = window.location.href + '?' + C.SUCCESS_FIRMWAREUPDATE;
-        window.location.reload();
-    });
+    let serialCommunicator = ATDevice.getCommunicator();
+    if (!dontReset) {
+        await serialCommunicator.close();
+        await TeensyFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
+    }
+    await TeensyFirmwareUpdater.uploadFirmware(url, progressHandler);
+    localStorageService.setFirmwareDownloadUrl('');
+    window.location.href = window.location.href + '?' + C.SUCCESS_FIRMWAREUPDATE;
+    window.location.reload();
 }
 
 function parseLiveData(data) {

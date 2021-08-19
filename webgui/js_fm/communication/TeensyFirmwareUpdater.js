@@ -25,12 +25,10 @@ TeensyFirmwareUpdater.resetDevice = async function (existingOpenPort) {
 /****************/
 // 2.) open the new bootloader USB-RAW HID (new USB-PID!); user interaction required
 /****************/
-TeensyFirmwareUpdater.uploadFirmware = async function (filecontents, progressFn) {
+TeensyFirmwareUpdater.uploadFirmware = async function (url, progressFn) {
     if (!("hid" in navigator)) {
         log.warn("Web HID API not supported, please use Chromium based browsers!");
     }
-    //parse intel hex
-    let flashData = firmwareUtil.parseIntelHex(filecontents, MAX_WORDS_TEENSY);
 
     //request serial port
     let filters = [
@@ -41,6 +39,10 @@ TeensyFirmwareUpdater.uploadFirmware = async function (filecontents, progressFn)
         //open & close
         // Wait for the RAW HID port to open.
         await port.open();
+
+        // retrieve firmware after opening port in order to prevent "no user interaction" error on opening port
+        let result = await L.CachedHTTPRequest(url, 'GET', 'text', 'FM_FIRMWARE');
+        let flashData = firmwareUtil.parseIntelHex(result, MAX_WORDS_TEENSY);
 
         //main source:
         //https://github.com/PaulStoffregen/teensy_loader_cli/blob/master/teensy_loader_cli.c
