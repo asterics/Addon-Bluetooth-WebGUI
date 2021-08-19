@@ -18,7 +18,7 @@ let _slots = [];
 let _currentSlot = null;
 let _slotChangeHandler = null;
 let _lastSlotChangeTime = 0;
-let _SLOT_CONSTANT = 'Slot:';
+let _SLOT_CONSTANT = 'Slot';
 let _valueHandler = null;
 let _liveValueLastUpdate = 0;
 
@@ -500,7 +500,7 @@ ATDevice.parseConfig = function(atCmdsString) {
         let currentElement = elements[i];
         let nextElement = elements[i + 1] || '';
         if (currentElement.indexOf(_SLOT_CONSTANT) > -1) {
-            let slotName = currentElement.substring(_SLOT_CONSTANT.length).trim();
+            let slotName = currentElement.substring(currentElement.indexOf(':') + 1).trim();
             currentParsedSlot = {
                 name: slotName,
                 config: {}
