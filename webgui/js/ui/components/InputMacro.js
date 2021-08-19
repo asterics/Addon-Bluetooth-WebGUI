@@ -70,6 +70,7 @@ class InputMacro extends Component {
             let atCmdObject = this.getAtCmdObject(atCmd);
             let atCmdValue = atCmd.substring(C.LENGTH_ATCMD_PREFIX).trim();
             let inputType = atCmdObject ? atCmdObject.input : null;
+            let inputCategory = atCmdObject ? atCmdObject.category : null;
             let optionsFn = atCmdObject ? atCmdObject.optionsFn : null;
             let possibleValues = optionsFn ? (this.optionsFnCache[atCmdObject.optionsFn] || await Promise.resolve(atCmdObject.optionsFn())) : [];
             this.optionsFnCache[optionsFn] = possibleValues;
@@ -77,6 +78,8 @@ class InputMacro extends Component {
                 return L.translate('unknown command // unbekannter Befehl');
             } else if(inputType === C.INPUTFIELD_TYPE_KEYBOARD && atCmdValue.length > 0 && atCmdValue.indexOf('KEY_') !== 0) {
                 return L.translate(`parameter must start with "KEY_" // Parameter muss mit "KEY_" beginnen`);
+            } else if(inputType === C.INPUTFIELD_TYPE_SELECT && atCmdValue.length > 0 && possibleValues.length === 0 && inputCategory === C.AT_CMD_CAT_IR) {
+                return L.translate(`no infrared commands stored on device // keine Infrarot-Kommandos am Gerät gespeichert`);
             } else if(inputType === C.INPUTFIELD_TYPE_SELECT && atCmdValue.length > 0 && possibleValues.indexOf(atCmdValue) === -1) {
                 return L.translate(`parameter must be one of ${JSON.stringify(possibleValues)} // Parameter muss einer von ${JSON.stringify(possibleValues)} sein`);
             } else if(inputType === C.INPUTFIELD_TYPE_NUMBER && atCmdValue.length > 0 && !Number.isInteger(parseInt(atCmdValue))) {
