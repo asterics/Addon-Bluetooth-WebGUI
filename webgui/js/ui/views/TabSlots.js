@@ -2,6 +2,7 @@ import { h, Component, render } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js'
 import {ATDevice} from "../../communication/ATDevice.js";
 import {FaIcon} from "../components/FaIcon.js";
+import {ActionButton} from "../components/ActionButton.js";
 
 const html = htm.bind(h);
 class TabSlots extends Component {
@@ -14,8 +15,17 @@ class TabSlots extends Component {
             newSlotName: '',
             slots: ATDevice.getSlots(),
             uploadedSlots: [],
-            selectedUploadSlots: []
+            selectedUploadSlots: [],
+            demoSettingSlots: [],
+            demoSettingSelected: null,
+            demoSettings: []
         }
+
+        L.CachedHTTPRequest(`https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/contents/Settings`, 'GET', 'json').then(result => {
+            this.setState({
+                demoSettings: result
+            })
+        })
     }
 
     createSlot() {
@@ -128,6 +138,29 @@ class TabSlots extends Component {
         }, 500, "setcolordebounce");
     }
 
+    demoSettingChanged(settingSha) {
+        let setting = this.state.demoSettings.filter(setting => setting.sha === settingSha)[0];
+        L.CachedHTTPRequest(setting.download_url, 'GET', 'text').then(result => {
+            let parsedSlots = ATDevice.parseConfig(result);
+            this.setState({
+                demoSettingSlots: parsedSlots,
+                demoSettingSelected: setting
+            });
+        });
+    }
+
+    async applyDemoSettings() {
+        let confirmMsg = L.translate('Do you want to apply demo setting "{?}"? This will delete all existing slots on the device. // Möchten Sie die Voreinstellung "{?}" anwenden? Dadurch werden alle bestehenden Slots gelöscht.', this.state.demoSettingSelected.name);
+        if (!confirm(confirmMsg)) {
+            return;
+        }
+        ATDevice.deleteAllSlots();
+        await ATDevice.uploadSlots(this.state.demoSettingSlots);
+        this.setState({
+            slots: ATDevice.getSlots()
+        })
+    }
+
     render() {
         let state = this.state;
         let slots = state.slots;
@@ -226,6 +259,7 @@ class TabSlots extends Component {
                 <div class="row">
                     <div class="col-sm-6 col-lg-5 ${!state.selectedFile ? 'd-none' : ''}">
                         <button disabled="${state.selectedUploadSlots.length === 0 || state.uploading}" onclick="${() => this.uploadSlots()}">
+                            ${html`<${FaIcon} icon="fas upload"/>`}
                             ${state.uploading ? L.translate('Uploading Slot(s) ... // Slot(s) hochladen ...') : L.translate('Upload Slot(s) // Slot(s) hochladen')}
                         </button>
                     </div>
@@ -238,6 +272,42 @@ class TabSlots extends Component {
                             ${html`<${FaIcon} icon="fas download"/>`}
                             ${L.translate('Download all slots // Alle Slots herunterladen')}
                         </button>
+                    </div>
+                </div>
+
+                <div class="${state.demoSettings.length > 0 ? '' : 'd-none'}">
+                    <h3 class="mt-5">${L.translate('Predefined settings // Demo-Voreinstellungen')}</h3>
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <label for="selectDemoSettings">${L.translate('Select settings // Wähle Voreinstellung')}</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-lg-5">
+                            <select id="selectDemoSettings" class="col-12" required onchange="${(event) => this.demoSettingChanged(event.target.value)}">
+                                <option value="" disabled selected hidden>${L.translate('(select setting preset) // (Voreinstellung auswählen)')}</option>
+                                ${state.demoSettings.filter(s => s.name.indexOf('.set') > -1).map(setting => html`<option value="${setting.sha}">${setting.name}</option>`)}
+                            </select>
+                        </div>
+                        <div class="col-sm-6 col-lg-5 ${state.demoSettingSlots.length > 0 ? '' : 'd-none'}">
+                            <span>${state.demoSettingSlots.length} Slots: </span>
+                            <ol class="d-inline">
+                                ${state.demoSettingSlots.map((slot, index) => html`
+                                <li class="d-inline">
+                                    <span>${slot.name}</span>
+                                    <span class="${index < state.demoSettingSlots.length - 1 ? '' : 'd-none'}">, </span>
+                                </li>
+                            `)}
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-lg-5">
+                            ${html`<${ActionButton} onclick="${() => this.applyDemoSettings()}"
+                                            label="Apply settings preset // Voreinstellungen anwenden"
+                                            disabled="${state.demoSettingSlots.length === 0}"
+                                            progressLabel="Uploading settings... // Settings hochladen..." faIcon="fas upload"/>`}
+                        </div>
                     </div>
                 </div>
             </div>
