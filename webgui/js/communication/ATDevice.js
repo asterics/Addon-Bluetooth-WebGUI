@@ -342,6 +342,9 @@ ATDevice.getButtonActionATCmdSuffix = function (index, slot) {
 }
 
 ATDevice.save = async function () {
+    if (!_currentSlot) {
+        return;
+    }
     ATDevice.abortAutoSaving();
     return ATDevice.sendAtCmdWithResult('AT SA', _currentSlot);
 };
@@ -445,6 +448,13 @@ ATDevice.deleteSlot = function (slotName) {
     emitSlotChange();
     return Promise.resolve();
 };
+
+ATDevice.deleteAllSlots = function () {
+    ATDevice.sendATCmd(C.AT_CMD_DELETE_SLOT);
+    _slots = [];
+    _currentSlot = '';
+    emitSlotChange();
+}
 
 ATDevice.uploadSlots = async function (slotObjects) {
     ATDevice.save();
