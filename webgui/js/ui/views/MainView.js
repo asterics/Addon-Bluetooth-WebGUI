@@ -216,7 +216,7 @@ class MainView extends Component {
             <div class="row">
                 <h1 id="mainHeading" tabindex="-1" class="col col-md-6">${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
                 <div class="d-none d-md-inline-block col-md-3">
-                    <label class="col-12" for="selectSlots">${L.translate('Select Slot // Slot auswählen')}</label>
+                    <label class="col-12" for="selectSlots" dangerouslySetInnerHTML="${{__html: L.translate('Select Slot // <span lang="en">Slot</span> auswählen')}}"></label>
                     <div class="col-12">
                         <select id="selectSlots" class="col-12" value="${state.currentSlot}" onchange="${(event) => ATDevice.setSlot(event.target.value)}">
                         ${state.slots.map((slot) => html`
