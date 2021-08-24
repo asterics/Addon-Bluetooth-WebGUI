@@ -189,7 +189,11 @@ class MainView extends Component {
                             case C.ERROR_SERIAL_NOT_SUPPORTED:
                                 return html`
                                     <span>${L.translate("Connecting to real device not supported by current browser! // Verbindung zu echtem Gerät wird von akuellem Browser nicht unterstützt!")}</span>
-                                    <div>${L.translate('Please try a different browser (Chrome) or use the offline configuration tool from: // Bitte verwenden Sie einen anderen Browser (Chrome) oder verwenden Sie das offline Konfigurations-Tool von:')}</div>
+                                    <div>
+                                        <span>${L.translate('Please try  // Bitte verwenden Sie den ')}</span>
+                                        <a href="https://www.google.com/intl/de/chrome/" target="_blank">${L.translate('Chrome browser // Chrome-Browser')}</a>
+                                        <span>${L.translate(' or use the offline configuration tool from: //  oder verwenden Sie das offline Konfigurations-Tool von:')}</span>
+                                    </div>
                                     <div><a href="https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest" target="_blank">https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest</a></div>
                                 `;
                             case C.ERROR_CONNECTION_LOST:
