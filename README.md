@@ -14,13 +14,13 @@ To adjust settings on your assistive device, please:
     <li>
         <a href="https://flipmouse.asterics.eu" style="border: 1px solid; margin-bottom: 1em">
             <span>FLipMouse</span>
-            <div style="border: 1px solid"><img src="https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fm_lowres.png" alt="FLipMouse logo" width="300"/></div>
+            <div style="border: 1px solid"><img src="https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/webgui/img/fm_lowres.png" alt="FLipMouse logo" width="300"/></div>
         </a>
     </li>
     <li>
         <a href="https://fabi.asterics.eu" style="border: 1px solid">
             <span>FABI</span>
-            <div style="border: 1px solid"><img src="https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/img/fabi_lowres.png" alt="FABI logo" width="300"/></div>
+            <div style="border: 1px solid"><img src="https://github.com/asterics/Addon-Bluetooth-WebGUI/blob/main/webgui/img/fabi_lowres.png" alt="FABI logo" width="300"/></div>
         </a>
     </li>
 </ul>
