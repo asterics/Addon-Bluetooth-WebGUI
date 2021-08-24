@@ -217,9 +217,10 @@ L.isLang = function (localeString) {
     return lang.indexOf(localeString) > -1;
 };
 
+window.lang = '';
 L.getLang = function () {
     var lang = window.navigator.userLanguage || window.navigator.language;
-    return lang.substring(0, 2);
+    return window.lang || lang.substring(0, 2);
 };
 
 /**
