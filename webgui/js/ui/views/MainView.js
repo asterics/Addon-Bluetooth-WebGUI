@@ -165,7 +165,12 @@ class MainView extends Component {
         </div>
         <div class="top-layer-center ${state.showScreen === SCREENS.CONNECTION? '' : 'd-none'}">
             <div class="container-fluid top-layer-content">
-                <h1>${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
+                <h1 class="sr-only">
+                    <span >${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</span>
+                </h1>
+                <div class="row mb-5" aria-hidden="true">
+                    <img class="col-10 offset-1 col-md-6 offset-md-3" src="./img/${C.DEVICE_IS_FM ? 'fm' : 'fabi'}_lowres.png"/>
+                </div>
                 <div class="row">
                     <div class="col-12 col-md-8 offset-md-2"><button onclick="${() => this.initATDevice()}">${L.translate("Connect to {?} connected via USB // Verbinden zu {?} (über USB angeschlossen)", C.CURRENT_DEVICE)}</button></div>
                 </div>
