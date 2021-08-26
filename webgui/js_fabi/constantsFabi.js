@@ -39,6 +39,17 @@ C.VIEWS = [{
 }];
 C.VIEW_START_HASH = '#tabActions';
 
+C.ADDITIONAL_LINKS = [{
+    label: 'More information about FABI // Mehr Infos zu FABI',
+    url: L.translate('https://www.asterics-foundation.org/projects/fabi/ // https://www.asterics-foundation.org/projekte-2/fabi/')
+}, {
+    label: 'Ask questions about FABI // Eine Frage zu FABI stellen',
+    url: 'https://q2a.wbt.wien/ask'
+}, {
+    label: 'Legal Notice // Impressum',
+    url: L.translate('https://www.asterics-foundation.org/legal-notice/ // https://www.asterics-foundation.org/impressum/')
+}]
+
 C.AT_CMD_CATEGORIES = [{
     constant: C.AT_CMD_CAT_KEYBOARD,
     label: 'Keyboard // Tastatur'

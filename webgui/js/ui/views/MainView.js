@@ -148,13 +148,13 @@ class MainView extends Component {
             <div class="container-fluid top-layer-content">
                 <h1>${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
                 <div class="row mb-5">
-                    <div class="col-12 col-md-8 offset-md-2">
+                    <div class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3">
                         ${html`<${FaIcon} icon="fas exclamation-triangle"/>`}
                         <span>${L.translate('The last firmware update was cancelled. Restart it in order to be able to use your device. // Das letzte Firmware-Update wurde abgebrochen. Starten Sie es erneut um das Gerät weiter verwenden zu können.')}</span>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12 col-md-8 offset-md-2">
+                    <div class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3">
                         <button onclick="${() => this.restartFirmwareUpdate()}" disabled="${this.state.updateProgress}">
                             <span class="${state.updateProgress ? 'd-none' : ''}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Restart firmware update // Firmware-Update erneut starten')}</span>
                             <span class="${state.updateProgress ? '' : 'd-none'}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Updating... {?}% // Aktualisiere... {?}%', state.updateProgress)}</span>
@@ -172,10 +172,10 @@ class MainView extends Component {
                     <img class="col-10 offset-1 col-md-6 offset-md-3 col-xl-4 offset-xl-4" src="./img/${C.DEVICE_IS_FM ? 'fm' : 'fabi'}_lowres.png"/>
                 </div>
                 <div class="row">
-                    <div class="col-12 col-md-8 offset-md-2"><button onclick="${() => this.initATDevice()}">${L.translate("Connect to {?} connected via USB // Verbinden zu {?} (über USB angeschlossen)", C.CURRENT_DEVICE)}</button></div>
+                    <div class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3"><button onclick="${() => this.initATDevice()}">${L.translate("Connect to {?} connected via USB // Verbinden zu {?} (über USB angeschlossen)", C.CURRENT_DEVICE)}</button></div>
                 </div>
                 <div class="row">
-                    <div class="col-12 col-md-8 offset-md-2"><button onclick="${() => this.testMode()}">${L.translate("Use Test mode without real {?} // Test-Modus ohne {?} verwenden", C.CURRENT_DEVICE)}</button></div>
+                    <div class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3"><button onclick="${() => this.testMode()}">${L.translate("Use Test mode without real {?} // Test-Modus ohne {?} verwenden", C.CURRENT_DEVICE)}</button></div>
                 </div>
                 <div class="row" class="${state.errorCode ? '' : 'd-none'}" style="color: darkred">
                     <strong>${L.translate('Error: // Fehler:')}</strong><span> </span>
@@ -209,6 +209,11 @@ class MainView extends Component {
                 <div class="row" class="${!state.errorCode && state.showSuccessMsg ? '' : 'd-none'}" style="color: darkgreen">
                     <strong>${L.translate('Success: // Erfolg:')}</strong><span> </span>
                     <span>${L.translate('Firmware update was successful! Please reconnect. // Firmwareupdate erfolgreich abgeschlossen! Bitte erneut verbinden.')}</span>
+                </div>
+                <div style="margin-top: 6em">
+                    ${(C.ADDITIONAL_LINKS || []).map(link => html`
+                        <div><a href="${link.url}" target="_blank">${L.translate(link.label)}</a></div>
+                    `)}
                 </div>
             </div>
         </div>
@@ -248,11 +253,18 @@ class MainView extends Component {
                 </div>
             </div>
         </header>
-        <main role="main">
+        <main role="main" class="${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}" style="flex-grow: 1">
             <div id="viewContainer" style="margin-bottom: 15em;">
                 ${this.state.currentView ? html`<${this.state.currentView.object}/>` : ''}
             </div>
         </main>
+        <footer class="container-fluid ${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}" style="border-top: 2px solid #0D5F77">
+            <div class="d-flex justify-content-around">
+                ${(C.ADDITIONAL_LINKS || []).map(link => html`
+                        <a href="${link.url}" target="_blank" style="padding-top: 1em">${L.translate(link.label)}</a>
+                    `)}
+            </div>
+        </footer>
         ${MainView.style}`;
     }
 }

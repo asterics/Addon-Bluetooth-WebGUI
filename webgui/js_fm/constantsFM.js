@@ -44,6 +44,17 @@ C.VIEWS = [{
     label: 'Visualization // Visualisierung'
 }];
 
+C.ADDITIONAL_LINKS = [{
+    label: 'More information about FLipMouse // Mehr Infos zur FLipMouse',
+    url: L.translate('https://www.asterics-foundation.org/projects/the-flipmouse/ // https://www.asterics-foundation.org/projekte-2/flipmouse/')
+}, {
+    label: 'Ask questions about the FLipMouse // Eine Frage zur FLipMouse stellen',
+    url: 'https://q2a.wbt.wien/ask'
+}, {
+    label: 'Legal Notice // Impressum',
+    url: L.translate('https://www.asterics-foundation.org/legal-notice/ // https://www.asterics-foundation.org/impressum/')
+}]
+
 C.AT_CMD_CATEGORIES = [{
     constant: C.AT_CMD_CAT_KEYBOARD,
     label: 'Keyboard // Tastatur'
