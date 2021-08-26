@@ -12,7 +12,7 @@ class FaIcon extends Component {
         if (!this.props.icon) {
             return '';
         }
-        return html`<img src="${path}"
+        return html`<img src="${path}" aria-hidden="true"
                          style="display: inline-block; height: 1.2em; margin: 0 0.5em; vertical-align: middle; ${this.props.invert ? 'filter: invert(1);' : ''}"/>`;
     }
 }

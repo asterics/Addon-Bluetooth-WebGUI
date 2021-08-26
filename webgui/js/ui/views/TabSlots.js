@@ -199,7 +199,7 @@ class TabSlots extends Component {
                                                        class="small-button button py-2 py-md-0 ${C.DEVICE_IS_FM ? 'd-none' : ''}">${html`
                                                     <${FaIcon} icon="fas palette"/>`}<span
                                                         class="d-none d-sm-inline">${L.translate('Set color // Farbe wählen')}</span></label>
-                                                <input id="colorinput${slot}" type="color" class="sr-only"
+                                                <input id="colorinput${slot}" type="color" class="sr-only ${C.DEVICE_IS_FM ? 'd-none' : ''}"
                                                        oninput="${(event) => this.colorChanged(slot, event)}"/>
                                             </div>
                                             <div class="col d-flex">

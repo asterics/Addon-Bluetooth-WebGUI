@@ -17,7 +17,7 @@ class Slider extends Component {
         return html`
             <div class="d-flex justify-content-between">
                 <label for="${id}" lang="${props.lang}" dangerouslySetInnerHTML="${{__html: L.translate(props.label)}}"></label>
-                <a href="javascript:;" onclick="${() => props.toggleFn()}">${L.translate(props.toggleFnLabel)}</a>
+                <a class="${!props.toggleFnLabel ? 'd-none' : ''}" href="javascript:;" onclick="${() => props.toggleFn()}">${L.translate(props.toggleFnLabel)}</a>
             </div>
             <div class="row">
                 <span aria-hidden="true" class="col-sm-1">${props.value}</span>

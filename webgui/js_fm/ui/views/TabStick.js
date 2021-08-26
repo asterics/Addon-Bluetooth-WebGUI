@@ -1,4 +1,4 @@
-import { h, Component, render } from '../../../lib/preact.min.js';
+import { h, Component } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
 import {PositionVisualization} from "../components/PositionVisualization.js";
 import {preactUtil} from "../../util/preactUtil.js";
@@ -75,31 +75,39 @@ class TabStick extends Component {
                 </div>
             </div>
             
-            <div style="display: ${!state.splitSensitivity ? 'block' : 'none'}">
-                ${html`<${Slider} label="Sensitivity: // Sensitivität:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_X]}"
-                        min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y]}"
-                        toggleFn="${() => this.toggleState('splitSensitivity', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`}
-            </div>
-            <div style="display: ${state.splitSensitivity ? 'block' : 'none'}">
-                ${html`<${Slider} label="Horizontal Sensitivity: // Sensitivität horizontal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_X]}"
-                        min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_X]}"
-                        toggleFn="${() => this.toggleState('splitSensitivity', [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>`}
-                ${html`<${Slider} label="Vertical Sensitivity: // Sensitivität vertikal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_Y]}"
-                        min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_Y]}"/>`}
+            <div>
+                ${(() => {
+                    if (state.splitSensitivity) {
+                        return html`
+                        <${Slider} label="Horizontal Sensitivity: // Sensitivität horizontal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_X]}"
+                            min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_X]}"
+                            toggleFn="${() => this.toggleState('splitSensitivity', [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>
+                        <${Slider} label="Vertical Sensitivity: // Sensitivität vertikal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_Y]}"
+                                   min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_Y]}"/>`
+                    } else {
+                        return html`
+                        <${Slider} label="Sensitivity: // Sensitivität:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_X]}"
+                            min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y]}"
+                            toggleFn="${() => this.toggleState('splitSensitivity', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
+                    }
+                })()}
             </div>
             <div class="mt-4">
-                <div  style="display: ${!state.splitDeadzone ? 'block' : 'none'}">
-                    ${html`<${Slider} label="<span lang="en">Deadzone:</span>" lang="en" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
-                        min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y]}"
-                        toggleFn="${() => this.toggleState('splitDeadzone', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`}
-                </div>
-                <div style="display: ${state.splitDeadzone ? 'block' : 'none'}">
-                    ${html`<${Slider} label="Horizontal Deadzone: // <span lang="en">Deadzone:</span> horizontal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
-                        min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_X]}"
-                        toggleFn="${() => this.toggleState('splitDeadzone', [C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>`}
-                    ${html`<${Slider} label="Vertical Deadzone: // <span lang="en">Deadzone:</span> vertikal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_Y]}"
-                        min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_Y]}"/>`}
-                </div>
+                ${(() => {
+                    if (state.splitDeadzone) {
+                        return html`
+                        <${Slider} label="Horizontal Deadzone: // <span lang="en">Deadzone</span> horizontal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
+                            min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_X]}"
+                            toggleFn="${() => this.toggleState('splitDeadzone', [C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>
+                        <${Slider} label="Vertical Deadzone: // <span lang="en">Deadzone</span> vertikal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_Y]}"
+                            min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_Y]}"/>`
+                    } else {
+                        return html`
+                        <${Slider} label="<span lang="en">Deadzone:</span>" lang="en" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
+                            min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y]}"
+                            toggleFn="${() => this.toggleState('splitDeadzone', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
+                    }
+                })()}
             </div>
             <div class="mt-4">
                 ${html`<${Slider} label="Maximum speed: // Maximale Geschwindigkeit:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_MAX_SPEED]}"

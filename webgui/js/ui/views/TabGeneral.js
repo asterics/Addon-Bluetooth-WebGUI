@@ -139,7 +139,7 @@ class TabGeneral extends Component {
             </div>
             <div class="row">
                 <span class="col col-md-4">${L.translate('Available version // Verfügbare Version')}</span>   
-                <a href="${this.state.newMainVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newMainVersion}</a>   
+                <a rel="noreferrer" href="${this.state.newMainVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newMainVersion}</a>   
                 <div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.mainVersion, this.state.newMainVersion) || window.showUpgradeButton ? '' : 'd-none'}">
                     <button class="col-12" onclick="${() => this.updateFirmware()}" disabled="${this.state.mainUpgradeProgress}">
                         <span class="${this.state.mainUpgradeProgress ? 'd-none' : ''}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Update firmware // Firmware aktualisieren')}</span>
@@ -159,7 +159,7 @@ class TabGeneral extends Component {
             </div>
             <div class="row">
                 <span class="col col-md-4">${L.translate('Available version // Verfügbare Version')}</span>   
-                <a href="${this.state.newBtVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newBtVersion}</a>   
+                <a rel="noreferrer" href="${this.state.newBtVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newBtVersion}</a>   
                 <div class="col-12 col-md-4 mt-3 mt-md-0 ${L.isVersionNewer(this.state.btVersion, this.state.newBtVersion) || window.showUpgradeButton ? '' : 'd-none'}">
                     <button class="col-12" onclick="${() => this.updateBTFirmware()}" disabled="${this.state.btUpgradeProgress}">
                         <span class="${this.state.btUpgradeProgress ? 'd-none' : ''}"><span class="sr-only">Bluetooth-Addon: </span>${L.translate('Update bluetooth firmware // Bluetooth-Firmware aktualisieren')}</span>

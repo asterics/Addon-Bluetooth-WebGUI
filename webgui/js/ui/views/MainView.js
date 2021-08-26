@@ -189,17 +189,17 @@ class MainView extends Component {
                                 return html`
                                     <span>${L.translate('Firmware of device is outdated! // Firmware des Gerätes ist veraltet!')}</span>
                                     <div>${L.translate('Please download and install the latest firmware from: // Bitte aktuelle Firmware herunterladen und installieren:')}</div>
-                                    <div><a href="https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest" target="_blank">https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest</a></div>
+                                    <div><a rel="noreferrer" href="https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest" target="_blank">https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest</a></div>
                                 `;
                             case C.ERROR_SERIAL_NOT_SUPPORTED:
                                 return html`
                                     <span>${L.translate("Connecting to real device not supported by current browser! // Verbindung zu echtem Gerät wird von akuellem Browser nicht unterstützt!")}</span>
                                     <div>
                                         <span>${L.translate('Please try  // Bitte verwenden Sie den ')}</span>
-                                        <a href="https://www.google.com/intl/de/chrome/" target="_blank">${L.translate('Chrome browser // Chrome-Browser')}</a>
+                                        <a rel="noreferrer" href="https://www.google.com/intl/de/chrome/" target="_blank">${L.translate('Chrome browser // Chrome-Browser')}</a>
                                         <span>${L.translate(' or use the offline configuration tool from: //  oder verwenden Sie das offline Konfigurations-Tool von:')}</span>
                                     </div>
-                                    <div><a href="https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest" target="_blank">https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest</a></div>
+                                    <div><a rel="noreferrer" href="https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest" target="_blank">https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest</a></div>
                                 `;
                             case C.ERROR_CONNECTION_LOST:
                                 return html`<span>${L.translate('Connection to device lost! Please try to reconnect. // Verbindung zum Gerät verloren! Bitte versuchen Sie sich wieder zu verbinden.')}</span>`;
@@ -212,12 +212,12 @@ class MainView extends Component {
                 </div>
                 <div style="margin-top: 6em">
                     ${(C.ADDITIONAL_LINKS || []).map(link => html`
-                        <div><a href="${link.url}" target="_blank">${L.translate(link.label)}</a></div>
+                        <div><a rel="noreferrer" href="${link.url}" target="_blank">${L.translate(link.label)}</a></div>
                     `)}
                 </div>
             </div>
         </div>
-        <header class="container-fluid p-0 ${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}" role="banner">
+        <header class="container-fluid p-0 ${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}">
             <div class="row">
                 <h1 id="mainHeading" tabindex="-1" class="col col-md-6">${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
                 <div class="d-none d-md-inline-block col-md-3">
@@ -243,14 +243,14 @@ class MainView extends Component {
                 </div>
             </div>
             <div class="container-fluid">
-                <div class="row mb-5" id="tabMenu" role="menubar" tabindex="-1" accesskey="0">
+                <nav class="row mb-5" id="tabMenu" role="tablist" tabindex="-1" accesskey="0">
                     <button id="toNavLink" onclick="${() => this.setState({menuOpen: !state.menuOpen})}" class="col d-md-none button button-primary">${L.translate('\u2630 Menu // \u2630 Menü')}</button>
                     ${state.views.map(view => html`
-                        <button role="menuitem" onclick="${() => this.toView(view.hash)}" class="col-md m-1 d-md-block menubutton button-primary ${state.menuOpen ? '' : 'd-none'} ${state.currentView.hash === view.hash ? 'selected' : ''}" aria-selected="${state.currentView.hash === view.hash}">
+                        <button role="tab" onclick="${() => this.toView(view.hash)}" class="col-md m-1 d-md-block menubutton button-primary ${state.menuOpen ? '' : 'd-none'} ${state.currentView.hash === view.hash ? 'selected' : ''}" aria-selected="${state.currentView.hash === view.hash}">
                             ${L.translate(view.label)}
                         </button>
                     `)}
-                </div>
+                </nav>
             </div>
         </header>
         <main role="main" class="${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}" style="flex-grow: 1">
@@ -261,7 +261,7 @@ class MainView extends Component {
         <footer class="container-fluid ${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}" style="border-top: 2px solid #0D5F77">
             <div class="d-flex justify-content-around">
                 ${(C.ADDITIONAL_LINKS || []).map(link => html`
-                        <a href="${link.url}" target="_blank" style="padding-top: 1em">${L.translate(link.label)}</a>
+                        <a rel="noreferrer" href="${link.url}" target="_blank" style="padding-top: 1em">${L.translate(link.label)}</a>
                     `)}
             </div>
         </footer>
