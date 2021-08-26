@@ -45,9 +45,3 @@ This project here has two purposes:
 * All build files for building the ESP32 based Bluetooth and WebGUI addon are located here
 
 If you are interested in flashing/updating your ESP32 addon for FABI/FLipMouse, please go to this repository's page: [Addon-Bluetooth-WebGUI](https://github.com/asterics/Addon-Bluetooth-WebGUI)
-
-## Run WebGUI locally
-You need a local webserver in order to run the WebGUI locally. There are many possibilities for this, an easy one if you've already installed [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) is:
-1. run `npm install --global http-server` (only once)
-2. go to the project directory and run `http-server`
-3. open `localhost:8080` in your chromium-based browser and select the appropriate html file
