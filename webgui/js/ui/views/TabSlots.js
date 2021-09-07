@@ -21,7 +21,8 @@ class TabSlots extends Component {
             demoSettingSelected: {},
             demoSettingSelectedText: {},
             demoSettings: [],
-            showDemoDescription: false
+            showDemoDescription: false,
+            selectedFileValid: undefined
         }
 
         L.CachedHTTPRequest(`https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/contents/Settings`, 'GET', 'json').then(result => {
@@ -67,6 +68,7 @@ class TabSlots extends Component {
         reader.readAsText(target.files[0]);
         reader.onloadend = function(e) {
             let parsedSlots = ATDevice.parseConfig(e.target.result);
+            let validConfig = C.DEVICE_IS_FM ? !!parsedSlots[0].config[C.AT_CMD_DEADZONE_X] : !!parsedSlots[0].config[C.AT_CMD_ANTITREMOR_IDLE];
             parsedSlots.forEach(slot => { //prevent duplicated names
                 let originalSlotname = slot.name;
                 let counter = 1;
@@ -77,7 +79,8 @@ class TabSlots extends Component {
             })
             thiz.setState({
                 uploadedSlots: parsedSlots,
-                selectedFile: target.files[0].name
+                selectedFile: target.files[0].name,
+                selectedFileValid: validConfig
             })
         };
     }
@@ -91,18 +94,31 @@ class TabSlots extends Component {
             this.state.selectedUploadSlots.pop();
         }
         ATDevice.uploadSlots(this.state.selectedUploadSlots).then(() => {
-            thiz.setState({
-                slots: ATDevice.getSlots(),
-                selectedUploadSlots: [],
-                uploadedSlots: [],
-                uploading: false
-            });
-            L('#fileInputSlotUpload').value = null;
-            this.setState({
-                selectedFile: ''
-            })
+            thiz.resetUploadFile();
         });
     };
+
+    async uploadAllSlots() {
+        let confirmMsg = L.translate('Do you want to upload and replace all slots from file "{?}"? This will delete all existing slots on the device. // Möchten Sie alle Slots aus der Datei "{?}" hochladen und ersetzen? Dadurch werden alle bestehenden Slots gelöscht.', this.state.selectedFile);
+        if (!confirm(confirmMsg)) {
+            return;
+        }
+        ATDevice.deleteAllSlots();
+        await ATDevice.uploadSlots(this.state.uploadedSlots);
+        this.resetUploadFile();
+    }
+
+    resetUploadFile() {
+        this.setState({
+            slots: ATDevice.getSlots(),
+            selectedUploadSlots: [],
+            uploadedSlots: [],
+            uploading: false,
+            selectedFile: '',
+            selectedFileValid: undefined
+        });
+        L('#fileInputSlotUpload').value = null;
+    }
 
     downloadSlot(slot) {
         let datestr = new Date().toISOString().substr(0, 10);
@@ -250,7 +266,10 @@ class TabSlots extends Component {
                     <div class="col-sm-6 col-lg-5">
                         <span>${L.translate('Selected file: // Gewählte Datei:')}</span> <span>${this.state.selectedFile || L.translate('(none) // (keine)')}</span>
                     </div>
-                    <fieldset class="mt-3 col-12 ${this.state.uploadedSlots.length === 0 ? 'd-none' : ''}">
+                    <div class="col-sm-6 col-lg-5 ${state.selectedFileValid === false ? '' : 'd-none'}">
+                        <span style="color: darkred">${L.translate('Selected file does not contain valid config for {?}! // Gewählte Datei beinhaltet keine gültige Konfiguration für {?}!', C.CURRENT_DEVICE)}</span>
+                    </div>
+                    <fieldset class="mt-3 col-12 ${this.state.uploadedSlots.length === 0 || !state.selectedFileValid ? 'd-none' : ''}">
                         <legend>${L.translate('Choose slots to upload // Wähle Slots zum Hochladen')}</legend>
                         ${state.uploadedSlots.map(slot => html`
                             <div>
@@ -262,11 +281,19 @@ class TabSlots extends Component {
                 </div>
                 
                 <div class="row">
-                    <div class="col-sm-6 col-lg-5 ${!state.selectedFile ? 'd-none' : ''}">
+                    <div class="col-sm-6 col-lg-5 ${!state.selectedFile || !state.selectedFileValid ? 'd-none' : ''}">
                         <button disabled="${state.selectedUploadSlots.length === 0 || state.uploading}" onclick="${() => this.uploadSlots()}">
                             ${html`<${FaIcon} icon="fas upload"/>`}
-                            ${state.uploading ? L.translate('Uploading Slot(s) ... // Slot(s) hochladen ...') : L.translate('Upload Slot(s) // Slot(s) hochladen')}
+                            ${state.uploading ? L.translate('Uploading Slot(s) ... // Slot(s) hochladen ...') : L.translate('Upload selected Slot(s) // Gewählte Slot(s) hochladen')}
                         </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-lg-5 ${!state.selectedFile || !state.selectedFileValid ? 'd-none' : ''}">
+                        ${html`<${ActionButton} onclick="${() => this.uploadAllSlots()}"
+                                            label="Upload and replace all Slots // Alle Slots hochladen und ersetzen"
+                                            disabled="${state.uploadedSlots.length === 0}"
+                                            progressLabel="Uploading slots... // Slots hochladen..." faIcon="fas upload"/>`}
                     </div>
                 </div>
 
