@@ -37,9 +37,7 @@ class TabActions extends Component {
     }
 
     getLinkTitle(btnMode, slot) {
-        let modeValue = ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot);
-        let isFMNonAltMode = C.DEVICE_IS_FM && btnMode.category === C.BTN_CAT_STICK && modeValue !== C.FLIPMOUSE_MODE_ALT.value;
-        if (isFMNonAltMode) {
+        if (this.isFMNonAltMode(btnMode, slot)) {
             return L.translate(btnMode.label);
         } else {
             return L.translate(btnMode.label) + (ATDevice.getButtonAction(btnMode.index, slot) ? ': ' + ATDevice.getButtonAction(btnMode.index, slot) : '');
@@ -47,9 +45,8 @@ class TabActions extends Component {
     }
 
     getLinkLabel(btnMode, slot) {
-        let modeValue = ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot);
-        let isFMNonAltMode = C.DEVICE_IS_FM && btnMode.category === C.BTN_CAT_STICK && modeValue !== C.FLIPMOUSE_MODE_ALT.value;
-        if (isFMNonAltMode) {
+        if (this.isFMNonAltMode(btnMode, slot)) {
+            let modeValue = ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot);
             let mode = C.FLIPMOUSE_MODES.filter(mode => mode.value === modeValue)[0] || {};
             return L.translate(mode.label);
         } else {
@@ -57,9 +54,17 @@ class TabActions extends Component {
         }
     }
 
+    getBtnModeParam(btnMode, slot) {
+        return ATDevice.getButtonAction(btnMode.index, slot).substr(C.LENGTH_ATCMD_PREFIX);
+    }
+
+    isFMNonAltMode(btnMode, slot) {
+        let modeValue = ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot);
+        return C.DEVICE_IS_FM && btnMode.category === C.BTN_CAT_STICK && modeValue !== C.FLIPMOUSE_MODE_ALT.value;
+    }
+
     getSlotStyle(slot) {
-        let count = ATDevice.getSlots().length;
-        return count > 1 && ATDevice.getCurrentSlot() === slot ? 'font-weight-bold' : '';
+        return ATDevice.getCurrentSlot() === slot ? 'font-weight-bold' : '';
     }
 
     getMaxPrintableSlots() {
@@ -118,7 +123,10 @@ class TabActions extends Component {
                         ${slots.map(slot => html`
                             <span class="${mobileView ? 'col-12' : 'col'} ${this.getSlotStyle(slot)}">
                                 <span class="${mobileView ? '' : 'd-none'}">Slot "${slot}": </span>
-                                <a href="javascript:;" title="${this.getLinkTitle(btnMode, slot)}" onclick="${() => this.setState({modalBtnMode: btnMode, modalSlot: slot})}">${this.getLinkLabel(btnMode, slot)}</a>
+                                <a href="javascript:;" title="${this.getLinkTitle(btnMode, slot)}" onclick="${() => this.setState({modalBtnMode: btnMode, modalSlot: slot})}">
+                                    <span>${this.getLinkLabel(btnMode, slot)}</span>
+                                    <span class="${this.isFMNonAltMode(btnMode, slot) || (state.showAllSlots && ATDevice.getSlots().length > 1) || !this.getBtnModeParam(btnMode, slot) ? 'd-none' : ''}" style="font-weight: normal"> (${this.getBtnModeParam(btnMode, slot)})</span>
+                                </a>
                             </span>
                         `)}
                     </li>`)}
