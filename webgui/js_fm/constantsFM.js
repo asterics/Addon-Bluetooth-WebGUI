@@ -48,8 +48,14 @@ C.ADDITIONAL_LINKS = [{
     label: 'More information about FLipMouse // Mehr Infos zur FLipMouse',
     url: L.translate('https://www.asterics-foundation.org/projects/the-flipmouse/ // https://www.asterics-foundation.org/projekte-2/flipmouse/')
 }, {
-    label: 'Ask questions about the FLipMouse // Eine Frage zur FLipMouse stellen',
+    label: 'Ask as question // Eine Frage stellen',
     url: 'https://q2a.wbt.wien/ask'
+}, {
+    label: 'Safety instructions // Sicherheitshinweise',
+    url: 'https://github.com/asterics/FLipMouse/blob/master/Cleaning_instructions.pdf'
+}, {
+    label: 'Licensing // Lizenzbestimmungen',
+    url: 'https://github.com/asterics/FLipMouse/blob/master/LICENSE'
 }, {
     label: 'Legal Notice // Impressum',
     url: L.translate('https://www.asterics-foundation.org/legal-notice/ // https://www.asterics-foundation.org/impressum/')

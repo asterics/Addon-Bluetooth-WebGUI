@@ -263,8 +263,8 @@ class MainView extends Component {
                 ${this.state.currentView ? html`<${this.state.currentView.object}/>` : ''}
             </div>
         </main>
-        <footer class="container-fluid ${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}" style="border-top: 2px solid #0D5F77">
-            <div class="d-flex justify-content-around">
+        <footer class="container-fluid p-0 ${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}" style="border-top: 2px solid #0D5F77">
+            <div class="d-flex justify-content-md-around flex-column flex-md-row">
                 ${(C.ADDITIONAL_LINKS || []).map(link => html`
                         <a rel="noreferrer" href="${link.url}" target="_blank" style="padding-top: 1em">${L.translate(link.label)}</a>
                     `)}
