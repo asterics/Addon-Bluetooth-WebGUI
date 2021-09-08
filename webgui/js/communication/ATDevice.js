@@ -486,6 +486,9 @@ ATDevice.restoreDefaultConfiguration = function () {
     let promise = ATDevice.refreshConfig();
     promise.then(() => {
         emitSlotChange();
+        if (C.DEVICE_IS_FM) {
+            ATDevice.Specific.calibrate();
+        }
     })
     return promise;
 };
