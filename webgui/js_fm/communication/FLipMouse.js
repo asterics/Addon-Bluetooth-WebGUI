@@ -106,10 +106,10 @@ function parseLiveData(data) {
         _lastLiveValueParse = new Date().getTime();
         let valArray = data.split(':')[1].split(',');
         _liveData[C.LIVE_PRESSURE] = parseInt(valArray[0]);
-        _liveData[FLipMouse.LIVE_UP] = parseInt(valArray[1]);
-        _liveData[FLipMouse.LIVE_DOWN] = parseInt(valArray[2]);
-        _liveData[FLipMouse.LIVE_LEFT] = parseInt(valArray[3]);
-        _liveData[FLipMouse.LIVE_RIGHT] = parseInt(valArray[4]);
+        _liveData[FLipMouse.LIVE_DOWN] = parseInt(valArray[1]);
+        _liveData[FLipMouse.LIVE_UP] = parseInt(valArray[2]);
+        _liveData[FLipMouse.LIVE_RIGHT] = parseInt(valArray[3]);
+        _liveData[FLipMouse.LIVE_LEFT] = parseInt(valArray[4]);
         _liveData[FLipMouse.LIVE_MOV_X] = parseInt(valArray[5]);
         _liveData[FLipMouse.LIVE_MOV_Y] = parseInt(valArray[6]);
         if (valArray[7]) {

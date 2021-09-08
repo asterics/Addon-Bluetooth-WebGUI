@@ -11,7 +11,7 @@ class TabVisualization extends Component {
         return html`<h2 id="tabVisHeader" style="margin-bottom: 2em">${L.translate('Visualization of current state // Visualisierung aktueller Status')}</h2>
             <div class="row" style="margin-bottom: 2em">
                 <div id="tabVisVisContainer" class="col-12 col-lg-3 col-xl-4">
-                    <${PositionVisualization}/>
+                    <${PositionVisualization} showAnalogBars="${true}" showAnalogValues="${true}" showOrientation="${true}"/>
                 </div>
                 <div id="tabVisBtnSipVis" class="col-12 col-lg-9 col-xl-8">
                     <${BtnSipPuffVisualization}/>

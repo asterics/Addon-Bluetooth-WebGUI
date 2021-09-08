@@ -61,7 +61,7 @@ class TabStick extends Component {
             </div>
             <div class="row mt-3 mb-5">
                 <div id="posVisBasic" class="six columns">
-                    <${PositionVisualization} mode="tabStick"/>
+                    <${PositionVisualization} showDeadzone="${true}" showOrientation="${true}" circleRadius="${10}"/>
                 </div>
                 <div class="five columns">
                     <button onclick="${() => FLipMouse.calibrate()}">

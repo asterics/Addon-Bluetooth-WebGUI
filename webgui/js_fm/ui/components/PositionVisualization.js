@@ -19,26 +19,15 @@ class PositionVisualization extends Component {
             pY: 50,
             pDzX: 0,
             pDzY: 0,
-            showAnalogBars: false,
-            showAnalogValues: false,
-            showOrientation: false,
-            showDeadzone: false,
-            showMaxPos: false,
-            circleRadius: 20,
+            showAnalogBars: props.showAnalogBars === undefined ? false : props.showAnalogBars,
+            showAnalogValues: props.showAnalogValues === undefined ? false : props.showAnalogValues,
+            showOrientation: props.showOrientation === undefined ? false : props.showOrientation,
+            showDeadzone: props.showDeadzone === undefined ? false : props.showDeadzone,
+            showMaxPos: props.showMaxPos === undefined ? false : props.showMaxPos,
+            circleRadius: props.circleRadius || 20,
             maxPos: 100,
             maxPosManual: undefined
         };
-
-        if (props.mode === 'tabStick') {
-            this.setState({
-                showAnalogBars: false,
-                showAnalogValues: true,
-                showOrientation: true,
-                showDeadzone: true,
-                showMaxPos: true,
-                circleRadius: 10
-            });
-        }
     }
 
     componentWillUnmount() {
@@ -79,6 +68,10 @@ class PositionVisualization extends Component {
         });
     }
 
+    getPercentLength(constant) {
+        return (this.state.liveData[constant] / 1024 * 100) / 2
+    }
+
     render() {
         if (this.stateListener) {
             this.stateListener(this.state);
@@ -98,13 +91,13 @@ class PositionVisualization extends Component {
                         </div>
                         <div style="display: ${this.state.showAnalogBars ? 'block' : 'none'}">
                             <div id="upPos" class="back-layer color-lightred"
-                                 style="top: ${(50 - (data[FLipMouse.LIVE_UP] / 1024 * 100) / 2)}%; left: 48%; height: ${(data[FLipMouse.LIVE_UP] / 1024 * 100) / 2}%; width: 4%;"></div>
+                                 style="top: ${50-this.getPercentLength(FLipMouse.LIVE_UP)}%; left: 48%; height: ${this.getPercentLength(FLipMouse.LIVE_UP)}%; width: 4%;"></div>
                             <div id="downPos" class="back-layer color-lightred"
-                                 style="top: 50%; left: 48%; height: ${(data[FLipMouse.LIVE_DOWN] / 1024 * 100) / 2}%; width: 4%;"></div>
+                                 style="top: 50%; left: 48%; height: ${this.getPercentLength(FLipMouse.LIVE_DOWN)}%; width: 4%;"></div>
                             <div id="leftPos" class="back-layer color-lightred"
-                                 style="top: 48%; left: ${(50 - (data[FLipMouse.LIVE_LEFT] / 1024 * 100) / 2)}%; height: 4%; width: ${(data[FLipMouse.LIVE_LEFT] / 1024 * 100) / 2}%;"></div>
+                                 style="top: 48%; left: ${50-this.getPercentLength(FLipMouse.LIVE_LEFT)}%; height: 4%; width: ${this.getPercentLength(FLipMouse.LIVE_LEFT)}%;"></div>
                             <div id="rightPos" class="back-layer color-lightred"
-                                 style="top: 48%; left: 50%; height: 4%; width: ${(data[FLipMouse.LIVE_RIGHT] / 1024 * 100) / 2}%;"></div>
+                                 style="top: 48%; left: 50%; height: 4%; width: ${this.getPercentLength(FLipMouse.LIVE_RIGHT)}%;"></div>
                         </div>
                         <div class="back-layer"
                              style="left: 50%; height: 100%; border-right-style: solid; border-right-width: thin;"></div>
