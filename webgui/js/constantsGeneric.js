@@ -219,7 +219,7 @@ C.AT_CMDS_ACTIONS = [{
 }, {
     cmd: C.AT_CMD_MOUSE_MOVEY,
     label: 'Move mouse vertically (y-axis) // Maus vertikal bewegen (y-Achse)',
-    shortLabel: 'Move mouse x-axis // Mausbewegung y-Achse',
+    shortLabel: 'Move mouse y-axis // Mausbewegung y-Achse',
     category: C.AT_CMD_CAT_MOUSE,
     input: C.INPUTFIELD_TYPE_NUMBER
 }, {
