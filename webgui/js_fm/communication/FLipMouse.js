@@ -14,6 +14,8 @@ FLipMouse.LIVE_MOV_X_MAX = 'LIVE_MOV_X_MAX';
 FLipMouse.LIVE_MOV_Y_MIN = 'LIVE_MOV_Y_MIN';
 FLipMouse.LIVE_MOV_Y_MAX = 'LIVE_MOV_Y_MAX';
 FLipMouse.LIVE_BUTTONS = 'LIVE_BUTTONS';
+FLipMouse.LIVE_DRIFTCOMP_X = 'LIVE_DRIFTCOMP_X';
+FLipMouse.LIVE_DRIFTCOMP_Y = 'LIVE_DRIFTCOMP_Y';
 
 let _AT_CMD_IR_TIMEOUT_RESPONSE = 'IR_TIMEOUT';
 let _liveData = {};
@@ -120,6 +122,12 @@ function parseLiveData(data) {
             if (slot && slot !== ATDevice.getCurrentSlot()) {
                 ATDevice.setSlot(slot, true);
             }
+        }
+        if (valArray[9]) {
+            _liveData[FLipMouse.LIVE_DRIFTCOMP_X] = parseInt(valArray[9]);
+        }
+        if (valArray[10]) {
+            _liveData[FLipMouse.LIVE_DRIFTCOMP_Y] = parseInt(valArray[10]);
         }
         _liveData[C.LIVE_PRESSURE_MIN] = L.robustMin(_liveData[C.LIVE_PRESSURE_MIN], _liveData[C.LIVE_PRESSURE]);
         _liveData[FLipMouse.LIVE_MOV_X_MIN] = L.robustMin(_liveData[FLipMouse.LIVE_MOV_X_MIN], _liveData[FLipMouse.LIVE_MOV_X]);

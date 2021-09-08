@@ -25,7 +25,7 @@ class PositionVisualization extends Component {
             showDeadzone: props.showDeadzone === undefined ? false : props.showDeadzone,
             showMaxPos: props.showMaxPos === undefined ? false : props.showMaxPos,
             circleRadius: props.circleRadius || 20,
-            maxPos: 100,
+            maxPos: 50,
             maxPosManual: undefined
         };
     }
@@ -57,13 +57,19 @@ class PositionVisualization extends Component {
         this.state.maxPos = this.state.maxPosManual !== undefined ? this.state.maxPosManual : Math.max(maxX, maxY, Math.abs(minX), Math.abs(minY), Math.round(deadX * 1.1), Math.round(deadY * 1.1), this.state.maxPos);
         let percentageX = L.limitValue(L.getPercentage(x, -this.state.maxPos, this.state.maxPos), 0, 100);
         let percentageY = L.limitValue(L.getPercentage(y, -this.state.maxPos, this.state.maxPos), 0, 100);
+        let driftCompX = L.limitValue(L.getPercentage(data[FLipMouse.LIVE_DRIFTCOMP_X], -this.state.maxPos, this.state.maxPos), 0, 100);
+        let driftCompY = L.limitValue(L.getPercentage(data[FLipMouse.LIVE_DRIFTCOMP_Y], -this.state.maxPos, this.state.maxPos), 0, 100);
 
         this.setState({
             liveData: data,
             pX: percentageX,
             pY: percentageY,
+            driftCompX: driftCompX,
+            driftCompY: driftCompY,
             pDzX: (L.getPercentage(ATDevice.getConfig(C.AT_CMD_DEADZONE_X), 0, this.state.maxPos)),
             pDzY: (L.getPercentage(ATDevice.getConfig(C.AT_CMD_DEADZONE_Y), 0, this.state.maxPos)),
+            pDriftX: (L.getPercentage(ATDevice.getConfig(C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP), 0, this.state.maxPos)),
+            pDriftY: (L.getPercentage(ATDevice.getConfig(C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP), 0, this.state.maxPos)),
             inDeadzone: x < deadX && x > -deadX && y < deadY && y > -deadY
         });
     }
@@ -88,6 +94,10 @@ class PositionVisualization extends Component {
                         <div style="display: ${this.state.showDeadzone ? 'block' : 'none'}">
                             <div id="deadZonePos" class="back-layer ${state.inDeadzone ? 'color-lightcyan' : 'color-lightercyan'}"
                                  style="top: ${(100 - this.state.pDzY) / 2}%; left: ${(100 - this.state.pDzX) / 2}%; height: ${this.state.pDzY}%; width: ${this.state.pDzX}%;"></div>
+                        </div>
+                        <div style="display: ${this.state.showDeadzone ? 'block' : 'none'}">
+                            <div id="driftComp" class="back-layer"
+                                 style="top: ${(100 - this.state.pDriftY) / 2}%; left: ${(100 - this.state.pDriftX) / 2}%; height: ${this.state.pDriftY}%; width: ${this.state.pDriftX}%; background-color: transparent; border: 1px solid gray"></div>
                         </div>
                         <div style="display: ${this.state.showAnalogBars ? 'block' : 'none'}">
                             <div id="upPos" class="back-layer color-lightred"
@@ -114,6 +124,9 @@ class PositionVisualization extends Component {
                         </div>
                         <div id="cursorPos" class="back-layer" style="top: ${this.state.pY}%; left: ${this.state.pX}%;">
                             <div class="back-layer circle" style="${styleUtil.getCircleStyle(this.state.circleRadius)}"></div>
+                        </div>
+                        <div id="driftCompPos" class="back-layer ${this.state.showDeadzone ? '' : 'd-none'}" style="top: ${this.state.driftCompY}%; left: ${this.state.driftCompX}%;">
+                            <div class="back-layer circle" style="${styleUtil.getCircleStyle(4, 'blue')}"></div>
                         </div>
                     </div>
                 </div>`;

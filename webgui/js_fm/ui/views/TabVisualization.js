@@ -27,7 +27,7 @@ class TabVisualization extends Component {
                     <div style="font-weight: bold">${L.translate('Show/hide elements // Elemente anzeigen/verstecken')}</div>
                 </div>
                 <div class="row" style="margin-top: 1em">
-                    <button class="col-12 col-md m-1" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showDeadzone')}">Deadzone</button>
+                    <button class="col-12 col-md m-1" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showDeadzone')}">Deadzone & Driftcomp</button>
                     <button class="col-12 col-md m-1" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showAnalogBars')}">Bars</button>
                     <button class="col-12 col-md m-1" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showAnalogValues')}">Values</button>
                     <button class="col-12 col-md m-1" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showMaxPos')}">Max. Position</button>
