@@ -267,46 +267,6 @@ C.AT_CMDS_ACTIONS = [{
     input: C.INPUTFIELD_TYPE_SELECT,
     optionsFn: ATDevice.getSlots
 }, {
-    cmd: C.AT_CMD_JOYSTICK_X,
-    label: 'Joystick set x-axis // Joystick x-Achse setzen',
-    category: C.AT_CMD_CAT_JOYSTICK,
-    input: C.INPUTFIELD_TYPE_NUMBER
-}, {
-    cmd: C.AT_CMD_JOYSTICK_Y,
-    label: 'Joystick set y-axis // Joystick y-Achse setzen',
-    category: C.AT_CMD_CAT_JOYSTICK,
-    input: C.INPUTFIELD_TYPE_NUMBER
-}, {
-    cmd: C.AT_CMD_JOYSTICK_Z,
-    label: 'Joystick set z-axis // Joystick z-Achse setzen',
-    category: C.AT_CMD_CAT_JOYSTICK,
-    input: C.INPUTFIELD_TYPE_NUMBER
-}, {
-    cmd: C.AT_CMD_JOYSTICK_ZTURN,
-    label: 'Joystick set z-turn // Joystick z-Drehung setzen',
-    category: C.AT_CMD_CAT_JOYSTICK,
-    input: C.INPUTFIELD_TYPE_NUMBER
-}, {
-    cmd: C.AT_CMD_JOYSTICK_SLIDER,
-    label: 'Joystick set slider // Joystick Regler setzen',
-    category: C.AT_CMD_CAT_JOYSTICK,
-    input: C.INPUTFIELD_TYPE_NUMBER
-}, {
-    cmd: C.AT_CMD_JOYSTICK_BUTTON_PRESS,
-    label: 'Press joystick button // Joystick-Button drücken',
-    category: C.AT_CMD_CAT_JOYSTICK,
-    input: C.INPUTFIELD_TYPE_NUMBER
-}, {
-    cmd: C.AT_CMD_JOYSTICK_BUTTON_RELEASE,
-    label: 'Release joystick button // Joystick-Button auslassen',
-    category: C.AT_CMD_CAT_JOYSTICK,
-    input: C.INPUTFIELD_TYPE_NUMBER
-}, {
-    cmd: C.AT_CMD_JOYSTICK_HAT_POS,
-    label: 'Set joystick hat position // Joystick Hat-Position setzen',
-    category: C.AT_CMD_CAT_JOYSTICK,
-    input: C.INPUTFIELD_TYPE_NUMBER
-}, {
     cmd: C.AT_CMD_MACRO,
     label: 'Custom macro // Benutzerdefiniertes Makro',
     category: C.AT_CMD_CAT_MACRO,

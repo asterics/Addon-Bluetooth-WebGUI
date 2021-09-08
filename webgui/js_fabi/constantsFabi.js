@@ -60,9 +60,6 @@ C.AT_CMD_CATEGORIES = [{
     constant: C.AT_CMD_CAT_MOUSE,
     label: 'Mouse // Maus'
 }, {
-    constant: C.AT_CMD_CAT_JOYSTICK,
-    label: 'Joystick'
-}, {
     constant: C.AT_CMD_CAT_DEVICE,
     label: 'Device // Gerät'
 }, {
