@@ -169,8 +169,12 @@ label {
 .cursorPosWrapper {
     border: medium solid;
     background-color: transparent;
-    height: 200px;
-    width: 200px;
+    min-height: 200px;
+    min-width: 200px;
+    height: 20vw;
+    width: 20vw;
+    max-width: 350px;
+    max-height: 350px;
     margin-bottom: 2em;
 }
 

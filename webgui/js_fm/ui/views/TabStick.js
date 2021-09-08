@@ -59,22 +59,24 @@ class TabStick extends Component {
             <span id="posLiveA11yLabel" class="sr-only">${L.translate('Current position of FLipMouse Stick // Aktuelle Position des Sticks der FLipMouse')}</span>
             <span id="posLiveA11y" aria-describedby="posLiveA11yLabel" class="onlyscreenreader" role="status" aria-live="off" accesskey="q" tabindex="-1"></span>
 
-            <div class="mb-5">
-                ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => FLipMouse.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)}"/>`}
-            </div>
-            <div class="row mt-3 mb-5">
-                <div id="posVisBasic" class="six columns">
-                    <${PositionVisualization} showDeadzone="${true}" showOrientation="${true}" circleRadius="${10}"/>
+            <div class="row mb-4">
+                <div class="col-12 col-md-6">
+                    <div class="mb-5">
+                        ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => FLipMouse.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)}"/>`}
+                    </div>
+                    <div class="mb-4">
+                        <button onclick="${() => FLipMouse.calibrate()}">
+                            ${html`<${FaIcon} icon="far dot-circle"/>`}
+                            <span>${L.translate('Calibrate middle position // Mittelposition kalibrieren')}</span>
+                        </button>
+                        <button onclick="${() => FLipMouse.rotate()}">
+                            ${html`<${FaIcon} icon="fas redo"/>`}
+                            <span>${L.translate('Rotate right // Nach rechts drehen')}</span>
+                        </button>
+                    </div>
                 </div>
-                <div class="five columns">
-                    <button onclick="${() => FLipMouse.calibrate()}">
-                        ${html`<${FaIcon} icon="far dot-circle"/>`}
-                        <span>${L.translate('Calibrate middle position // Mittelposition kalibrieren')}</span>
-                    </button>
-                    <button onclick="${() => FLipMouse.rotate()}">
-                        ${html`<${FaIcon} icon="fas redo"/>`}
-                        <span>${L.translate('Rotate right // Nach rechts drehen')}</span>
-                    </button>
+                <div class="col-12 col-md-6 mt-5">
+                    <${PositionVisualization} showDeadzone="${true}" showOrientation="${true}" circleRadius="${10}"/>
                 </div>
             </div>
             
