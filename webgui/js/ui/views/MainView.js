@@ -161,6 +161,11 @@ class MainView extends Component {
                         </button>
                     </div>
                 </div>
+                <div class="row">
+                    <a class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3 mt-3" href="javascript:;" onclick="${() => {localStorageService.setFirmwareDownloadUrl(''); this.setState({showScreen: SCREENS.CONNECTION})}}">
+                        ${L.translate('Cancel firmware update // Firmware-Update abbrechen')}
+                    </a>
+                </div>
             </div>
         </div>
         <div class="top-layer-center ${state.showScreen === SCREENS.CONNECTION? '' : 'd-none'}">
