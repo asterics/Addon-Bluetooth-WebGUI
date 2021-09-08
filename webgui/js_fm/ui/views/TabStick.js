@@ -27,7 +27,8 @@ class TabStick extends Component {
             splitSensitivity: ATDevice.getConfig(C.AT_CMD_SENSITIVITY_X) !== ATDevice.getConfig(C.AT_CMD_SENSITIVITY_Y),
             splitDeadzone: ATDevice.getConfig(C.AT_CMD_DEADZONE_X) !== ATDevice.getConfig(C.AT_CMD_DEADZONE_Y),
             splitDriftcompRange: ATDevice.getConfig(C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP) !== ATDevice.getConfig(C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP),
-            splitDriftcompGain: ATDevice.getConfig(C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP) !== ATDevice.getConfig(C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP)
+            splitDriftcompGain: ATDevice.getConfig(C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP) !== ATDevice.getConfig(C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP),
+            showAdvanced: false
         });
         let additionalState = {};
         this.atCmds.forEach(atCmd => {
@@ -118,43 +119,50 @@ class TabStick extends Component {
                 ${html`<${Slider} label="Maximum speed: // Maximale Geschwindigkeit:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_MAX_SPEED]}"
                     min="0" max="100" updateConstants="${[C.AT_CMD_MAX_SPEED]}"/>`}
             </div>
-            <div class="mt-4">
-                ${html`<${Slider} label="Acceleration: // Beschleunigung:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_ACCELERATION]}"
-                    min="0" max="100" updateConstants="${[C.AT_CMD_ACCELERATION]}"/>`}
+            <div class="my-5">
+                <a href="javascript:;" onclick="${() => {this.setState({showAdvanced: !state.showAdvanced})}}">
+                    ${state.showAdvanced ? L.translate('Hide advanced options // Verstecke erweiterte Einstellungen') : L.translate('Show advanced options // Zeige erweiterte Einstellungen')}
+                </a>
             </div>
-            <div class="mt-4">
-                ${(() => {
-                    if (state.splitDriftcompRange) {
-                        return html`
-                        <${Slider} label="<span lang="en">Horizontal drift compensation range:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
-                            min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
-                            toggleFn="${() => this.toggleState('splitDriftcompRange', [C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>
-                        <${Slider} label="<span lang="en">Vertical drift compensation range:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"
-                            min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"/>`
-                    } else {
-                        return html`
-                        <${Slider} label="<span lang="en">Drift compensation range:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
-                            min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"
-                            toggleFn="${() => this.toggleState('splitDriftcompRange', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
-                    }
-                })()}
-            </div>
-            <div class="mt-4">
-                ${(() => {
-                    if (state.splitDriftcompGain) {
-                        return html`
-                        <${Slider} label="<span lang="en">Horizontal drift compensation gain:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
-                            min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
-                            toggleFn="${() => this.toggleState('splitDriftcompGain', [C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP, C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>
-                        <${Slider} label="<span lang="en">Vertical drift compensation gain:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"
-                            min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"/>`
-                    } else {
-                        return html`
-                        <${Slider} label="<span lang="en">Drift compensation gain:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
-                            min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP, C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"
-                            toggleFn="${() => this.toggleState('splitDriftcompGain', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
-                    }
-                })()}
+            <div class="${state.showAdvanced ? '' : 'd-none'}">
+                <div class="mt-4">
+                    ${html`<${Slider} label="Acceleration: // Beschleunigung:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_ACCELERATION]}"
+                        min="0" max="100" updateConstants="${[C.AT_CMD_ACCELERATION]}"/>`}
+                </div>
+                <div class="mt-4">
+                    ${(() => {
+                        if (state.splitDriftcompRange) {
+                            return html`
+                            <${Slider} label="<span lang="en">Horizontal drift compensation range:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
+                                min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
+                                toggleFn="${() => this.toggleState('splitDriftcompRange', [C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>
+                            <${Slider} label="<span lang="en">Vertical drift compensation range:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"
+                                min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"/>`
+                        } else {
+                            return html`
+                            <${Slider} label="<span lang="en">Drift compensation range:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
+                                min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"
+                                toggleFn="${() => this.toggleState('splitDriftcompRange', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
+                        }
+                    })()}
+                </div>
+                <div class="mt-4">
+                    ${(() => {
+                        if (state.splitDriftcompGain) {
+                            return html`
+                            <${Slider} label="<span lang="en">Horizontal drift compensation gain:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
+                                min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
+                                toggleFn="${() => this.toggleState('splitDriftcompGain', [C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP, C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>
+                            <${Slider} label="<span lang="en">Vertical drift compensation gain:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"
+                                min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"/>`
+                        } else {
+                            return html`
+                            <${Slider} label="<span lang="en">Drift compensation gain:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
+                                min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP, C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"
+                                toggleFn="${() => this.toggleState('splitDriftcompGain', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
+                        }
+                    })()}
+                </div>
             </div>
             <div class="row" style="margin-top: 4em">
                 <div class="col">
