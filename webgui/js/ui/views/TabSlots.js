@@ -16,6 +16,7 @@ class TabSlots extends Component {
             newSlotName: '',
             slots: ATDevice.getSlots(),
             uploadedSlots: [],
+            uploadProgress: 0,
             selectedUploadSlots: [],
             demoSettingSlots: [],
             demoSettingSelected: {},
@@ -93,7 +94,9 @@ class TabSlots extends Component {
         while (this.state.selectedUploadSlots.length + this.state.slots.length > C.MAX_NUMBER_SLOTS) {
             this.state.selectedUploadSlots.pop();
         }
-        ATDevice.uploadSlots(this.state.selectedUploadSlots).then(() => {
+        ATDevice.uploadSlots(this.state.selectedUploadSlots, (progress) => {
+            thiz.setState({uploadProgress: progress})
+        }).then(() => {
             thiz.resetUploadFile();
         });
     };
@@ -104,7 +107,9 @@ class TabSlots extends Component {
             return;
         }
         ATDevice.deleteAllSlots();
-        await ATDevice.uploadSlots(this.state.uploadedSlots);
+        await ATDevice.uploadSlots(this.state.uploadedSlots, (progress) => {
+            this.setState({uploadProgress: progress})
+        });
         this.resetUploadFile();
     }
 
@@ -176,7 +181,9 @@ class TabSlots extends Component {
             return;
         }
         ATDevice.deleteAllSlots();
-        await ATDevice.uploadSlots(this.state.demoSettingSlots);
+        await ATDevice.uploadSlots(this.state.demoSettingSlots, (progress) => {
+            this.setState({uploadProgress: progress})
+        });
         this.setState({
             slots: ATDevice.getSlots()
         })
@@ -284,7 +291,7 @@ class TabSlots extends Component {
                     <div class="col-sm-6 col-lg-5 ${!state.selectedFile || !state.selectedFileValid ? 'd-none' : ''}">
                         <button disabled="${state.selectedUploadSlots.length === 0 || state.uploading}" onclick="${() => this.uploadSlots()}">
                             ${html`<${FaIcon} icon="fas upload"/>`}
-                            ${state.uploading ? L.translate('Uploading Slot(s) ... // Slot(s) hochladen ...') : L.translate('Upload selected Slot(s) // Gewählte Slot(s) hochladen')}
+                            ${state.uploading ? L.translate('Uploading slot(s) {?}% ... // Slot(s) hochladen {?}% ...', state.uploadProgress) : L.translate('Upload selected Slot(s) // Gewählte Slot(s) hochladen')}
                         </button>
                     </div>
                 </div>
@@ -293,7 +300,7 @@ class TabSlots extends Component {
                         ${html`<${ActionButton} onclick="${() => this.uploadAllSlots()}"
                                             label="Upload and replace all Slots // Alle Slots hochladen und ersetzen"
                                             disabled="${state.uploadedSlots.length === 0}"
-                                            progressLabel="Uploading slots... // Slots hochladen..." faIcon="fas upload"/>`}
+                                            progressLabel="${L.translate('Uploading slots {?}% ... // Slots hochladen {?}% ...', state.uploadProgress)}" faIcon="fas upload"/>`}
                     </div>
                 </div>
 
@@ -346,7 +353,7 @@ class TabSlots extends Component {
                             ${html`<${ActionButton} onclick="${() => this.applyDemoSettings()}"
                                             label="Apply settings preset // Voreinstellungen anwenden"
                                             disabled="${state.demoSettingSlots.length === 0}"
-                                            progressLabel="Uploading settings... // Settings hochladen..." faIcon="fas upload"/>`}
+                                            progressLabel="${L.translate('Uploading slots {?}% ... // Slots hochladen {?}% ...', state.uploadProgress)}" faIcon="fas upload"/>`}
                         </div>
                     </div>
                 </div>

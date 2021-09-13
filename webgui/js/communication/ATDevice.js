@@ -456,9 +456,11 @@ ATDevice.deleteAllSlots = function () {
     emitSlotChange();
 }
 
-ATDevice.uploadSlots = async function (slotObjects) {
+ATDevice.uploadSlots = async function (slotObjects, progressHandler) {
     ATDevice.save();
     let slotObject = null;
+    progressHandler = progressHandler || (() => {});
+    progressHandler(1);
     for (let i = 0; i < slotObjects.length; i++) {
         slotObject = slotObjects[i];
         Object.keys(slotObject.config).forEach(function (key) {
@@ -470,11 +472,13 @@ ATDevice.uploadSlots = async function (slotObjects) {
             }
         });
         await ATDevice.sendAtCmdWithResult(C.AT_CMD_SAVE_SLOT, slotObject.name);
+        progressHandler(Math.round((i+1) / slotObjects.length * 100));
         _slots.push(slotObject);
     }
-    if (slotObject) {
-        ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, slotObject.name);
-        _currentSlot = slotObject.name;
+    progressHandler(100);
+    if (slotObjects[0]) {
+        ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, slotObjects[0].name);
+        _currentSlot = slotObjects[0].name;
         emitSlotChange();
     }
 }
