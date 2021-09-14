@@ -54,6 +54,12 @@ class TabActions extends Component {
         }
     }
 
+    isDisabled(btnMode, slot) {
+        let isDisabledLongPress = C.DEVICE_IS_FABI && btnMode.category === C.BTN_CAT_BTN_LONGPRESS && ATDevice.getConfig(C.AT_CMD_THRESHOLD_LONGPRESS, slot) === 0;
+        let isDisabledBtn = C.DEVICE_IS_FABI && btnMode.category !== C.BTN_CAT_BTN_LONGPRESS && (btnMode.index === 7 || btnMode.index === 8) && ATDevice.getConfig(C.AT_CMD_THRESHOLD_LONGPRESS, slot) > 0;
+        return isDisabledLongPress || isDisabledBtn;
+    }
+
     getBtnModeParam(btnMode, slot) {
         return ATDevice.getButtonAction(btnMode.index, slot).substr(C.LENGTH_ATCMD_PREFIX);
     }
@@ -89,17 +95,15 @@ class TabActions extends Component {
         let state = this.state;
         let slots = state.showAllSlots ? ATDevice.getSlots(): [ATDevice.getCurrentSlot()];
         let mobileView = slots.length > this.getMaxPrintableSlots();
-        
-        let useBtnModes = C.DEVICE_IS_FABI && parseInt(ATDevice.getConfig(C.AT_CMD_THRESHOLD_LONGPRESS)) > 0 ? C.BTN_MODES_LONGPRESS : C.BTN_MODES;
-        let btnModes = useBtnModes.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
+
+        let btnModes = C.BTN_MODES_ACTIONLIST.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
         let modalOpen = !!state.modalBtnMode;
         if(modalOpen) {
             L.addClass('body', 'modal-open');
         } else {
             L.removeClass('body', 'modal-open');
         }
-        let useCategories = C.DEVICE_IS_FABI && parseInt(ATDevice.getConfig(C.AT_CMD_THRESHOLD_LONGPRESS)) > 0 ? C.BTN_CATEGORIES_LONGPRESS : C.BTN_CATEGORIES;
-        let categoryElements = useCategories.map(cat => {return {value: cat.constant, label: cat.label}});
+        let categoryElements = C.BTN_CATEGORIES.map(cat => {return {value: cat.constant, label: cat.label}});
         categoryElements = [{value: null, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
         let slotElements = [{value: true, label: 'All slots // Alle Slots'}, {value: false, label: 'Current slot // Aktueller Slot'}];
 
@@ -123,8 +127,11 @@ class TabActions extends Component {
                         ${slots.map(slot => html`
                             <span class="${mobileView ? 'col-12' : 'col'} ${this.getSlotStyle(slot)}">
                                 <span class="${mobileView ? '' : 'd-none'}">Slot "${slot}": </span>
-                                <a href="javascript:;" title="${this.getLinkTitle(btnMode, slot)}" onclick="${() => this.setState({modalBtnMode: btnMode, modalSlot: slot})}">
-                                    <span>${this.getLinkLabel(btnMode, slot)}</span>
+                                <span class="${this.isDisabled(btnMode, slot) ? '' : 'd-none'}" style="font-weight: normal" title="${L.translate('Go to tab "Timings" to configure long press threshold // Gehe zu Tab "Timings" um Schwellenwert für langes Drücken zu konfigurieren')}">
+                                    ${L.translate('(disabled) // (deaktiviert)')}
+                                </span>
+                                <a href="javascript:;" title="${this.getLinkTitle(btnMode, slot)}" class="${this.isDisabled(btnMode, slot) ? 'd-none' : ''}" onclick="${() => this.setState({modalBtnMode: btnMode, modalSlot: slot})}">
+                                    <span style="${ATDevice.getButtonAction(btnMode.index, slot) === C.AT_CMD_NO_CMD ? 'font-weight: normal' : ''}">${this.getLinkLabel(btnMode, slot)}</span>
                                     <span class="${this.isFMNonAltMode(btnMode, slot) || (state.showAllSlots && ATDevice.getSlots().length > 1) || !this.getBtnModeParam(btnMode, slot) ? 'd-none' : ''}" style="font-weight: normal"> (${this.getBtnModeParam(btnMode, slot)})</span>
                                 </a>
                             </span>

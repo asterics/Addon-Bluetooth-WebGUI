@@ -240,6 +240,8 @@ C.BTN_MODES = [{
     category: C.BTN_CAT_STICKPLUS
 }];
 
+C.BTN_MODES_ACTIONLIST = C.BTN_MODES;
+
 C.FLIPMOUSE_MODE_MOUSE = {
     value: 1,
     label: 'Mouse movement // Mausbewegung'

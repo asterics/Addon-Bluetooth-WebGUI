@@ -74,14 +74,6 @@ C.BTN_CATEGORIES = [{
     constant: C.BTN_CAT_BTN,
     label: 'Buttons'
 }, {
-    constant: C.BTN_CAT_SIPPUFF,
-    label: 'Sip/Puff // Ansaugen/Pusten'
-}]
-
-C.BTN_CATEGORIES_LONGPRESS = [{
-    constant: C.BTN_CAT_BTN,
-    label: 'Buttons'
-}, {
     constant: C.BTN_CAT_BTN_LONGPRESS,
     label: 'Buttons long press // Buttons lange drücken'
 }, {
@@ -131,7 +123,7 @@ C.BTN_MODES = [{
     category: C.BTN_CAT_SIPPUFF
 }];
 
-C.BTN_MODES_LONGPRESS = [{
+C.BTN_MODES_ACTIONLIST = [{
     index: 1,
     label: 'Button 1',
     category: C.BTN_CAT_BTN
@@ -154,6 +146,14 @@ C.BTN_MODES_LONGPRESS = [{
 }, {
     index: 6,
     label: 'Button 6',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 7,
+    label: 'Button 7',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 8,
+    label: 'Button 8',
     category: C.BTN_CAT_BTN
 }, {
     index: 7,
