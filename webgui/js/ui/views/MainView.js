@@ -150,13 +150,13 @@ class MainView extends Component {
                 <div class="row mb-5">
                     <div class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3">
                         ${html`<${FaIcon} icon="fas exclamation-triangle"/>`}
-                        <span>${L.translate('The last firmware update was cancelled. Restart it in order to be able to use your device. // Das letzte Firmware-Update wurde abgebrochen. Starten Sie es erneut um das Gerät weiter verwenden zu können.')}</span>
+                        <span>${L.translate('Firmware update was not completed yet. Continue in order to be able to use your device. // Das Firmware-Update wurde noch nicht abgeschlossen. Setzen Sie das Update fort um das Gerät weiter verwenden zu können.')}</span>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3">
                         <button onclick="${() => this.restartFirmwareUpdate()}" disabled="${this.state.updateProgress}">
-                            <span class="${state.updateProgress ? 'd-none' : ''}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Restart firmware update // Firmware-Update erneut starten')}</span>
+                            <span class="${state.updateProgress ? 'd-none' : ''}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Continue firmware update // Firmware-Update fortsetzen')}</span>
                             <span class="${state.updateProgress ? '' : 'd-none'}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Updating... {?}% // Aktualisiere... {?}%', state.updateProgress)}</span>
                         </button>
                     </div>
