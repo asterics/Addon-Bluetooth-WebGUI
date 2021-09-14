@@ -147,16 +147,19 @@ C.AT_CMDS_ACTIONS = [{
     cmd: C.AT_CMD_HOLD_MOUSE_L,
     label: 'Hold left mouse button (as long as input action) // Linke Maustaste halten (für Dauer der Eingabe-Aktion)',
     shortLabel: 'Hold left mouse button // Linke Maustaste halten',
+    macroLabel: 'Hold left mouse button // Linke Maustaste halten',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_HOLD_MOUSE_R,
     label: 'Hold right mouse button (as long as input action) // Rechte Maustaste halten (für Dauer der Eingabe-Aktion)',
     shortLabel: 'Hold right mouse button // Rechte Maustaste halten',
+    macroLabel: 'Hold right mouse button // Rechte Maustaste halten',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_HOLD_MOUSE_M,
     label: 'Hold middle mouse button (as long as input action) // Mittlere Maustaste halten (für Dauer der Eingabe-Aktion)',
     shortLabel: 'Hold middle mouse button // Mittlere Maustaste halten',
+    macroLabel: 'Hold middle mouse button // Mittlere Maustaste halten',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_CLICK_MOUSE_L,
@@ -192,18 +195,6 @@ C.AT_CMDS_ACTIONS = [{
     shortLabel: 'Toggle middle mouse button // Umschalten mittlere Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
-    cmd: C.AT_CMD_RELEASE_MOUSE_L,
-    label: 'Release left mouse button // Linke Maustaste loslassen',
-    category: C.AT_CMD_CAT_MOUSE
-}, {
-    cmd: C.AT_CMD_RELEASE_MOUSE_R,
-    label: 'Release right mouse button // Rechte Maustaste loslassen',
-    category: C.AT_CMD_CAT_MOUSE
-}, {
-    cmd: C.AT_CMD_RELEASE_MOUSE_M,
-    label: 'Release middle mouse button // Mittlere Maustaste loslassen',
-    category: C.AT_CMD_CAT_MOUSE
-}, {
     cmd: C.AT_CMD_MOUSEWHEEL_UP,
     label: 'Scroll down // Nach unten scrollen',
     category: C.AT_CMD_CAT_MOUSE
@@ -227,6 +218,7 @@ C.AT_CMDS_ACTIONS = [{
     cmd: C.AT_CMD_KEYHOLD,
     label: 'Hold key(s) (as long as input action) // Taste(n) halten (für Dauer der Eingabe-Aktion)',
     shortLabel: 'Hold key(s) // Taste(n) halten',
+    macroLabel: 'Hold key(s) // Taste(n) halten',
     category: C.AT_CMD_CAT_KEYBOARD,
     input: C.INPUTFIELD_TYPE_KEYBOARD
 }, {
@@ -246,17 +238,6 @@ C.AT_CMDS_ACTIONS = [{
     label: 'Write word // Schreibe Wort',
     category: C.AT_CMD_CAT_KEYBOARD,
     input: C.INPUTFIELD_TYPE_TEXT
-}, {
-    cmd: C.AT_CMD_KEYRELEASE,
-    label: 'Release specific key(s) // Spezifische Taste(n) auslassen',
-    shortLabel: 'Release key(s) // Taste(n) auslassen',
-    category: C.AT_CMD_CAT_KEYBOARD,
-    input: C.INPUTFIELD_TYPE_KEYBOARD
-}, {
-    cmd: C.AT_CMD_KEYRELEASEALL,
-    label: 'Release all key(s) // Alle Taste(n) auslassen',
-    shortLabel: 'Release key(s) // Taste(n) auslassen',
-    category: C.AT_CMD_CAT_KEYBOARD
 }, {
     cmd: C.AT_CMD_NEXT_SLOT,
     label: 'Load next slot // Nächsten Slot laden',
@@ -278,6 +259,29 @@ C.AT_CMDS_MACRO = [{
     cmd: C.AT_CMD_WAIT,
     label: 'Wait time in milliseconds // Warten (Millisekunden)',
     input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_KEYRELEASE,
+    label: 'Release specific key(s) // Spezifische Taste(n) auslassen',
+    shortLabel: 'Release key(s) // Taste(n) auslassen',
+    category: C.AT_CMD_CAT_KEYBOARD,
+    input: C.INPUTFIELD_TYPE_KEYBOARD
+}, {
+    cmd: C.AT_CMD_KEYRELEASEALL,
+    label: 'Release all key(s) // Alle Taste(n) auslassen',
+    shortLabel: 'Release key(s) // Taste(n) auslassen',
+    category: C.AT_CMD_CAT_KEYBOARD
+}, {
+    cmd: C.AT_CMD_RELEASE_MOUSE_L,
+    label: 'Release left mouse button // Linke Maustaste loslassen',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_RELEASE_MOUSE_R,
+    label: 'Release right mouse button // Rechte Maustaste loslassen',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_RELEASE_MOUSE_M,
+    label: 'Release middle mouse button // Mittlere Maustaste loslassen',
+    category: C.AT_CMD_CAT_MOUSE
 }];
 
 // keycode stuff

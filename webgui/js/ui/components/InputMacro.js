@@ -7,7 +7,15 @@ class InputMacro extends Component {
     constructor(props) {
         super();
 
-        this.selectATCMDS = C.AT_CMDS_MACRO.concat(C.AT_CMDS_ACTIONS);
+        this.selectATCMDS = C.AT_CMDS_ACTIONS.concat(C.AT_CMDS_MACRO).sort((a, b) => {
+            if (!a.category) {
+                return -1;
+            }
+            if (!b.category) {
+                return 1;
+            }
+            return a.category.localeCompare(b.category) * (-1);
+        }).filter(a => a.cmd !== C.AT_CMD_MACRO);
         this.selectATCMDStrings = this.selectATCMDS.map(cmd => cmd.cmd);
         this.optionsFnCache = {};
         this.props = props;
@@ -103,7 +111,7 @@ class InputMacro extends Component {
                     <div class="row">
                         <div class="col-9 col-md-8">
                             <select class="col-12" id="selectKeys" onchange="${(event) => this.setState({selectedCmd: event.target.value})}">
-                                ${this.selectATCMDS.map(cmd => html`<option value="${cmd.cmd}">${cmd.cmd.replace('AT ', '') + ': ' + L.translate(cmd.label)}</option>`)}
+                                ${this.selectATCMDS.map(cmd => html`<option value="${cmd.cmd}">${cmd.cmd.replace('AT ', '') + ': ' + L.translate(cmd.macroLabel || cmd.label)}</option>`)}
                             </select>
                         </div>
                         <div class="col-3 col-md-4">
