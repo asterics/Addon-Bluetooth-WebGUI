@@ -141,6 +141,7 @@ C.INPUTFIELD_TYPE_MACRO = 'INPUTFIELD_TYPE_MACRO';
 C.AT_CMDS_ACTIONS = [{
     cmd: C.AT_CMD_NO_CMD,
     label: 'No command // Keine Funktion',
+    shortLabel: '(empty) // (leer)',
     category: C.AT_CMD_CAT_DEVICE
 }, {
     cmd: C.AT_CMD_HOLD_MOUSE_L,
