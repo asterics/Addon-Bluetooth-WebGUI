@@ -8,9 +8,11 @@ import {ATDevice} from "../../../js/communication/ATDevice.js";
 import {FLipMouse} from "../../communication/FLipMouse.js";
 import {ActionButton} from "../../../js/ui/components/ActionButton.js";
 import {FaIcon} from "../../../js/ui/components/FaIcon.js";
+import {localStorageService} from "../../../js/localStorageService.js";
 
 const html = htm.bind(h);
 
+const KEY_TAB_STICK_SHOW_ADVANCED = 'KEY_TAB_STICK_SHOW_ADVANCED';
 class TabStick extends Component {
     constructor() {
         super();
@@ -28,7 +30,7 @@ class TabStick extends Component {
             splitDeadzone: ATDevice.getConfig(C.AT_CMD_DEADZONE_X) !== ATDevice.getConfig(C.AT_CMD_DEADZONE_Y),
             splitDriftcompRange: ATDevice.getConfig(C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP) !== ATDevice.getConfig(C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP),
             splitDriftcompGain: ATDevice.getConfig(C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP) !== ATDevice.getConfig(C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP),
-            showAdvanced: false
+            showAdvanced: localStorageService.hasKey(KEY_TAB_STICK_SHOW_ADVANCED) ? localStorageService.get(KEY_TAB_STICK_SHOW_ADVANCED) : false
         });
         let additionalState = {};
         this.atCmds.forEach(atCmd => {
@@ -77,7 +79,7 @@ class TabStick extends Component {
                     </div>
                 </div>
                 <div class="col-12 col-md-6 mt-4 mt-md-0">
-                    <${PositionVisualization} showDeadzone="${true}" showOrientation="${true}" circleRadius="${10}"/>
+                    <${PositionVisualization} showDeadzone="${true}" showOrientation="${true}" showMaxPos="${true}" circleRadius="${10}" showZoom="${true}"/>
                 </div>
             </div>
             
@@ -120,7 +122,7 @@ class TabStick extends Component {
                     min="0" max="100" updateConstants="${[C.AT_CMD_MAX_SPEED]}"/>`}
             </div>
             <div class="my-5">
-                <a href="javascript:;" onclick="${() => {this.setState({showAdvanced: !state.showAdvanced})}}">
+                <a href="javascript:;" onclick="${() => {localStorageService.save(KEY_TAB_STICK_SHOW_ADVANCED, !state.showAdvanced); this.setState({showAdvanced: !state.showAdvanced})}}">
                     ${state.showAdvanced ? L.translate('Hide advanced options // Verstecke erweiterte Einstellungen') : L.translate('Show advanced options // Zeige erweiterte Einstellungen')}
                 </a>
             </div>

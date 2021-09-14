@@ -5,8 +5,9 @@ import {RadioFieldset} from "../components/RadioFieldset.js";
 import {ATDevice} from "../../communication/ATDevice.js";
 import {localStorageService} from "../../localStorageService.js";
 
-
 const html = htm.bind(h);
+
+const KEY_TAB_ACTIONS_SHOW_ALL_SLOTS = 'KEY_TAB_ACTIONS_SHOW_ALL_SLOTS';
 class TabActions extends Component {
 
     constructor() {
@@ -15,7 +16,7 @@ class TabActions extends Component {
         TabActions.instance = this;
         this.state = {
             showCategory: null,
-            showAllSlots: localStorageService.getTabActionConfig().showAllSlots !== undefined ? localStorageService.getTabActionConfig().showAllSlots : true,
+            showAllSlots: localStorageService.hasKey(KEY_TAB_ACTIONS_SHOW_ALL_SLOTS) ? localStorageService.get(KEY_TAB_ACTIONS_SHOW_ALL_SLOTS) : true,
             modalBtnMode: null,
             modalSlot: null,
             widthEm: window.innerWidth / parseFloat(getComputedStyle(document.querySelector('body'))['font-size'])
@@ -88,7 +89,7 @@ class TabActions extends Component {
 
     setShowAllSlots(value) {
         this.setState({showAllSlots: value});
-        localStorageService.setTabActionConfig({showAllSlots: value});
+        localStorageService.save(KEY_TAB_ACTIONS_SHOW_ALL_SLOTS, value);
     }
     
     render() {

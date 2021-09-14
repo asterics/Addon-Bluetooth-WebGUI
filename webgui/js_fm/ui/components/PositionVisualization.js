@@ -3,14 +3,23 @@ import htm from '../../../lib/htm.min.js';
 import {styleUtil} from '../../util/styleUtil.js';
 import {ATDevice} from "../../../js/communication/ATDevice.js";
 import {FLipMouse} from "../../communication/FLipMouse.js";
+import {FaIcon} from "../../../js/ui/components/FaIcon.js";
+import {localStorageService} from "../../../js/localStorageService.js";
 
 const html = htm.bind(h);
 
+const KEY_POS_VIS_MAX_POS_ZOOM = 'KEY_POS_VIS_MAX_POS_ZOOM';
 class PositionVisualization extends Component {
 
     constructor(props) {
         super();
 
+        /*
+        possible props (default values):
+        showAnalogBars (false), showAnalogValues (false), showOrientation (false), showDeadzone (false), showMaxPos (false), circleRadius (20), maxPosManual (undefined), showZoom (false)
+         */
+
+        this.props = props;
         PositionVisualization.instance = this;
         this.stateListener = null;
         this.state = {
@@ -19,15 +28,13 @@ class PositionVisualization extends Component {
             pY: 50,
             pDzX: 0,
             pDzY: 0,
-            showAnalogBars: props.showAnalogBars === undefined ? false : props.showAnalogBars,
-            showAnalogValues: props.showAnalogValues === undefined ? false : props.showAnalogValues,
-            showOrientation: props.showOrientation === undefined ? false : props.showOrientation,
-            showDeadzone: props.showDeadzone === undefined ? false : props.showDeadzone,
-            showMaxPos: props.showMaxPos === undefined ? false : props.showMaxPos,
-            circleRadius: props.circleRadius || 20,
             maxPos: 50,
-            maxPosManual: undefined
+            maxPosZoom: localStorageService.hasKey(KEY_POS_VIS_MAX_POS_ZOOM) ? localStorageService.get(KEY_POS_VIS_MAX_POS_ZOOM) : 50
         };
+    }
+
+    getValue(value, defaultValue) {
+        return value !== undefined ? value : defaultValue;
     }
 
     componentWillUnmount() {
@@ -45,6 +52,13 @@ class PositionVisualization extends Component {
         this.stateListener = fn;
     }
 
+    getMaxPosManual() {
+        if (this.props.showZoom) {
+            return this.state.maxPosZoom;
+        }
+        return this.props.maxPosManual;
+    }
+
     updateData(data) {
         let x = data[FLipMouse.LIVE_MOV_X];
         let y = data[FLipMouse.LIVE_MOV_Y];
@@ -54,7 +68,7 @@ class PositionVisualization extends Component {
         let minY = data[FLipMouse.LIVE_MOV_Y_MIN];
         let deadX = ATDevice.getConfig(C.AT_CMD_DEADZONE_X);
         let deadY = ATDevice.getConfig(C.AT_CMD_DEADZONE_Y);
-        this.state.maxPos = this.state.maxPosManual !== undefined ? this.state.maxPosManual : Math.max(maxX, maxY, Math.abs(minX), Math.abs(minY), Math.round(deadX * 1.1), Math.round(deadY * 1.1), this.state.maxPos);
+        this.state.maxPos = this.getMaxPosManual() !== undefined ? this.getMaxPosManual() : Math.max(maxX, maxY, Math.abs(minX), Math.abs(minY), Math.round(deadX * 1.1), Math.round(deadY * 1.1), this.state.maxPos);
         let percentageX = L.limitValue(L.getPercentage(x, -this.state.maxPos, this.state.maxPos), 0, 100);
         let percentageY = L.limitValue(L.getPercentage(y, -this.state.maxPos, this.state.maxPos), 0, 100);
         let driftCompX = L.limitValue(L.getPercentage(data[FLipMouse.LIVE_DRIFTCOMP_X], -this.state.maxPos, this.state.maxPos), 0, 100);
@@ -78,28 +92,44 @@ class PositionVisualization extends Component {
         return (this.state.liveData[constant] / 1024 * 100) / 2
     }
 
-    render() {
+    setMaxPosZoom(value) {
+        this.setState({
+            maxPosZoom: value
+        });
+        localStorageService.save(KEY_POS_VIS_MAX_POS_ZOOM, value);
+    }
+
+    render(props) {
         if (this.stateListener) {
             this.stateListener(this.state);
         }
+        this.props = props;
         let state = this.state;
         let data = this.state.liveData;
         return html`<div id="posVis" aria-hidden="true">
                     <div class="relative center-div cursorPosWrapper">
-                        <div style="display: ${this.state.showOrientation ? 'block' : 'none'}">
+                        <div style="display: ${this.getValue(props.showZoom, false) ? 'block' : 'none'};">
+                            <div id="zoomButtons" style="top: 1%; left: 1%; position: absolute; width: 100%">
+                                <div class="relative">
+                                    <button title="${L.translate('zoom in // Vergrößern')}" onclick="${() => this.setMaxPosZoom(Math.max(state.maxPosZoom * 0.9, 20))}" style="width: 15%; height: 15%; opacity: 0.7">${html`<${FaIcon} height="0.9em" icon="fas plus"/>`}</button>
+                                    <button title="${L.translate('zoom out // Verkleinern')}" onclick="${() => this.setMaxPosZoom(Math.min(state.maxPosZoom * 1.1, 1024))}" style="width: 15%; height: 15%; opacity: 0.7">${html`<${FaIcon} height="0.9em" icon="fas minus"/>`}</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: ${this.getValue(props.showOrientation, false) ? 'block' : 'none'}">
                             <div id="orientationSign" class="back-layer full-height full-width" style="transform: rotate(${(ATDevice.getConfig(C.AT_CMD_ORIENTATION_ANGLE))%360}deg);">
                                 <div class="back-layer" style="top:100%; left: 35%; width: 30%; height: 10%; background-color: black; z-index: 2"></div>
                             </div>
                         </div>
-                        <div style="display: ${this.state.showDeadzone ? 'block' : 'none'}">
+                        <div style="display: ${this.getValue(props.showDeadzone, false) ? 'block' : 'none'}">
                             <div id="deadZonePos" class="back-layer ${state.inDeadzone ? 'color-lightcyan' : 'color-lightercyan'}"
-                                 style="top: ${(100 - this.state.pDzY) / 2}%; left: ${(100 - this.state.pDzX) / 2}%; height: ${this.state.pDzY}%; width: ${this.state.pDzX}%;"></div>
+                                 style="top: ${Math.max(100 - this.state.pDzY, 0) / 2}%; left: ${Math.max(100 - this.state.pDzX, 0) / 2}%; height: ${Math.min(this.state.pDzY, 100)}%; width: ${Math.min(this.state.pDzX, 100)}%;"></div>
                         </div>
-                        <div style="display: ${this.state.showDeadzone ? 'block' : 'none'}">
+                        <div style="display: ${this.getValue(props.showDeadzone, false) ? 'block' : 'none'}">
                             <div id="driftComp" class="back-layer"
-                                 style="top: ${(100 - this.state.pDriftY) / 2}%; left: ${(100 - this.state.pDriftX) / 2}%; height: ${this.state.pDriftY}%; width: ${this.state.pDriftX}%; background-color: transparent; border: 1px solid gray"></div>
+                                 style="top: ${Math.max(100 - this.state.pDriftY, 0) / 2}%; left: ${Math.max(100 - this.state.pDriftX, 0) / 2}%; height: ${Math.min(this.state.pDriftY, 100)}%; width: ${Math.min(this.state.pDriftX, 100)}%; background-color: transparent; border: 1px solid gray"></div>
                         </div>
-                        <div style="display: ${this.state.showAnalogBars ? 'block' : 'none'}">
+                        <div style="display: ${this.getValue(props.showAnalogBars, false) ? 'block' : 'none'}">
                             <div id="upPos" class="back-layer color-lightred"
                                  style="top: ${50-this.getPercentLength(FLipMouse.LIVE_UP)}%; left: 48%; height: ${this.getPercentLength(FLipMouse.LIVE_UP)}%; width: 4%;"></div>
                             <div id="downPos" class="back-layer color-lightred"
@@ -113,17 +143,17 @@ class PositionVisualization extends Component {
                              style="left: 50%; height: 100%; border-right-style: solid; border-right-width: thin;"></div>
                         <div class="back-layer"
                              style="top: 50%; width: 100%; border-bottom-style: solid; border-bottom-width: thin;"></div>
-                        <div style="display: ${this.state.showAnalogValues ? 'block' : 'none'}">
+                        <div style="display: ${this.getValue(props.showAnalogValues, false) ? 'block' : 'none'}">
                             <div id="upPosVal" class="back-layer" style="top: 0%; left: 52%">${data[FLipMouse.LIVE_UP]}</div>
                             <div id="downPosVal" class="back-layer" style="top: 90%; left: 52%">${data[FLipMouse.LIVE_DOWN]}</div>
                             <div id="leftPosVal" class="back-layer" style="top: 38%; left: 1%;">${data[FLipMouse.LIVE_LEFT]}</div>
                             <div id="rightPosVal" class="back-layer" style="top: 38%; left: 88%">${data[FLipMouse.LIVE_RIGHT]}</div>
                         </div>
-                        <div style="display: ${this.state.showMaxPos ? 'block' : 'none'}">
-                            <div id="cursorPosVal" class="back-layer" style="top: 90%; left: 2%;">${this.state.maxPos}</div>
+                        <div style="display: ${this.getValue(props.showMaxPos, false) ? 'block' : 'none'}">
+                            <div id="cursorPosVal" class="back-layer" style="top: 90%; left: 2%;">${Math.round(this.state.maxPos)}</div>
                         </div>
                         <div id="cursorPos" class="back-layer" style="top: ${this.state.pY}%; left: ${this.state.pX}%;">
-                            <div class="back-layer circle" style="${styleUtil.getCircleStyle(this.state.circleRadius)}"></div>
+                            <div class="back-layer circle" style="${styleUtil.getCircleStyle(this.getValue(props.circleRadius, 20))}"></div>
                         </div>
                         <div id="driftCompPos" class="back-layer ${this.state.showDeadzone ? '' : 'd-none'}" style="top: ${this.state.driftCompY}%; left: ${this.state.driftCompX}%;">
                             <div class="back-layer circle" style="${styleUtil.getCircleStyle(4, 'blue')}"></div>

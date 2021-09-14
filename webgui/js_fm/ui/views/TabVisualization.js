@@ -2,16 +2,39 @@ import { h, Component, render } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
 import {PositionVisualization} from "../components/PositionVisualization.js";
 import {BtnSipPuffVisualization} from "../components/BtnSipPuffVisualization.js";
-import {preactUtil} from "../../util/preactUtil.js";
+import {localStorageService} from "../../../js/localStorageService.js";
 
 const html = htm.bind(h);
 
+const KEY_TAB_VISUALIZATION_CONFIG = 'KEY_TAB_VISUALIZATION_CONFIG';
 class TabVisualization extends Component {
+    constructor(props) {
+        super(props);
+
+        let stored = localStorageService.get(KEY_TAB_VISUALIZATION_CONFIG) || {};
+        this.setState({
+            showDeadzone: stored.showDeadzone !== undefined ? stored.showDeadzone : false,
+            showAnalogBars: stored.showAnalogBars !== undefined ? stored.showAnalogBars : true,
+            showAnalogValues: stored.showAnalogValues !== undefined ? stored.showAnalogValues : true,
+            showMaxPos: stored.showMaxPos !== undefined ? stored.showMaxPos : false,
+            showOrientation: stored.showOrientation !== undefined ? stored.showOrientation : false,
+            maxPosManual: stored.maxPosManual
+        })
+    }
+
+    toggleState(constant) {
+        let newState = {};
+        newState[constant] = !this.state[constant];
+        this.setState(newState);
+    }
+
     render() {
+        let state = this.state;
+        localStorageService.save(KEY_TAB_VISUALIZATION_CONFIG, this.state);
         return html`<h2 id="tabVisHeader" style="margin-bottom: 2em">${L.translate('Visualization of current state // Visualisierung aktueller Status')}</h2>
             <div class="row" style="margin-bottom: 2em">
                 <div id="tabVisVisContainer" class="col-12 col-lg-3 col-xl-4">
-                    <${PositionVisualization} showAnalogBars="${true}" showAnalogValues="${true}" showOrientation="${true}"/>
+                    <${PositionVisualization} showDeadzone="${state.showDeadzone}" showAnalogBars="${state.showAnalogBars}" showAnalogValues="${state.showAnalogValues}" showMaxPos="${state.showMaxPos}" showOrientation="${state.showOrientation}" maxPosManual="${state.maxPosManual}"/>
                 </div>
                 <div id="tabVisBtnSipVis" class="col-12 col-lg-9 col-xl-8">
                     <${BtnSipPuffVisualization}/>
@@ -20,18 +43,18 @@ class TabVisualization extends Component {
             <div class="container-fluid">
                 <div class="row">
                     <label for="sliderMaxRange">${L.translate('Maximum position // Maximal angezeigte Auslenkung')}</label>
-                    <input type="range" id="sliderMaxRange" min="10" max="1024" onInput="${(event) => PositionVisualization.instance.updateState({maxPosManual: event.target.value})}"/>
+                    <input type="range" id="sliderMaxRange" min="10" max="1024" onInput="${(event) => this.setState({maxPosManual: event.target.value})}"/>
                     <span id="sliderMaxRangeValue">?</span>
                 </div>
                 <div class="row" style="margin-top: 2em">
                     <div style="font-weight: bold">${L.translate('Show/hide elements // Elemente anzeigen/verstecken')}</div>
                 </div>
                 <div class="row" style="margin-top: 1em">
-                    <button class="col-12 col-md m-1" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showDeadzone')}">Deadzone & Driftcomp</button>
-                    <button class="col-12 col-md m-1" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showAnalogBars')}">Bars</button>
-                    <button class="col-12 col-md m-1" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showAnalogValues')}">Values</button>
-                    <button class="col-12 col-md m-1" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showMaxPos')}">Max. Position</button>
-                    <button class="col-12 col-md m-1" onclick="${() => preactUtil.toggleState(PositionVisualization.instance, 'showOrientation')}">Orientation</button>
+                    <button class="col-12 col-md m-1" onclick="${() => this.toggleState('showDeadzone')}">Deadzone & Driftcomp</button>
+                    <button class="col-12 col-md m-1" onclick="${() => this.toggleState('showAnalogBars')}">Bars</button>
+                    <button class="col-12 col-md m-1" onclick="${() => this.toggleState('showAnalogValues')}">Values</button>
+                    <button class="col-12 col-md m-1" onclick="${() => this.toggleState('showMaxPos')}">Max. Position</button>
+                    <button class="col-12 col-md m-1" onclick="${() => this.toggleState('showOrientation')}">Orientation</button>
                 </div>
             </div>
             `;
