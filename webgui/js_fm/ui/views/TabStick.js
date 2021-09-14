@@ -76,7 +76,7 @@ class TabStick extends Component {
                         </button>
                     </div>
                 </div>
-                <div class="col-12 col-md-6 mt-5">
+                <div class="col-12 col-md-6 mt-4 mt-md-0">
                     <${PositionVisualization} showDeadzone="${true}" showOrientation="${true}" circleRadius="${10}"/>
                 </div>
             </div>
