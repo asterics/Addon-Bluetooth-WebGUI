@@ -118,7 +118,7 @@ class TabActions extends Component {
              </div>
              
              <ul>
-                <li class="row ${mobileView ? 'd-none' : 'd-flex'}" aria-hidden="true" style="font-style: italic">
+                <li class="row ${mobileView ? 'd-none' : 'd-flex'}" aria-hidden="true" style="font-style: italic; font-size: 1.2em">
                     <span class="${mobileView ? 'col-12' : 'col'}">Bezeichnung</span>
                     ${slots.map(slot => html`<span class="${mobileView ? 'col-12' : 'col'} ${this.getSlotStyle(slot)}">Slot "${slot}"</span>`)}
                 </li>
