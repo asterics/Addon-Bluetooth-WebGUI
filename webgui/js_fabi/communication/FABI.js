@@ -78,7 +78,9 @@ function parseLiveData(data) {
     }
 }
 
-ATDevice.setLiveValueHandler(parseLiveData);
+if (C.DEVICE_IS_FABI) {
+    ATDevice.setLiveValueHandler(parseLiveData);
+}
 
 export {FABI};
 export default FABI;

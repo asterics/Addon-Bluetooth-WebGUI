@@ -1,7 +1,6 @@
 import { h, Component } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
 import {ATDevice} from "../../../js/communication/ATDevice.js";
-import {FLipMouse} from "../../communication/FLipMouse.js";
 
 const html = htm.bind(h);
 
@@ -20,7 +19,7 @@ class ManageIR extends Component {
 
     recordIrCmd() {
         this.setState({isRecording: true});
-        FLipMouse.recordIrCommand(this.state.irCmdName).then(success => {
+        ATDevice.Specific.recordIrCommand(this.state.irCmdName).then(success => {
             if (success) {
                 this.props.onchange(this.state.irCmdName);
                 this.setState({irCmdName: '', deleteIrName: this.state.irCmdName});

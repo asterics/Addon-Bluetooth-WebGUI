@@ -142,7 +142,9 @@ function parseLiveData(data) {
     }
 }
 
-ATDevice.setLiveValueHandler(parseLiveData);
+if (C.DEVICE_IS_FM) {
+    ATDevice.setLiveValueHandler(parseLiveData);
+}
 
 export {FLipMouse};
 export default FLipMouse;
