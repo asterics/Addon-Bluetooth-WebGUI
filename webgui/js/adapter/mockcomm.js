@@ -32,7 +32,7 @@ function MockCommunicator() {
                         if(thiz.y > 100 || thiz.y < -100 || thiz.x > 100 || thiz.x < -100) {
                             thiz.incrementXY *= -1;
                         }
-                        _valueHandler(VALUE_CONSTANT + thiz.pressure + ',0,0,0,0,' + thiz.x + ',' + thiz.y);
+                        _valueHandler(`${VALUE_CONSTANT}${thiz.pressure},${getRandomInt(500,600)},${getRandomInt(500,600)},${getRandomInt(500,600)},${getRandomInt(500,600)},${thiz.x},${thiz.y}`);
                     }
                 }, 200);
             } else if (value.indexOf('AT ER') > -1) {
