@@ -18,6 +18,7 @@ class MainView extends Component {
         super();
 
         MainView.instance = this;
+        MainView.lastViewHash = '';
         this.state = {
             views: [],
             currentView: {},
@@ -112,6 +113,7 @@ class MainView extends Component {
     }
 
     toView(viewHash) {
+        MainView.lastViewHash = this.state.currentView ? this.state.currentView.hash : '';
         let viewHashes = this.state.views.map(el => el.hash);
         viewHash = viewHash || window.location.hash;
         viewHash = viewHashes.includes(viewHash) ? viewHash : C.VIEW_START_HASH || viewHashes[0];
@@ -131,6 +133,12 @@ class MainView extends Component {
         window.location.hash = viewHash;
         document.body.scrollTop = 0;
         document.documentElement.scrollTop = 0;
+    }
+
+    toLastView() {
+        if (MainView.lastViewHash) {
+            this.toView(MainView.lastViewHash);
+        }
     }
 
     restartFirmwareUpdate() {

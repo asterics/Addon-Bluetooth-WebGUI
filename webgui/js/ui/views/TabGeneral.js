@@ -189,6 +189,17 @@ class TabGeneral extends Component {
                 </button>
             </div>
         </div>
+        <h2 class="mt-5">${L.translate('Keyboard shortcuts // Tastenkombinationen')}</h2>
+        <div class="row mt-2">
+            <div class="col-12">
+                <span>${L.translate('The following keyboard shortcuts can be used on this page: // Die folgenden Tastenkombinationen können auf dieser Seite verwendet werden:')}</span>
+                <ul>
+                    <li class="${C.DEVICE_IS_FM ? '' : 'd-none'}"><b>${L.translate('Ctrl + C // Strg + C')}:</b> <span>${L.translate('Calibrate FLipMouse middle position // Mittelposition der FLipMouse kalibrieren')}</span></li>
+                    <li><b>${L.translate('Ctrl + [1-{?}] // Strg + [1-{?}]', C.VIEWS.length)}:</b> <span>${L.translate('Jump to tab with the chosen number // Springe zu Tab mit der gewählten Nummer')}</span></li>
+                    <li><b>${L.translate('Ctrl + Space // Strg + Leertaste')}:</b> <span>${L.translate('Jump to last tab // Springe zu vorherigem Tab')}</span></li>
+                </ul>
+            </div>
+        </div>
         `;
     }
 }
