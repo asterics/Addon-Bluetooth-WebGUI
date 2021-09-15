@@ -16,7 +16,7 @@ class TabActions extends Component {
         TabActions.instance = this;
         this.state = {
             showCategory: null,
-            showAllSlots: localStorageService.hasKey(KEY_TAB_ACTIONS_SHOW_ALL_SLOTS) ? localStorageService.get(KEY_TAB_ACTIONS_SHOW_ALL_SLOTS) : true,
+            showAllSlots: localStorageService.hasKey(KEY_TAB_ACTIONS_SHOW_ALL_SLOTS) ? localStorageService.get(KEY_TAB_ACTIONS_SHOW_ALL_SLOTS) : false,
             modalBtnMode: null,
             modalSlot: null,
             widthEm: window.innerWidth / parseFloat(getComputedStyle(document.querySelector('body'))['font-size'])
@@ -106,7 +106,7 @@ class TabActions extends Component {
         }
         let categoryElements = C.BTN_CATEGORIES.map(cat => {return {value: cat.constant, label: cat.label}});
         categoryElements = [{value: null, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
-        let slotElements = [{value: true, label: 'All slots // Alle Slots'}, {value: false, label: 'Current slot // Aktueller Slot'}];
+        let slotElements = [{value: false, label: 'Current slot // Aktueller Slot'}, {value: true, label: 'All slots // Alle Slots'}];
 
         return html`<div id="tabActions">
              <h2>${L.translate('Action configuration // Aktionen-Konfiguration')}</h2>
