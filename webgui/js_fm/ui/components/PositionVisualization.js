@@ -155,7 +155,7 @@ class PositionVisualization extends Component {
                         <div id="cursorPos" class="back-layer" style="top: ${this.state.pY}%; left: ${this.state.pX}%;">
                             <div class="back-layer circle" style="${styleUtil.getCircleStyle(this.getValue(props.circleRadius, 20))}"></div>
                         </div>
-                        <div id="driftCompPos" class="back-layer ${this.state.showDeadzone ? '' : 'd-none'}" style="top: ${this.state.driftCompY}%; left: ${this.state.driftCompX}%;">
+                        <div id="driftCompPos" class="back-layer ${this.getValue(props.showDeadzone, false) ? '' : 'd-none'}" style="top: ${this.state.driftCompY}%; left: ${this.state.driftCompX}%;">
                             <div class="back-layer circle" style="${styleUtil.getCircleStyle(4, 'blue')}"></div>
                         </div>
                     </div>
