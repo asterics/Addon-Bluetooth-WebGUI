@@ -13,6 +13,7 @@ import {localStorageService} from "../../../js/localStorageService.js";
 const html = htm.bind(h);
 
 const KEY_TAB_STICK_SHOW_ADVANCED = 'KEY_TAB_STICK_SHOW_ADVANCED';
+const KEY_TAB_STICK_SHOW_BARS = 'KEY_TAB_STICK_SHOW_BARS';
 class TabStick extends Component {
     constructor() {
         super();
@@ -24,13 +25,18 @@ class TabStick extends Component {
         this.initValues();
     }
 
+    componentWillUnmount() {
+        TabStick.instance = null;
+    }
+
     initValues() {
         this.setState({
             splitSensitivity: ATDevice.getConfig(C.AT_CMD_SENSITIVITY_X) !== ATDevice.getConfig(C.AT_CMD_SENSITIVITY_Y),
             splitDeadzone: ATDevice.getConfig(C.AT_CMD_DEADZONE_X) !== ATDevice.getConfig(C.AT_CMD_DEADZONE_Y),
             splitDriftcompRange: ATDevice.getConfig(C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP) !== ATDevice.getConfig(C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP),
             splitDriftcompGain: ATDevice.getConfig(C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP) !== ATDevice.getConfig(C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP),
-            showAdvanced: localStorageService.hasKey(KEY_TAB_STICK_SHOW_ADVANCED) ? localStorageService.get(KEY_TAB_STICK_SHOW_ADVANCED) : false
+            showAdvanced: localStorageService.hasKey(KEY_TAB_STICK_SHOW_ADVANCED) ? localStorageService.get(KEY_TAB_STICK_SHOW_ADVANCED) : false,
+            showAnalogBars: localStorageService.hasKey(KEY_TAB_STICK_SHOW_BARS) ? localStorageService.get(KEY_TAB_STICK_SHOW_BARS) : false
         });
         let additionalState = {};
         this.atCmds.forEach(atCmd => {
@@ -52,6 +58,13 @@ class TabStick extends Component {
     toggleState(toggleName, updateConstants) {
         preactUtil.toggleState(this, toggleName);
         this.valueChanged(this.state[updateConstants[0]], updateConstants);
+    }
+
+    toggleShowBars() {
+        localStorageService.save(KEY_TAB_STICK_SHOW_BARS, !this.state.showAnalogBars);
+        this.setState({
+            showAnalogBars: !this.state.showAnalogBars
+        });
     }
     
     render() {
@@ -79,7 +92,7 @@ class TabStick extends Component {
                     </div>
                 </div>
                 <div class="col-12 col-md-6 mt-4 mt-md-0">
-                    <${PositionVisualization} showDeadzone="${true}" showOrientation="${true}" showMaxPos="${true}" circleRadius="${10}" showZoom="${true}"/>
+                    <${PositionVisualization} showAnalogBars="${state.showAnalogBars}" showAnalogValues="${state.showAnalogBars}" showDeadzone="${true}" showOrientation="${true}" showMaxPos="${true}" circleRadius="${10}" showZoom="${true}"/>
                 </div>
             </div>
             

@@ -12,6 +12,7 @@ class TabVisualization extends Component {
         super(props);
 
         let stored = localStorageService.get(KEY_TAB_VISUALIZATION_CONFIG) || {};
+        TabVisualization.instance = this;
         this.setState({
             showDeadzone: stored.showDeadzone !== undefined ? stored.showDeadzone : false,
             showAnalogBars: stored.showAnalogBars !== undefined ? stored.showAnalogBars : true,
@@ -20,6 +21,10 @@ class TabVisualization extends Component {
             showOrientation: stored.showOrientation !== undefined ? stored.showOrientation : false,
             maxPosManual: stored.maxPosManual
         })
+    }
+
+    componentWillUnmount() {
+        TabVisualization.instance = null;
     }
 
     toggleState(constant) {

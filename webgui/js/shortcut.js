@@ -1,5 +1,7 @@
 import {ATDevice} from "./communication/ATDevice.js";
 import {MainView} from "./ui/views/MainView.js";
+import {TabStick} from "../js_fm/ui/views/TabStick.js";
+import {TabVisualization} from "../js_fm/ui/views/TabVisualization.js";
 
 if (C.DEVICE_IS_FM) {
     window.addEventListener('keydown', event => {
@@ -16,7 +18,17 @@ window.addEventListener('keydown', event => {
         event.preventDefault();
         MainView.instance.toLastView();
     }
-})
+    if (event.key === 'b' && event.ctrlKey) {
+        event.preventDefault();
+        if (TabStick.instance) {
+            TabStick.instance.toggleShowBars();
+        }
+        if (TabVisualization.instance) {
+            TabVisualization.instance.toggleState('showAnalogBars');
+            TabVisualization.instance.toggleState('showAnalogValues');
+        }
+    }
+});
 
 for (let i = 0; i < C.VIEWS.length; i++) {
     window.addEventListener('keydown', event => {
