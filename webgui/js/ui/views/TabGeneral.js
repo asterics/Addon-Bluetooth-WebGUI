@@ -3,6 +3,7 @@ import htm from '../../../lib/htm.min.js';
 import {ATDevice} from "../../communication/ATDevice.js";
 import {FaIcon} from "../components/FaIcon.js";
 import {L} from "../../lquery.js";
+import {firmwareUtil} from "../../util/firmwareUtil.js";
 
 const html = htm.bind(h);
 let unknown = L.translate('(unknown) // (unbekannt)')
@@ -28,21 +29,18 @@ class TabGeneral extends Component {
     }
 
     getVersions() {
-        let mainDeviceURL = `https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/releases/latest`
-        L.CachedHTTPRequest(mainDeviceURL, 'GET', 'json').then(result => {
-            let binaryAsset = result.assets.filter(asset => asset.name.indexOf('.hex') > -1)[0];
+        firmwareUtil.getDeviceFWInfo().then(result => {
             this.setState({
-                newMainVersion: L.formatVersion(result['tag_name']),
-                newMainVersionUrl: result['html_url'],
-                newMainVersionDownloadUrl: binaryAsset.browser_download_url
+                newMainVersion: result.version,
+                newMainVersionUrl: result.infoUrl,
+                newMainVersionDownloadUrl: result.downloadUrl
             });
         });
-        L.CachedHTTPRequest('https://api.github.com/repos/asterics/esp32_mouse_keyboard/releases/latest', 'GET', 'json').then(result => {
-            let binaryAsset = result.assets.filter(asset => asset.name.indexOf('.bin') > -1)[0];
+        firmwareUtil.getBTFWInfo().then(result => {
             this.setState({
-                newBtVersion: L.formatVersion(result['tag_name']),
-                newBtVersionUrl: result['html_url'],
-                newBtVersionDownloadUrl: binaryAsset.browser_download_url
+                newBtVersion: result.version,
+                newBtVersionUrl: result.infoUrl,
+                newBtVersionDownloadUrl: result.downloadUrl
             });
         });
         this.getDeviceVersions();
@@ -66,8 +64,7 @@ class TabGeneral extends Component {
         if (!confirm(L.translate('Do you want to update the firmware version of the BT-Addon to version {?}? Hint: keep this tab open and in foreground while updating! // Möchten Sie die Version des BT-Addons auf Version {?} aktualisieren? Hinweis: lassen Sie diesen Tab während dem Update im Vordergrund geöffnet!', this.state.newBtVersion))) {
             return;
         }
-        let url = 'https://proxy.asterics-foundation.org/proxybase64url.php?csurl=' + encodeURIComponent(btoa(this.state.newBtVersionDownloadUrl));
-        L.CachedHTTPRequest(url, 'GET', 'arraybuffer', 'BT_FIRMWARE').then(result => {
+        L.CachedHTTPRequest(this.state.newBtVersionDownloadUrl, 'GET', 'arraybuffer', 'BT_FIRMWARE').then(result => {
             thiz.setState({btUpgradeProgress: 1});
             ATDevice.upgradeBTAddon(result, (progress) => {
                 thiz.setState({btUpgradeProgress: progress || 1});
@@ -88,14 +85,13 @@ class TabGeneral extends Component {
 
     updateFirmware() {
         let thiz = this;
-        let url = 'https://proxy.asterics-foundation.org/proxybase64url.php?csurl=' + encodeURIComponent(btoa(this.state.newMainVersionDownloadUrl));
         let message = 'Do you want to update the firmware to version {?}? After confirming this message you have to re-select the device ("{?}") in a browser popup. Keep this tab open and in foreground while updating! // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung müssen Sie das Gerät erneut in einem Browser-Popup auswählen ("{?}"). Lassen Sie diesen Tab während dem Update im Vordergrund geöffnet!';
         let deviceName = C.DEVICE_IS_FM ? L.translate('Unknown device // Unbekanntes Gerät') : 'Arduino Leonardo';
         if (!confirm(L.translate(message, this.state.newMainVersion, deviceName))) {
             return;
         }
         thiz.setState({mainUpgradeProgress: 1});
-        ATDevice.Specific.updateFirmware(url, (progress) => {
+        ATDevice.Specific.updateFirmware(this.state.newMainVersionDownloadUrl, (progress) => {
             thiz.setState({mainUpgradeProgress: progress || 1});
         });
     }

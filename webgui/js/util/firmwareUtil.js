@@ -1,3 +1,5 @@
+import {L} from "../lquery.js";
+
 let firmwareUtil = {};
 
 // Intel HEX parser by https://github.com/bminer/intel-hex.js
@@ -150,5 +152,24 @@ firmwareUtil.parseIntelHex = function (data, bufferSize) {
     }
     throw new Error("Unexpected end of input: missing or invalid EOF record.");
 };
+
+firmwareUtil.getBTFWInfo = function () {
+    return getFWInfo('https://api.github.com/repos/asterics/esp32_mouse_keyboard/releases/latest', '.bin');
+}
+
+firmwareUtil.getDeviceFWInfo = function () {
+    return getFWInfo(`https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/releases/latest`, '.hex');
+}
+
+function getFWInfo(apiUrl, binaryStringFilter) {
+    return L.CachedHTTPRequest(apiUrl, 'GET', 'json').then(result => {
+        let binaryAsset = result.assets.filter(asset => asset.name.indexOf(binaryStringFilter) > -1)[0];
+        return {
+            version: L.formatVersion(result['tag_name']),
+            infoUrl: result['html_url'],
+            downloadUrl: 'https://proxy.asterics-foundation.org/proxybase64url.php?csurl=' + encodeURIComponent(btoa(binaryAsset.browser_download_url))
+        };
+    });
+}
 
 export {firmwareUtil};
