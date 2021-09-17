@@ -10,23 +10,23 @@ if (C.DEVICE_IS_FM) {
                 ATDevice.Specific.calibrate();
             }
         }
-    })
+        if (event.key === 'b' && event.ctrlKey) {
+            event.preventDefault();
+            if (TabStick.instance) {
+                TabStick.instance.toggleShowBars();
+            }
+            if (TabVisualization.instance) {
+                TabVisualization.instance.toggleState('showAnalogBars');
+                TabVisualization.instance.toggleState('showAnalogValues');
+            }
+        }
+    });
 }
 
 window.addEventListener('keydown', event => {
     if (event.key === ' ' && event.ctrlKey) {
         event.preventDefault();
         MainView.instance.toLastView();
-    }
-    if (event.key === 'b' && event.ctrlKey) {
-        event.preventDefault();
-        if (TabStick.instance) {
-            TabStick.instance.toggleShowBars();
-        }
-        if (TabVisualization.instance) {
-            TabVisualization.instance.toggleState('showAnalogBars');
-            TabVisualization.instance.toggleState('showAnalogValues');
-        }
     }
 });
 
