@@ -3,12 +3,14 @@ import htm from '../../../lib/htm.min.js';
 import {ATDevice} from "../../communication/ATDevice.js";
 import {localStorageService} from "../../localStorageService.js";
 import {FaIcon} from "../components/FaIcon.js";
+import {firmwareUtil} from "../../util/firmwareUtil.js";
 
 const html = htm.bind(h);
 
 const SCREENS = {
     CONNECTION: 'CONNECTION',
     MAIN: 'MAIN',
+    FIRMWARE_UPDATE: 'FIRMWARE_UPDATE',
     FIRMWARE_CONTINUE: 'FIRMWARE_CONTINUE'
 }
 
@@ -94,9 +96,15 @@ class MainView extends Component {
                 }
             });
         }).catch(error => {
-            this.setState({
-                errorCode: error
-            });
+            if (error === C.ERROR_FIRMWARE_OUTDATED) {
+                this.setState({
+                    showScreen: SCREENS.FIRMWARE_UPDATE
+                });
+            } else {
+                this.setState({
+                    errorCode: error
+                });
+            }
         });
     }
 
@@ -141,17 +149,48 @@ class MainView extends Component {
         }
     }
 
-    restartFirmwareUpdate() {
+    continueFirmwareUpdate() {
         let thiz = this;
         ATDevice.Specific.updateFirmware(localStorageService.getFirmwareDownloadUrl(), (progress) => {
-            thiz.setState({updateProgress: progress});
+            thiz.setState({updateProgress: progress || 1});
         }, true);
+    }
+
+    startFirmwareUpdate() {
+        let thiz = this;
+        firmwareUtil.updateDeviceFirmware(progress => {
+            thiz.setState({updateProgress: progress || 1});
+        });
     }
 
     render() {
         let state = this.state;
 
         return html`
+        <div class="top-layer-center ${state.showScreen === SCREENS.FIRMWARE_UPDATE ? '' : 'd-none'}">
+            <div class="container-fluid top-layer-content">
+                <h1>${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
+                <div class="row mb-5">
+                    <div class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3">
+                        ${html`<${FaIcon} icon="fas exclamation-triangle"/>`}
+                        <span>${L.translate('The firmware of your device is outdated. Please update it to be able to use this web-based configuration. // Die Firmware des Geräts ist veraltet. Bitte aktualisieren, um die web-basierte Konfiguration verwenden zu können.')}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3">
+                        <button onclick="${() => this.startFirmwareUpdate()}" disabled="${this.state.updateProgress}">
+                            <span class="${state.updateProgress ? 'd-none' : ''}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Update firmware // Firmware aktualisieren')}</span>
+                            <span class="${state.updateProgress ? '' : 'd-none'}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Updating... {?}% // Aktualisiere... {?}%', state.updateProgress)}</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <a class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3 mt-3" href="javascript:;" onclick="${() => {this.setState({showScreen: SCREENS.CONNECTION})}}">
+                        ${L.translate('Cancel // Abbrechen')}
+                    </a>
+                </div>
+            </div>
+        </div>
         <div class="top-layer-center ${state.showScreen === SCREENS.FIRMWARE_CONTINUE? '' : 'd-none'}">
             <div class="container-fluid top-layer-content">
                 <h1>${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
@@ -163,7 +202,7 @@ class MainView extends Component {
                 </div>
                 <div class="row">
                     <div class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3">
-                        <button onclick="${() => this.restartFirmwareUpdate()}" disabled="${this.state.updateProgress}">
+                        <button onclick="${() => this.continueFirmwareUpdate()}" disabled="${this.state.updateProgress}">
                             <span class="${state.updateProgress ? 'd-none' : ''}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Continue firmware update // Firmware-Update fortsetzen')}</span>
                             <span class="${state.updateProgress ? '' : 'd-none'}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Updating... {?}% // Aktualisiere... {?}%', state.updateProgress)}</span>
                         </button>
@@ -198,12 +237,6 @@ class MainView extends Component {
                                 return html`<span>${L.translate('Connecting to device not allowed by user, please try again! // Verbindung zum Gerät nicht zugelassen, bitte erneut versuchen!')}</span>`;
                             case C.ERROR_SERIAL_BUSY: 
                                 return html`<span>${L.translate("Connecting to device not possible, maybe it's used by another program?! // Verbindung zum Gerät nicht möglich, vielleicht wird es von einem anderen Programm verwendet?!")}</span>`;
-                            case C.ERROR_FIRMWARE_OUTDATED: 
-                                return html`
-                                    <span>${L.translate('Firmware of device is outdated! // Firmware des Gerätes ist veraltet!')}</span>
-                                    <div>${L.translate('Please download and install the latest firmware from: // Bitte aktuelle Firmware herunterladen und installieren:')}</div>
-                                    <div><a rel="noreferrer" href="https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest" target="_blank">https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest</a></div>
-                                `;
                             case C.ERROR_SERIAL_NOT_SUPPORTED:
                                 return html`
                                     <span>${L.translate("Connecting to real device not supported by current browser! // Verbindung zu echtem Gerät wird von akuellem Browser nicht unterstützt!")}</span>
