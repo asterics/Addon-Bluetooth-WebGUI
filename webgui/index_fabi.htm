@@ -38,6 +38,11 @@
     <script type="module">
         import {MainView} from "./js/ui/views/MainView.js";
         MainView.init();
+        if ('serviceWorker' in navigator && !location.href.includes('localhost')) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('serviceWorker.js');
+            });
+        }
     </script>
 </body>
 </html>
