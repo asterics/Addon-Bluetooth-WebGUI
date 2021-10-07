@@ -10,6 +10,7 @@ class Slider extends Component {
         props.value = props.value !== undefined ? props.value : null;
         props.min = props.min !== undefined ? props.min : 0;
         props.max = props.max !== undefined ? props.max : 255;
+        props.step = props.step !== undefined ? props.step : '';
         props.updateConstants = props.updateConstants || [];
         props.toggleFn = props.toggleFn || (() => {});
         props.toggleFnLabel = props.toggleFnLabel || '';
@@ -22,7 +23,7 @@ class Slider extends Component {
             <div class="row">
                 <span aria-hidden="true" class="col-sm-1">${props.value}</span>
                 <input type="range" value="${props.value}" oninput="${(event) => props.oninput(event.target.value, props.updateConstants)}"
-                       id="${id}" min="${props.min}" max="${props.max}" class="col-sm-11"/>
+                       id="${id}" min="${props.min}" max="${props.max}" step="${props.step}" class="col-sm-11"/>
             </div>
             ${Slider.style}`;
     }
