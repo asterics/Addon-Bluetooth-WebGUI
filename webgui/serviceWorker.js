@@ -11,7 +11,11 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', event => {
-    console.log('Service Worker active!');
+    clients.claim();
+    self.clients.matchAll().then(clients => {
+        clients.forEach(client => client.postMessage({activated: true}));
+    });
+    console.log('service worker active!');
 });
 
 workbox.routing.registerRoute(({url, request, event}) => {

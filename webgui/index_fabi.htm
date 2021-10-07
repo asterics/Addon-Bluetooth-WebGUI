@@ -36,13 +36,16 @@
     <div id="content">
     </div>
     <script type="module">
-        import {MainView} from "./js/ui/views/MainView.js";
-        MainView.init();
         if ('serviceWorker' in navigator && !location.href.includes('localhost')) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('serviceWorker.js');
+            navigator.serviceWorker.register('serviceWorker.js');
+            navigator.serviceWorker.addEventListener("message", (evt) => {
+                if (evt.data && evt.data.activated) {
+                    window.location.reload();
+                }
             });
         }
+        import {MainView} from "./js/ui/views/MainView.js";
+        MainView.init();
     </script>
 </body>
 </html>
