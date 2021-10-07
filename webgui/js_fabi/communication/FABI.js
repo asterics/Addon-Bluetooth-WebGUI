@@ -40,8 +40,12 @@ FABI.updateFirmware = async function (url, progressHandler, dontReset) {
         await ProMicroFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
     }
     await ProMicroFirmwareUpdater.uploadFirmware(url, progressHandler);
-    window.location.href = window.location.href + '?' + C.SUCCESS_FIRMWAREUPDATE;
-    window.location.reload();
+    if (!window.location.href.includes(C.SUCCESS_FIRMWAREUPDATE)) {
+        window.location.replace(window.location.href = window.location.href + '?' + C.SUCCESS_FIRMWAREUPDATE);
+    }
+    setTimeout(() => {
+        window.location.reload();
+    }, 100);
 }
 
 function parseLiveData(data) {
