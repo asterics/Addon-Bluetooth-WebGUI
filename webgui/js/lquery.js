@@ -218,8 +218,9 @@ L.isLang = function (localeString) {
 };
 
 window.lang = '';
+window.customLang = '';
 L.getLang = function () {
-    var lang = window.navigator.userLanguage || window.navigator.language;
+    var lang = window.customLang || window.navigator.userLanguage || window.navigator.language;
     return window.lang || lang.substring(0, 2);
 };
 
