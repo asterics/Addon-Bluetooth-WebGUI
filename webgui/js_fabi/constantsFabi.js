@@ -17,14 +17,6 @@ C.USB_DEVICE_FILTERS =  [
 ];
 
 C.VIEWS = [{
-    object: TabTimings,
-    hash: '#tabTimings',
-    label: 'Timings'
-}, {
-    object: TabSipPuff,
-    hash: '#tabPuff',
-    label: 'Sip and Puff // Saug-Puste-Steuerung'
-}, {
     object: TabActions,
     hash: '#tabActions',
     label: 'Actions // Aktionen'
@@ -32,6 +24,14 @@ C.VIEWS = [{
     object: TabSlots,
     hash: '#tabSlots',
     label: 'Slots // Slots'
+}, {
+    object: TabTimings,
+    hash: '#tabTimings',
+    label: 'Timings'
+}, {
+    object: TabSipPuff,
+    hash: '#tabPuff',
+    label: 'Sip and Puff // Saug-Puste-Steuerung'
 }, {
     object: TabGeneral,
     hash: '#tabGeneral',
