@@ -4,10 +4,10 @@ RewriteRule     ^(.*)$ https://%{SERVER_NAME}%{REQUEST_URI} [L,R]
 
 #RewriteCond %{HTTP_HOST} ^fabi.asterics.eu$ [OR]
 #RewriteCond %{HTTP_HOST} ^fabi.asterics-foundation.org$ [OR]
-#RewriteRule ^(.+)(js|css|ico|svg|png)(.*)$ https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/%{REQUEST_URI} [END,P]
+#RewriteRule ^(.+)(js|css|ico|svg|png|htm|html)(.*)$ https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/%{REQUEST_URI} [END,P]
 #RewriteRule ^$ https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fabi.htm [END,P]
 
 RewriteCond %{HTTP_HOST} ^flipmouse.asterics.eu$ [OR]
 RewriteCond %{HTTP_HOST} ^flipmouse.asterics-foundation.org$ [OR]
-RewriteRule ^(.+)(js|css|ico|svg|png)(.*)$ https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/%{REQUEST_URI} [END,P]
+RewriteRule ^(.+)(js|css|ico|svg|png|htm|html)(.*)$ https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/%{REQUEST_URI} [END,P]
 RewriteRule ^$ https://asterics.github.io/Addon-Bluetooth-WebGUI/webgui/index_fm.htm [END,P]
