@@ -12,6 +12,8 @@ let _liveData = {};
 let _liveValueHandler = null;
 let _lastLiveValueParse = 0;
 
+FABI.Updater = ProMicroFirmwareUpdater;
+
 FABI.startLiveValueListener = function (handler) {
     _liveValueHandler = handler;
 };

@@ -3,6 +3,8 @@ import {TeensyFirmwareUpdater} from "./TeensyFirmwareUpdater.js";
 import {localStorageService} from "../../js/localStorageService.js";
 
 let FLipMouse = {};
+FLipMouse.Updater = TeensyFirmwareUpdater;
+
 FLipMouse.LIVE_UP = 'LIVE_UP';
 FLipMouse.LIVE_DOWN = 'LIVE_DOWN';
 FLipMouse.LIVE_LEFT = 'LIVE_LEFT';
@@ -82,18 +84,24 @@ FLipMouse.resetMinMaxLiveValues = function () {
 FLipMouse.updateFirmware = async function (url, progressHandler, dontReset) {
     localStorageService.setFirmwareDownloadUrl(url);
     let serialCommunicator = ATDevice.getCommunicator();
+    let failed = false;
     if (!dontReset) {
         await serialCommunicator.close();
         await TeensyFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
     }
-    await TeensyFirmwareUpdater.uploadFirmware(url, progressHandler);
-    localStorageService.setFirmwareDownloadUrl('');
-    if (!window.location.href.includes(C.SUCCESS_FIRMWAREUPDATE)) {
-        window.location.replace(window.location.href = window.location.href + '?' + C.SUCCESS_FIRMWAREUPDATE);
-    }
-    setTimeout(() => {
+    await TeensyFirmwareUpdater.uploadFirmware(url, progressHandler).catch(() => {
+        failed = true;
         window.location.reload();
-    }, 100);
+    });
+    if (!failed) {
+        localStorageService.setFirmwareDownloadUrl('');
+        if (!window.location.href.includes(C.SUCCESS_FIRMWAREUPDATE)) {
+            window.location.replace(window.location.href = window.location.href + '?' + C.SUCCESS_FIRMWAREUPDATE);
+        }
+        setTimeout(() => {
+            window.location.reload();
+        }, 100);
+    }
 }
 
 function parseLiveData(data) {

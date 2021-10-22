@@ -7,8 +7,8 @@ const MAX_WORDS_TEENSY = 65536;
 /****************/
 // 1.) reset TeensyLC into bootloader mode (user interaction required)
 /****************/
-TeensyFirmwareUpdater.resetDevice = async function (existingOpenPort) {
-    let filters = [
+TeensyFirmwareUpdater.resetDevice = async function (existingOpenPort, filters) {
+    filters = filters || [
         {usbVendorId: 0x16C0, usbProductId: 0x0487}
     ];
     let port = existingOpenPort || await navigator.serial.requestPort({filters});
@@ -25,13 +25,13 @@ TeensyFirmwareUpdater.resetDevice = async function (existingOpenPort) {
 /****************/
 // 2.) open the new bootloader USB-RAW HID (new USB-PID!); user interaction required
 /****************/
-TeensyFirmwareUpdater.uploadFirmware = async function (url, progressFn) {
+TeensyFirmwareUpdater.uploadFirmware = async function (url, progressFn, filters) {
     if (!("hid" in navigator)) {
         log.warn("Web HID API not supported, please use Chromium based browsers!");
     }
 
     //request serial port
-    let filters = [
+    filters = filters || [
         {vendorId: 0x16C0, productId: 0x0478}
     ];
     try {
@@ -101,7 +101,6 @@ TeensyFirmwareUpdater.uploadFirmware = async function (url, progressFn) {
         await port.close();
     } catch (e) {
         log.warn(e);
-        window.location.reload();
         return Promise.reject();
     }
 }

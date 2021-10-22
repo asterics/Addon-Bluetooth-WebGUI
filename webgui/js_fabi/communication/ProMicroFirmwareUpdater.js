@@ -12,20 +12,25 @@ const equals = (a, b) =>
 /****************/
 // 1.) reset TeensyLC into bootloader mode (user interaction required)
 /****************/
-ProMicroFirmwareUpdater.resetDevice = async function (existingPort) {
+ProMicroFirmwareUpdater.resetDevice = async function (existingPort, filters) {
     //open & close
     // Wait for the serial port to open.
-    await existingPort.open({baudRate: 1200});
+    let port = existingPort;
+    filters = filters || [];
+    if (!port) {
+        port = await navigator.serial.requestPort({filters});
+    }
+    await port.open({baudRate: 1200});
     await firmwareUtil.wait(500);
-    await existingPort.close();
+    await port.close();
     log.info('reset done!');
 }
 
 /****************/
 // 2.) open the new bootloader USB-RAW HID (new USB-PID!); user interaction required
 /****************/
-ProMicroFirmwareUpdater.uploadFirmware = async function (url, progressFn) {
-    let filters = [
+ProMicroFirmwareUpdater.uploadFirmware = async function (url, progressFn, filters) {
+    filters = filters || [
         {usbVendorId: 0x2341, usbProductId: 0x0036}
         //TODO: I think there are more possible PIDs...
     ];

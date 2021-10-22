@@ -260,6 +260,7 @@ class MainView extends Component {
                     ${(C.ADDITIONAL_LINKS || []).map(link => html`
                         <div><a rel="noreferrer" href="${link.url}" target="_blank">${L.translate(link.label)}</a></div>
                     `)}
+                    <a rel="noreferrer" href="init.html?device=${C.CURRENT_DEVICE}">${L.translate('Device initialization // Geräte-Initialisierung')}</a>
                 </div>
             </div>
         </div>
