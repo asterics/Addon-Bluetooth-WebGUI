@@ -129,7 +129,8 @@ C.AT_CMDS_ACTIONS = C.AT_CMDS_ACTIONS.concat([{
     input: C.INPUTFIELD_TYPE_NUMBER
 }, {
     cmd: C.AT_CMD_JOYSTICK_BUTTON_PRESS,
-    label: 'Press joystick button // Joystick-Button drücken',
+    label: 'Hold joystick button (as long as input action) // Joystick-Button halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold joystick button // Joystick-Button halten',
     category: C.AT_CMD_CAT_JOYSTICK,
     input: C.INPUTFIELD_TYPE_NUMBER,
     minValue: 1,
