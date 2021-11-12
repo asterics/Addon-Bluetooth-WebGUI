@@ -131,17 +131,24 @@ C.AT_CMDS_ACTIONS = C.AT_CMDS_ACTIONS.concat([{
     cmd: C.AT_CMD_JOYSTICK_BUTTON_PRESS,
     label: 'Press joystick button // Joystick-Button drücken',
     category: C.AT_CMD_CAT_JOYSTICK,
-    input: C.INPUTFIELD_TYPE_NUMBER
-}, {
-    cmd: C.AT_CMD_JOYSTICK_BUTTON_RELEASE,
-    label: 'Release joystick button // Joystick-Button auslassen',
-    category: C.AT_CMD_CAT_JOYSTICK,
-    input: C.INPUTFIELD_TYPE_NUMBER
+    input: C.INPUTFIELD_TYPE_NUMBER,
+    minValue: 1,
+    maxValue: 32
 }, {
     cmd: C.AT_CMD_JOYSTICK_HAT_POS,
     label: 'Set joystick hat position // Joystick Hat-Position setzen',
     category: C.AT_CMD_CAT_JOYSTICK,
     input: C.INPUTFIELD_TYPE_NUMBER
+}]);
+
+C.AT_CMDS_MACRO = C.AT_CMDS_MACRO || [];
+C.AT_CMDS_MACRO = C.AT_CMDS_MACRO.concat([{
+    cmd: C.AT_CMD_JOYSTICK_BUTTON_RELEASE,
+    label: 'Release joystick button // Joystick-Button auslassen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER,
+    minValue: 1,
+    maxValue: 32
 }]);
 
 C.BTN_CAT_BTN = 'BTN_CAT_BTN';

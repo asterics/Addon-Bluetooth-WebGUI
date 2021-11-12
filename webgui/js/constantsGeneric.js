@@ -255,6 +255,7 @@ C.AT_CMDS_ACTIONS = [{
     input: C.INPUTFIELD_TYPE_MACRO
 }];
 
+C.AT_CMDS_MACRO = C.AT_CMDS_MACRO || [];
 C.AT_CMDS_MACRO = [{
     cmd: C.AT_CMD_WAIT,
     label: 'Wait time in milliseconds // Warten (Millisekunden)',

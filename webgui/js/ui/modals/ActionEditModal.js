@@ -102,6 +102,16 @@ class ActionEditModal extends Component {
         }
         this.props.closeHandler();
     }
+
+    saveButtonsDisabled() {
+        if (this.state.atCmd.minValue !== undefined && this.state.atCmdSuffix < this.state.atCmd.minValue) {
+            return true;
+        }
+        if (this.state.atCmd.maxValue !== undefined && this.state.atCmdSuffix > this.state.atCmd.maxValue) {
+            return true;
+        }
+        return this.state.atCmd.input && !this.state.atCmdSuffix;
+    }
     
     render(props) {
         let state = this.state;
@@ -161,7 +171,9 @@ class ActionEditModal extends Component {
                                                 <div class="row">
                                                     <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
                                                     <div class="col-md-8">
-                                                        <input id="inputText" value="${state.atCmdSuffix}" type="number" oninput="${(event) => this.setAtCmdSuffix(event.target.value)}" placeholder="${L.translate('Input number // Zahl eingeben')}" class="col-12"/>
+                                                        <input id="inputText" value="${state.atCmdSuffix}" type="number" oninput="${(event) => this.setAtCmdSuffix(event.target.value)}" class="col-12"
+                                                               placeholder="${L.translate('Input number // Zahl eingeben') + (state.atCmd.minValue !== undefined ? ` [${state.atCmd.minValue}-${this.state.atCmd.maxValue}]` : '')}"
+                                                               min="${state.atCmd.minValue}" max="${state.atCmd.maxValue}"/>
                                                     </div>
                                                 </div>`;
                                         case C.INPUTFIELD_TYPE_SELECT:
@@ -198,7 +210,7 @@ class ActionEditModal extends Component {
                                     </button>
                                 </div>
                                 <div class="col">
-                                    <button onclick="${() => this.save()}" disabled="${this.state.atCmd.input && !this.state.atCmdSuffix}" class="button-primary">
+                                    <button onclick="${() => this.save()}" disabled="${this.saveButtonsDisabled()}" class="button-primary">
                                         ${html`<${FaIcon} icon="fas save" invert="true"/>`}
                                         ${L.translate('Save // Speichern')}
                                     </button>
@@ -209,7 +221,7 @@ class ActionEditModal extends Component {
                                     ${html`<${ActionButton} onclick="${() => this.save(true)}"
                                         label="Save for alls slots // Für alle Slots speichern"
                                         progressLabel="Saving to all slots... // Speichern für alle Slots..." 
-                                        disabled="${this.state.atCmd.input && !this.state.atCmdSuffix}"
+                                        disabled="${this.saveButtonsDisabled()}"
                                         faIcon="far clone"/>`}
                                 </div>
                             </div>
