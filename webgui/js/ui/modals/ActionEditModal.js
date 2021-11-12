@@ -139,7 +139,7 @@ class ActionEditModal extends Component {
                                     ${html`<${RadioFieldset} legend="Show action categories: // Zeige Aktions-Kategorien:" onchange="${(value) => this.selectActionCategory(value)}" elements="${categoryElements}" value="${state.showCategory}"/>`}
                                 </div>
                                 <div class="row">
-                                    <label for="actionSelect" class="col-md-4">${L.translate('Selection action // Aktion auswählen')}</label>
+                                    <label for="actionSelect" class="col-md-4">${L.translate('Select action // Aktion auswählen')}</label>
                                     <div class="col-md-8">
                                         <select id="actionSelect" class="col-12" value="${state.atCmd.cmd}" onchange="${(event) => this.setAtCmd(event.target.value)}">
                                             ${state.possibleAtCmds.map(atCmd => html`<option value="${atCmd.cmd}">${L.translate(atCmd.label)}</option>`)}
