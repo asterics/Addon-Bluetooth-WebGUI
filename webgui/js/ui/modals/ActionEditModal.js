@@ -169,7 +169,7 @@ class ActionEditModal extends Component {
                                         case C.INPUTFIELD_TYPE_TEXT:
                                             return html`
                                                 <div class="row">
-                                                    <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
+                                                    <label for="inputText" class="col-md-4">${L.translate(state.atCmd.shortLabel || state.atCmd.label)}</label>
                                                     <div class="col-md-8">
                                                         <input id="inputText" value="${state.atCmdSuffix}" oninput="${(event) => this.setAtCmdSuffix(event.target.value)}" type="text" class="col-12" placeholder="${L.translate('Input text // Text eingeben')}"/>
                                                     </div>
@@ -177,7 +177,7 @@ class ActionEditModal extends Component {
                                         case C.INPUTFIELD_TYPE_NUMBER:
                                             return html`
                                                 <div class="row">
-                                                    <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
+                                                    <label for="inputText" class="col-md-4">${L.translate(state.atCmd.shortLabel || state.atCmd.label)}</label>
                                                     <div class="col-md-8">
                                                         <input id="inputText" value="${state.atCmdSuffix}" type="number" oninput="${(event) => this.setAtCmdSuffix(event.target.value)}" class="col-12"
                                                                placeholder="${L.translate('Input number // Zahl eingeben') + (state.atCmd.minValue !== undefined ? ` [${state.atCmd.minValue}-${this.state.atCmd.maxValue}]` : '')}"
@@ -187,7 +187,7 @@ class ActionEditModal extends Component {
                                         case C.INPUTFIELD_TYPE_SELECT:
                                             return html`
                                                 <div class="row">
-                                                    <label for="inputText" class="col-md-4">${L.translate(state.atCmd.label)}</label>
+                                                    <label for="inputText" class="col-md-4">${L.translate(state.atCmd.shortLabel || state.atCmd.label)}</label>
                                                     <div class="col-md-8">
                                                         <select class="col-12" value="${state.atCmdSuffix || state.selectOptions[0]}" onchange="${(event) => this.setAtCmdSuffix(event.target.value)}" disabled="${state.selectOptions.length === 0}">
                                                             ${state.selectOptions.length === 0 ? html`<option value="" disabled selected>${L.translate('(empty) // (leer)')}</option>` : ''}
