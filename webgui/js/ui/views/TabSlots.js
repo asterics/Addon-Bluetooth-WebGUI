@@ -69,13 +69,19 @@ class TabSlots extends Component {
         reader.readAsText(target.files[0]);
         reader.onloadend = function(e) {
             let parsedSlots = ATDevice.parseConfig(e.target.result);
-            let validConfig = C.DEVICE_IS_FM ? !!parsedSlots[0].config[C.AT_CMD_DEADZONE_X] : !!parsedSlots[0].config[C.AT_CMD_ANTITREMOR_IDLE];
+            let validConfig = parsedSlots.length > 0;
+            validConfig = validConfig && C.DEVICE_IS_FM ? !!parsedSlots[0].config[C.AT_CMD_DEADZONE_X] : !!parsedSlots[0].config[C.AT_CMD_ANTITREMOR_IDLE];
             parsedSlots.forEach(slot => { //prevent duplicated names
+                slot.name = slot.name.substring(0, C.MAX_LENGTH_SLOTNAME);
                 let originalSlotname = slot.name;
                 let counter = 1;
                 let otherSlotNames = parsedSlots.filter(s => s !== slot).map(slot => slot.name);
-                while (thiz.state.slots.includes(slot.name) || otherSlotNames.includes(slot.name)) {
-                    slot.name = `${originalSlotname} (${counter++})`
+                slot.dedupedName = slot.name;
+                while (thiz.state.slots.includes(slot.dedupedName) || otherSlotNames.includes(slot.dedupedName)) {
+                    let postfix = ` (${counter})`;
+                    let originalTrimmed = originalSlotname.substring(0, C.MAX_LENGTH_SLOTNAME - postfix.length);
+                    slot.dedupedName = originalTrimmed + postfix;
+                    counter++;
                 }
             })
             thiz.setState({
@@ -94,7 +100,11 @@ class TabSlots extends Component {
         while (this.state.selectedUploadSlots.length + this.state.slots.length > C.MAX_NUMBER_SLOTS) {
             this.state.selectedUploadSlots.pop();
         }
-        ATDevice.uploadSlots(this.state.selectedUploadSlots, (progress) => {
+        let uploadSlots = this.state.selectedUploadSlots.map(slot => {
+            slot.name = slot.dedupedName;
+            return slot;
+        });
+        ATDevice.uploadSlots(uploadSlots, (progress) => {
             thiz.setState({uploadProgress: progress})
         }).then(() => {
             thiz.resetUploadFile();
@@ -120,7 +130,8 @@ class TabSlots extends Component {
             uploadedSlots: [],
             uploading: false,
             selectedFile: '',
-            selectedFileValid: undefined
+            selectedFileValid: undefined,
+            showAdvancedUpload: false
         });
         L('#fileInputSlotUpload').value = null;
     }
@@ -254,7 +265,7 @@ class TabSlots extends Component {
                 <div class="row">
                     <div class="col-sm-6 col-lg-5">
                         <input disabled="${maxSlotsReached}" id="newSlotLabel" class="col-12" value="${state.newSlotName}" oninput="${(event) => this.setState({newSlotName: event.target.value})}" type="text" 
-                               placeholder="${!maxSlotsReached ? L.translate('insert name for new slot // Namen für neuen Slot eingeben') : L.translate('Storage full, no space for more slots. // Speicher voll, kein Platz für weitere Slots.')}" maxlength="15"/>
+                               placeholder="${!maxSlotsReached ? L.translate('insert name for new slot // Namen für neuen Slot eingeben') : L.translate('Storage full, no space for more slots. // Speicher voll, kein Platz für weitere Slots.')}" maxlength="${C.MAX_LENGTH_SLOTNAME}"/>
                     </div>
                     <div class="col-sm-6 col-lg-5">
                         <button disabled="${!state.newSlotName || this.state.slots.includes(this.state.newSlotName) || maxSlotsReached}" onclick="${() => this.createSlot()}">
@@ -267,43 +278,66 @@ class TabSlots extends Component {
                 <h3 class="mt-5">${L.translate('Upload slots from file // Slots aus Datei hochladen')}</h3>
                 <div class="row mt-4">
                     <div class="col-sm-6 col-lg-5">
-                        <label title="${maxSlotsReached ? L.translate('Storage full, no space for more slots. // Speicher voll, kein Platz für weitere Slots.') : ''}" class="button ${maxSlotsReached ? 'disabled' : ''}" for="fileInputSlotUpload">${html`<${FaIcon} icon="fas file"/>`} ${L.translate('Select file // Datei auswählen')}</label>
-                        <input disabled="${maxSlotsReached}" class="sr-only" type=file id="fileInputSlotUpload" accept=".set" onchange="${(event) => this.fileUploadChanged(event.target)}"/>
+                        <label for="fileInputSlotUpload" class="button">${html`<${FaIcon} icon="fas file"/>`} ${L.translate('Select file // Datei auswählen')}</label>
+                        <input class="sr-only" type=file id="fileInputSlotUpload" accept=".set" onchange="${(event) => this.fileUploadChanged(event.target)}"/>
                     </div>
                     <div class="col-sm-6 col-lg-5">
-                        <span>${L.translate('Selected file: // Gewählte Datei:')}</span> <span>${this.state.selectedFile || L.translate('(none) // (keine)')}</span>
+                        <span>${L.translate('Selected file: // Gewählte Datei:')}</span> <span>${this.state.selectedFile || L.translate('(none) // (keine)')}</span><br/>
+                        <span class="${this.state.selectedFile ? '' : 'd-none'}">${this.state.uploadedSlots.length} Slots: ${JSON.stringify(this.state.uploadedSlots.map(slot => slot.name)).replaceAll(',', ', ')}</span>
                     </div>
-                    <div class="col-sm-6 col-lg-5 ${state.selectedFileValid === false ? '' : 'd-none'}">
+                    <div class="col-sm-6 col-lg-5 ${state.selectedFile && !state.selectedFileValid ? '' : 'd-none'}">
                         <span style="color: darkred">${L.translate('Selected file does not contain valid config for {?}! // Gewählte Datei beinhaltet keine gültige Konfiguration für {?}!', C.CURRENT_DEVICE)}</span>
                     </div>
-                    <fieldset class="mt-3 col-12 ${this.state.uploadedSlots.length === 0 || !state.selectedFileValid ? 'd-none' : ''}">
-                        <legend>${L.translate('Choose slots to upload // Wähle Slots zum Hochladen')}</legend>
-                        ${state.uploadedSlots.map(slot => html`
-                            <div>
-                                <input id="${slot.name + 'checkbox'}" type="checkbox" class="mr-2" onchange="${(event) => this.uploadCheckboxChanged(slot, event.target.checked)}"/>
-                                <label for="${slot.name + 'checkbox'}">${'Slot "' + slot.name + '"'}</label>
-                            </div>
-                        `)}
-                    </fieldset>
                 </div>
-                
-                <div class="row">
-                    <div class="col-sm-6 col-lg-5 ${!state.selectedFile || !state.selectedFileValid ? 'd-none' : ''}">
-                        <button disabled="${state.selectedUploadSlots.length === 0 || state.uploading}" onclick="${() => this.uploadSlots()}">
-                            ${html`<${FaIcon} icon="fas upload"/>`}
-                            ${state.uploading ? L.translate('Uploading slot(s) {?}% ... // Slot(s) hochladen {?}% ...', state.uploadProgress) : L.translate('Upload selected Slot(s) // Gewählte Slot(s) hochladen')}
-                        </button>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-6 col-lg-5 ${!state.selectedFile || !state.selectedFileValid ? 'd-none' : ''}">
+                <div class="row mt-3 ${!state.selectedFileValid ? 'd-none' : ''}">
+                    <div class="col-sm-6 col-lg-5">
                         ${html`<${ActionButton} onclick="${() => this.uploadAllSlots()}"
                                             label="Upload and replace all Slots // Alle Slots hochladen und ersetzen"
                                             disabled="${state.uploadedSlots.length === 0}"
                                             progressLabel="${L.translate('Uploading slots {?}% ... // Slots hochladen {?}% ...', state.uploadProgress)}" faIcon="fas upload"/>`}
                     </div>
                 </div>
-
+                <div class="row mt-3 ${!state.selectedFileValid || maxSlotsReached ? 'd-none' : ''}">
+                    <div class="col-12">
+                        <a href="javascript:;" onclick="${() => {this.setState({showAdvancedUpload: !state.showAdvancedUpload})}}">
+                            <span class="${!state.showAdvancedUpload ? '' : 'd-none'}">${L.translate("Show advanced options to upload single slots // Zeige erweiterte Optionen zum Hochladen einzelner Slots")}</span>
+                            <span class="${state.showAdvancedUpload ? '' : 'd-none'}">${L.translate("Hide advanced options to upload single slots // Verstecke erweiterte Optionen zum Hochladen einzelner Slots")}</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="mt-3 ${!state.selectedFileValid || !state.showAdvancedUpload ? 'd-none' : ''}">
+                    <div class="row">
+                        <fieldset class="mt-3 col-12">
+                            <legend>${L.translate('Choose slots to upload // Wähle Slots zum Hochladen')}</legend>
+                            ${state.uploadedSlots.map(slot => {
+                                let disabled = !state.selectedUploadSlots.includes(slot) && state.selectedUploadSlots.length + state.slots.length >= C.MAX_NUMBER_SLOTS;
+                                return html`
+                                    <div>
+                                        <input disabled="${disabled}" id="${slot.dedupedName + 'checkbox'}"
+                                               type="checkbox" class="mr-2"
+                                               onchange="${(event) => this.uploadCheckboxChanged(slot, event.target.checked)}"/>
+                                        <label for="${slot.dedupedName + 'checkbox'}">${'Slot "' + slot.dedupedName + '"'}</label>
+                                    </div>`
+                            })}
+                        </fieldset>
+                    </div>
+                    <div class="row mb-5 ${state.selectedUploadSlots.length + state.slots.length >= C.MAX_NUMBER_SLOTS ? '' : 'd-none'}">
+                        <div class="col-12">
+                            ${html`<${FaIcon} icon="fas exclamation-triangle"/>`}
+                            <span>${L.translate("Maximum number of slots reached! // Maximale Anzahl an Slots erreicht!")}</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 col-lg-5">
+                            <button disabled="${state.selectedUploadSlots.length === 0 || state.uploading}" onclick="${() => this.uploadSlots()}">
+                                ${html`<${FaIcon} icon="fas upload"/>`}
+                                ${state.uploading ? L.translate('Uploading slot(s) {?}% ... // Slot(s) hochladen {?}% ...', state.uploadProgress) : L.translate('Upload selected Slot(s) // Gewählte Slot(s) hochladen')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
                 <h3 class="mt-5">${L.translate('Download all slots // Alle Slots herunterladen')}</h3>
                 <div class="row mt-4">
                     <div class="col-sm-6 col-lg-5">
