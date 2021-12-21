@@ -181,17 +181,17 @@ C.AT_CMDS_ACTIONS = [{
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_MOUSE_TOGGLE_L,
-    label: 'Press or release left mouse button (toggle) // Drücken oder Loslassen linke Maustaste (wechseln)',
+    label: 'Press or release left mouse button (toggle) // Drücken oder Loslassen linke Maustaste (umschalten)',
     shortLabel: 'Toggle left mouse button // Umschalten linke Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_MOUSE_TOGGLE_R,
-    label: 'Press or release right mouse button (toggle) // Drücken oder Loslassen rechte Maustaste (wechseln)',
+    label: 'Press or release right mouse button (toggle) // Drücken oder Loslassen rechte Maustaste (umschalten)',
     shortLabel: 'Toggle right mouse button // Umschalten rechte Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
     cmd: C.AT_CMD_MOUSE_TOGGLE_M,
-    label: 'Press or release middle mouse button (toggle) // Drücken oder Loslassen mittlere Maustaste (wechseln)',
+    label: 'Press or release middle mouse button (toggle) // Drücken oder Loslassen mittlere Maustaste (umschalten)',
     shortLabel: 'Toggle middle mouse button // Umschalten mittlere Maustaste',
     category: C.AT_CMD_CAT_MOUSE
 }, {
@@ -229,7 +229,7 @@ C.AT_CMDS_ACTIONS = [{
     input: C.INPUTFIELD_TYPE_KEYBOARD
 }, {
     cmd: C.AT_CMD_KEYTOGGLE,
-    label: 'Press or release key(s) (toggle) // Taste(n) drücken oder auslassen (wechseln)',
+    label: 'Press or release key(s) (toggle) // Taste(n) drücken oder auslassen (umschalten)',
     shortLabel: 'Press/release key(s) // Taste(n) drücken/auslassen',
     category: C.AT_CMD_CAT_KEYBOARD,
     input: C.INPUTFIELD_TYPE_KEYBOARD
