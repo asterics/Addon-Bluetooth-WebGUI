@@ -140,7 +140,7 @@ C.INPUTFIELD_TYPE_MACRO = 'INPUTFIELD_TYPE_MACRO';
 
 C.AT_CMDS_ACTIONS = [{
     cmd: C.AT_CMD_NO_CMD,
-    label: 'No command // Keine Funktion',
+    label: 'No command (empty) // Keine Funktion (leer)',
     shortLabel: '(empty) // (leer)',
     category: C.AT_CMD_CAT_DEVICE
 }, {
