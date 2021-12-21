@@ -25,10 +25,10 @@ class InputMacro extends Component {
             selectedCmd: this.selectATCMDS[0].cmd,
             errorList: []
         };
-        this.inputChanged(props.value);
+        this.inputChanged(props.value, true);
     }
 
-    inputChanged(value) {
+    inputChanged(value, dontEmit) {
         value = value || '';
         value = value.replace(/\\;/g, '#=#='); // mask \; in order to correctly split on ";"
         let list = value ? value.split(';').map(e => e.replace(/#=#=/g, '\\;')) : [];
@@ -38,7 +38,9 @@ class InputMacro extends Component {
             commandList: list,
             currentValue: value
         });
-        this.emitValue(value);
+        if (!dontEmit) {
+            this.emitValue(value);
+        }
         L.debounce(() => {
             this.updateErrorList(list);
         }, 300, 'INPUT_MACRO');

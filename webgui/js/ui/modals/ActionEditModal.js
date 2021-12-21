@@ -27,17 +27,20 @@ class ActionEditModal extends Component {
             showCategory: showCategory,
             atCmd: currentAtCmdObject,
             atCmdSuffix: ATDevice.getButtonActionATCmdSuffix(props.buttonMode.index, props.slot),
+            atCmdSelectedByUser: false,
             possibleAtCmds: possibleAtCmds,
             selectOptions: [],
             shouldChangeMode: false,
             hasChanges: false
         }
+        this.state.originalState = JSON.parse(JSON.stringify(this.state));
         this.updateSelect(currentAtCmdObject);
     }
 
     selectActionCategory(category) {
         let possible = C.AT_CMDS_ACTIONS.filter(atCmd => category === ActionEditModal.ALL_CATEGORIES || atCmd.category === category);
         let atCmd = possible.includes(this.state.atCmd) ? this.state.atCmd : possible[0];
+        atCmd = !this.state.atCmdSelectedByUser && possible.map(atCmd => atCmd.cmd).includes(this.state.originalState.atCmd.cmd) ? this.state.originalState.atCmd : atCmd;
         this.setState({
             showCategory: category,
             possibleAtCmds: possible
@@ -48,8 +51,12 @@ class ActionEditModal extends Component {
     setAtCmd(atCmdString) {
         let atCmdObject = C.AT_CMDS_ACTIONS.filter(atCmd => atCmdString === atCmd.cmd)[0];
         let isAndWasKeyboard = atCmdObject.input === C.INPUTFIELD_TYPE_KEYBOARD && this.state.atCmd.input === C.INPUTFIELD_TYPE_KEYBOARD;
+        let atCmdSuffix = isAndWasKeyboard ? this.state.atCmdSuffix : '';
+        if (!this.state.atCmdSelectedByUser && atCmdObject.cmd === this.state.originalState.atCmd.cmd) {
+            atCmdSuffix = this.state.originalState.atCmdSuffix;
+        }
         this.setState({
-            atCmdSuffix: isAndWasKeyboard ? this.state.atCmdSuffix : '',
+            atCmdSuffix: atCmdSuffix,
             atCmd: atCmdObject,
             selectOptions: [],
             hasChanges: true
@@ -79,6 +86,7 @@ class ActionEditModal extends Component {
 
     setAtCmdSuffix(suffix) {
         this.setState({
+            atCmdSelectedByUser: true,
             atCmdSuffix: suffix,
             hasChanges: true
         })
@@ -151,7 +159,7 @@ class ActionEditModal extends Component {
                                 <div class="row">
                                     <label for="actionSelect" class="col-md-4">${L.translate('Select action // Aktion auswählen')}</label>
                                     <div class="col-md-8">
-                                        <select id="actionSelect" class="col-12" value="${state.atCmd.cmd}" onchange="${(event) => this.setAtCmd(event.target.value)}">
+                                        <select id="actionSelect" class="col-12" value="${state.atCmd.cmd}" onchange="${(event) => {this.setState({atCmdSelectedByUser: true}); this.setAtCmd(event.target.value)}}">
                                             ${state.possibleAtCmds.map(atCmd => html`<option value="${atCmd.cmd}">${L.translate(atCmd.label)}</option>`)}
                                         </select>
                                     </div>
