@@ -95,14 +95,11 @@ C.AT_CMDS_ACTIONS = C.AT_CMDS_ACTIONS.concat([{
     optionsFn: FLipMouse.getIRCommands
 }, {
     cmd: C.AT_CMD_IR_HOLD,
-    label: 'Hold infrared command // Infrarot-Kommando halten',
+    label: 'Hold infrared command (as long as input action) // Infrarot-Kommando halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold IR command // IR-Kommando halten',
     category: C.AT_CMD_CAT_IR,
     input: C.INPUTFIELD_TYPE_SELECT,
     optionsFn: FLipMouse.getIRCommands
-}, {
-    cmd: C.AT_CMD_IR_STOP,
-    label: 'Stop infrared command // Infrarot-Kommando stoppen',
-    category: C.AT_CMD_CAT_IR
 }, {
     cmd: C.AT_CMD_JOYSTICK_X,
     label: 'Joystick set x-axis // Joystick x-Achse setzen',
@@ -151,6 +148,10 @@ C.AT_CMDS_MACRO = C.AT_CMDS_MACRO.concat([{
     input: C.INPUTFIELD_TYPE_NUMBER,
     minValue: 1,
     maxValue: 32
+}, {
+    cmd: C.AT_CMD_IR_STOP,
+    label: 'Stop infrared command // Infrarot-Kommando stoppen',
+    category: C.AT_CMD_CAT_IR
 }]);
 
 C.BTN_CAT_BTN = 'BTN_CAT_BTN';
