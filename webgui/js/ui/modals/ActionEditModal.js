@@ -120,6 +120,17 @@ class ActionEditModal extends Component {
         }
         return this.state.atCmd.input && !this.state.atCmdSuffix;
     }
+
+    clearCommand() {
+        this.selectActionCategory(ActionEditModal.ALL_CATEGORIES);
+        this.setAtCmd(C.AT_CMD_NO_CMD);
+        let originalState = JSON.parse(JSON.stringify(this.state.originalState));
+        originalState.atCmd = C.AT_CMDS_ACTIONS.filter(atCmd => atCmd.cmd === C.AT_CMD_NO_CMD)[0];
+        this.setState({
+            atCmdSelectedByUser: true,
+            originalState: originalState
+        });
+    }
     
     render(props) {
         let state = this.state;
@@ -153,6 +164,12 @@ class ActionEditModal extends Component {
                                 </div>
                             </div>
                             <div class="${!showActionSelection ? 'd-none' : ''}">
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <span>${L.translate('Current action: // Aktuelle Aktion:')}</span> <span class="mr-3">${L.translate(state.originalState.atCmd.label)}</span>
+                                        <button class="small-button my-3" onclick="${() => this.clearCommand()}" disabled="${state.originalState.atCmd.cmd === C.AT_CMD_NO_CMD}">${html`<${FaIcon} icon="far trash-alt"/>`} ${L.translate('Delete // Löschen')}</button>
+                                    </div>
+                                </div>
                                 <div class="filter-buttons mb-4">
                                     ${html`<${RadioFieldset} legend="Show action categories: // Zeige Aktions-Kategorien:" onchange="${(value) => this.selectActionCategory(value)}" elements="${categoryElements}" value="${state.showCategory}"/>`}
                                 </div>
@@ -236,8 +253,20 @@ class ActionEditModal extends Component {
                         </div>
                     </div>
                 </div>
-            </div>`
+            </div>
+            ${ActionEditModal.style}`
     }
 }
+
+ActionEditModal.style = html`<style>
+    .small-button {
+        display: inline-block;
+        padding: 0 5px !important;
+        line-height: unset;
+        width: unset;
+        margin: 0.5em 0.5em 0.5em 0;
+        text-transform: none;
+    }
+</style>`
 
 export {ActionEditModal};
