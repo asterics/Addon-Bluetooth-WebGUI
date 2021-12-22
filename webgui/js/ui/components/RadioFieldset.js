@@ -10,7 +10,7 @@ class RadioFieldset extends Component {
         props.value = props.value !== undefined ? props.value : null;
         props.name = props.name || props.elements[0].value + props.elements[1].value;
         return html`
-            <fieldset class="radio-fieldset" role="radiogroup" onchange="${(event) => props.onchange(event.target.value || null)}">
+            <fieldset class="radio-fieldset m-0" role="radiogroup" onchange="${(event) => props.onchange(event.target.value || null)}">
                 <legend>${L.translate(props.legend)}</legend>
                 ${props.elements.map(el => html`
                     <div class="d-inline">
