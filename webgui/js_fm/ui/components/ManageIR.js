@@ -13,7 +13,8 @@ class ManageIR extends Component {
         this.state = {
             deleteIrName: null,
             irCmdName: '',
-            isRecording: false
+            isRecording: false,
+            showAdvancedOptions: false
         };
     }
 
@@ -60,10 +61,10 @@ class ManageIR extends Component {
                 <div class="col-md-8">
                     <div class="row">
                         <div class="col-md-6">
-                            <input type="text" class="col-12" id="inputIRName" value="${state.irCmdName}" oninput="${(event) => this.setState({irCmdName: event.target.value})}" placeholder="Name"/>
+                            <input type="text" class="col-12 my-0" id="inputIRName" value="${state.irCmdName}" oninput="${(event) => this.setState({irCmdName: event.target.value})}" placeholder="Name"/>
                         </div>
                         <div class="col-md-6">
-                            <button class="col-12" disabled="${!state.irCmdName}" onclick="${() => this.recordIrCmd()}">
+                            <button class="col-12 my-0" disabled="${!state.irCmdName}" onclick="${() => this.recordIrCmd()}">
                                 <span class="${state.isRecording ? 'd-none' : ''}">${L.translate('Record // Aufnahme')}</span>
                                 <span class="${!state.isRecording ? 'd-none' : ''}">${L.translate('Recording ... // Aufnahme ...')}</span>
                             </button>
@@ -72,6 +73,20 @@ class ManageIR extends Component {
                 </div>
             </div>
             <div class="row">
+                <div class="offset-md-4 col-md-8 col-12 mt-2">
+                    <a href="javascript:;" onclick="${() => this.setState({showAdvancedOptions: !state.showAdvancedOptions})}">
+                        <span class="${state.showAdvancedOptions ? 'd-none' : ''}">${L.translate('Show advanced options // Zeige erweiterte Optionen')}</span>
+                        <span class="${!state.showAdvancedOptions ? 'd-none' : ''}">${L.translate('Hide advanced options // Verstecke erweiterte Optionen')}</span>
+                    </a>
+                </div>
+            </div>
+            <div class="row mt-4 ${state.showAdvancedOptions ? '' : 'd-none'}">
+                <div class="offset-md-4 col-md-8 col-12">
+                    <label class="mr-2" for="inputTimeout">${L.translate('IR recording timeout (ms) // IR Aufnahme-Timeout (ms)')}</label>
+                    <input id="inputTimeout" type="number" min="0" max="100" value="${ManageIR.irTimeout}" onchange="${(event) => {ATDevice.sendATCmd(C.AT_CMD_IR_TIMEOUT, event.target.value); ManageIR.irTimeout = event.target.value;}}"/>
+                </div>
+            </div>
+            <div class="row mt-5">
                 <label for="selectIRDelete" class="col-12 col-md-4">${L.translate('Delete IR command // IR Kommando löschen')}</label>
                 <div class="col-md-8">
                     <div class="row">
@@ -99,5 +114,7 @@ class ManageIR extends Component {
             `;
     }
 }
+
+ManageIR.irTimeout = 10;
 
 export {ManageIR};
