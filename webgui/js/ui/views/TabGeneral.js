@@ -63,7 +63,7 @@ class TabGeneral extends Component {
         if (!confirm(L.translate('Do you want to update the firmware version of the BT-Addon to version {?}? Hint: keep this tab open and in foreground while updating! // Möchten Sie die Version des BT-Addons auf Version {?} aktualisieren? Hinweis: lassen Sie diesen Tab während dem Update im Vordergrund geöffnet!', this.state.newBtVersion))) {
             return;
         }
-        L.CachedHTTPRequest(this.state.newBtVersionDownloadUrl, 'GET', 'arraybuffer', 'BT_FIRMWARE').then(result => {
+        L.HTTPRequest(this.state.newBtVersionDownloadUrl, 'GET', 'arraybuffer', 'BT_FIRMWARE').then(result => {
             thiz.setState({btUpgradeProgress: 1});
             ATDevice.upgradeBTAddon(result, (progress) => {
                 thiz.setState({btUpgradeProgress: progress || 1});

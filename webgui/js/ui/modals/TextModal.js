@@ -15,7 +15,7 @@ class TextModal extends Component {
     
     render(props) {
         if (!this.state.text && props.textUrl) {
-            L.CachedHTTPRequest(props.textUrl, 'GET', 'text').then(text => {
+            L.HTTPRequest(props.textUrl, 'GET', 'text').then(text => {
                 this.setState({
                     text: text
                 });

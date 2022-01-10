@@ -44,7 +44,7 @@ TeensyFirmwareUpdater.uploadFirmware = async function (url, progressFn, filters)
             progressFn(1);
         }
         // retrieve firmware after opening port in order to prevent "no user interaction" error on opening port
-        let result = await L.CachedHTTPRequest(url, 'GET', 'text', 'FM_FIRMWARE');
+        let result = await L.HTTPRequest(url, 'GET', 'text', 'FM_FIRMWARE');
         let flashData = firmwareUtil.parseIntelHex(result, MAX_WORDS_TEENSY);
 
         //main source:

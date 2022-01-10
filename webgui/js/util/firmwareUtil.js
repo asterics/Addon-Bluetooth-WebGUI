@@ -176,7 +176,7 @@ firmwareUtil.updateDeviceFirmware = function(progressHandler) {
 }
 
 function getFWInfo(apiUrl, binaryStringFilter) {
-    return L.CachedHTTPRequest(apiUrl, 'GET', 'json').then(result => {
+    return L.HTTPRequest(apiUrl, 'GET', 'json').then(result => {
         let binaryAsset = result.assets.filter(asset => asset.name.indexOf(binaryStringFilter) > -1)[0];
         return {
             version: L.formatVersion(result['tag_name']),

@@ -26,7 +26,7 @@ class TabSlots extends Component {
             selectedFileValid: undefined
         }
 
-        L.CachedHTTPRequest(`https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/contents/Settings`, 'GET', 'json').then(result => {
+        L.HTTPRequest(`https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/contents/Settings`, 'GET', 'json').then(result => {
             this.setState({
                 demoSettings: result
             })
@@ -176,7 +176,7 @@ class TabSlots extends Component {
     demoSettingChanged(settingSha) {
         let setting = this.state.demoSettings.filter(s => s.sha === settingSha)[0];
         let settingText = this.state.demoSettings.filter(s => L.equalIgnoreCase(setting.name.replace('.set', ''), s.name.replace('.md', '')))[0];
-        L.CachedHTTPRequest(setting.download_url, 'GET', 'text').then(result => {
+        L.HTTPRequest(setting.download_url, 'GET', 'text').then(result => {
             let parsedSlots = ATDevice.parseConfig(result);
             this.setState({
                 demoSettingSlots: parsedSlots,
