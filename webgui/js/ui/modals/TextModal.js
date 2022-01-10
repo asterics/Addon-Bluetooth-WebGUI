@@ -9,15 +9,17 @@ class TextModal extends Component {
     constructor(props) {
         super();
         this.state = {
-            text: ''
+            text: '',
+            currentUrl: ''
         }
     }
     
     render(props) {
-        if (!this.state.text && props.textUrl) {
+        if (!this.state.text || props.textUrl !== this.state.currentUrl) {
             L.HTTPRequest(props.textUrl, 'GET', 'text').then(text => {
                 this.setState({
-                    text: text
+                    text: text,
+                    currentUrl: props.textUrl
                 });
             });
         }
