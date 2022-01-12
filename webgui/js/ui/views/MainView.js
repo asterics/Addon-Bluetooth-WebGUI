@@ -221,7 +221,7 @@ class MainView extends Component {
                     <span >${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</span>
                 </h1>
                 <div class="row mb-5" aria-hidden="true">
-                    <img class="col-10 offset-1 col-md-6 offset-md-3 col-xl-4 offset-xl-4" src="./img/${C.CURRENT_DEVICE}_logo.svg"/>
+                    <img class="col-10 offset-1 col-md-6 offset-md-3 col-xl-4 offset-xl-4" src="./img/${C.DEVICE_IS_FM ? 'FLipMouse' : 'FABI'}_logo.svg"/>
                 </div>
                 <div class="row">
                     <div class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3"><button onclick="${() => this.initATDevice()}">${L.translate("Connect to {?} connected via USB // Verbinden zu {?} (über USB angeschlossen)", C.CURRENT_DEVICE)}</button></div>

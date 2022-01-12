@@ -235,6 +235,10 @@ L.getLang = function () {
  * @return {*}
  */
 L.translate = function (translationKey) {
+    if (translationKey && C.DEVICE_IS_FLIPPAD && !translationKey.toLowerCase().includes("joystick")) {
+        translationKey = translationKey.replaceAll("Stick", "Pad");
+        translationKey = translationKey.replaceAll("stick", "pad");
+    }
     translationKey = translationKey + '' || '';
     let translated = '';
     if (translationKey.indexOf(' // ') > -1) {

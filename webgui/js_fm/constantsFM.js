@@ -11,6 +11,7 @@ window.C = window.C || {};
 C.CURRENT_DEVICE = C.AT_DEVICE_FLIPMOUSE;
 C.DEVICE_IS_FABI = false;
 C.DEVICE_IS_FM = true;
+C.DEVICE_IS_FLIPPAD = undefined;
 C.MIN_FIRMWARE_VERSION = '2.11.0';
 C.MAX_NUMBER_SLOTS = 10;
 C.MAX_LENGTH_SLOTNAME = 13;
@@ -272,4 +273,13 @@ C.FLIPMOUSE_MODE_JOYSTICK_SLIDERS = {
     value: 4,
     label: 'Joystick (Slider) // Joystick (Slider)'
 };
+C.FLIPPAD_MODE_PAD = {
+    value: 5,
+    label: 'Pad mode // Pad-Modus'
+};
+C.FLIPPAD_MODE_PAD_ALTERNATIVE = {
+    value: 6,
+    label: 'Alternative pad mode // Alternativer Pad-Modus'
+};
+
 C.FLIPMOUSE_MODES = [C.FLIPMOUSE_MODE_MOUSE, C.FLIPMOUSE_MODE_ALT, C.FLIPMOUSE_MODE_JOYSTICK_XY, C.FLIPMOUSE_MODE_JOYSTICK_ZR, C.FLIPMOUSE_MODE_JOYSTICK_SLIDERS];

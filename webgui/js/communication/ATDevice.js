@@ -91,6 +91,11 @@ ATDevice.isInitialized = function () {
 
 ATDevice.getVersion = function () {
     return ATDevice.sendAtCmdWithResult(C.AT_CMD_VERSION).then(result => {
+        if (result.toLowerCase().includes("pad")) {
+            C.DEVICE_IS_FLIPPAD = true;
+            C.FLIPMOUSE_MODES = C.FLIPMOUSE_MODES.concat([C.FLIPPAD_MODE_PAD, C.FLIPPAD_MODE_PAD_ALTERNATIVE]);
+            C.CURRENT_DEVICE = "FLipPad";
+        }
         return Promise.resolve(L.formatVersion(result));
     });
 }
