@@ -159,7 +159,7 @@ firmwareUtil.getBTFWInfo = function () {
 }
 
 firmwareUtil.getDeviceFWInfo = function () {
-    return getFWInfo(`https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/releases/latest`, '.hex');
+    return getFWInfo(`https://api.github.com/repos/asterics/${C.DEVICE_IS_FM ? 'FLipMouse' : 'FABI'}/releases/latest`, '.hex');
 }
 
 firmwareUtil.updateDeviceFirmware = function(progressHandler) {

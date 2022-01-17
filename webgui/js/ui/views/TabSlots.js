@@ -26,7 +26,7 @@ class TabSlots extends Component {
             selectedFileValid: undefined
         }
 
-        L.HTTPRequest(`https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/contents/Settings`, 'GET', 'json').then(result => {
+        L.HTTPRequest(`https://api.github.com/repos/asterics/${C.DEVICE_IS_FM ? 'FLipMouse' : 'FABI'}/contents/Settings`, 'GET', 'json').then(result => {
             this.setState({
                 demoSettings: result
             })
