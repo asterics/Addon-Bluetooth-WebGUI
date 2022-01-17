@@ -235,6 +235,7 @@ L.getLang = function () {
  * @return {*}
  */
 L.translate = function (translationKey) {
+    translationKey = translationKey ? translationKey + '' : translationKey;
     if (translationKey && C.DEVICE_IS_FLIPPAD && !translationKey.toLowerCase().includes("joystick") && !translationKey.includes('[[')) {
         translationKey = translationKey.replaceAll("Stick", "Pad");
         translationKey = translationKey.replaceAll("stick", "pad");
