@@ -1,5 +1,6 @@
 import {FLipMouse} from "./communication/FLipMouse.js";
 import {TabStick} from "./ui/views/TabStick.js";
+import {TabStickPad} from "./ui/views/TabStickPad.js";
 import {TabSipPuff} from "../js/ui/views/TabSipPuff.js";
 import {TabSlots} from "../js/ui/views/TabSlots.js";
 import {TabActions} from "../js/ui/views/TabActions.js";
@@ -19,6 +20,12 @@ C.MAX_LENGTH_SLOTNAME = 13;
 C.USB_DEVICE_FILTERS =  [
     {usbVendorId: 0x16c0} // Teensy
 ];
+
+C.VIEW_TAB_PAD = {
+    object: TabStickPad,
+    hash: '#tabPad',
+    label: 'Pad-Config'
+};
 
 C.VIEWS = [{
     object: TabStick,
@@ -273,13 +280,21 @@ C.FLIPMOUSE_MODE_JOYSTICK_SLIDERS = {
     value: 4,
     label: 'Joystick (Slider) // Joystick (Slider)'
 };
+C.FLIPPAD_MODE_MOUSE = {
+    value: 0,
+    label: 'Mouse ([[stick]] mode) // Maus ([[Stick]]-Modus)'
+};
 C.FLIPPAD_MODE_PAD = {
     value: 5,
-    label: 'Pad mode // Pad-Modus'
+    label: 'Mouse (pad mode) // Maus (Pad-Modus)'
+};
+C.FLIPPAD_MODE_STICK_ALTERNATIVE = {
+    value: 1,
+    label: 'Alternative actions ([[stick]] mode) // Alternative Aktionen ([[Stick]]-Modus)'
 };
 C.FLIPPAD_MODE_PAD_ALTERNATIVE = {
     value: 6,
-    label: 'Alternative pad mode // Alternativer Pad-Modus'
+    label: 'Alternative actions (pad mode) // Alternative Aktionen (Pad-Modus)'
 };
 
 C.FLIPMOUSE_MODES = [C.FLIPMOUSE_MODE_MOUSE, C.FLIPMOUSE_MODE_ALT, C.FLIPMOUSE_MODE_JOYSTICK_XY, C.FLIPMOUSE_MODE_JOYSTICK_ZR, C.FLIPMOUSE_MODE_JOYSTICK_SLIDERS];

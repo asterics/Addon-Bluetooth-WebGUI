@@ -52,6 +52,12 @@ class MainView extends Component {
         }
     }
 
+    resetViews(views) {
+        this.setState({
+            views: views
+        });
+    }
+
     toConnectionScreen() {
         this.setState({
             showScreen: SCREENS.CONNECTION,

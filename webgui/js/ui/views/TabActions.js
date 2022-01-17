@@ -38,7 +38,7 @@ class TabActions extends Component {
     }
 
     getLinkTitle(btnMode, slot) {
-        if (this.isFMNonAltMode(btnMode, slot)) {
+        if (!this.showFnName(btnMode, slot)) {
             return L.translate(btnMode.label);
         } else {
             return L.translate(btnMode.label) + (ATDevice.getButtonAction(btnMode.index, slot) ? ': ' + ATDevice.getButtonAction(btnMode.index, slot) : '');
@@ -46,7 +46,7 @@ class TabActions extends Component {
     }
 
     getLinkLabel(btnMode, slot) {
-        if (this.isFMNonAltMode(btnMode, slot)) {
+        if (!this.showFnName(btnMode, slot)) {
             let modeValue = ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot);
             let mode = C.FLIPMOUSE_MODES.filter(mode => mode.value === modeValue)[0] || {};
             return L.translate(mode.label);
@@ -65,9 +65,10 @@ class TabActions extends Component {
         return ATDevice.getButtonAction(btnMode.index, slot).substr(C.LENGTH_ATCMD_PREFIX);
     }
 
-    isFMNonAltMode(btnMode, slot) {
-        let modeValue = ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot);
-        return C.DEVICE_IS_FM && btnMode.category === C.BTN_CAT_STICK && modeValue !== C.FLIPMOUSE_MODE_ALT.value;
+    showFnName(btnMode, slot) {
+        let flipmouseAltMode = C.DEVICE_IS_FM && !C.DEVICE_IS_FLIPPAD && ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot) === C.FLIPMOUSE_MODE_ALT.value;
+        let flipadAltMode = C.DEVICE_IS_FM && C.DEVICE_IS_FLIPPAD && [C.FLIPPAD_MODE_PAD_ALTERNATIVE.value, C.FLIPPAD_MODE_STICK_ALTERNATIVE.value].includes(ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot));
+        return C.DEVICE_IS_FABI || flipmouseAltMode || flipadAltMode || btnMode.category !== C.BTN_CAT_STICK;
     }
 
     getSlotStyle(slot) {
@@ -133,7 +134,7 @@ class TabActions extends Component {
                                 </span>
                                 <a href="javascript:;" title="${this.getLinkTitle(btnMode, slot)}" class="${this.isDisabled(btnMode, slot) ? 'd-none' : ''}" onclick="${() => this.setState({modalBtnMode: btnMode, modalSlot: slot})}">
                                     <span style="${ATDevice.getButtonAction(btnMode.index, slot) === C.AT_CMD_NO_CMD ? 'font-weight: normal' : ''}">${this.getLinkLabel(btnMode, slot)}</span>
-                                    <span class="${this.isFMNonAltMode(btnMode, slot) || (state.showAllSlots && ATDevice.getSlots().length > 1) || !this.getBtnModeParam(btnMode, slot) ? 'd-none' : ''}" style="font-weight: normal"> (${this.getBtnModeParam(btnMode, slot)})</span>
+                                    <span class="${!this.showFnName(btnMode, slot) || (state.showAllSlots && ATDevice.getSlots().length > 1) || !this.getBtnModeParam(btnMode, slot) ? 'd-none' : ''}" style="font-weight: normal"> (${this.getBtnModeParam(btnMode, slot)})</span>
                                 </a>
                             </span>
                         `)}

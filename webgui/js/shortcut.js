@@ -1,6 +1,7 @@
 import {ATDevice} from "./communication/ATDevice.js";
 import {MainView} from "./ui/views/MainView.js";
 import {TabStick} from "../js_fm/ui/views/TabStick.js";
+import {TabStickPad} from "../js_fm/ui/views/TabStickPad.js";
 import {TabVisualization} from "../js_fm/ui/views/TabVisualization.js";
 
 if (C.DEVICE_IS_FM) {
@@ -14,6 +15,9 @@ if (C.DEVICE_IS_FM) {
             event.preventDefault();
             if (TabStick.instance) {
                 TabStick.instance.toggleShowBars();
+            }
+            if (TabStickPad.instance) {
+                TabStickPad.instance.toggleShowBars();
             }
             if (TabVisualization.instance) {
                 TabVisualization.instance.toggleState('showAnalogBars');
