@@ -281,7 +281,7 @@ C.FLIPMOUSE_MODE_JOYSTICK_SLIDERS = {
     label: 'Joystick (Slider) // Joystick (Slider)'
 };
 C.FLIPPAD_MODE_MOUSE = {
-    value: 0,
+    value: 1,
     label: 'Mouse ([[stick]] mode) // Maus ([[Stick]]-Modus)'
 };
 C.FLIPPAD_MODE_PAD = {
@@ -289,7 +289,7 @@ C.FLIPPAD_MODE_PAD = {
     label: 'Mouse (pad mode) // Maus (Pad-Modus)'
 };
 C.FLIPPAD_MODE_STICK_ALTERNATIVE = {
-    value: 1,
+    value: 0,
     label: 'Alternative actions ([[stick]] mode) // Alternative Aktionen ([[Stick]]-Modus)'
 };
 C.FLIPPAD_MODE_PAD_ALTERNATIVE = {
