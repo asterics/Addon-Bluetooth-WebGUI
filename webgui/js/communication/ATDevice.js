@@ -68,8 +68,13 @@ ATDevice.init = function (dontGetLiveValues) {
         }
     }).then(function () {
         _isInitialized = true;
-        return ATDevice.getVersion();
+        return ATDevice.sendAtCmdWithResult(C.AT_CMD_VERSION);
     }).then((versionString) => {
+        if (C.DEVICE_IS_FM && versionString.toLowerCase().includes("pad") ||
+            C.DEVICE_IS_FLIPPAD && versionString.toLowerCase().includes("mouse")) {
+            if (_communicator.close) _communicator.close();
+            return Promise.reject(C.ERROR_WRONG_DEVICE);
+        }
         if (!L.isVersionNewer(C.MIN_FIRMWARE_VERSION, versionString) && !L.isVersionEqual(C.MIN_FIRMWARE_VERSION, versionString)) {
             if (_communicator.close) _communicator.close();
             return Promise.reject(C.ERROR_FIRMWARE_OUTDATED);

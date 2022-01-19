@@ -249,6 +249,14 @@ class MainView extends Component {
                                 `;
                             case C.ERROR_CONNECTION_LOST:
                                 return html`<span>${L.translate('Connection to device lost! Please try to reconnect. // Verbindung zum Gerät verloren! Bitte versuchen Sie sich wieder zu verbinden.')}</span>`;
+                            case C.ERROR_WRONG_DEVICE:
+                                return html`
+                                    <span>${L.translate("Detected wrong device! // Falsches Gerät erkannt!")}</span>
+                                    <div>
+                                        <span>${L.translate('Try to use the  // Bitte verwenden Sie stattdessen den ')}</span>
+                                        <a rel="noreferrer" href="${C.DEVICE_IS_FM ? 'https://flippad.asterics.eu/' : 'https://flipmouse.asterics.eu/'}">${L.translate('{?} config manager // {?} Config-Manager', C.DEVICE_IS_FM ? 'FLipPad' : 'FLipMouse')}</a>
+                                    </div>
+                                `;
                         }
                     })()}
                 </div>
