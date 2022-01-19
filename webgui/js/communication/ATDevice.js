@@ -4,7 +4,6 @@
  * ATDevice holds a reference to the current specific class (FLipMouse or FABI) in ATDevice.Specific
  */
 import {SerialCommunicator} from "../adapter/sercomm.js";
-import {MainView} from "../ui/views/MainView.js";
 
 let ATDevice = {};
 ATDevice.parseLiveData = true;
@@ -92,13 +91,6 @@ ATDevice.isInitialized = function () {
 
 ATDevice.getVersion = function () {
     return ATDevice.sendAtCmdWithResult(C.AT_CMD_VERSION).then(result => {
-        if (result.toLowerCase().includes("pad")) {
-            C.DEVICE_IS_FLIPPAD = true;
-            C.FLIPMOUSE_MODES = [C.FLIPPAD_MODE_MOUSE, C.FLIPPAD_MODE_PAD, C.FLIPPAD_MODE_STICK_ALTERNATIVE, C.FLIPPAD_MODE_PAD_ALTERNATIVE, C.FLIPMOUSE_MODE_JOYSTICK_XY, C.FLIPMOUSE_MODE_JOYSTICK_ZR, C.FLIPMOUSE_MODE_JOYSTICK_SLIDERS];
-            C.CURRENT_DEVICE = "FLipPad";
-            C.VIEWS[0] = C.VIEW_TAB_PAD;
-            MainView.instance.resetViews(C.VIEWS);
-        }
         return Promise.resolve(L.formatVersion(result));
     });
 }
@@ -415,7 +407,7 @@ ATDevice.setSlot = function (slot, dontSendToDevice) {
             ATDevice.save();
             promise = ATDevice.sendAtCmdWithResult(C.AT_CMD_LOAD_SLOT, slot);
             promise.finally(() => ATDevice.parseLiveData = true);
-            if (C.DEVICE_IS_FM) {
+            if (C.DEVICE_IS_FM_OR_PAD) {
                 ATDevice.sendATCmd(C.AT_CMD_CALIBRATION);
             }
         }
@@ -498,7 +490,7 @@ ATDevice.restoreDefaultConfiguration = function () {
     let promise = ATDevice.refreshConfig();
     promise.then(() => {
         emitSlotChange();
-        if (C.DEVICE_IS_FM) {
+        if (C.DEVICE_IS_FM_OR_PAD) {
             ATDevice.Specific.calibrate();
         }
     })
