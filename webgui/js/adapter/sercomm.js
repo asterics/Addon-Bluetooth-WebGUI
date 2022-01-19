@@ -104,7 +104,7 @@ function SerialCommunicator() {
         }
         _sendingRaw = true;
         let array = new Int8Array(arrayBuffer);
-        let chunksize = C.DEVICE_IS_FM ? 256 : 128;
+        let chunksize = C.DEVICE_IS_FM_OR_PAD ? 256 : 128;
         let sent = 0;
         let lastProgress = null;
         for (let i = 0; i < array.length; i += chunksize) {

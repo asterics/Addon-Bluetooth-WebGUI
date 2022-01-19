@@ -23,7 +23,7 @@ class InitDeviceView extends Component {
         thiz.setState({success: false});
         firmwareUtil.getDeviceFWInfo().then(async result => {
             await ATDevice.Specific.Updater.resetDevice(null, []);
-            if (C.DEVICE_IS_FM) {
+            if (C.DEVICE_IS_FM_OR_PAD) {
                 localStorageService.setFirmwareDownloadUrl(result.downloadUrl);
             }
             await ATDevice.Specific.Updater.uploadFirmware(result.downloadUrl, (progress) => {
@@ -34,7 +34,7 @@ class InitDeviceView extends Component {
                     thiz.setState({updateProgress: progress || 1});
                 }
             }, []).catch(() => {
-                if (C.DEVICE_IS_FM) {
+                if (C.DEVICE_IS_FM_OR_PAD) {
                     window.location.replace('index_fm.htm'); // redirect to main page where aborted FW Update is handled
                 }
             });
@@ -75,7 +75,7 @@ class InitDeviceView extends Component {
                     </div>
                     <div class="row">
                         <a class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3 mt-3"
-                           href="${C.DEVICE_IS_FM ? 'index_fm.htm' : 'index_fabi.htm'}">
+                           href="${C.DEVICE_IS_FM ? 'index_fm.htm' : (C.DEVICE_IS_FABI ? 'index_fabi.htm' : 'index_pad.htm')}">
                             ${L.translate('Back to main page // Zurück zur Hauptseite')}
                         </a>
                     </div>

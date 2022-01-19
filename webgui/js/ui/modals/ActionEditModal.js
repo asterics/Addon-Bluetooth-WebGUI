@@ -103,7 +103,7 @@ class ActionEditModal extends Component {
         }
         if (forAllSlots) {
             let constants = [C.AT_CMD_BTN_MODE + " " + this.props.buttonMode.index];
-            if (C.DEVICE_IS_FM && this.props.buttonMode.category === C.BTN_CAT_STICK) {
+            if (C.DEVICE_IS_FM_OR_PAD && this.props.buttonMode.category === C.BTN_CAT_STICK) {
                 constants.push(C.AT_CMD_FLIPMOUSE_MODE)
             }
             await ATDevice.copyConfigToAllSlots(constants, this.props.slot, true);
@@ -137,10 +137,10 @@ class ActionEditModal extends Component {
         let btnMode = props.buttonMode;
         let categoryElements = C.AT_CMD_CATEGORIES.map(cat => {return {value: cat.constant, label: cat.label}});
         categoryElements = [{value: ActionEditModal.ALL_CATEGORIES, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
-        let flipmouseAltMode = C.DEVICE_IS_FM && !C.DEVICE_IS_FLIPPAD && ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value;
-        let flipadAltMode = C.DEVICE_IS_FM && C.DEVICE_IS_FLIPPAD && [C.FLIPPAD_MODE_PAD_ALTERNATIVE.value, C.FLIPPAD_MODE_STICK_ALTERNATIVE.value].includes(ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE));
+        let flipmouseAltMode = C.DEVICE_IS_FM && ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value;
+        let flipadAltMode = C.DEVICE_IS_FLIPPAD && [C.FLIPPAD_MODE_PAD_ALTERNATIVE.value, C.FLIPPAD_MODE_STICK_ALTERNATIVE.value].includes(ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE));
         let showActionSelection = C.DEVICE_IS_FABI || flipmouseAltMode || flipadAltMode || btnMode.category !== C.BTN_CAT_STICK || state.shouldChangeMode;
-        let modeLabel = C.DEVICE_IS_FM ? C.FLIPMOUSE_MODES.filter(mode => mode.value === ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, props.slot))[0].label : '';
+        let modeLabel = C.DEVICE_IS_FM_OR_PAD ? C.FLIPMOUSE_MODES.filter(mode => mode.value === ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, props.slot))[0].label : '';
 
         return html`
             <div class="modal-mask">

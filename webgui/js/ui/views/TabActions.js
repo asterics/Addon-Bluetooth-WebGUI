@@ -66,8 +66,8 @@ class TabActions extends Component {
     }
 
     showFnName(btnMode, slot) {
-        let flipmouseAltMode = C.DEVICE_IS_FM && !C.DEVICE_IS_FLIPPAD && ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot) === C.FLIPMOUSE_MODE_ALT.value;
-        let flipadAltMode = C.DEVICE_IS_FM && C.DEVICE_IS_FLIPPAD && [C.FLIPPAD_MODE_PAD_ALTERNATIVE.value, C.FLIPPAD_MODE_STICK_ALTERNATIVE.value].includes(ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot));
+        let flipmouseAltMode = C.DEVICE_IS_FM && ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot) === C.FLIPMOUSE_MODE_ALT.value;
+        let flipadAltMode = C.DEVICE_IS_FLIPPAD && [C.FLIPPAD_MODE_PAD_ALTERNATIVE.value, C.FLIPPAD_MODE_STICK_ALTERNATIVE.value].includes(ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, slot));
         return C.DEVICE_IS_FABI || flipmouseAltMode || flipadAltMode || btnMode.category !== C.BTN_CAT_STICK;
     }
 

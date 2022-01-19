@@ -26,7 +26,7 @@ class TabSlots extends Component {
             selectedFileValid: undefined
         }
 
-        L.HTTPRequest(`https://api.github.com/repos/asterics/${C.DEVICE_IS_FM ? 'FLipMouse' : 'FABI'}/contents/Settings`, 'GET', 'json').then(result => {
+        L.HTTPRequest(`https://api.github.com/repos/asterics/${C.DEVICE_IS_FM_OR_PAD ? 'FLipMouse' : 'FABI'}/contents/Settings`, 'GET', 'json').then(result => {
             this.setState({
                 demoSettings: result
             })
@@ -70,7 +70,7 @@ class TabSlots extends Component {
         reader.onloadend = function(e) {
             let parsedSlots = ATDevice.parseConfig(e.target.result);
             let validConfig = parsedSlots.length > 0;
-            validConfig = validConfig && C.DEVICE_IS_FM ? !!parsedSlots[0].config[C.AT_CMD_DEADZONE_X] : !!parsedSlots[0].config[C.AT_CMD_ANTITREMOR_IDLE];
+            validConfig = validConfig && C.DEVICE_IS_FM_OR_PAD ? !!parsedSlots[0].config[C.AT_CMD_DEADZONE_X] : !!parsedSlots[0].config[C.AT_CMD_ANTITREMOR_IDLE];
             parsedSlots.forEach(slot => { //prevent duplicated names
                 slot.name = slot.name.substring(0, C.MAX_LENGTH_SLOTNAME);
                 let originalSlotname = slot.name;
@@ -215,7 +215,7 @@ class TabSlots extends Component {
                             <li class="my-2" style="${index % 2 === 0 ? 'background-color: rgb(224 224 224)' : ''}">
                                 <div class="row d-flex align-items-center">
                                     <div class="col-4">
-                                        <span class="mx-2 px-3 ${C.DEVICE_IS_FM ? 'd-none' : ''}"
+                                        <span class="mx-2 px-3 ${C.DEVICE_IS_FM_OR_PAD ? 'd-none' : ''}"
                                               style="background-color: ${ATDevice.getConfig(C.AT_CMD_SET_COLOR, slot).replace('0x', '#')}; border: 1px solid"></span>
                                         <a title="${L.translate('Slot "{?}": click to activate // Slot "{?}": zum Aktivieren klicken', slot)}"
                                            href="javascript:;" onclick="${() => ATDevice.setSlot(slot)}"
@@ -230,10 +230,10 @@ class TabSlots extends Component {
                                         <div class="row d-flex">
                                             <div class="col">
                                                 <label for="colorinput${slot}"
-                                                       class="small-button button py-2 py-md-0 ${C.DEVICE_IS_FM ? 'd-none' : ''}">${html`
+                                                       class="small-button button py-2 py-md-0 ${C.DEVICE_IS_FM_OR_PAD ? 'd-none' : ''}">${html`
                                                     <${FaIcon} icon="fas palette"/>`}<span
                                                         class="d-none d-sm-inline">${L.translate('Set color // Farbe wählen')}</span></label>
-                                                <input id="colorinput${slot}" type="color" class="sr-only ${C.DEVICE_IS_FM ? 'd-none' : ''}"
+                                                <input id="colorinput${slot}" type="color" class="sr-only ${C.DEVICE_IS_FM_OR_PAD ? 'd-none' : ''}"
                                                        oninput="${(event) => this.colorChanged(slot, event)}"/>
                                             </div>
                                             <div class="col d-flex">

@@ -1,10 +1,10 @@
 import {ATDevice} from "./communication/ATDevice.js";
 import {MainView} from "./ui/views/MainView.js";
 import {TabStick} from "../js_fm/ui/views/TabStick.js";
-import {TabStickPad} from "../js_fm/ui/views/TabStickPad.js";
+import {TabPad} from "../js_pad/ui/views/TabPad.js";
 import {TabVisualization} from "../js_fm/ui/views/TabVisualization.js";
 
-if (C.DEVICE_IS_FM) {
+if (C.DEVICE_IS_FM_OR_PAD) {
     window.addEventListener('keydown', event => {
         if (event.key === 'c' && event.ctrlKey) {
             if (ATDevice.isInitialized()) {
@@ -16,8 +16,8 @@ if (C.DEVICE_IS_FM) {
             if (TabStick.instance) {
                 TabStick.instance.toggleShowBars();
             }
-            if (TabStickPad.instance) {
-                TabStickPad.instance.toggleShowBars();
+            if (TabPad.instance) {
+                TabPad.instance.toggleShowBars();
             }
             if (TabVisualization.instance) {
                 TabVisualization.instance.toggleState('showAnalogBars');

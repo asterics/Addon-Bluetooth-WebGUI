@@ -154,7 +154,7 @@ function parseLiveData(data) {
     }
 }
 
-if (C.DEVICE_IS_FM) {
+if (C.DEVICE_IS_FM_OR_PAD) {
     ATDevice.setLiveValueHandler(parseLiveData);
 }
 
