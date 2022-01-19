@@ -1,11 +1,11 @@
 import { h, Component } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
-import {PositionVisualization} from "../components/PositionVisualization.js";
-import {preactUtil} from "../../util/preactUtil.js";
+import {PositionVisualization} from "../../../js_fm/ui/components/PositionVisualization.js";
+import {preactUtil} from "../../../js_fm/util/preactUtil.js";
 import {RadioFieldset} from "../../../js/ui/components/RadioFieldset.js";
 import {Slider} from "../../../js/ui/components/Slider.js";
 import {ATDevice} from "../../../js/communication/ATDevice.js";
-import {FLipMouse} from "../../communication/FLipMouse.js";
+import {FLipPad} from "../../communication/FLipPad.js";
 import {ActionButton} from "../../../js/ui/components/ActionButton.js";
 import {FaIcon} from "../../../js/ui/components/FaIcon.js";
 import {localStorageService} from "../../../js/localStorageService.js";
@@ -14,11 +14,11 @@ const html = htm.bind(h);
 
 const KEY_TAB_STICK_SHOW_ADVANCED = 'KEY_TAB_STICK_SHOW_ADVANCED';
 const KEY_TAB_STICK_SHOW_BARS = 'KEY_TAB_STICK_SHOW_BARS';
-class TabStickPad extends Component {
+class TabPad extends Component {
     constructor() {
         super();
 
-        TabStickPad.instance = this;
+        TabPad.instance = this;
         this.state = {};
         this.atCmds = [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y, C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y, C.AT_CMD_MAX_SPEED, C.AT_CMD_ACCELERATION,
             C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP, C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP, C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP];
@@ -26,7 +26,7 @@ class TabStickPad extends Component {
     }
 
     componentWillUnmount() {
-        TabStickPad.instance = null;
+        TabPad.instance = null;
     }
 
     initValues() {
@@ -43,7 +43,7 @@ class TabStickPad extends Component {
             additionalState[atCmd] = ATDevice.getConfig(atCmd);
         });
         this.setState(additionalState);
-        FLipMouse.resetMinMaxLiveValues();
+        FLipPad.resetMinMaxLiveValues();
     }
 
     valueChanged(value, constants) {
@@ -72,20 +72,20 @@ class TabStickPad extends Component {
 
         return html`
             <h2>${L.translate('Stick configuration (slot "{?}") // Stick-Konfiguration (Slot "{?}")', ATDevice.getCurrentSlot())}</h2>
-            <span id="posLiveA11yLabel" class="sr-only">${L.translate('Current position of FLipMouse Stick // Aktuelle Position des Sticks der FLipMouse')}</span>
+            <span id="posLiveA11yLabel" class="sr-only">${L.translate('Current position of FLipPad Stick // Aktuelle Position des Sticks der FLipPad')}</span>
             <span id="posLiveA11y" aria-describedby="posLiveA11yLabel" class="onlyscreenreader" role="status" aria-live="off" accesskey="q" tabindex="-1"></span>
 
             <div class="row mb-4">
                 <div class="col-12 col-md-6">
                     <div class="mb-5">
-                        ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => FLipMouse.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)}"/>`}
+                        ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => FLipPad.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)}"/>`}
                     </div>
                     <div class="mb-4">
-                        <button onclick="${() => FLipMouse.calibrate()}">
+                        <button onclick="${() => FLipPad.calibrate()}">
                             ${html`<${FaIcon} icon="far dot-circle"/>`}
                             <span>${L.translate('Calibrate middle position // Mittelposition kalibrieren')}</span>
                         </button>
-                        <button onclick="${() => FLipMouse.rotate()}">
+                        <button onclick="${() => FLipPad.rotate()}">
                             ${html`<${FaIcon} icon="fas redo"/>`}
                             <span>${L.translate('Rotate right // Nach rechts drehen')}</span>
                         </button>
@@ -185,16 +185,16 @@ class TabStickPad extends Component {
     }
 }
 
-TabStickPad.valueHandler = function (data) {
+TabPad.valueHandler = function (data) {
     if (PositionVisualization.instance) {
         PositionVisualization.instance.updateData(data);
     }
 };
 
-TabStickPad.slotChangeHandler = function (data) {
-    if (TabStickPad.instance) {
-        TabStickPad.instance.initValues();
+TabPad.slotChangeHandler = function (data) {
+    if (TabPad.instance) {
+        TabPad.instance.initValues();
     }
 };
 
-export {TabStickPad};
+export {TabPad};
