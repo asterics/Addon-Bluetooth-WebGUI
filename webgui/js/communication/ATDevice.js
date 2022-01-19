@@ -8,9 +8,17 @@ import {SerialCommunicator} from "../adapter/sercomm.js";
 let ATDevice = {};
 ATDevice.parseLiveData = true;
 
-let deviceClassPath = C.DEVICE_IS_FM ? '../../js_fm/communication/FLipMouse.js' : '../../js_fabi/communication/FABI.js';
+let deviceClassPath = '';
+if (C.DEVICE_IS_FM) {
+    deviceClassPath = '../../js_fm/communication/FLipMouse.js';
+} else if (C.DEVICE_IS_FABI) {
+    deviceClassPath = '../../js_fabi/communication/FABI.js';
+} else if (C.DEVICE_IS_FLIPPAD) {
+    deviceClassPath = '../../js_pad/communication/FLipPad.js';
+}
+
 import(deviceClassPath).then(module => {
-    //set ATDevice.Specific to instance of either FLipMouse or FABI class
+    //set ATDevice.Specific to instance of either FLipMouse, FLipPad or FABI class
     ATDevice.Specific = module.default;
 });
 
