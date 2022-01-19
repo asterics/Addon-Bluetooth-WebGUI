@@ -1,34 +1,40 @@
-import {FLipMouse} from "./communication/FLipMouse.js";
-import {TabStickPad} from "./ui/views/TabStickPad.js";
-import {TabSipPuff} from "../js/ui/views/TabSipPuff.js";
+import {FLipPad} from "./communication/FLipPad.js";
+import {TabPad} from "./ui/views/TabPad.js";
 import {TabSlots} from "../js/ui/views/TabSlots.js";
 import {TabActions} from "../js/ui/views/TabActions.js";
 import {TabGeneral} from "../js/ui/views/TabGeneral.js";
-import {TabVisualization} from "./ui/views/TabVisualization.js";
+import {TabVisualization} from "../js_fm/ui/views/TabVisualization.js";
 
 window.C = window.C || {};
 
 C.CURRENT_DEVICE = C.AT_DEVICE_FLIPPAD;
-C.DEVICE_IS_FABI = false;
-C.DEVICE_IS_FM = false;
-C.DEVICE_IS_FLIPPAD = true;
-C.DEVICE_IS_FM_OR_PAD = true;
+C.DEVICE_IS_FABI = C.CURRENT_DEVICE === C.AT_DEVICE_FABI;
+C.DEVICE_IS_FM = C.CURRENT_DEVICE === C.AT_DEVICE_FLIPMOUSE;
+C.DEVICE_IS_FLIPPAD = C.CURRENT_DEVICE === C.AT_DEVICE_FLIPPAD;
+C.DEVICE_IS_FM_OR_PAD = C.DEVICE_IS_FM || C.DEVICE_IS_FABI;
 C.MIN_FIRMWARE_VERSION = '2.11.1';
 C.MAX_NUMBER_SLOTS = 10;
 C.MAX_LENGTH_SLOTNAME = 13;
+
+C.TRANSLATION_FILTER = function (translationKey) {
+    if (translationKey && C.DEVICE_IS_FLIPPAD && !translationKey.toLowerCase().includes("joystick") && !translationKey.includes('[[')) {
+        translationKey = translationKey.replaceAll("Stick", "Pad");
+        translationKey = translationKey.replaceAll("stick", "pad");
+    } else if (C.DEVICE_IS_FLIPPAD && translationKey && translationKey.includes('[[')) {
+        translationKey = translationKey.replaceAll("[[", "");
+        translationKey = translationKey.replaceAll("]]", "");
+    }
+    return translationKey;
+}
 
 C.USB_DEVICE_FILTERS =  [
     {usbVendorId: 0x16c0} // Teensy
 ];
 
 C.VIEWS = [{
-    object: TabStickPad,
+    object: TabPad,
     hash: '#tabPad',
     label: 'Pad-Config'
-}, {
-    object: TabSipPuff,
-    hash: '#tabPuff',
-    label: 'Sip and Puff // Saug-Puste-Steuerung'
 }, {
     object: TabActions,
     hash: '#tabActions',
@@ -88,14 +94,14 @@ C.AT_CMDS_ACTIONS = C.AT_CMDS_ACTIONS.concat([{
     label: 'Play infrared command // Infrarot-Kommando abspielen',
     category: C.AT_CMD_CAT_IR,
     input: C.INPUTFIELD_TYPE_SELECT,
-    optionsFn: FLipMouse.getIRCommands
+    optionsFn: FLipPad.getIRCommands
 }, {
     cmd: C.AT_CMD_IR_HOLD,
     label: 'Hold infrared command (as long as input action) // Infrarot-Kommando halten (für Dauer der Eingabe-Aktion)',
     shortLabel: 'Hold IR command // IR-Kommando halten',
     category: C.AT_CMD_CAT_IR,
     input: C.INPUTFIELD_TYPE_SELECT,
-    optionsFn: FLipMouse.getIRCommands
+    optionsFn: FLipPad.getIRCommands
 }, {
     cmd: C.AT_CMD_JOYSTICK_X,
     label: 'Joystick set x-axis // Joystick x-Achse setzen',

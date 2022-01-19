@@ -19,9 +19,11 @@
     <script src="lib/loglevel.min.js"></script>
 
     <script>
-        window.C = window.C || {}; //set those 2 constants here in order to get dynamic import in ATDevice working
+        window.C = window.C || {}; //set those constants here in order to get dynamic import in ATDevice working
         C.DEVICE_IS_FABI = false;
         C.DEVICE_IS_FM = true;
+        C.DEVICE_IS_FLIPPAD = false;
+        C.DEVICE_IS_FM_OR_PAD = true;
     </script>
 
     <script type="module" src="js/constantsGeneric.js"></script>

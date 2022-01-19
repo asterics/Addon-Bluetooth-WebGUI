@@ -3,6 +3,7 @@ import {ATDevice} from "./communication/ATDevice.js";
 window.C = window.C || {};
 
 C.AT_DEVICE_FLIPMOUSE = 'FLipMouse';
+C.AT_DEVICE_FLIPPAD = 'FLipPad';
 C.AT_DEVICE_FABI = 'FABI';
 
 C.GUI_IS_HOSTED = window.location.href.indexOf('localhost') > -1 || window.location.href.indexOf('asterics.github.io') > -1 || window.location.href.indexOf('file://') > -1 || window.location.hostname.indexOf('asterics') > -1;

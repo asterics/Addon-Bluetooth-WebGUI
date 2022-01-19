@@ -1,6 +1,5 @@
 import {FLipMouse} from "./communication/FLipMouse.js";
 import {TabStick} from "./ui/views/TabStick.js";
-import {TabStickPad} from "./ui/views/TabStickPad.js";
 import {TabSipPuff} from "../js/ui/views/TabSipPuff.js";
 import {TabSlots} from "../js/ui/views/TabSlots.js";
 import {TabActions} from "../js/ui/views/TabActions.js";
@@ -10,9 +9,10 @@ import {TabVisualization} from "./ui/views/TabVisualization.js";
 window.C = window.C || {};
 
 C.CURRENT_DEVICE = C.AT_DEVICE_FLIPMOUSE;
-C.DEVICE_IS_FABI = false;
-C.DEVICE_IS_FM = true;
-C.DEVICE_IS_FLIPPAD = undefined;
+C.DEVICE_IS_FABI = C.CURRENT_DEVICE === C.AT_DEVICE_FABI;
+C.DEVICE_IS_FM = C.CURRENT_DEVICE === C.AT_DEVICE_FLIPMOUSE;
+C.DEVICE_IS_FLIPPAD = C.CURRENT_DEVICE === C.AT_DEVICE_FLIPPAD;
+C.DEVICE_IS_FM_OR_PAD = C.DEVICE_IS_FM || C.DEVICE_IS_FABI;
 C.MIN_FIRMWARE_VERSION = '2.11.0';
 C.MAX_NUMBER_SLOTS = 10;
 C.MAX_LENGTH_SLOTNAME = 13;
@@ -20,12 +20,6 @@ C.MAX_LENGTH_SLOTNAME = 13;
 C.USB_DEVICE_FILTERS =  [
     {usbVendorId: 0x16c0} // Teensy
 ];
-
-C.VIEW_TAB_PAD = {
-    object: TabStickPad,
-    hash: '#tabPad',
-    label: 'Pad-Config'
-};
 
 C.VIEWS = [{
     object: TabStick,
