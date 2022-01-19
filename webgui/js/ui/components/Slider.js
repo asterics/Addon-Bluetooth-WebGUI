@@ -14,6 +14,7 @@ class Slider extends Component {
         props.updateConstants = props.updateConstants || [];
         props.toggleFn = props.toggleFn || (() => {});
         props.toggleFnLabel = props.toggleFnLabel || '';
+        props.viewFactor = props.viewFactor || 1;
         let id = props.updateConstants[0];
         return html`
             <div class="d-flex justify-content-between">
@@ -21,7 +22,7 @@ class Slider extends Component {
                 <a class="${!props.toggleFnLabel ? 'd-none' : ''}" href="javascript:;" onclick="${() => props.toggleFn()}">${L.translate(props.toggleFnLabel)}</a>
             </div>
             <div class="row">
-                <span aria-hidden="true" class="col-sm-1">${props.value}</span>
+                <span aria-hidden="true" class="col-sm-1">${props.value * props.viewFactor}</span>
                 <input type="range" value="${props.value}" oninput="${(event) => props.oninput(event.target.value, props.updateConstants)}"
                        id="${id}" min="${props.min}" max="${props.max}" step="${props.step}" class="col-sm-11"/>
             </div>

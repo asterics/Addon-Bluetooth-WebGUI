@@ -146,26 +146,16 @@ class TabPad extends Component {
                 </div>
                 <div class="mt-4">
                     ${(() => {
-                        if (state.splitDriftcompRange) {
-                            return html`
-                            <${Slider} label="Horizontal trackpad sensitivity // Horizontale Trackpad-Sensitivität" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
-                                min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
-                                toggleFn="${() => this.toggleState('splitDriftcompRange', [C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>
-                            <${Slider} label="Vertical trackpad sensitivity // Vertikale Trackpad-Sensitivität" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"
-                                min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"/>`
-                        } else {
-                            return html`
-                            <${Slider} label="Trackpad sensitivity // Trackpad-Sensitivität" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
-                                min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"
-                                toggleFn="${() => this.toggleState('splitDriftcompRange', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
-                        }
+                        return html`
+                        <${Slider} label="Trackpad sensitivity // Trackpad-Sensitivität" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"
+                            min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"/>`
                     })()}
                 </div>
                 <div class="mt-4">
                     ${(() => {
                         return html`
-                        <${Slider} label="Tap duration for left click // Tap-Dauer für Linksklick" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
-                            min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP, C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"/>`
+                        <${Slider} label="Tap duration for left click // Tap-Dauer für Linksklick" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"
+                            min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}" viewFactor="${10}"/>`
                     })()}
                 </div>
             </div>
