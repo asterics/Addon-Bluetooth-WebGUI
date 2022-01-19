@@ -2,7 +2,6 @@ import { h, Component, render } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
 import {styleUtil} from '../../util/styleUtil.js';
 import {ATDevice} from "../../../js/communication/ATDevice.js";
-import {FLipMouse} from "../../communication/FLipMouse.js";
 import {FaIcon} from "../../../js/ui/components/FaIcon.js";
 import {localStorageService} from "../../../js/localStorageService.js";
 
@@ -60,19 +59,19 @@ class PositionVisualization extends Component {
     }
 
     updateData(data) {
-        let x = data[FLipMouse.LIVE_MOV_X];
-        let y = data[FLipMouse.LIVE_MOV_Y];
-        let maxX = data[FLipMouse.LIVE_MOV_X_MAX];
-        let maxY = data[FLipMouse.LIVE_MOV_Y_MAX];
-        let minX = data[FLipMouse.LIVE_MOV_X_MIN];
-        let minY = data[FLipMouse.LIVE_MOV_Y_MIN];
+        let x = data[ATDevice.Specific.LIVE_MOV_X];
+        let y = data[ATDevice.Specific.LIVE_MOV_Y];
+        let maxX = data[ATDevice.Specific.LIVE_MOV_X_MAX];
+        let maxY = data[ATDevice.Specific.LIVE_MOV_Y_MAX];
+        let minX = data[ATDevice.Specific.LIVE_MOV_X_MIN];
+        let minY = data[ATDevice.Specific.LIVE_MOV_Y_MIN];
         let deadX = ATDevice.getConfig(C.AT_CMD_DEADZONE_X);
         let deadY = ATDevice.getConfig(C.AT_CMD_DEADZONE_Y);
         this.state.maxPos = this.getMaxPosManual() !== undefined ? this.getMaxPosManual() : Math.max(maxX, maxY, Math.abs(minX), Math.abs(minY), Math.round(deadX * 1.1), Math.round(deadY * 1.1), this.state.maxPos);
         let percentageX = L.limitValue(L.getPercentage(x, -this.state.maxPos, this.state.maxPos), 0, 100);
         let percentageY = L.limitValue(L.getPercentage(y, -this.state.maxPos, this.state.maxPos), 0, 100);
-        let driftCompX = L.limitValue(L.getPercentage(data[FLipMouse.LIVE_DRIFTCOMP_X], -this.state.maxPos, this.state.maxPos), 0, 100);
-        let driftCompY = L.limitValue(L.getPercentage(data[FLipMouse.LIVE_DRIFTCOMP_Y], -this.state.maxPos, this.state.maxPos), 0, 100);
+        let driftCompX = L.limitValue(L.getPercentage(data[ATDevice.Specific.LIVE_DRIFTCOMP_X], -this.state.maxPos, this.state.maxPos), 0, 100);
+        let driftCompY = L.limitValue(L.getPercentage(data[ATDevice.Specific.LIVE_DRIFTCOMP_Y], -this.state.maxPos, this.state.maxPos), 0, 100);
 
         this.setState({
             liveData: data,
@@ -131,23 +130,23 @@ class PositionVisualization extends Component {
                         </div>
                         <div style="display: ${this.getValue(props.showAnalogBars, false) ? 'block' : 'none'}">
                             <div id="upPos" class="back-layer color-lightred"
-                                 style="top: ${50-this.getPercentLength(FLipMouse.LIVE_UP)}%; left: 48%; height: ${this.getPercentLength(FLipMouse.LIVE_UP)}%; width: 4%;"></div>
+                                 style="top: ${50-this.getPercentLength(ATDevice.Specific.LIVE_UP)}%; left: 48%; height: ${this.getPercentLength(ATDevice.Specific.LIVE_UP)}%; width: 4%;"></div>
                             <div id="downPos" class="back-layer color-lightred"
-                                 style="top: 50%; left: 48%; height: ${this.getPercentLength(FLipMouse.LIVE_DOWN)}%; width: 4%;"></div>
+                                 style="top: 50%; left: 48%; height: ${this.getPercentLength(ATDevice.Specific.LIVE_DOWN)}%; width: 4%;"></div>
                             <div id="leftPos" class="back-layer color-lightred"
-                                 style="top: 48%; left: ${50-this.getPercentLength(FLipMouse.LIVE_LEFT)}%; height: 4%; width: ${this.getPercentLength(FLipMouse.LIVE_LEFT)}%;"></div>
+                                 style="top: 48%; left: ${50-this.getPercentLength(ATDevice.Specific.LIVE_LEFT)}%; height: 4%; width: ${this.getPercentLength(ATDevice.Specific.LIVE_LEFT)}%;"></div>
                             <div id="rightPos" class="back-layer color-lightred"
-                                 style="top: 48%; left: 50%; height: 4%; width: ${this.getPercentLength(FLipMouse.LIVE_RIGHT)}%;"></div>
+                                 style="top: 48%; left: 50%; height: 4%; width: ${this.getPercentLength(ATDevice.Specific.LIVE_RIGHT)}%;"></div>
                         </div>
                         <div class="back-layer"
                              style="left: 50%; height: 100%; border-right-style: solid; border-right-width: thin;"></div>
                         <div class="back-layer"
                              style="top: 50%; width: 100%; border-bottom-style: solid; border-bottom-width: thin;"></div>
                         <div style="display: ${this.getValue(props.showAnalogValues, false) ? 'block' : 'none'}">
-                            <div id="upPosVal" class="back-layer" style="top: 0%; left: 52%">${data[FLipMouse.LIVE_UP]}</div>
-                            <div id="downPosVal" class="back-layer" style="top: 90%; left: 52%">${data[FLipMouse.LIVE_DOWN]}</div>
-                            <div id="leftPosVal" class="back-layer" style="top: 38%; left: 1%;">${data[FLipMouse.LIVE_LEFT]}</div>
-                            <div id="rightPosVal" class="back-layer" style="top: 38%; left: 88%">${data[FLipMouse.LIVE_RIGHT]}</div>
+                            <div id="upPosVal" class="back-layer" style="top: 0%; left: 52%">${data[ATDevice.Specific.LIVE_UP]}</div>
+                            <div id="downPosVal" class="back-layer" style="top: 90%; left: 52%">${data[ATDevice.Specific.LIVE_DOWN]}</div>
+                            <div id="leftPosVal" class="back-layer" style="top: 38%; left: 1%;">${data[ATDevice.Specific.LIVE_LEFT]}</div>
+                            <div id="rightPosVal" class="back-layer" style="top: 38%; left: 88%">${data[ATDevice.Specific.LIVE_RIGHT]}</div>
                         </div>
                         <div style="display: ${this.getValue(props.showMaxPos, false) ? 'block' : 'none'}">
                             <div id="cursorPosVal" class="back-layer" style="top: 90%; left: 2%;">${Math.round(this.state.maxPos)}</div>

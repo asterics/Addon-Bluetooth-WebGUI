@@ -2,7 +2,6 @@ import { h, Component, render } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
 import {styleUtil} from '../../util/styleUtil.js'
 import {ATDevice} from "../../../js/communication/ATDevice.js";
-import {FLipMouse} from "../../communication/FLipMouse.js";
 
 const html = htm.bind(h);
 
@@ -47,7 +46,7 @@ class BtnSipPuffVisualization extends Component {
         let data = this.state.liveData;
         let circleRadius = Math.min(70, window.innerWidth / 7);
         let fontStyle = `text-align: center; line-height: ${circleRadius}px; font-size: 30px`;
-        let getColor = (btnNum) => data[FLipMouse.LIVE_BUTTONS] && data[FLipMouse.LIVE_BUTTONS][btnNum] ? 'orange' : 'transparent';
+        let getColor = (btnNum) => data[ATDevice.Specific.LIVE_BUTTONS] && data[ATDevice.Specific.LIVE_BUTTONS][btnNum] ? 'orange' : 'transparent';
 
         let liveP = data[C.LIVE_PRESSURE];
         let sip = ATDevice.getConfig(C.AT_CMD_SIP_THRESHOLD);
