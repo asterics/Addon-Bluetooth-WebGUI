@@ -78,7 +78,7 @@ class TabPad extends Component {
             <div class="row mb-4">
                 <div class="col-12 col-md-6">
                     <div class="mb-5">
-                        ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => FLipPad.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)}"/>`}
+                        ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => {FLipPad.setFlipmouseMode(value); this.forceUpdate();}}" elements="${C.FLIPMOUSE_MODES}" value="${ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)}"/>`}
                     </div>
                     <div class="mb-4">
                         <button onclick="${() => FLipPad.calibrate()}">
@@ -140,7 +140,7 @@ class TabPad extends Component {
                 </a>
             </div>
             <div class="${state.showAdvanced ? '' : 'd-none'}">
-                <div class="mt-4">
+                <div class="mt-4 ${ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPPAD_MODE_MOUSE.value ? '' : 'd-none'}">
                     ${html`<${Slider} label="Acceleration: // Beschleunigung:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_ACCELERATION]}"
                         min="0" max="100" updateConstants="${[C.AT_CMD_ACCELERATION]}"/>`}
                 </div>
@@ -154,7 +154,7 @@ class TabPad extends Component {
                 <div class="mt-4">
                     ${(() => {
                         return html`
-                        <${Slider} label="Tap duration for left click // Tap-Dauer für Linksklick" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"
+                        <${Slider} label="Maximum tap duration for left click [ms] // Maximale Tap-Dauer für Linksklick [ms]" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"
                             min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}" viewFactor="${10}"/>`
                     })()}
                 </div>
