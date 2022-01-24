@@ -1,5 +1,6 @@
 import {FLipPad} from "./communication/FLipPad.js";
 import {TabPad} from "./ui/views/TabPad.js";
+import {TabSipPuff} from "../js/ui/views/TabSipPuff.js";
 import {TabSlots} from "../js/ui/views/TabSlots.js";
 import {TabActions} from "../js/ui/views/TabActions.js";
 import {TabGeneral} from "../js/ui/views/TabGeneral.js";
@@ -35,6 +36,10 @@ C.VIEWS = [{
     object: TabPad,
     hash: '#tabPad',
     label: 'Pad-Config'
+}, {
+    object: TabSipPuff,
+    hash: '#tabPuff',
+    label: 'Sip and Puff // Saug-Puste-Steuerung'
 }, {
     object: TabActions,
     hash: '#tabActions',
