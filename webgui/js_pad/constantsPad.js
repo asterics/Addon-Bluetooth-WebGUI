@@ -241,19 +241,19 @@ C.BTN_MODES = [{
     category: C.BTN_CAT_STICKPLUS
 }, {
     index: 16,
-    label: 'Strong Puff + Up // Stark pusten + nach oben',
+    label: 'Double tap + Up // 2x tippen + nach oben',
     category: C.BTN_CAT_STICKPLUS
 }, {
     index: 17,
-    label: 'Strong Puff + Down // Stark pusten + nach unten',
+    label: 'Double tap + Down // 2x tippen + nach unten',
     category: C.BTN_CAT_STICKPLUS
 }, {
     index: 18,
-    label: 'Strong Puff + Left // Stark pusten + nach links',
+    label: 'Double tap + Left // 2x tippen + nach links',
     category: C.BTN_CAT_STICKPLUS
 }, {
     index: 19,
-    label: 'Strong Puff + Right // Stark pusten + nach rechts',
+    label: 'Double tap + Right // 2x tippen + nach rechts',
     category: C.BTN_CAT_STICKPLUS
 }];
 
