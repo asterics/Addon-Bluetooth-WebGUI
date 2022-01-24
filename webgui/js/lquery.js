@@ -255,6 +255,15 @@ L.translate = function (translationKey) {
     return translated;
 };
 
+L.translateKeepArgs = function (translationKey) {
+    translationKey = translationKey.replaceAll('{?}', '{$}');
+    let translation = L.translate(translationKey);
+    for (let i = 1; i < arguments.length; i++) {
+        translation = translation.replace('{$}', arguments[i]);
+    }
+    return translation;
+}
+
 L.getLastElement = function (array) {
     return array.slice(-1)[0];
 };
