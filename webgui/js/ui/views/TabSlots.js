@@ -25,8 +25,15 @@ class TabSlots extends Component {
             showDemoDescription: false,
             selectedFileValid: undefined
         }
-
-        L.HTTPRequest(`https://api.github.com/repos/asterics/${C.DEVICE_IS_FM_OR_PAD ? 'FLipMouse' : 'FABI'}/contents/Settings`, 'GET', 'json').then(result => {
+        let url = '';
+        if (C.DEVICE_IS_FABI) {
+            url = 'https://api.github.com/repos/asterics/FABI/contents/Settings';
+        } else if(C.DEVICE_IS_FM) {
+            url = 'https://api.github.com/repos/asterics/FLipMouse/contents/Settings';
+        } else if(C.DEVICE_IS_FLIPPAD) {
+            url = 'https://api.github.com/repos/asterics/FLipMouse/contents/SettingsFlippad';
+        }
+        L.HTTPRequest(url, 'GET', 'json').then(result => {
             this.setState({
                 demoSettings: result
             })
