@@ -19,11 +19,12 @@ self.addEventListener('activate', event => {
 });
 
 workbox.routing.registerRoute(({url, request, event}) => {
-    let isApiCall = url.pathname.includes("proxy.asterics-foundation.org") || url.pathname.includes("api.github.com");
-    return (url.pathname.indexOf('serviceWorker.js') === -1 && url.pathname.indexOf('workbox-sw.js') === -1 && !isApiCall); //do not cache serviceWorker.js
+    let isApiCall = url.origin.includes("proxy.asterics-foundation.org") || url.origin.includes("api.github.com");
+    let useStale = (url.pathname.indexOf('serviceWorker.js') === -1 && url.pathname.indexOf('workbox-sw.js') === -1 && !isApiCall); //do not cache serviceWorker.js
+    return useStale;
 }, new workbox.strategies.StaleWhileRevalidate());
 
 workbox.routing.registerRoute(({url, request, event}) => {
-    let isApiCall = url.pathname.includes("proxy.asterics-foundation.org") || url.pathname.includes("api.github.com");
+    let isApiCall = url.origin.includes("proxy.asterics-foundation.org") || url.origin.includes("api.github.com");
     return isApiCall;
 }, new workbox.strategies.NetworkFirst());
