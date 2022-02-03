@@ -37,15 +37,17 @@ class ActionEditModal extends Component {
         this.updateSelect(currentAtCmdObject);
     }
 
-    selectActionCategory(category) {
+    selectActionCategory(category, dontChangeAtCmd) {
         let possible = C.AT_CMDS_ACTIONS.filter(atCmd => category === ActionEditModal.ALL_CATEGORIES || atCmd.category === category);
-        let atCmd = possible.includes(this.state.atCmd) ? this.state.atCmd : possible[0];
-        atCmd = !this.state.atCmdSelectedByUser && possible.map(atCmd => atCmd.cmd).includes(this.state.originalState.atCmd.cmd) ? this.state.originalState.atCmd : atCmd;
         this.setState({
             showCategory: category,
             possibleAtCmds: possible
         });
-        this.setAtCmd(atCmd.cmd);
+        if (!dontChangeAtCmd) {
+            let atCmd = possible.includes(this.state.atCmd) ? this.state.atCmd : possible[0];
+            atCmd = !this.state.atCmdSelectedByUser && possible.map(atCmd => atCmd.cmd).includes(this.state.originalState.atCmd.cmd) ? this.state.originalState.atCmd : atCmd;
+            this.setAtCmd(atCmd.cmd);
+        }
     }
 
     setAtCmd(atCmdString) {
@@ -122,13 +124,14 @@ class ActionEditModal extends Component {
     }
 
     clearCommand() {
-        this.selectActionCategory(ActionEditModal.ALL_CATEGORIES);
         this.setAtCmd(C.AT_CMD_NO_CMD);
+        this.selectActionCategory(ActionEditModal.ALL_CATEGORIES, true);
         let originalState = JSON.parse(JSON.stringify(this.state.originalState));
         originalState.atCmd = C.AT_CMDS_ACTIONS.filter(atCmd => atCmd.cmd === C.AT_CMD_NO_CMD)[0];
         this.setState({
             atCmdSelectedByUser: true,
-            originalState: originalState
+            originalState: originalState,
+            atCmdSuffix: ''
         });
     }
     
