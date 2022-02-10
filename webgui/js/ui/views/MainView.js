@@ -266,7 +266,7 @@ class MainView extends Component {
                 </div>
                 <div style="margin-top: 6em">
                     ${(C.ADDITIONAL_LINKS || []).map(link => html`
-                        <div><a rel="noreferrer" href="${link.url}" target="_blank">${L.translate(link.label)}</a></div>
+                        <div><a rel="noreferrer" href="${L.translate(link.url)}" target="_blank">${L.translate(link.label)}</a></div>
                     `)}
                     <a rel="noreferrer" href="init.html?device=${C.CURRENT_DEVICE}">${L.translate('Device initialization // Geräte-Initialisierung')}</a>
                 </div>
@@ -316,7 +316,7 @@ class MainView extends Component {
         <footer class="container-fluid p-0 ${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}" style="border-top: 2px solid #0D5F77">
             <div class="d-flex justify-content-md-around flex-column flex-md-row">
                 ${(C.ADDITIONAL_LINKS || []).map(link => html`
-                        <a rel="noreferrer" href="${link.url}" target="_blank" style="padding-top: 1em">${L.translate(link.label)}</a>
+                        <a rel="noreferrer" href="${L.translate(link.url)}" target="_blank" style="padding-top: 1em">${L.translate(link.label)}</a>
                     `)}
             </div>
         </footer>

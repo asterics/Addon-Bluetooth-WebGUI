@@ -66,7 +66,7 @@ C.ADDITIONAL_LINKS = [{
     url: 'https://github.com/asterics/FLipMouse/blob/master/LICENSE'
 }, {
     label: 'Legal Notice // Impressum',
-    url: L.translate('https://www.asterics-foundation.org/legal-notice/ // https://www.asterics-foundation.org/impressum/')
+    url: 'https://www.asterics-foundation.org/legal-notice/ // https://www.asterics-foundation.org/impressum/'
 }]
 
 C.AT_CMD_CATEGORIES = [{

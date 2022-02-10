@@ -44,7 +44,10 @@ C.VIEW_START_HASH = '#tabActions';
 
 C.ADDITIONAL_LINKS = [{
     label: 'More information about FABI // Mehr Infos zu FABI',
-    url: L.translate('https://www.asterics-foundation.org/projects/fabi/ // https://www.asterics-foundation.org/projekte-2/fabi/')
+    url: 'https://www.asterics-foundation.org/projects/fabi/ // https://www.asterics-foundation.org/projekte-2/fabi/'
+}, {
+    label: 'User manual // Benutzerhandbuch',
+    url: 'https://github.com/asterics/FABI/blob/master/Documentation/UserManual/Markdown/Fabi%20User%20Manual.md // https://github.com/asterics/FABI/blob/master/Documentation/UserManual/Markdown/Fabi%20Anwendungsanleitung.md'
 }, {
     label: 'Ask questions about FABI // Eine Frage zu FABI stellen',
     url: 'https://q2a.wbt.wien/ask'
@@ -53,7 +56,7 @@ C.ADDITIONAL_LINKS = [{
     url: 'https://github.com/asterics/FABI/blob/master/LICENSE'
 }, {
     label: 'Legal Notice // Impressum',
-    url: L.translate('https://www.asterics-foundation.org/legal-notice/ // https://www.asterics-foundation.org/impressum/')
+    url: 'https://www.asterics-foundation.org/legal-notice/ // https://www.asterics-foundation.org/impressum/'
 }]
 
 C.AT_CMD_CATEGORIES = [{
