@@ -183,6 +183,7 @@ class TabGeneral extends Component {
                 <span>${L.translate('The following keyboard shortcuts can be used on this page: // Die folgenden Tastenkombinationen können auf dieser Seite verwendet werden:')}</span>
                 <ul>
                     <li class="${C.DEVICE_IS_FM_OR_PAD ? '' : 'd-none'}"><b>${L.translate('Ctrl + C // Strg + C')}:</b> <span>${L.translate('Calibrate FLipMouse middle position // Mittelposition der FLipMouse kalibrieren')}</span></li>
+                    <li><b>${L.translate('F1')}:</b> <span>${L.translate('Open manual section for the currently active tab // Benutzerhandbuch-Abschnitt zum aktuell geöffneten Tab öffnen')}</span></li>
                     <li><b>${L.translate('Ctrl + [1-{?}] // Strg + [1-{?}]', C.VIEWS.length)}:</b> <span>${L.translate('Jump to tab with the chosen number // Springe zu Tab mit der gewählten Nummer')}</span></li>
                     <li><b>${L.translate('Ctrl + Space // Strg + Leertaste')}:</b> <span>${L.translate('Jump to last tab // Springe zu vorherigem Tab')}</span></li>
                     <li class="${C.DEVICE_IS_FM_OR_PAD ? '' : 'd-none'}"><b>${L.translate('Ctrl + B // Strg + B')}:</b> <span>${L.translate('Show / hide analog values in visualization // Zeigen / Verstecken der analogen Werte in der Visualisierung')}</span></li>
