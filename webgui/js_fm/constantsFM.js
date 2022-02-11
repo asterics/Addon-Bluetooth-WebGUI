@@ -16,6 +16,7 @@ C.DEVICE_IS_FM_OR_PAD = C.DEVICE_IS_FM || C.DEVICE_IS_FLIPPAD;
 C.MIN_FIRMWARE_VERSION = '2.11.0';
 C.MAX_NUMBER_SLOTS = 10;
 C.MAX_LENGTH_SLOTNAME = 13;
+C.HELP_BASE_URL = 'https://github.com/asterics/FLipMouse/blob/master/Documentation/UserManual/Markdown/FLipMouseUserManual.md // https://github.com/asterics/FLipMouse/blob/master/Documentation/UserManual/Markdown/FLipMouseAnwendungsanleitung.md';
 
 C.USB_DEVICE_FILTERS =  [
     {usbVendorId: 0x16c0} // Teensy
@@ -24,27 +25,33 @@ C.USB_DEVICE_FILTERS =  [
 C.VIEWS = [{
     object: TabStick,
     hash: '#tabStick',
-    label: 'Stick-Config'
+    label: 'Stick-Config',
+    helpHash: '#stick-configuration-tab-stick-config // #stick-konfiguration-tab-stick-config'
 }, {
     object: TabSipPuff,
     hash: '#tabPuff',
-    label: 'Sip and Puff // Saug-Puste-Steuerung'
+    label: 'Sip and Puff // Saug-Puste-Steuerung',
+    helpHash: '#sippuff-actions-and-levels-tab-sip-and-puff // #saugpuste-aktionen-and-schwellenwerte-tab-saug-puste-steuerung'
 }, {
     object: TabActions,
     hash: '#tabActions',
-    label: 'Actions // Aktionen'
+    label: 'Actions // Aktionen',
+    helpHash: '#assignment-of-different-actions-tab-actions // #zuweisung-von-verschiedenen-aktionen-tab-aktionen'
 }, {
     object: TabSlots,
     hash: '#tabSlots',
-    label: 'Slots // Slots'
+    label: 'Slots // Slots',
+    helpHash: '#using-configuration-slots-tab-slots // #speicherplätze-verwalten-tab-slots'
 }, {
     object: TabGeneral,
     hash: '#tabGeneral',
-    label: 'General // Allgemein'
+    label: 'General // Allgemein',
+    helpHash: '#general-settings-tab-general // #allgemeine-einstellungen-tab-allgemein'
 }, {
     object: TabVisualization,
     hash: '#tabVis',
-    label: 'Visualization // Visualisierung'
+    label: 'Visualization // Visualisierung',
+    helpHash: '#view-force-levels-tab-visualization // #kraftstufen-anzeigen-tab-visualisierung'
 }];
 
 C.ADDITIONAL_LINKS = [{
@@ -52,7 +59,7 @@ C.ADDITIONAL_LINKS = [{
     url: 'https://www.asterics-foundation.org/projects/the-flipmouse/ // https://www.asterics-foundation.org/projekte-2/flipmouse/'
 }, {
     label: 'User manual // Benutzerhandbuch',
-    url: 'https://github.com/asterics/FLipMouse/blob/master/Documentation/UserManual/Markdown/FLipMouseUserManual.md // https://github.com/asterics/FLipMouse/blob/master/Documentation/UserManual/Markdown/FLipMouseAnwendungsanleitung.md'
+    url: C.HELP_BASE_URL
 }, {
     label: 'Ask as question // Eine Frage stellen',
     url: 'https://q2a.wbt.wien/ask'

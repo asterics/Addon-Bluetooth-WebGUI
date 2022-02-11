@@ -16,6 +16,7 @@ C.DEVICE_IS_FM_OR_PAD = C.DEVICE_IS_FM || C.DEVICE_IS_FLIPPAD;
 C.MIN_FIRMWARE_VERSION = '2.11.1';
 C.MAX_NUMBER_SLOTS = 10;
 C.MAX_LENGTH_SLOTNAME = 13;
+C.HELP_BASE_URL = '';
 
 C.TRANSLATION_FILTER = function (translationKey) {
     if (translationKey && C.DEVICE_IS_FLIPPAD && !translationKey.toLowerCase().includes("joystick") && !translationKey.includes('[[')) {

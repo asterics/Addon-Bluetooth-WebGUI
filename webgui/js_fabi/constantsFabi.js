@@ -14,6 +14,7 @@ C.DEVICE_IS_FM_OR_PAD = C.DEVICE_IS_FM || C.DEVICE_IS_FLIPPAD;
 C.MIN_FIRMWARE_VERSION = '2.5.0';
 C.MAX_NUMBER_SLOTS = 10;
 C.MAX_LENGTH_SLOTNAME = 11;
+C.HELP_BASE_URL = 'https://github.com/asterics/FABI/blob/master/Documentation/UserManual/Markdown/Fabi%20User%20Manual.md // https://github.com/asterics/FABI/blob/master/Documentation/UserManual/Markdown/Fabi%20Anwendungsanleitung.md';
 
 C.USB_DEVICE_FILTERS =  [
     {usbVendorId: 0x2341, usbProductId: 0x8037} // Arduino Pro Micro
@@ -22,23 +23,28 @@ C.USB_DEVICE_FILTERS =  [
 C.VIEWS = [{
     object: TabActions,
     hash: '#tabActions',
-    label: 'Actions // Aktionen'
+    label: 'Actions // Aktionen',
+    helpHash: '#actions-tab-assigning-button-functions // #zuweisung-der-taster-funktionen-reiter-aktionen'
 }, {
     object: TabSlots,
     hash: '#tabSlots',
-    label: 'Slots // Slots'
+    label: 'Slots // Slots',
+    helpHash: '#slots-tab-using-configuration-slots // #verwendung-der-speicherplätze-reiter-slots'
 }, {
     object: TabTimings,
     hash: '#tabTimings',
-    label: 'Timings'
+    label: 'Timings',
+    helpHash: '#timings-tab-antitremor-and-special-functions // #einstellmöglichkeiten-im-reiter-timings'
 }, {
     object: TabSipPuff,
     hash: '#tabPuff',
-    label: 'Sip and Puff // Saug-Puste-Steuerung'
+    label: 'Sip and Puff // Saug-Puste-Steuerung',
+    helpHash: '#sip-and-puff-tab-using-a-pressure-sensor // #verwendung-eines-drucksensors-sip-puff---reiter-saug-puste-steuerung'
 }, {
     object: TabGeneral,
     hash: '#tabGeneral',
-    label: 'General // Allgemein'
+    label: 'General // Allgemein',
+    helpHash: '#general-tab-bluetooth-and-firmware-options // #einstellmöglichkeiten-im-reiter-allgemein'
 }];
 C.VIEW_START_HASH = '#tabActions';
 
@@ -47,7 +53,7 @@ C.ADDITIONAL_LINKS = [{
     url: 'https://www.asterics-foundation.org/projects/fabi/ // https://www.asterics-foundation.org/projekte-2/fabi/'
 }, {
     label: 'User manual // Benutzerhandbuch',
-    url: 'https://github.com/asterics/FABI/blob/master/Documentation/UserManual/Markdown/Fabi%20User%20Manual.md // https://github.com/asterics/FABI/blob/master/Documentation/UserManual/Markdown/Fabi%20Anwendungsanleitung.md'
+    url: C.HELP_BASE_URL
 }, {
     label: 'Ask questions about FABI // Eine Frage zu FABI stellen',
     url: 'https://q2a.wbt.wien/ask'

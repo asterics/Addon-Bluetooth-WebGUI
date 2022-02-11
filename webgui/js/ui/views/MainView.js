@@ -4,6 +4,7 @@ import {ATDevice} from "../../communication/ATDevice.js";
 import {localStorageService} from "../../localStorageService.js";
 import {FaIcon} from "../components/FaIcon.js";
 import {firmwareUtil} from "../../util/firmwareUtil.js";
+import {helpUtil} from "../../util/helpUtil.js";
 
 const html = htm.bind(h);
 
@@ -22,7 +23,6 @@ class MainView extends Component {
         MainView.instance = this;
         MainView.lastViewHash = '';
         this.state = {
-            views: [],
             currentView: {},
             showScreen: SCREENS.CONNECTION,
             currentSlot: null,
@@ -33,10 +33,6 @@ class MainView extends Component {
             showSuccessMsg: window.location.href.indexOf(C.SUCCESS_FIRMWAREUPDATE) > -1,
             updateProgress: null
         }
-
-        C.VIEWS.forEach(view => {
-            this.addView(view.hash, view.object, view.label);
-        });
 
         L('html')[0].lang = L.getLang();
         if (C.GUI_IS_MOCKED_VERSION || C.GUI_IS_ON_DEVICE) {
@@ -108,24 +104,13 @@ class MainView extends Component {
         });
     }
 
-    addView(hash, viewObject, label) {
-        let views = this.state.views || [];
-        views.push({
-            hash: hash,
-            object: viewObject,
-            label: label
-        });
-        this.setState({
-            views: views
-        })
-    }
-
     toView(viewHash) {
         MainView.lastViewHash = this.state.currentView ? this.state.currentView.hash : '';
-        let viewHashes = this.state.views.map(el => el.hash);
+        let viewHashes = C.VIEWS.map(el => el.hash);
         viewHash = viewHash || window.location.hash;
         viewHash = viewHashes.includes(viewHash) ? viewHash : C.VIEW_START_HASH || viewHashes[0];
-        let view = this.state.views.filter(el => el.hash === viewHash)[0];
+        let view = C.VIEWS.filter(el => el.hash === viewHash)[0];
+        helpUtil.setHash(view.helpHash);
 
         this.setState({
             currentView: view,
@@ -300,7 +285,7 @@ class MainView extends Component {
             <div class="container-fluid">
                 <nav class="row mb-5" id="tabMenu" role="tablist" tabindex="-1" accesskey="0">
                     <button id="toNavLink" onclick="${() => this.setState({menuOpen: !state.menuOpen})}" class="col d-md-none button button-primary">${L.translate('\u2630 Menu // \u2630 Menü')}</button>
-                    ${state.views.map(view => html`
+                    ${C.VIEWS.map(view => html`
                         <button role="tab" onclick="${() => this.toView(view.hash)}" class="col-md m-1 d-md-block menubutton button-primary ${state.menuOpen ? '' : 'd-none'} ${state.currentView.hash === view.hash ? 'selected' : ''}" aria-selected="${state.currentView.hash === view.hash}">
                             ${L.translate(view.label)}
                         </button>
