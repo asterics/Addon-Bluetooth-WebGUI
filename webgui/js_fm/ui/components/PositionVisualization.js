@@ -1,4 +1,4 @@
-import { h, Component, render } from '../../../lib/preact.min.js';
+import { h, Component, createRef } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
 import {styleUtil} from '../../util/styleUtil.js';
 import {ATDevice} from "../../../js/communication/ATDevice.js";
@@ -9,6 +9,9 @@ const html = htm.bind(h);
 
 const KEY_POS_VIS_MAX_POS_ZOOM = 'KEY_POS_VIS_MAX_POS_ZOOM';
 class PositionVisualization extends Component {
+
+    canvasRef = createRef();
+    posVisRef = createRef();
 
     constructor(props) {
         super();
@@ -98,6 +101,18 @@ class PositionVisualization extends Component {
         localStorageService.save(KEY_POS_VIS_MAX_POS_ZOOM, value);
     }
 
+    componentDidUpdate() {
+        let posVisSize = this.posVisRef.current.getBoundingClientRect().width;
+        let canvas = this.canvasRef.current;
+        canvas.width = posVisSize;
+        canvas.height = posVisSize;
+        let ctx = canvas.getContext('2d');
+        ctx.beginPath();
+        ctx.ellipse(ctx.canvas.width / 2, ctx.canvas.height / 2, ctx.canvas.width * this.state.pDzX / 200, ctx.canvas.height * this.state.pDzY / 200, 0, 0, 2 * Math.PI);
+        ctx.fillStyle = this.state.inDeadzone ? '#9be7ff' : '#cceff9';
+        ctx.fill();
+    }
+
     render(props) {
         if (this.stateListener) {
             this.stateListener(this.state);
@@ -106,7 +121,8 @@ class PositionVisualization extends Component {
         let state = this.state;
         let data = this.state.liveData;
         return html`<div id="posVis" aria-hidden="true">
-                    <div class="relative center-div cursorPosWrapper">
+                    <div ref="${this.posVisRef}" class="relative center-div cursorPosWrapper full-vis-size">
+                        <canvas id="DeadzoneCanvas" ref="${this.canvasRef}" class="back-layer full-vis-size ${props.showDeadzone ? '' : 'd-none'}"></canvas>
                         <div style="display: ${this.getValue(props.showZoom, false) ? 'block' : 'none'};">
                             <div id="zoomButtons" style="top: 1%; left: 1%; position: absolute; width: 100%">
                                 <div class="relative">
@@ -119,10 +135,6 @@ class PositionVisualization extends Component {
                             <div id="orientationSign" class="back-layer full-height full-width" style="transform: rotate(${(ATDevice.getConfig(C.AT_CMD_ORIENTATION_ANGLE))%360}deg);">
                                 <div class="back-layer" style="top:100%; left: 35%; width: 30%; height: 10%; background-color: black; z-index: 2"></div>
                             </div>
-                        </div>
-                        <div style="display: ${this.getValue(props.showDeadzone, false) ? 'block' : 'none'}">
-                            <div id="deadZonePos" class="back-layer ${state.inDeadzone ? 'color-lightcyan' : 'color-lightercyan'}"
-                                 style="top: ${Math.max(100 - this.state.pDzY, 0) / 2}%; left: ${Math.max(100 - this.state.pDzX, 0) / 2}%; height: ${Math.min(this.state.pDzY, 100)}%; width: ${Math.min(this.state.pDzX, 100)}%;"></div>
                         </div>
                         <div style="display: ${this.getValue(props.showDeadzone, false) ? 'block' : 'none'}">
                             <div id="driftComp" class="back-layer"

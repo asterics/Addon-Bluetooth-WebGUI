@@ -169,15 +169,18 @@ label {
 }
 
 .cursorPosWrapper {
-    border: medium solid;
+    outline: medium solid;
     background-color: transparent;
+    margin-bottom: 2em;
+}
+
+.full-vis-size {
     min-height: 200px;
     min-width: 200px;
     height: 20vw;
     width: 20vw;
     max-width: 350px;
     max-height: 350px;
-    margin-bottom: 2em;
 }
 
 .color-lightcyan {
