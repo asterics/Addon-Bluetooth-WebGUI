@@ -118,14 +118,14 @@ class TabPad extends Component {
                     if (state.splitDeadzone) {
                         return html`
                         <${Slider} label="Horizontal Deadzone: // <span lang="en">Deadzone</span> horizontal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
-                            min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_X]}"
+                            min="0" max="200" updateConstants="${[C.AT_CMD_DEADZONE_X]}"
                             toggleFn="${() => this.toggleState('splitDeadzone', [C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>
                         <${Slider} label="Vertical Deadzone: // <span lang="en">Deadzone</span> vertikal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_Y]}"
-                            min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_Y]}"/>`
+                            min="0" max="200" updateConstants="${[C.AT_CMD_DEADZONE_Y]}"/>`
                     } else {
                         return html`
                         <${Slider} label="<span lang="en">Deadzone:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
-                            min="0" max="650" updateConstants="${[C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y]}"
+                            min="0" max="200" updateConstants="${[C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y]}"
                             toggleFn="${() => this.toggleState('splitDeadzone', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
                     }
                 })()}
@@ -156,6 +156,13 @@ class TabPad extends Component {
                         return html`
                         <${Slider} label="Maximum tap duration for left click [ms] // Maximale Tap-Dauer für Linksklick [ms]" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"
                             min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}" viewFactor="${10}"/>`
+                    })()}
+                </div>
+                <div class="mt-4">
+                    ${(() => {
+                        return html`
+                        <${Slider} label="Maximum tap-slide duration [ms] // Maximale Tap-Slide Dauer [ms]" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
+                            min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}" viewFactor="${10}"/>`
                     })()}
                 </div>
             </div>
