@@ -15,6 +15,7 @@ class TabVisualization extends Component {
         TabVisualization.instance = this;
         this.setState({
             showDeadzone: stored.showDeadzone !== undefined ? stored.showDeadzone : false,
+            showDriftComp: stored.showDriftComp !== undefined ? stored.showDriftComp : false,
             showAnalogBars: stored.showAnalogBars !== undefined ? stored.showAnalogBars : true,
             showAnalogValues: stored.showAnalogValues !== undefined ? stored.showAnalogValues : true,
             showMaxPos: stored.showMaxPos !== undefined ? stored.showMaxPos : false,
@@ -39,7 +40,7 @@ class TabVisualization extends Component {
         return html`<h2 id="tabVisHeader" style="margin-bottom: 2em">${L.translate('Visualization of current state // Visualisierung aktueller Status')}</h2>
             <div class="row" style="margin-bottom: 2em">
                 <div id="tabVisVisContainer" class="col-12 col-lg-3 col-xl-4">
-                    <${PositionVisualization} showDeadzone="${state.showDeadzone}" showAnalogBars="${state.showAnalogBars}" showAnalogValues="${state.showAnalogValues}" showMaxPos="${state.showMaxPos}" showOrientation="${state.showOrientation}" maxPosManual="${state.maxPosManual}"/>
+                    <${PositionVisualization} showDeadzone="${state.showDeadzone}" showDriftComp="${state.showDriftComp}" showAnalogBars="${state.showAnalogBars}" showAnalogValues="${state.showAnalogValues}" showMaxPos="${state.showMaxPos}" showOrientation="${state.showOrientation}" maxPosManual="${state.maxPosManual}"/>
                 </div>
                 <div id="tabVisBtnSipVis" class="col-12 col-lg-9 col-xl-8">
                     <${BtnSipPuffVisualization}/>
@@ -55,7 +56,8 @@ class TabVisualization extends Component {
                     <div style="font-weight: bold">${L.translate('Show/hide elements // Elemente anzeigen/verstecken')}</div>
                 </div>
                 <div class="row" style="margin-top: 1em">
-                    <button class="col-12 col-md m-1" onclick="${() => this.toggleState('showDeadzone')}">Deadzone & Driftcomp</button>
+                    <button class="col-12 col-md m-1" onclick="${() => this.toggleState('showDeadzone')}">Deadzone</button>
+                    <button class="col-12 col-md m-1 ${C.DEVICE_IS_FLIPPAD ? 'd-none' : ''}" onclick="${() => this.toggleState('showDriftComp')}">Driftcomp</button>
                     <button class="col-12 col-md m-1" onclick="${() => this.toggleState('showAnalogBars')}">Bars</button>
                     <button class="col-12 col-md m-1" onclick="${() => this.toggleState('showAnalogValues')}">Values</button>
                     <button class="col-12 col-md m-1" onclick="${() => this.toggleState('showMaxPos')}">Max. Position</button>
