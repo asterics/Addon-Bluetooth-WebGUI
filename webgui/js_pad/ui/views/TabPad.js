@@ -150,14 +150,14 @@ class TabPad extends Component {
                 <div class="mt-4">
                     ${(() => {
                         return html`
-                        <${Slider} label="Maximum tap duration for left click [ms] // Maximale Tap-Dauer für Linksklick [ms]" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"
+                        <${Slider} label="Maximum tap duration [ms] (0=disable) // Maximale Tap-Dauer [ms] (0=deaktiviert)" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"
                             min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}" viewFactor="${10}"/>`
                     })()}
                 </div>
                 <div class="mt-4">
                     ${(() => {
                         return html`
-                        <${Slider} label="Maximum tap-slide duration [ms] // Maximale Tap-Slide Dauer [ms]" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
+                        <${Slider} label="Maximum duration of Tap + Slide gestures [ms] (0=disable) // Maximale Dauer von Tippen + Wischen Gesten [ms] (0=deaktiviert)" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
                             min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}" viewFactor="${10}"/>`
                     })()}
                 </div>
