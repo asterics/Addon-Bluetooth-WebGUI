@@ -92,7 +92,7 @@ class TabPad extends Component {
                     </div>
                 </div>
                 <div class="col-12 col-md-6 mt-4 mt-md-0">
-                    <${PositionVisualization} showAnalogBars="${state.showAnalogBars}" showAnalogValues="${state.showAnalogBars}" showDeadzone="${true}" showOrientation="${true}" showMaxPos="${true}" circleRadius="${10}" showZoom="${true}"/>
+                    <${PositionVisualization} showAnalogBars="${state.showAnalogBars}" showAnalogValues="${state.showAnalogBars}" showDeadzone="${true}" showDrfitComp="${false}" showOrientation="${true}" showMaxPos="${true}" circleRadius="${10}" showZoom="${true}"/>
                 </div>
             </div>
             

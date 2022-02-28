@@ -70,11 +70,16 @@ class PositionVisualization extends Component {
         let minY = data[ATDevice.Specific.LIVE_MOV_Y_MIN];
         let deadX = ATDevice.getConfig(C.AT_CMD_DEADZONE_X);
         let deadY = ATDevice.getConfig(C.AT_CMD_DEADZONE_Y);
+        let pDzX = (L.getPercentage(ATDevice.getConfig(C.AT_CMD_DEADZONE_X), 0, this.state.maxPos));
+        let pDzY = (L.getPercentage(ATDevice.getConfig(C.AT_CMD_DEADZONE_Y), 0, this.state.maxPos));
         this.state.maxPos = this.getMaxPosManual() !== undefined ? this.getMaxPosManual() : Math.max(maxX, maxY, Math.abs(minX), Math.abs(minY), Math.round(deadX * 1.1), Math.round(deadY * 1.1), this.state.maxPos);
         let percentageX = L.limitValue(L.getPercentage(x, -this.state.maxPos, this.state.maxPos), 0, 100);
         let percentageY = L.limitValue(L.getPercentage(y, -this.state.maxPos, this.state.maxPos), 0, 100);
         let driftCompX = L.limitValue(L.getPercentage(data[ATDevice.Specific.LIVE_DRIFTCOMP_X], -this.state.maxPos, this.state.maxPos), 0, 100);
         let driftCompY = L.limitValue(L.getPercentage(data[ATDevice.Specific.LIVE_DRIFTCOMP_Y], -this.state.maxPos, this.state.maxPos), 0, 100);
+        let eX = percentageX - 50;
+        let eY = percentageY - 50;
+        let inDeadzone = (Math.pow(eX, 2) / Math.pow(pDzX/2, 2) + Math.pow(eY, 2) / Math.pow(pDzY/2, 2)) < 1;
 
         this.setState({
             liveData: data,
@@ -82,11 +87,11 @@ class PositionVisualization extends Component {
             pY: percentageY,
             driftCompX: driftCompX,
             driftCompY: driftCompY,
-            pDzX: (L.getPercentage(ATDevice.getConfig(C.AT_CMD_DEADZONE_X), 0, this.state.maxPos)),
-            pDzY: (L.getPercentage(ATDevice.getConfig(C.AT_CMD_DEADZONE_Y), 0, this.state.maxPos)),
+            pDzX: pDzX,
+            pDzY: pDzY,
             pDriftX: (L.getPercentage(ATDevice.getConfig(C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP), 0, this.state.maxPos)),
             pDriftY: (L.getPercentage(ATDevice.getConfig(C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP), 0, this.state.maxPos)),
-            inDeadzone: x < deadX && x > -deadX && y < deadY && y > -deadY
+            inDeadzone: inDeadzone
         });
     }
 
@@ -136,7 +141,7 @@ class PositionVisualization extends Component {
                                 <div class="back-layer" style="top:100%; left: 35%; width: 30%; height: 10%; background-color: black; z-index: 2"></div>
                             </div>
                         </div>
-                        <div style="display: ${this.getValue(props.showDeadzone, false) ? 'block' : 'none'}">
+                        <div style="display: ${this.getValue(props.showDriftComp, false) ? 'block' : 'none'}">
                             <div id="driftComp" class="back-layer"
                                  style="top: ${Math.max(100 - this.state.pDriftY, 0) / 2}%; left: ${Math.max(100 - this.state.pDriftX, 0) / 2}%; height: ${Math.min(this.state.pDriftY, 100)}%; width: ${Math.min(this.state.pDriftX, 100)}%; background-color: transparent; border: 1px solid gray"></div>
                         </div>
@@ -166,7 +171,7 @@ class PositionVisualization extends Component {
                         <div id="cursorPos" class="back-layer" style="top: ${this.state.pY}%; left: ${this.state.pX}%;">
                             <div class="back-layer circle" style="${styleUtil.getCircleStyle(this.getValue(props.circleRadius, 20))}"></div>
                         </div>
-                        <div id="driftCompPos" class="back-layer ${this.getValue(props.showDeadzone, false) ? '' : 'd-none'}" style="top: ${this.state.driftCompY}%; left: ${this.state.driftCompX}%;">
+                        <div id="driftCompPos" class="back-layer ${this.getValue(props.showDriftComp, false) ? '' : 'd-none'}" style="top: ${this.state.driftCompY}%; left: ${this.state.driftCompX}%;">
                             <div class="back-layer circle" style="${styleUtil.getCircleStyle(4, 'blue')}"></div>
                         </div>
                     </div>
