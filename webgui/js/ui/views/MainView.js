@@ -261,13 +261,20 @@ class MainView extends Component {
             <div class="row">
                 <h1 id="mainHeading" tabindex="-1" class="col col-md-6">${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
                 <div class="d-none d-md-inline-block col-md-3">
-                    <label class="col-12" for="selectSlots" dangerouslySetInnerHTML="${{__html: L.translate('Select Slot // <span lang="en">Slot</span> auswählen')}}"></label>
-                    <div class="col-12">
-                        <select id="selectSlots" class="col-12" value="${state.currentSlot}" onchange="${(event) => ATDevice.setSlot(event.target.value)}">
-                        ${state.slots.map((slot) => html`
+                    <div class="row">
+                        <label class="col-12" for="selectSlots" dangerouslySetInnerHTML="${{__html: L.translate('Select Slot // <span lang="en">Slot</span> auswählen')}}"></label>
+                    </div>
+                    <div class="row">
+                        <div class="col-10">
+                            <select id="selectSlots" class="col-12" value="${state.currentSlot}" onchange="${(event) => ATDevice.setSlot(event.target.value)}">
+                                ${state.slots.map((slot) => html`
                             <option value="${slot}">${slot}</option>
                         `)}
-                    </select>
+                            </select>
+                        </div>
+                        <div class="col-2 ${ATDevice.getConfig(C.AT_CMD_DEVICE_MODE) !== 1 ? '' : 'd-none'}">
+                            <img width="20" src="img/bt.svg" title="${L.translate('Current slot uses Bluetooth // Aktueller Slot verwendet Bluetooth')}"/>
+                        </div>
                     </div>
                 </div>
                 <div class="col col-md-3">
