@@ -1,5 +1,4 @@
 let localStorageService = {};
-let KEY_PREFIX = 'FMFABI_';
 let KEY_FRIMWARE_DOWNLOAD_URL = 'WEBGUI_KEY_FRIMWARE_DOWNLOAD_URL';
 let storage = null;
 
@@ -15,7 +14,7 @@ if (typeof (Storage) !== "undefined") {
 localStorageService.save = function (key, value) {
     if (storage) {
         try {
-            return storage.setItem(KEY_PREFIX + key, JSON.stringify(value));
+            return storage.setItem(C.CURRENT_DEVICE + key, JSON.stringify(value));
         } catch (e) {
             log.error(e)
         }
@@ -25,7 +24,7 @@ localStorageService.save = function (key, value) {
 localStorageService.get = function (key) {
     if (storage) {
         try {
-            let value = storage.getItem(KEY_PREFIX + key);
+            let value = storage.getItem(C.CURRENT_DEVICE + key);
             if (value === 'undefined') {
                 return undefined;
             }
@@ -37,7 +36,7 @@ localStorageService.get = function (key) {
 };
 
 localStorageService.hasKey = function (key) {
-    return storage.getItem(KEY_PREFIX + key) !== null;
+    return storage.getItem(C.CURRENT_DEVICE + key) !== null;
 }
 
 localStorageService.getFirmwareDownloadUrl = function () {
