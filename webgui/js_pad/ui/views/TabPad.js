@@ -81,10 +81,6 @@ class TabPad extends Component {
                         ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => {FLipPad.setFlipmouseMode(value); this.forceUpdate();}}" elements="${C.FLIPMOUSE_MODES}" value="${ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)}"/>`}
                     </div>
                     <div class="mb-4">
-                        <button onclick="${() => FLipPad.calibrate()}">
-                            ${html`<${FaIcon} icon="far dot-circle"/>`}
-                            <span>${L.translate('Calibrate middle position // Mittelposition kalibrieren')}</span>
-                        </button>
                         <button onclick="${() => FLipPad.rotate()}">
                             ${html`<${FaIcon} icon="fas redo"/>`}
                             <span>${L.translate('Rotate right // Nach rechts drehen')}</span>
