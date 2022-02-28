@@ -113,7 +113,7 @@ class TabPad extends Component {
                     }
                 })()}
             </div>
-            <div class="mt-4 ${[C.FLIPPAD_MODE_PAD.value].includes(ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)) ? 'd-none' : ''}">
+            <div class="mt-4">
                 ${(() => {
                     if (state.splitDeadzone) {
                         return html`
