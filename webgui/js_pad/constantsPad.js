@@ -18,17 +18,6 @@ C.MAX_NUMBER_SLOTS = 10;
 C.MAX_LENGTH_SLOTNAME = 13;
 C.HELP_BASE_URL = '';
 
-C.TRANSLATION_FILTER = function (translationKey) {
-    if (translationKey && C.DEVICE_IS_FLIPPAD && !translationKey.toLowerCase().includes("joystick") && !translationKey.includes('[[')) {
-        translationKey = translationKey.replaceAll("Stick", "Pad");
-        translationKey = translationKey.replaceAll("stick", "pad");
-    } else if (C.DEVICE_IS_FLIPPAD && translationKey && translationKey.includes('[[')) {
-        translationKey = translationKey.replaceAll("[[", "");
-        translationKey = translationKey.replaceAll("]]", "");
-    }
-    return translationKey;
-}
-
 C.USB_DEVICE_FILTERS =  [
     {usbVendorId: 0x16c0} // Teensy
 ];
@@ -91,11 +80,6 @@ C.AT_CMD_CATEGORIES = [{
 }];
 
 C.AT_CMDS_ACTIONS = C.AT_CMDS_ACTIONS.concat([{
-    cmd: C.AT_CMD_CALIBRATION,
-    label: 'Calibrate stick middle position // Stick-Mittelposition kalibrieren',
-    shortLabel: 'Calibrate stick // Stick kalibrieren',
-    category: C.AT_CMD_CAT_DEVICE
-}, {
     cmd: C.AT_CMD_IR_PLAY,
     label: 'Play infrared command // Infrarot-Kommando abspielen',
     category: C.AT_CMD_CAT_IR,
@@ -166,6 +150,7 @@ C.BTN_CAT_BTN = 'BTN_CAT_BTN';
 C.BTN_CAT_STICK = 'BTN_CAT_STICK';
 C.BTN_CAT_SIPPUFF = 'BTN_CAT_SIPPUFF';
 C.BTN_CAT_STICKPLUS = 'BTN_CAT_STICKPLUS';
+C.BTN_CAT_TAP = 'BTN_CAT_TAP';
 C.BTN_CATEGORIES = [{
     constant: C.BTN_CAT_BTN,
     label: 'Buttons'
@@ -174,10 +159,13 @@ C.BTN_CATEGORIES = [{
     label: 'Sip/Puff // Ansaugen/Pusten'
 }, {
     constant: C.BTN_CAT_STICK,
-    label: 'Stick actions // Stick-Aktionen'
+    label: 'Slide // Wischen'
+}, {
+    constant: C.BTN_CAT_TAP,
+    label: 'Tap // Tippen'
 }, {
     constant: C.BTN_CAT_STICKPLUS,
-    label: 'Advanced stick actions // Erweiterte Stick-Aktionen'
+    label: 'Tap + Slide // Tippen + Wischen'
 }]
 
 C.BTN_MODES = [{
@@ -194,19 +182,19 @@ C.BTN_MODES = [{
     category: C.BTN_CAT_BTN
 }, {
     index: 4,
-    label: 'Stick Up // Stick nach oben',
+    label: 'Slide Up // Wischen nach oben',
     category: C.BTN_CAT_STICK
 }, {
     index: 5,
-    label: 'Stick Down // Stick nach unten',
+    label: 'Slide Down // Wischen nach unten',
     category: C.BTN_CAT_STICK
 }, {
     index: 6,
-    label: 'Stick Left // Stick nach links',
+    label: 'Slide Left // Wischen nach links',
     category: C.BTN_CAT_STICK
 }, {
     index: 7,
-    label: 'Stick Right // Stick nach rechts',
+    label: 'Slide Right // Wischen nach rechts',
     category: C.BTN_CAT_STICK
 }, {
     index: 8,
@@ -226,35 +214,35 @@ C.BTN_MODES = [{
     category: C.BTN_CAT_SIPPUFF
 }, {
     index: 12,
-    label: 'Strong Sip + Up // Stark ansaugen + nach oben',
-    category: C.BTN_CAT_STICKPLUS
+    label: 'Tap // Tippen',
+    category: C.BTN_CAT_TAP
 }, {
     index: 13,
-    label: 'Strong Sip + Down // Stark ansaugen + nach unten',
-    category: C.BTN_CAT_STICKPLUS
+    label: '2x Tap // 2x Tippen',
+    category: C.BTN_CAT_TAP
 }, {
     index: 14,
-    label: 'Strong Sip + Left // Stark ansaugen + nach links',
-    category: C.BTN_CAT_STICKPLUS
+    label: '3x Tap // 3x Tippen',
+    category: C.BTN_CAT_TAP
 }, {
     index: 15,
-    label: 'Strong Sip + Right // Stark ansaugen + nach rechts',
-    category: C.BTN_CAT_STICKPLUS
+    label: '4x Tap // 4x Tippen',
+    category: C.BTN_CAT_TAP
 }, {
     index: 16,
-    label: 'Double tap + Up // 2x tippen + nach oben',
+    label: 'Tap + Slide Up // Tippen + wischen oben',
     category: C.BTN_CAT_STICKPLUS
 }, {
     index: 17,
-    label: 'Double tap + Down // 2x tippen + nach unten',
+    label: 'Tap + Slide Down // Tippen + wischen unten',
     category: C.BTN_CAT_STICKPLUS
 }, {
     index: 18,
-    label: 'Double tap + Left // 2x tippen + nach links',
+    label: 'Tap + Slide Left // Tippen + wischen links',
     category: C.BTN_CAT_STICKPLUS
 }, {
     index: 19,
-    label: 'Double tap + Right // 2x tippen + nach rechts',
+    label: 'Tap + Slide Right // Tippen + wischen rechts',
     category: C.BTN_CAT_STICKPLUS
 }];
 
@@ -262,7 +250,7 @@ C.BTN_MODES_ACTIONLIST = C.BTN_MODES;
 
 C.FLIPPAD_MODE_MOUSE = {
     value: 1,
-    label: 'Mouse ([[stick]] mode) // Maus ([[Stick]]-Modus)'
+    label: 'Mouse (stick mode) // Maus (Stick-Modus)'
 };
 C.FLIPPAD_MODE_PAD = {
     value: 5,
@@ -270,7 +258,7 @@ C.FLIPPAD_MODE_PAD = {
 };
 C.FLIPPAD_MODE_STICK_ALTERNATIVE = {
     value: 0,
-    label: 'Alternative actions ([[stick]] mode) // Alternative Aktionen ([[Stick]]-Modus)'
+    label: 'Alternative actions (stick mode) // Alternative Aktionen (Stick-Modus)'
 };
 C.FLIPPAD_MODE_PAD_ALTERNATIVE = {
     value: 6,

@@ -286,7 +286,7 @@ C.FLIPMOUSE_MODE_JOYSTICK_SLIDERS = {
 };
 C.FLIPPAD_MODE_MOUSE = {
     value: 1,
-    label: 'Mouse ([[stick]] mode) // Maus ([[Stick]]-Modus)'
+    label: 'Mouse (stick mode) // Maus (Stick-Modus)'
 };
 C.FLIPPAD_MODE_PAD = {
     value: 5,
@@ -294,7 +294,7 @@ C.FLIPPAD_MODE_PAD = {
 };
 C.FLIPPAD_MODE_STICK_ALTERNATIVE = {
     value: 0,
-    label: 'Alternative actions ([[stick]] mode) // Alternative Aktionen ([[Stick]]-Modus)'
+    label: 'Alternative actions (stick mode) // Alternative Aktionen (Stick-Modus)'
 };
 C.FLIPPAD_MODE_PAD_ALTERNATIVE = {
     value: 6,
