@@ -43,7 +43,7 @@ let _connectionTestCallbacks = [];
 let _connected = true;
 let _AT_CMD_BUSY_RESPONSE = 'BUSY';
 
-let _autoSaveTimeout = 2000;
+let _autoSaveTimeout = 750;
 let _dontGetLiveValues = false;
 
 /**
