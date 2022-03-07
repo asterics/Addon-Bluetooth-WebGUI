@@ -7,7 +7,12 @@ import {localStorageService} from "../../localStorageService.js";
 
 const html = htm.bind(h);
 
-const KEY_TAB_ACTIONS_SHOW_ALL_SLOTS = 'KEY_TAB_ACTIONS_SHOW_ALL_SLOTS';
+const KEY_TAB_ACTIONS_VIEW_MODE = 'KEY_TAB_ACTIONS_VIEW_MODE';
+
+const VIEW_MODE_SINGLE_SLOT = 'VIEW_MODE_SINGLE_SLOT';
+const VIEW_MODE_ALL_SLOTS_TABLE = 'VIEW_MODE_ALL_SLOTS_TABLE';
+const VIEW_MODE_ALL_SLOTS_LIST = 'VIEW_MODE_ALL_SLOTS_LIST';
+
 class TabActions extends Component {
 
     constructor() {
@@ -16,7 +21,7 @@ class TabActions extends Component {
         TabActions.instance = this;
         this.state = {
             showCategory: null,
-            showAllSlots: localStorageService.hasKey(KEY_TAB_ACTIONS_SHOW_ALL_SLOTS) ? localStorageService.get(KEY_TAB_ACTIONS_SHOW_ALL_SLOTS) : false,
+            viewMode: localStorageService.hasKey(KEY_TAB_ACTIONS_VIEW_MODE) ? localStorageService.get(KEY_TAB_ACTIONS_VIEW_MODE) : 'VIEW_MODE_SINGLE_SLOT',
             modalBtnMode: null,
             modalSlot: null,
             widthEm: window.innerWidth / parseFloat(getComputedStyle(document.querySelector('body'))['font-size'])
@@ -88,15 +93,15 @@ class TabActions extends Component {
         return 0;
     }
 
-    setShowAllSlots(value) {
-        this.setState({showAllSlots: value});
-        localStorageService.save(KEY_TAB_ACTIONS_SHOW_ALL_SLOTS, value);
+    setViewMode(value) {
+        this.setState({viewMode: value});
+        localStorageService.save(KEY_TAB_ACTIONS_VIEW_MODE, value);
     }
     
     render() {
         let state = this.state;
-        let slots = state.showAllSlots ? ATDevice.getSlots(): [ATDevice.getCurrentSlot()];
-        let mobileView = slots.length > this.getMaxPrintableSlots();
+        let slots = state.viewMode !== VIEW_MODE_SINGLE_SLOT ? ATDevice.getSlots(): [ATDevice.getCurrentSlot()];
+        let mobileView = slots.length > this.getMaxPrintableSlots() || state.viewMode === VIEW_MODE_ALL_SLOTS_LIST;
 
         let btnModes = C.BTN_MODES_ACTIONLIST.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
         let modalOpen = !!state.modalBtnMode;
@@ -107,12 +112,12 @@ class TabActions extends Component {
         }
         let categoryElements = C.BTN_CATEGORIES.map(cat => {return {value: cat.constant, label: cat.label}});
         categoryElements = [{value: null, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
-        let slotElements = [{value: false, label: 'Current slot // Aktueller Slot'}, {value: true, label: 'All slots // Alle Slots'}];
+        let slotElements = [{value: VIEW_MODE_SINGLE_SLOT, label: 'Current slot // Aktueller Slot'}, {value: VIEW_MODE_ALL_SLOTS_TABLE, label: 'All slots (table) // Alle Slots (Tabelle)'}, {value: VIEW_MODE_ALL_SLOTS_LIST, label: 'All slots (list) // Alle Slots (Liste)'}];
 
         return html`<div id="tabActions">
              <h2>${L.translate('Action configuration // Aktionen-Konfiguration')}</h2>
             <div class="filter-buttons mb-3">
-                ${html`<${RadioFieldset} legend="Show slots: // Zeige Slots:" onchange="${(value) => this.setShowAllSlots(value === 'true')}" elements="${slotElements}" value="${state.showAllSlots}"/>`}
+                ${html`<${RadioFieldset} legend="Show slots: // Zeige Slots:" onchange="${(value) => this.setViewMode(value)}" elements="${slotElements}" value="${state.viewMode}"/>`}
             </div> 
             <div class="${mobileView ? '' : 'd-none'} filter-buttons mb-3">
                 ${html`<${RadioFieldset} legend="Show categories: // Zeige Kategorien:" onchange="${(value) => this.setState({showCategory: value})}" elements="${categoryElements}" value="${state.showCategory}"/>`}
@@ -134,7 +139,7 @@ class TabActions extends Component {
                                 </span>
                                 <a href="javascript:;" title="${this.getLinkTitle(btnMode, slot)}" class="${this.isDisabled(btnMode, slot) ? 'd-none' : ''}" onclick="${() => this.setState({modalBtnMode: btnMode, modalSlot: slot})}">
                                     <span style="${ATDevice.getButtonAction(btnMode.index, slot) === C.AT_CMD_NO_CMD ? 'font-weight: normal' : ''}">${this.getLinkLabel(btnMode, slot)}</span>
-                                    <span class="${!this.showFnName(btnMode, slot) || (state.showAllSlots && ATDevice.getSlots().length > 1) || !this.getBtnModeParam(btnMode, slot) ? 'd-none' : ''}" style="font-weight: normal"> (${this.getBtnModeParam(btnMode, slot)})</span>
+                                    <span class="${!this.showFnName(btnMode, slot) || (!mobileView && state.viewMode === VIEW_MODE_ALL_SLOTS_TABLE && ATDevice.getSlots().length > 1) || !this.getBtnModeParam(btnMode, slot) ? 'd-none' : ''}" style="font-weight: normal"> (${this.getBtnModeParam(btnMode, slot)})</span>
                                 </a>
                             </span>
                         `)}
