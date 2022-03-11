@@ -258,7 +258,7 @@ C.FLIPPAD_MODE_PAD = {
 };
 C.FLIPPAD_MODE_STICK_ALTERNATIVE = {
     value: 0,
-    label: 'Alternative actions (stick mode) // Alternative Aktionen (Stick-Modus)'
+    label: 'Alternative actions (sticky mode) // Alternative Aktionen (Sticky-Modus)'
 };
 C.FLIPPAD_MODE_PAD_ALTERNATIVE = {
     value: 6,

@@ -160,7 +160,8 @@ class ActionEditModal extends Component {
     
                         <div class="modal-body container-fluid p-0">
                             <div class="${showActionSelection ? 'd-none' : ''}">
-                                <span class="pr-2">${L.translate('Stick is currently used for: // Stick wird derzeit verwendet für:')}</span>
+                                <span class="pr-2 ${C.DEVICE_IS_FM ? '' : 'd-none'}">${L.translate('Stick is currently used for: // Stick wird derzeit verwendet für:')}</span>
+                                <span class="pr-2 ${C.DEVICE_IS_FLIPPAD ? '' : 'd-none'}">${L.translate('Pad is currently used for: // Pad wird derzeit verwendet für:')}</span>
                                 <strong>${L.translate(modeLabel)}</strong>
                                 <div>
                                     <a href="javascript:;" onclick="${() => this.setState({shouldChangeMode: true})}">
