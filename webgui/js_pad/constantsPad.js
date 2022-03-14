@@ -49,6 +49,12 @@ C.VIEWS = [{
 }];
 
 C.ADDITIONAL_LINKS = [{
+    label: 'User Manual // Benutzerhandbuch',
+    url: 'https://github.com/asterics/FLipPad/blob/main/Documentation/UserManual/FLipPadUserManual.md // https://github.com/asterics/FLipPad/blob/main/Documentation/UserManual/FLipPadAnwendungsanleitung.md'
+}, {
+    label: 'FLipPad on Github // FLipPad auf Github',
+    url: 'https://github.com/asterics/FLipPad'
+}, {
     label: 'Ask as question // Eine Frage stellen',
     url: 'https://q2a.wbt.wien/ask'
 }, {
