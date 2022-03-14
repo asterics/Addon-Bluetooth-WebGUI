@@ -140,8 +140,8 @@ class ActionEditModal extends Component {
         let btnMode = props.buttonMode;
         let categoryElements = C.AT_CMD_CATEGORIES.map(cat => {return {value: cat.constant, label: cat.label}});
         categoryElements = [{value: ActionEditModal.ALL_CATEGORIES, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
-        let flipmouseAltMode = C.DEVICE_IS_FM && ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value;
-        let flipadAltMode = C.DEVICE_IS_FLIPPAD && [C.FLIPPAD_MODE_PAD_ALTERNATIVE.value, C.FLIPPAD_MODE_STICK_ALTERNATIVE.value].includes(ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE));
+        let flipmouseAltMode = C.DEVICE_IS_FM && ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, props.slot) === C.FLIPMOUSE_MODE_ALT.value;
+        let flipadAltMode = C.DEVICE_IS_FLIPPAD && [C.FLIPPAD_MODE_PAD_ALTERNATIVE.value, C.FLIPPAD_MODE_STICK_ALTERNATIVE.value].includes(ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, props.slot));
         let showActionSelection = C.DEVICE_IS_FABI || flipmouseAltMode || flipadAltMode || btnMode.category !== C.BTN_CAT_STICK || state.shouldChangeMode;
         let modeLabel = C.DEVICE_IS_FM_OR_PAD ? C.FLIPMOUSE_MODES.filter(mode => mode.value === ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE, props.slot))[0].label : '';
 
