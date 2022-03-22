@@ -166,7 +166,7 @@ firmwareUtil.updateDeviceFirmware = function(progressHandler) {
     progressHandler = progressHandler || (() => {});
     firmwareUtil.getDeviceFWInfo().then(result => {
         let message = 'Do you want to update the firmware to version {?}? After confirming this message you have to re-select the device ("{?}") in a browser popup. Keep this tab open and in foreground while updating! // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung müssen Sie das Gerät erneut in einem Browser-Popup auswählen ("{?}"). Lassen Sie diesen Tab während dem Update im Vordergrund geöffnet!';
-        let deviceName = C.DEVICE_IS_FM_OR_PAD ? L.translate('Unknown device // Unbekanntes Gerät') : 'Arduino Leonardo';
+        let deviceName = C.DEVICE_IS_FM_OR_PAD ? L.translate('Unknown device // Unbekanntes Gerät') : 'Arduino Leonardo/Mirco';
         if (!confirm(L.translate(message, result.version, deviceName))) {
             return;
         }
