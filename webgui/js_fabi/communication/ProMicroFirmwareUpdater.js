@@ -31,7 +31,7 @@ ProMicroFirmwareUpdater.resetDevice = async function (existingPort, filters) {
 /****************/
 ProMicroFirmwareUpdater.uploadFirmware = async function (url, progressFn, filters) {
     filters = filters || [
-        {usbVendorId: 0x2341, usbProductId: 0x0036}
+        // {usbVendorId: 0x2341, usbProductId: 0x0036}
         //TODO: I think there are more possible PIDs...
     ];
 
