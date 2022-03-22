@@ -4,7 +4,7 @@ styleUtil.getCircleStyle = function (radius, color, border) {
     radius = radius || 10;
     color = color || 'red';
     border = border || 'none';
-    return `width: ${radius}px;
+    return `min-width: ${radius}px;
                 height: ${radius}px;
                 background: ${color};
                 -moz-border-radius: ${radius / 2}px;
@@ -12,7 +12,8 @@ styleUtil.getCircleStyle = function (radius, color, border) {
                 border-radius: ${radius / 2}px;
                 top: -${radius / 2}px;
                 left: -${radius / 2}px;
-                border: ${border}`;
+                border: ${border};
+                padding: 0 5px;`;
 };
 
 export {styleUtil};
