@@ -3,6 +3,7 @@ import {TabActions} from "../js/ui/views/TabActions.js";
 import {TabGeneral} from "../js/ui/views/TabGeneral.js";
 import {TabTimings} from "./ui/views/TabTimings.js";
 import {TabSipPuff} from "../js/ui/views/TabSipPuff.js";
+import {TabVisualization} from "./ui/views/TabVisualization.js";
 
 window.C = window.C || {};
 
@@ -45,6 +46,10 @@ C.VIEWS = [{
     hash: '#tabGeneral',
     label: 'General // Allgemein',
     helpHash: '#general-tab-bluetooth-and-firmware-options // #einstellmöglichkeiten-im-reiter-allgemein'
+}, {
+    object: TabVisualization,
+    hash: '#tabVis',
+    label: 'Visualization // Visualisierung',
 }];
 C.VIEW_START_HASH = '#tabActions';
 

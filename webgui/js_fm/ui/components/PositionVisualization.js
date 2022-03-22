@@ -1,6 +1,6 @@
 import { h, Component, createRef } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
-import {styleUtil} from '../../util/styleUtil.js';
+import {styleUtil} from '../../../js/util/styleUtil.js';
 import {ATDevice} from "../../../js/communication/ATDevice.js";
 import {FaIcon} from "../../../js/ui/components/FaIcon.js";
 import {localStorageService} from "../../../js/localStorageService.js";
