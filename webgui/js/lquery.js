@@ -242,7 +242,7 @@ L.translate = function (translationKey) {
     let translated = '';
     if (translationKey.indexOf(' // ') > -1) {
         let translations = translationKey.split(' // ');
-        translated = 'en'.toUpperCase() === L.getLang().toUpperCase() ? translations[0] : translations[1];
+        translated = 'de'.toUpperCase() === L.getLang().toUpperCase() ? translations[1] : translations[0];
     } else {
         translated = translationKey;
     }
