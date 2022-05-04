@@ -14,7 +14,8 @@ class InitDeviceView extends Component {
 
         this.state = {
             updateProgress: null,
-            success: false
+            success: false,
+            redirectUrl: C.DEVICE_IS_FABI ? 'index_fabi.htm' : C.DEVICE_IS_FLIPPAD ? 'index_pad.htm' : 'index_fm.htm'
         }
     }
 
@@ -35,7 +36,7 @@ class InitDeviceView extends Component {
                 }
             }, []).catch(() => {
                 if (C.DEVICE_IS_FM_OR_PAD) {
-                    window.location.replace('index_fm.htm'); // redirect to main page where aborted FW Update is handled
+                    window.location.replace(thiz.state.redirectUrl); // redirect to main page where aborted FW Update is handled
                 }
             });
         });
@@ -75,7 +76,7 @@ class InitDeviceView extends Component {
                     </div>
                     <div class="row">
                         <a class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3 mt-3"
-                           href="${C.DEVICE_IS_FM ? 'index_fm.htm' : (C.DEVICE_IS_FABI ? 'index_fabi.htm' : 'index_pad.htm')}">
+                           href="${state.redirectUrl}">
                             ${L.translate('Back to main page // Zurück zur Hauptseite')}
                         </a>
                     </div>
