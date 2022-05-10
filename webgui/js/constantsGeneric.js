@@ -313,8 +313,8 @@ for (var code = 48; code <= 57; code++) {
     C.PRINTABLE_KEYCODES.push(code);
 }
 
-//F1-F12
-for (var code = 112; code <= 123; code++) {
+//F1-F24
+for (var code = 112; code <= 135; code++) {
     C.KEYCODE_MAPPING[code] = C.KEYCODE_PREFIX + 'F' + (code - 111);
 }
 
