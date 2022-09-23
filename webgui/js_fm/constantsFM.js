@@ -19,7 +19,8 @@ C.MAX_LENGTH_SLOTNAME = 13;
 C.HELP_BASE_URL = 'https://github.com/asterics/FLipMouse/blob/master/Documentation/UserManual/Markdown/FLipMouseUserManual.md // https://github.com/asterics/FLipMouse/blob/master/Documentation/UserManual/Markdown/FLipMouseAnwendungsanleitung.md';
 
 C.USB_DEVICE_FILTERS =  [
-    {usbVendorId: 0x16c0} // Teensy
+    {usbVendorId: 0x16c0}, // Teensy
+    {usbVendorId: 0x2e8a} // RP2040
 ];
 
 C.VIEWS = [{
