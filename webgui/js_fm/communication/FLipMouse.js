@@ -31,7 +31,7 @@ FLipMouse.getIRCommands = function () {
 };
 
 FLipMouse.recordIrCommand = function (name) {
-    return ATDevice.sendAtCmdWithResult(C.AT_CMD_IR_RECORD, name, 11000).then(result => {
+    return ATDevice.sendAtCmdWithResult(C.AT_CMD_IR_RECORD, name, {timeout: 11000}).then(result => {
         let success = result && result.indexOf(_AT_CMD_IR_TIMEOUT_RESPONSE) === -1;
         return Promise.resolve(success);
     });
@@ -45,7 +45,7 @@ FLipMouse.rotate = function () {
 };
 
 FLipMouse.calibrate = function () {
-    ATDevice.sendATCmd('AT CA');
+    ATDevice.sendAtCmdForce('AT CA');
 };
 
 FLipMouse.setFlipmouseMode = function (index) {
@@ -131,7 +131,7 @@ function parseLiveData(data) {
         }
         if (valArray[8]) {
             let slot = ATDevice.getSlotName(parseInt(valArray[8]));
-            if (slot && slot !== ATDevice.getCurrentSlot()) {
+            if (slot && slot !== ATDevice.getCurrentSlot() && !ATDevice.isSafeMode()) {
                 ATDevice.setSlot(slot, true);
             }
         }

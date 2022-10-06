@@ -411,4 +411,10 @@ TabSlots.style = html`<style>
     }
 </style>`;
 
+window.addEventListener(C.EVENT_REFRESH_MAIN, () => {
+    if (TabSlots.instance) {
+        TabSlots.instance.setState({slots: ATDevice.getSlots()});
+    }
+});
+
 export {TabSlots};

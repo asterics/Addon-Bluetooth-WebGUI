@@ -4,6 +4,7 @@
  * ATDevice holds a reference to the current specific class (FLipMouse or FABI) in ATDevice.Specific
  */
 import {SerialCommunicator} from "../adapter/sercomm.js";
+import {localStorageService} from "../localStorageService.js";
 
 let ATDevice = {};
 ATDevice.parseLiveData = true;
@@ -23,7 +24,9 @@ import(deviceClassPath).then(module => {
 });
 
 let _slots = [];
+let _slotsBackup = [];
 let _currentSlot = null;
+let _curretSlotBackup = null;
 let _slotChangeHandler = null;
 let _lastSlotChangeTime = 0;
 let _SLOT_CONSTANT = 'Slot';
@@ -45,6 +48,11 @@ let _AT_CMD_BUSY_RESPONSE = 'BUSY';
 
 let _autoSaveTimeout = 750;
 let _dontGetLiveValues = false;
+
+const SAFE_MODE = "SAFE_MODE";
+let _safeMode = localStorageService.get(SAFE_MODE) || window.location.href.includes('safeMode') || false;
+localStorageService.save(SAFE_MODE, _safeMode);
+let _isTesting = false;
 
 /**
  * initializes the instance of the device
@@ -68,7 +76,7 @@ ATDevice.init = function (dontGetLiveValues) {
         }
     }).then(function () {
         _isInitialized = true;
-        return ATDevice.sendAtCmdWithResult(C.AT_CMD_VERSION);
+        return ATDevice.sendAtCmdWithResultForce(C.AT_CMD_VERSION);
     }).then((versionString) => {
         if (C.DEVICE_IS_FM && versionString.toLowerCase().includes("pad") ||
             C.DEVICE_IS_FLIPPAD && versionString.toLowerCase().includes("mouse")) {
@@ -82,7 +90,7 @@ ATDevice.init = function (dontGetLiveValues) {
         return ATDevice.refreshConfig();
     }).then(() => {
         if (!_dontGetLiveValues) {
-            ATDevice.sendATCmd(C.AT_CMD_START_REPORTING_LIVE);
+            ATDevice.sendAtCmdForce(C.AT_CMD_START_REPORTING_LIVE);
             _communicator.setValueHandler((data) => {
                 _liveValueLastUpdate = new Date().getTime();
                 if (_valueHandler) {
@@ -103,19 +111,19 @@ ATDevice.isInitialized = function () {
 }
 
 ATDevice.getVersion = function () {
-    return ATDevice.sendAtCmdWithResult(C.AT_CMD_VERSION).then(result => {
+    return ATDevice.sendAtCmdWithResultForce(C.AT_CMD_VERSION).then(result => {
         return Promise.resolve(L.formatVersion(result));
     });
 }
 
 ATDevice.getBTVersion = function () {
-    ATDevice.sendATCmd(C.AT_CMD_STOP_REPORTING_LIVE);
-    return ATDevice.sendAtCmdWithResult(C.AT_CMD_ADDON_COMMAND, '$ID').then(result => {
+    ATDevice.sendAtCmdForce(C.AT_CMD_STOP_REPORTING_LIVE);
+    return ATDevice.sendAtCmdWithResultForce(C.AT_CMD_ADDON_COMMAND, '$ID').then(result => {
         result = result || '';
         result = result.toUpperCase().replace('P32', ''); //remove ESP32 in order to prevent wrong version number parsing
         return Promise.resolve(result.trim() ? L.formatVersion(result) : '');
     }).finally(() => {
-        if (!_dontGetLiveValues) ATDevice.sendATCmd(C.AT_CMD_START_REPORTING_LIVE);
+        if (!_dontGetLiveValues) ATDevice.sendAtCmdForce(C.AT_CMD_START_REPORTING_LIVE);
     });
 }
 
@@ -126,13 +134,18 @@ ATDevice.getBTVersion = function () {
  *
  * @param atCmd the AT command to send
  * @param param an optional parameter that is appended to the AT command
- * @param timeout maximum time after the returned promise resolves, regardless if data was received or not. Default 0ms.
- * @param onlyIfNotBusy if set to true, the command is sent only if no other AT command is currently waiting for a response
- * @param dontLog if set to true, there are no logs to console for this command
-
+ * @param options.timeout maximum time after the returned promise resolves, regardless if data was received or not. Default 0ms.
+ * @param options.onlyIfNotBusy if set to true, the command is sent only if no other AT command is currently waiting for a response
+ * @param options.dontLog if set to true, there are no logs to console for this command
+ * @param options.forceSend if set to true, AT command is send also in safe mode
  * @return {Promise} which resolves to the result of the command or '' if no result was received.
  */
-ATDevice.sendATCmd = function (atCmd, param, timeout, onlyIfNotBusy, dontLog) {
+ATDevice.sendATCmd = function (atCmd, param, options) {
+    options = options || {};
+    if (_safeMode && !options.forceSend) {
+        log.info(`not sending command ${atCmd} command because of safe mode.`);
+        return Promise.resolve();
+    }
     if (!ATDevice.isInitialized()) {
         return Promise.reject('cannot send AT command if not initialized.');
     }
@@ -140,19 +153,19 @@ ATDevice.sendATCmd = function (atCmd, param, timeout, onlyIfNotBusy, dontLog) {
         log.warn('not sending AT command because in raw mode.');
         return Promise.reject();
     }
-    if ((onlyIfNotBusy && _atCmdQueue.length > 0)) {
-        if (!dontLog) console.log('did not send cmd: "' + atCmd + "' because another command is executing.");
+    if ((options.onlyIfNotBusy && _atCmdQueue.length > 0)) {
+        if (!options.dontLog) console.log('did not send cmd: "' + atCmd + "' because another command is executing.");
         return Promise.resolve(_AT_CMD_BUSY_RESPONSE);
     }
     if (_atCmdQueue.length > 0) {
-        if (!dontLog) log.debug("adding cmd to queue: " + atCmd);
+        if (!options.dontLog) log.debug("adding cmd to queue: " + atCmd);
     }
     let queueElem = null;
     let cmd = param !== undefined ? atCmd + ' ' + param : atCmd;
     let promise = new Promise(function (resolve, reject) {
         queueElem = {
-            timeout: timeout || 0,
-            dontLog: dontLog,
+            timeout: options.timeout || 0,
+            dontLog: options.dontLog,
             cmd: cmd.trim(),
             resolveFn: resolve,
             rejectFn: reject
@@ -186,8 +199,15 @@ ATDevice.sendATCmd = function (atCmd, param, timeout, onlyIfNotBusy, dontLog) {
 
     return promise;
 };
+
+ATDevice.sendAtCmdForce = function (atCmd, param, options) {
+    options = options || {};
+    options.forceSend = true;
+    return ATDevice.sendATCmd(atCmd, param, options);
+}
+
 window.sendATCmd = (cmd) => {
-    ATDevice.sendAtCmdWithResult(cmd);
+    ATDevice.sendAtCmdWithResultForce(cmd);
 }
 
 /**
@@ -195,15 +215,20 @@ window.sendATCmd = (cmd) => {
  *
  * @param atCmd
  * @param param
- * @param timeout the timeout to wait for a response, default: 3000ms
- * @param onlyIfNotBusy
- * @param dontLog
+ * @param options.timeout the timeout to wait for a response, default: 3000ms
  * @return {Promise}
  */
-ATDevice.sendAtCmdWithResult = function (atCmd, param, timeout, onlyIfNotBusy, dontLog) {
-    timeout = timeout || 3000;
-    let promise = ATDevice.sendATCmd(atCmd, param, timeout, onlyIfNotBusy, dontLog);
+ATDevice.sendAtCmdWithResult = function (atCmd, param, options) {
+    options = options || {};
+    options.timeout = options.timeout || 3000;
+    let promise = ATDevice.sendATCmd(atCmd, param, options);
     return promise;
+}
+
+ATDevice.sendAtCmdWithResultForce = function (atCmd, param, options) {
+    options = options || {};
+    options.forceSend = true;
+    return ATDevice.sendAtCmdWithResult(atCmd, param, options);
 }
 
 ATDevice.upgradeBTAddon = async function (firmwareArrayBuffer, progressCallback) {
@@ -212,8 +237,8 @@ ATDevice.upgradeBTAddon = async function (firmwareArrayBuffer, progressCallback)
         return;
     }
     stopTestingConnection();
-    ATDevice.sendATCmd(C.AT_CMD_STOP_REPORTING_LIVE);
-    ATDevice.sendATCmd(C.AT_CMD_UPGRADE_ADDON);
+    ATDevice.sendAtCmdForce(C.AT_CMD_STOP_REPORTING_LIVE);
+    ATDevice.sendAtCmdForce(C.AT_CMD_UPGRADE_ADDON);
     _inRawMode = true;
     return _communicator.waitForReceiving('OTA:ready', 15000).then(() => {
         log.info('starting sending raw data');
@@ -228,7 +253,7 @@ ATDevice.upgradeBTAddon = async function (firmwareArrayBuffer, progressCallback)
         return Promise.reject();
     }).finally(() => {
         _inRawMode = false;
-        if (!_dontGetLiveValues) ATDevice.sendATCmd(C.AT_CMD_START_REPORTING_LIVE);
+        if (!_dontGetLiveValues) ATDevice.sendAtCmdForce(C.AT_CMD_START_REPORTING_LIVE);
         startTestingConnection();
     });
 }
@@ -258,6 +283,7 @@ ATDevice.getConfig = function (constant, slotName) {
 };
 
 ATDevice.setConfig = function (atCmd, value, debounceTimeout) {
+    value = value + '';
     debounceTimeout = debounceTimeout === undefined ? 300 : debounceTimeout;
     setConfigInternal(atCmd, value);
     return new Promise(resolve => {
@@ -303,7 +329,8 @@ ATDevice.copyConfigToAllSlots = async function (configConstants, sourceSlot, ski
                 }
             }
             if (slotChanged) {
-                await ATDevice.sendAtCmdWithResult('AT SA', slotObject.name);
+                emitConfigChange();
+                await ATDevice.save(slotObject.name);
             }
         }
     }
@@ -314,16 +341,19 @@ ATDevice.copyConfigToAllSlots = async function (configConstants, sourceSlot, ski
 
 ATDevice.refreshConfig = function () {
     return new Promise(function (resolve, reject) {
-        ATDevice.sendATCmd(C.AT_CMD_STOP_REPORTING_LIVE);
-        ATDevice.sendAtCmdWithResult(C.AT_CMD_LOAD_ALL).then(function (response) {
+        ATDevice.sendAtCmdForce(C.AT_CMD_STOP_REPORTING_LIVE);
+        ATDevice.sendAtCmdWithResultForce(C.AT_CMD_LOAD_ALL).then(function (response) {
             _slots = ATDevice.parseConfig(response);
+            _slotsBackup = JSON.parse(JSON.stringify(_slots));
             _currentSlot = _currentSlot || _slots[0].name;
+            _curretSlotBackup = _currentSlot;
+            emitConfigChange();
             resolve();
         }, function () {
             console.log("could not get config!");
             reject();
         }).finally(() => {
-            if (!_dontGetLiveValues) ATDevice.sendATCmd(C.AT_CMD_START_REPORTING_LIVE);
+            if (!_dontGetLiveValues) ATDevice.sendAtCmdForce(C.AT_CMD_START_REPORTING_LIVE);
         });
     });
 };
@@ -354,12 +384,13 @@ ATDevice.getButtonActionATCmdSuffix = function (index, slot) {
     return action ? action.substring(C.LENGTH_ATCMD_PREFIX).trim() : null;
 }
 
-ATDevice.save = async function () {
-    if (!_currentSlot) {
+ATDevice.save = async function (slot) {
+    slot = slot || _currentSlot;
+    if (!slot) {
         return;
     }
     ATDevice.abortAutoSaving();
-    return ATDevice.sendAtCmdWithResult('AT SA', _currentSlot);
+    return ATDevice.sendAtCmdWithResult(C.AT_CMD_SAVE_SLOT, slot);
 };
 
 ATDevice.planSaving = function () {
@@ -378,6 +409,10 @@ ATDevice.getSlots = function () {
 
 ATDevice.getAllSlotObjects = function () {
     return JSON.parse(JSON.stringify(_slots));
+}
+
+ATDevice.getAllSlotBackupObjects = function () {
+    return JSON.parse(JSON.stringify(_slotsBackup));
 }
 
 ATDevice.getSlotConfig = function (slotName) {
@@ -440,7 +475,7 @@ ATDevice.createSlot = function (slotName) {
         name: slotName,
         config: L.deepCopy(slotConfig)
     });
-    ATDevice.sendATCmd(C.AT_CMD_SAVE_SLOT, slotName);
+    ATDevice.save(slotName);
     ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, slotName);
     emitSlotChange();
     return Promise.resolve();
@@ -484,7 +519,7 @@ ATDevice.uploadSlots = async function (slotObjects, progressHandler) {
                 ATDevice.sendATCmd(key, slotObject.config[key]);
             }
         });
-        await ATDevice.sendAtCmdWithResult(C.AT_CMD_SAVE_SLOT, slotObject.name);
+        await ATDevice.save(slotObject.name);
         progressHandler(Math.round((i+1) / slotObjects.length * 100));
         _slots.push(slotObject);
     }
@@ -553,11 +588,101 @@ ATDevice.getCommunicator = function () {
     return _communicator;
 }
 
+ATDevice.isSafeMode = function () {
+    return _safeMode;
+}
+
+ATDevice.setSafeMode = function (enabled) {
+    if (!_safeMode && enabled) {
+        _curretSlotBackup = _currentSlot;
+        _slotsBackup = JSON.parse(JSON.stringify(_slots));
+    }
+    _safeMode = enabled;
+    localStorageService.save(SAFE_MODE, enabled);
+    if (_slotChangeHandler) { // repaint MainView
+        _slotChangeHandler();
+    }
+}
+
+ATDevice.revertCurrentSlot = function () {
+    if (!_safeMode) {
+        return;
+    }
+    ATDevice.stopTestingCurrentSlot();
+    let backupSlotNames = _slotsBackup.map(slot => slot.name);
+    let deviceSlot = _slotsBackup.filter(slot => slot.name === _currentSlot)[0];
+    let guiSlot = _slots.filter(slot => slot.name === _currentSlot)[0];
+    if (backupSlotNames.includes(_currentSlot)) {
+        _slots[_slots.indexOf((guiSlot))] = JSON.parse(JSON.stringify(deviceSlot));
+        emitSlotChange();
+    }
+    window.dispatchEvent(new CustomEvent(C.EVENT_REFRESH_MAIN));
+}
+
+ATDevice.testCurrentSlot = function () {
+    _isTesting = true;
+    if (_currentSlot !== _curretSlotBackup) {
+        ATDevice.sendAtCmdForce(C.AT_CMD_LOAD_SLOT, _currentSlot);
+    }
+    let guiSlotConfig = _slots.filter(slot => slot.name === _currentSlot)[0].config;
+    let deviceSlot = _slotsBackup.filter(slot => slot.name === _currentSlot)[0];
+    let deviceSlotConfig = deviceSlot ? deviceSlot.config : {};
+    Object.keys(guiSlotConfig).forEach(key => {
+        if (deviceSlotConfig[key] !== guiSlotConfig[key]) {
+            if (key.indexOf(C.AT_CMD_BTN_MODE) > -1) {
+                ATDevice.sendAtCmdForce(key);
+                ATDevice.sendAtCmdForce(guiSlotConfig[key]);
+            } else {
+                ATDevice.sendAtCmdForce(key, guiSlotConfig[key]);
+            }
+        }
+    });
+    window.dispatchEvent(new CustomEvent(C.EVENT_REFRESH_MAIN));
+}
+
+ATDevice.isTesting = function () {
+    return _isTesting;
+}
+
+ATDevice.stopTestingCurrentSlot = function () {
+    if (_isTesting) {
+        _isTesting = false;
+        ATDevice.sendAtCmdForce(C.AT_CMD_LOAD_SLOT, _curretSlotBackup);
+        window.dispatchEvent(new CustomEvent(C.EVENT_REFRESH_MAIN));
+    }
+}
+
+ATDevice.approveCurrentSlot = function () {
+    if (!_isTesting) {
+        return;
+    }
+    let backupSlotNames = _slotsBackup.map(slot => slot.name);
+    let deviceSlot = _slotsBackup.filter(slot => slot.name === _currentSlot)[0];
+    let guiSlot = _slots.filter(slot => slot.name === _currentSlot)[0];
+    if (backupSlotNames.includes(_currentSlot)) {
+        _slotsBackup[_slotsBackup.indexOf((deviceSlot))] = JSON.parse(JSON.stringify(guiSlot));
+    } else {
+        _slotsBackup.push(JSON.parse(JSON.stringify(guiSlot)));
+    }
+    ATDevice.sendAtCmdForce(C.AT_CMD_SAVE_SLOT, _currentSlot);
+    _isTesting = false;
+    window.dispatchEvent(new CustomEvent(C.EVENT_REFRESH_MAIN));
+}
+
+ATDevice.hasUnsavedChanges = function () {
+    return JSON.stringify(_slotsBackup) !== JSON.stringify(_slots) || _curretSlotBackup !== _currentSlot;
+}
+
 function emitSlotChange() {
+    emitConfigChange();
     if (_slotChangeHandler && new Date().getTime() - _lastSlotChangeTime > 200) {
         _lastSlotChangeTime = new Date().getTime();
         _slotChangeHandler();
     }
+}
+
+function emitConfigChange() {
+    window.dispatchEvent(new CustomEvent(C.EVENT_CONFIG_CHANGED));
 }
 
 function setConfigInternal(constant, value, slots) {
@@ -568,6 +693,7 @@ function setConfigInternal(constant, value, slots) {
             slotConfig[constant] = value;
         }
     });
+    emitConfigChange();
 }
 
 function startTestingConnection() {
@@ -588,13 +714,15 @@ function stopTestingConnection() {
     clearInterval(_connectionTestIntervalHandler);
 }
 
-
-
 window.addEventListener('beforeunload', () => {
     if (ATDevice.isInitialized()) {
         log.info('saving config before closing...');
         //sending in one command because two are not possible in beforeunload
-        ATDevice.sendATCmd('AT SA ' + _currentSlot + '\n' + C.AT_CMD_STOP_REPORTING_LIVE);
+        let cmd = C.AT_CMD_SAVE_SLOT + ' ' + _currentSlot + '\n' + C.AT_CMD_STOP_REPORTING_LIVE;
+        if (_safeMode) {
+            cmd = C.AT_CMD_LOAD_SLOT + ' ' + _currentSlot + '\n' + C.AT_CMD_STOP_REPORTING_LIVE;
+        }
+        ATDevice.sendAtCmdForce(cmd);
         //ATDevice.save();
         //ATDevice.sendATCmd(C.AT_CMD_STOP_REPORTING_LIVE);
     }

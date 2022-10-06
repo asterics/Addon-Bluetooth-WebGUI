@@ -207,4 +207,10 @@ TabStick.slotChangeHandler = function (data) {
     }
 };
 
+window.addEventListener(C.EVENT_REFRESH_MAIN, () => {
+    if (TabStick.instance) {
+        TabStick.instance.initValues();
+    }
+});
+
 export {TabStick};

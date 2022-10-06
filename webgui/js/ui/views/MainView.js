@@ -5,6 +5,7 @@ import {localStorageService} from "../../localStorageService.js";
 import {FaIcon} from "../components/FaIcon.js";
 import {firmwareUtil} from "../../util/firmwareUtil.js";
 import {helpUtil} from "../../util/helpUtil.js";
+import {SafeModeDialog} from "../components/SafeModeDialog.js";
 
 const html = htm.bind(h);
 
@@ -46,6 +47,10 @@ class MainView extends Component {
                 showScreen: SCREENS.CONNECTION,
             });
         }
+
+        window.addEventListener(C.EVENT_REFRESH_MAIN, () => {
+            this.setState({});
+        });
     }
 
     toConnectionScreen() {
@@ -257,7 +262,8 @@ class MainView extends Component {
                 </div>
             </div>
         </div>
-        <header class="container-fluid p-0 ${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}">
+        
+        <header class="container-fluid p-0 mt-4 ${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}">
             <div class="row">
                 <h1 id="mainHeading" tabindex="-1" class="col col-md-6">${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
                 <div class="d-none d-md-inline-block col-md-3">
@@ -300,18 +306,20 @@ class MainView extends Component {
                 </nav>
             </div>
         </header>
+        
         <main role="main" class="${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}" style="flex-grow: 1">
             <div id="viewContainer" style="margin-bottom: 15em;">
                 ${this.state.currentView ? html`<${this.state.currentView.object}/>` : ''}
             </div>
         </main>
-        <footer class="container-fluid p-0 ${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}" style="border-top: 2px solid #0D5F77">
+        <footer class="container-fluid p-0 mb-4 ${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}" style="border-top: 2px solid #0D5F77">
             <div class="d-flex justify-content-md-around flex-column flex-md-row">
                 ${(C.ADDITIONAL_LINKS || []).map(link => html`
                         <a rel="noreferrer" href="${L.translate(link.url)}" target="_blank" style="padding-top: 1em">${L.translate(link.label)}</a>
                     `)}
             </div>
         </footer>
+        ${ATDevice.isSafeMode() && state.showScreen === SCREENS.MAIN ? html`<${SafeModeDialog}/>` : ''}
         ${MainView.style}`;
     }
 }

@@ -108,6 +108,14 @@ class TabGeneral extends Component {
 
         return html`
         <h2>${L.translate('General settings // Allgemeine Einstellungen')}</h2>
+        <div class="container-fluid p-0">
+            <div class="row">
+                <div class="col-12">
+                    <input id="safeMode" type="checkbox" class="mr-2" onchange="${(event) => ATDevice.setSafeMode(event.target.checked)}" checked="${ATDevice.isSafeMode()}"/>
+                    <label for="safeMode">${L.translate('Enable safe mode // Sicheren Modus aktivieren')}</label>
+                </div>
+            </div>
+        </div>
         <h3>${L.translate('Usage via USB oder Bluetooth // Verwendung über USB oder Bluetooth')}</h3>
         <div class="container-fluid p-0">
             ${slots.map(slot => html`
