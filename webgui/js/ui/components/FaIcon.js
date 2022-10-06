@@ -9,11 +9,12 @@ class FaIcon extends Component {
         let folder = props.icon.split(' ')[0];
         let icon = props.icon.split(' ')[1];
         let height = props.height || '1.2em';
+        let clasz = props.class || '';
         let path = `./lib/fa-svgs/${folder}/${icon}.svg`;
         if (!this.props.icon) {
             return '';
         }
-        return html`<img src="${path}" aria-hidden="true"
+        return html`<img class="${clasz}" src="${path}" aria-hidden="true"
                          style="${`display: inline-block; height: ${height}; margin: 0 0.5em; vertical-align: middle;`} ${this.props.invert ? 'filter: invert(1);' : ''}"/>`;
     }
 }
