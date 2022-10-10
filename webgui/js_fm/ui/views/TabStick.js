@@ -134,17 +134,17 @@ class TabStick extends Component {
                 ${html`<${Slider} label="Maximum speed: // Maximale Geschwindigkeit:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_MAX_SPEED]}"
                     min="0" max="100" updateConstants="${[C.AT_CMD_MAX_SPEED]}"/>`}
             </div>
+            <div class="mt-4">
+                ${html`<${Slider} label="Acceleration: // Beschleunigung:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_ACCELERATION]}"
+                        min="0" max="100" updateConstants="${[C.AT_CMD_ACCELERATION]}"/>`}
+            </div>
             <div class="my-5">
                 <a href="javascript:;" onclick="${() => {localStorageService.save(KEY_TAB_STICK_SHOW_ADVANCED, !state.showAdvanced); this.setState({showAdvanced: !state.showAdvanced})}}">
                     ${state.showAdvanced ? L.translate('Hide advanced options // Verstecke erweiterte Einstellungen') : L.translate('Show advanced options // Zeige erweiterte Einstellungen')}
                 </a>
             </div>
             <div class="${state.showAdvanced ? '' : 'd-none'}">
-                <div class="mt-4">
-                    ${html`<${Slider} label="Acceleration: // Beschleunigung:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_ACCELERATION]}"
-                        min="0" max="100" updateConstants="${[C.AT_CMD_ACCELERATION]}"/>`}
-                </div>
-                <div class="mt-4">
+                <div class="mt-4 ${ATDevice.isMajorVersion(2) ? '' : 'd-none'}">
                     ${(() => {
                         if (state.splitDriftcompRange) {
                             return html`
@@ -161,7 +161,7 @@ class TabStick extends Component {
                         }
                     })()}
                 </div>
-                <div class="mt-4">
+                <div class="mt-4 ${ATDevice.isMajorVersion(2) ? '' : 'd-none'}">
                     ${(() => {
                         if (state.splitDriftcompGain) {
                             return html`
@@ -177,6 +177,17 @@ class TabStick extends Component {
                                 toggleFn="${() => this.toggleState('splitDriftcompGain', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
                         }
                     })()}
+                </div>
+                <div class="mt-4 row ${ATDevice.isMajorVersion(3) ? '' : 'd-none'}">
+                    <label class="col-12" for="selectProfile">${L.translate('Sensitivity profile // Sensitivitäts-Profil')}</label>
+                    <div class="col-12">
+                        <select id="selectProfile" value="${ATDevice.getConfig(C.AT_CMD_SENSORBOARD)}" oninput="${(event) => {ATDevice.setConfig(C.AT_CMD_SENSORBOARD, event.target.value, 0)}}">
+                            <option value="0">1K-Sensorboard</option>
+                            <option value="1">10K-Sensorboard</option>
+                            <option value="2">100K-Sensorboard</option>
+                            <option value="3">StrainGauge-Sesorboard</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="row" style="margin-top: 4em">
