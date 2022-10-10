@@ -49,6 +49,8 @@ let _AT_CMD_BUSY_RESPONSE = 'BUSY';
 let _autoSaveTimeout = 750;
 let _dontGetLiveValues = false;
 
+let _lastVersionResult = null
+
 const SAFE_MODE = "SAFE_MODE";
 let _safeMode = localStorageService.get(SAFE_MODE) || window.location.href.includes('safeMode') || false;
 localStorageService.save(SAFE_MODE, _safeMode);
@@ -78,6 +80,7 @@ ATDevice.init = function (dontGetLiveValues) {
         _isInitialized = true;
         return ATDevice.sendAtCmdWithResultForce(C.AT_CMD_VERSION);
     }).then((versionString) => {
+        _lastVersionResult = L.parseVersion(versionString);
         if (C.DEVICE_IS_FM && versionString.toLowerCase().includes("pad") ||
             C.DEVICE_IS_FLIPPAD && versionString.toLowerCase().includes("mouse")) {
             if (_communicator.close) _communicator.close();
@@ -112,8 +115,14 @@ ATDevice.isInitialized = function () {
 
 ATDevice.getVersion = function () {
     return ATDevice.sendAtCmdWithResultForce(C.AT_CMD_VERSION).then(result => {
+        _lastVersionResult = L.parseVersion(result);
         return Promise.resolve(L.formatVersion(result));
     });
+}
+
+ATDevice.isMajorVersion = function (numValue) {
+    let currentVersion = _lastVersionResult || {};
+    return currentVersion.major === numValue;
 }
 
 ATDevice.getBTVersion = function () {
