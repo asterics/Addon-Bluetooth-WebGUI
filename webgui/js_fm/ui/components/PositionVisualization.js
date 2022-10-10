@@ -153,13 +153,13 @@ class PositionVisualization extends Component {
                         </div>
                         <div style="display: ${this.getValue(props.showAnalogBars, false) ? 'block' : 'none'}">
                             <div id="upPos" class="back-layer color-lightred"
-                                 style="top: ${50-this.getPercentLength(ATDevice.Specific.LIVE_UP)}%; left: 48%; height: ${this.getPercentLength(ATDevice.Specific.LIVE_UP)}%; width: 4%;"></div>
+                                 style="top: ${50-this.getPercentLength(ATDevice.Specific.LIVE_UP)}%; left: 48.5%; height: ${this.getPercentLength(ATDevice.Specific.LIVE_UP)}%; width: 3%;"></div>
                             <div id="downPos" class="back-layer color-lightred"
-                                 style="top: 50%; left: 48%; height: ${this.getPercentLength(ATDevice.Specific.LIVE_DOWN)}%; width: 4%;"></div>
+                                 style="top: 50%; left: 48.5%; height: ${this.getPercentLength(ATDevice.Specific.LIVE_DOWN)}%; width: 3%;"></div>
                             <div id="leftPos" class="back-layer color-lightred"
-                                 style="top: 48%; left: ${50-this.getPercentLength(ATDevice.Specific.LIVE_LEFT)}%; height: 4%; width: ${this.getPercentLength(ATDevice.Specific.LIVE_LEFT)}%;"></div>
+                                 style="top: 48.5%; left: ${50-this.getPercentLength(ATDevice.Specific.LIVE_LEFT)}%; height: 3%; width: ${this.getPercentLength(ATDevice.Specific.LIVE_LEFT)}%;"></div>
                             <div id="rightPos" class="back-layer color-lightred"
-                                 style="top: 48%; left: 50%; height: 4%; width: ${this.getPercentLength(ATDevice.Specific.LIVE_RIGHT)}%;"></div>
+                                 style="top: 48.5%; left: 50%; height: 3%; width: ${this.getPercentLength(ATDevice.Specific.LIVE_RIGHT)}%;"></div>
                         </div>
                         <div class="back-layer"
                              style="left: 50%; height: 100%; border-right-style: solid; border-right-width: thin;"></div>
@@ -175,7 +175,7 @@ class PositionVisualization extends Component {
                             <div id="cursorPosVal" class="back-layer" style="top: 90%; left: 2%;">${Math.round(this.state.maxPos)}</div>
                         </div>
                         <div id="cursorPos" class="back-layer" style="top: ${this.state.pY}%; left: ${this.state.pX}%;">
-                            <div class="back-layer circle" style="${styleUtil.getCircleStyle(this.getValue(props.circleRadius, 20))}"></div>
+                            <div class="back-layer circle" style="${styleUtil.getCircleStyle(this.getValue(props.circleRadius, 12))}"></div>
                         </div>
                         <div id="driftCompPos" class="back-layer ${this.getValue(props.showDriftComp, false) ? '' : 'd-none'}" style="top: ${this.state.driftCompY}%; left: ${this.state.driftCompX}%;">
                             <div class="back-layer circle" style="${styleUtil.getCircleStyle(4, 'blue')}"></div>
