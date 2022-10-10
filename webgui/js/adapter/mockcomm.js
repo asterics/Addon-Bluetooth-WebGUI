@@ -1,5 +1,5 @@
 function MockCommunicator() {
-    let DEFAULT_CONFIGURATION = ['AT AX 60', 'AT AY 60', 'AT DX 20', 'AT DY 20', 'AT MS 50', 'AT AC 50', 'AT TS 500', 'AT TP 525', 'AT WS 3', 'AT SP 700', 'AT SS 300', 'AT MM 1', 'AT GU 50', 'AT GD 50', 'AT GL 50', 'AT GR 50', 'AT RO 0', 'AT BT 1', 'AT BM 01', 'AT NE', 'AT BM 02', 'AT KP KEY_ESC', 'AT BM 03', 'AT NC', 'AT BM 04', 'AT KP KEY_UP', 'AT BM 05', 'AT KP KEY_DOWN', 'AT BM 06', 'AT KP KEY_LEFT', 'AT BM 07', 'AT KP KEY_RIGHT', 'AT BM 08', 'AT PL', 'AT BM 09', 'AT NC', 'AT BM 10', 'AT CR', 'AT BM 11', 'AT CA', 'AT BM 12', 'AT NC', 'AT BM 13', 'AT NC', 'AT BM 14', 'AT NC', 'AT BM 15', 'AT NC', 'AT BM 16', 'AT NC', 'AT BM 17', 'AT NC', 'AT BM 18', 'AT NC', 'AT BM 19', 'AT NC'];
+    let DEFAULT_CONFIGURATION = ['AT SB 2', 'AT AX 60', 'AT AY 60', 'AT DX 20', 'AT DY 20', 'AT MS 50', 'AT AC 50', 'AT TS 500', 'AT TP 525', 'AT WS 3', 'AT SP 700', 'AT SS 300', 'AT MM 1', 'AT GU 50', 'AT GD 50', 'AT GL 50', 'AT GR 50', 'AT RO 0', 'AT BT 1', 'AT BM 01', 'AT NE', 'AT BM 02', 'AT KP KEY_ESC', 'AT BM 03', 'AT NC', 'AT BM 04', 'AT KP KEY_UP', 'AT BM 05', 'AT KP KEY_DOWN', 'AT BM 06', 'AT KP KEY_LEFT', 'AT BM 07', 'AT KP KEY_RIGHT', 'AT BM 08', 'AT PL', 'AT BM 09', 'AT NC', 'AT BM 10', 'AT CR', 'AT BM 11', 'AT CA', 'AT BM 12', 'AT NC', 'AT BM 13', 'AT NC', 'AT BM 14', 'AT NC', 'AT BM 15', 'AT NC', 'AT BM 16', 'AT NC', 'AT BM 17', 'AT NC', 'AT BM 18', 'AT NC', 'AT BM 19', 'AT NC'];
     var VALUE_CONSTANT = 'VALUES:';
     var _valueHandler = null;
     var _invervalHandler = null;
@@ -32,7 +32,7 @@ function MockCommunicator() {
                         if(thiz.y > 100 || thiz.y < -100 || thiz.x > 100 || thiz.x < -100) {
                             thiz.incrementXY *= -1;
                         }
-                        _valueHandler(`${VALUE_CONSTANT}${thiz.pressure},${getRandomInt(500,600)},${getRandomInt(500,600)},${getRandomInt(500,600)},${getRandomInt(500,600)},${thiz.x},${thiz.y}`);
+                        _valueHandler(`${VALUE_CONSTANT}${thiz.pressure},${getRandomInt(500,600)},${getRandomInt(500,600)},${getRandomInt(500,600)},${getRandomInt(500,600)},${thiz.x},${thiz.y},111,mouse,10,10`);
                     }
                 }, 200);
             } else if (value.indexOf('AT ER') > -1) {
@@ -47,7 +47,7 @@ function MockCommunicator() {
             } else if (value.indexOf('AT IL') > -1) {
                 resolve('IRCommand0:play\nIRCommand1:pause\nIRCommand2:stop');
             } else if (value.indexOf('AT ID') > -1) {
-                resolve('VERSION 5.0');
+                resolve('VERSION 3.14');
             }
             setTimeout(function () {
                 resolve();
