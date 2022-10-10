@@ -113,7 +113,13 @@ class PositionVisualization extends Component {
         canvas.height = posVisSize;
         let ctx = canvas.getContext('2d');
         ctx.beginPath();
-        ctx.ellipse(ctx.canvas.width / 2, ctx.canvas.height / 2, ctx.canvas.width * this.state.pDzX / 200, ctx.canvas.height * this.state.pDzY / 200, 0, 0, 2 * Math.PI);
+        let rectW = ctx.canvas.width * this.state.pDzX / 100;
+        let rectH = ctx.canvas.height * this.state.pDzY / 100;
+        if (ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value) {
+            ctx.rect(ctx.canvas.width / 2 - rectW / 2, ctx.canvas.height / 2 - rectH / 2, rectW, rectH);
+        } else {
+            ctx.ellipse(ctx.canvas.width / 2, ctx.canvas.height / 2, rectW / 2, rectH / 2, 0, 0, 2 * Math.PI);
+        }
         ctx.fillStyle = this.state.inDeadzone ? '#9be7ff' : '#cceff9';
         ctx.fill();
     }
