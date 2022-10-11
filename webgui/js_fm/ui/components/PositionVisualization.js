@@ -151,7 +151,7 @@ class PositionVisualization extends Component {
                             <div id="driftComp" class="back-layer"
                                  style="top: ${Math.max(100 - this.state.pDriftY, 0) / 2}%; left: ${Math.max(100 - this.state.pDriftX, 0) / 2}%; height: ${Math.min(this.state.pDriftY, 100)}%; width: ${Math.min(this.state.pDriftX, 100)}%; background-color: transparent; border: 1px solid gray"></div>
                         </div>
-                        <div style="display: ${this.getValue(props.showAnalogBars, false) ? 'block' : 'none'}">
+                        <div class="analogBars" style="display: ${this.getValue(props.showAnalogBars, false) ? 'block' : 'none'}">
                             <div id="upPos" class="back-layer color-lightred"
                                  style="top: ${50-this.getPercentLength(ATDevice.Specific.LIVE_UP)}%; left: 48.5%; height: ${this.getPercentLength(ATDevice.Specific.LIVE_UP)}%; width: 3%;"></div>
                             <div id="downPos" class="back-layer color-lightred"
@@ -181,7 +181,12 @@ class PositionVisualization extends Component {
                             <div class="back-layer circle" style="${styleUtil.getCircleStyle(4, 'blue')}"></div>
                         </div>
                     </div>
-                </div>`;
+                </div>
+                <style>
+                    .analogBars div {
+                        opacity: 0.7;
+                    }
+                </style>`;
     }
 }
 
