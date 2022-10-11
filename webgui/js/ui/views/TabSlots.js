@@ -23,7 +23,8 @@ class TabSlots extends Component {
             demoSettingSelectedText: {},
             demoSettings: [],
             showDemoDescription: false,
-            selectedFileValid: undefined
+            selectedFileValid: undefined,
+            showColorInput: C.DEVICE_IS_FABI || (C.DEVICE_IS_FM && ATDevice.isMajorVersion(3))
         }
         let url = `https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/contents/Settings`;
         L.HTTPRequest(url, 'GET', 'json').then(result => {
@@ -215,7 +216,7 @@ class TabSlots extends Component {
                             <li class="my-2" style="${index % 2 === 0 ? 'background-color: rgb(224 224 224)' : ''}">
                                 <div class="row d-flex align-items-center">
                                     <div class="col-4">
-                                        <span class="mx-2 px-3 ${C.DEVICE_IS_FM_OR_PAD ? 'd-none' : ''}"
+                                        <span class="mx-2 px-3 ${state.showColorInput? '' : 'd-none'}"
                                               style="background-color: ${ATDevice.getConfig(C.AT_CMD_SET_COLOR, slot).replace('0x', '#')}; border: 1px solid"></span>
                                         <a title="${L.translate('Slot "{?}": click to activate // Slot "{?}": zum Aktivieren klicken', slot)}"
                                            href="javascript:;" onclick="${() => ATDevice.setSlot(slot)}"
@@ -230,10 +231,10 @@ class TabSlots extends Component {
                                         <div class="row d-flex">
                                             <div class="col">
                                                 <label for="colorinput${slot}"
-                                                       class="small-button button py-2 py-md-0 ${C.DEVICE_IS_FM_OR_PAD ? 'd-none' : ''}">${html`
+                                                       class="small-button button py-2 py-md-0 ${state.showColorInput ? '' : 'd-none'}">${html`
                                                     <${FaIcon} icon="fas palette"/>`}<span
                                                         class="d-none d-sm-inline">${L.translate('Set color // Farbe wählen')}</span></label>
-                                                <input id="colorinput${slot}" type="color" class="sr-only ${C.DEVICE_IS_FM_OR_PAD ? 'd-none' : ''}"
+                                                <input id="colorinput${slot}" type="color" class="sr-only ${state.showColorInput ? '' : 'd-none'}"
                                                        oninput="${(event) => this.colorChanged(slot, event)}"/>
                                             </div>
                                             <div class="col d-flex">
