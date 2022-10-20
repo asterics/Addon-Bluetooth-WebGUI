@@ -3,6 +3,7 @@ import htm from '../../../lib/htm.min.js';
 import {PositionVisualization} from "../components/PositionVisualization.js";
 import {BtnSipPuffVisualization} from "../components/BtnSipPuffVisualization.js";
 import {localStorageService} from "../../../js/localStorageService.js";
+import {MouseAndKeyboardVisualization} from "../../../js/ui/components/MouseAndKeyboardVisualization.js";
 
 const html = htm.bind(h);
 
@@ -63,6 +64,10 @@ class TabVisualization extends Component {
                     <button class="col-12 col-md m-1" onclick="${() => this.toggleState('showMaxPos')}">Max. Position</button>
                     <button class="col-12 col-md m-1" onclick="${() => this.toggleState('showOrientation')}">Orientation</button>
                 </div>
+            </div>
+            <h3 class="mt-5">${L.translate('Currently pressed buttons // Aktuell gedrückte Tasten')}</h3>
+            <div>
+                <${MouseAndKeyboardVisualization}/>
             </div>
             `;
     }

@@ -2,6 +2,7 @@ import { h, Component, render } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
 import {styleUtil} from "../../../js/util/styleUtil.js";
 import {ATDevice} from "../../../js/communication/ATDevice.js";
+import {MouseAndKeyboardVisualization} from "../../../js/ui/components/MouseAndKeyboardVisualization.js";
 
 const html = htm.bind(h);
 
@@ -43,6 +44,10 @@ class TabVisualization extends Component {
                 }
                 return html`<div style="margin: 10px; ${styleUtil.getCircleStyle(circleRadius, color, 'medium solid')}; ${fontStyle}">${L.translate(btnNames[index])}</div>`
             })}
+        </div>
+        <h3 class="mt-5">${L.translate('Currently pressed buttons // Aktuell gedrückte Tasten')}</h3>
+        <div>
+            <${MouseAndKeyboardVisualization}/>
         </div>
             `;
     }
