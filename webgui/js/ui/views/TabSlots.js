@@ -4,6 +4,7 @@ import {ATDevice} from "../../communication/ATDevice.js";
 import {FaIcon} from "../components/FaIcon.js";
 import {ActionButton} from "../components/ActionButton.js";
 import {TextModal} from "../modals/TextModal.js";
+import {Slider} from "../components/Slider.js";
 
 const html = htm.bind(h);
 class TabSlots extends Component {
@@ -390,6 +391,25 @@ class TabSlots extends Component {
                                             disabled="${state.demoSettingSlots.length === 0}"
                                             progressLabel="${L.translate('Uploading slots {?}% ... // Slots hochladen {?}% ...', state.uploadProgress)}" faIcon="fas upload"/>`}
                         </div>
+                    </div>
+                </div>
+                <h3 class="mt-5">${L.translate('Slot test mode // Slot-Test Modus')}</h3>
+                <div class="row">
+                    <div class="col-12">
+                        <input id="safeMode" type="checkbox" class="mr-2" onchange="${(event) => ATDevice.setSlotTestModeOptions({enabled: event.target.checked})}" checked="${ATDevice.isSlotTestMode()}"/>
+                        <label for="safeMode">${L.translate('Enable slot test mode // Slot-Test Modus aktivieren')}</label>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-sm-6 col-lg-5">
+                        <${Slider} label="Countdown before Test [s] // Countdown vor Test [s]" oninput="${(value) => ATDevice.setSlotTestModeOptions({countdownSeconds: parseInt(value)})}"
+                                   min="1" max="120" value="${ATDevice.getSlotTestModeOptions().countdownSeconds}"/>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-lg-5">
+                        <${Slider} label="Test duration [s] // Test-Dauer [s]" oninput="${(value) => ATDevice.setSlotTestModeOptions({testSeconds: parseInt(value)})}"
+                                   min="1" max="600" value="${ATDevice.getSlotTestModeOptions().testSeconds}"/>
                     </div>
                 </div>
             </div>

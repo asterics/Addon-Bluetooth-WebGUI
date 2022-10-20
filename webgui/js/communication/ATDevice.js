@@ -51,9 +51,13 @@ let _dontGetLiveValues = false;
 
 let _lastVersionResult = null
 
-const SAFE_MODE = "SAFE_MODE";
-let _safeMode = localStorageService.get(SAFE_MODE) || window.location.href.includes('safeMode') || false;
-localStorageService.save(SAFE_MODE, _safeMode);
+const TEST_MODE_OPTIONS = "TEST_MODE_OPTIONS";
+let _testModeOptions = localStorageService.get(TEST_MODE_OPTIONS) || {
+    enabled: false,
+    countdownSeconds: 10,
+    testSeconds: 90
+};
+localStorageService.save(TEST_MODE_OPTIONS, _testModeOptions);
 let _isTesting = false;
 
 /**
@@ -151,7 +155,7 @@ ATDevice.getBTVersion = function () {
  */
 ATDevice.sendATCmd = function (atCmd, param, options) {
     options = options || {};
-    if (_safeMode && !options.forceSend) {
+    if (_testModeOptions.enabled && !options.forceSend) {
         log.info(`not sending command ${atCmd} command because of safe mode.`);
         return Promise.resolve();
     }
@@ -597,24 +601,29 @@ ATDevice.getCommunicator = function () {
     return _communicator;
 }
 
-ATDevice.isSafeMode = function () {
-    return _safeMode;
+ATDevice.isSlotTestMode = function () {
+    return _testModeOptions.enabled;
 }
 
-ATDevice.setSafeMode = function (enabled) {
-    if (!_safeMode && enabled) {
+ATDevice.setSlotTestModeOptions = function (options) {
+    options = options || {};
+    if (!_testModeOptions.enabled && options.enabled) {
         _curretSlotBackup = _currentSlot;
         _slotsBackup = JSON.parse(JSON.stringify(_slots));
     }
-    _safeMode = enabled;
-    localStorageService.save(SAFE_MODE, enabled);
+    _testModeOptions = Object.assign(_testModeOptions, options);
+    localStorageService.save(TEST_MODE_OPTIONS, _testModeOptions);
     if (_slotChangeHandler) { // repaint MainView
         _slotChangeHandler();
     }
 }
 
+ATDevice.getSlotTestModeOptions = function () {
+    return JSON.parse(JSON.stringify(_testModeOptions));
+}
+
 ATDevice.revertCurrentSlot = function () {
-    if (!_safeMode) {
+    if (!_testModeOptions.enabled) {
         return;
     }
     ATDevice.stopTestingCurrentSlot();
@@ -728,7 +737,7 @@ window.addEventListener('beforeunload', () => {
         log.info('saving config before closing...');
         //sending in one command because two are not possible in beforeunload
         let cmd = C.AT_CMD_SAVE_SLOT + ' ' + _currentSlot + '\n' + C.AT_CMD_STOP_REPORTING_LIVE;
-        if (_safeMode) {
+        if (_testModeOptions.enabled) {
             cmd = C.AT_CMD_LOAD_SLOT + ' ' + _currentSlot + '\n' + C.AT_CMD_STOP_REPORTING_LIVE;
         }
         ATDevice.sendAtCmdForce(cmd);
