@@ -71,9 +71,7 @@ function parseLiveData(data) {
         }
         if (valArray[2]) {
             let slot = ATDevice.getSlotName(parseInt(valArray[2]));
-            if (slot && slot !== ATDevice.getCurrentSlot() && !ATDevice.isSlotTestMode()) {
-                ATDevice.setSlot(slot, true);
-            }
+            ATDevice.handleSlotChangeFromDevice(slot);
         }
         _liveData[FABI.LIVE_PRESSURE_MIN] = L.robustMin(_liveData[FABI.LIVE_PRESSURE_MIN], _liveData[FABI.LIVE_PRESSURE]);
         _liveData[FABI.LIVE_PRESSURE_MAX] = L.robustMax(_liveData[FABI.LIVE_PRESSURE_MAX], _liveData[FABI.LIVE_PRESSURE]);

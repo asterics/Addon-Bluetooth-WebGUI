@@ -131,9 +131,7 @@ function parseLiveData(data) {
         }
         if (valArray[8]) {
             let slot = ATDevice.getSlotName(parseInt(valArray[8]));
-            if (slot && slot !== ATDevice.getCurrentSlot() && !ATDevice.isSlotTestMode()) {
-                ATDevice.setSlot(slot, true);
-            }
+            ATDevice.handleSlotChangeFromDevice(slot);
         }
         if (valArray[9]) {
             _liveData[FLipMouse.LIVE_DRIFTCOMP_X] = parseInt(valArray[9]);

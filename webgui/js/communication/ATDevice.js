@@ -26,7 +26,7 @@ import(deviceClassPath).then(module => {
 let _slots = [];
 let _slotsBackup = [];
 let _currentSlot = null;
-let _curretSlotBackup = null;
+let _currentSlotBackup = null;
 let _slotChangeHandler = null;
 let _lastSlotChangeTime = 0;
 let _SLOT_CONSTANT = 'Slot';
@@ -58,7 +58,8 @@ let _testModeOptions = localStorageService.get(TEST_MODE_OPTIONS) || {
     testSeconds: 90
 };
 localStorageService.save(TEST_MODE_OPTIONS, _testModeOptions);
-let _isTesting = false;
+let _currentlyTestingSlot = '';
+let _currentDeviceSlot = '';
 
 /**
  * initializes the instance of the device
@@ -359,7 +360,7 @@ ATDevice.refreshConfig = function () {
             _slots = ATDevice.parseConfig(response);
             _slotsBackup = JSON.parse(JSON.stringify(_slots));
             _currentSlot = _currentSlot || _slots[0].name;
-            _curretSlotBackup = _currentSlot;
+            _currentSlotBackup = _currentSlot;
             emitConfigChange();
             resolve();
         }, function () {
@@ -455,6 +456,21 @@ ATDevice.getSlotConfigText = function (slotName) {
     });
 
     return ret;
+}
+
+ATDevice.handleSlotChangeFromDevice = function (deviceSlot) {
+    if (!deviceSlot) {
+        return;
+    }
+    if (ATDevice.isSlotTestMode() && ATDevice.isTesting()) {
+        if (deviceSlot === _currentlyTestingSlot && _currentDeviceSlot !== deviceSlot) { // switched back to current testing slot on device
+            applySlotChangesToDevice();
+        }
+    }
+    _currentDeviceSlot = deviceSlot;
+    if (!ATDevice.isSlotTestMode()) {
+        ATDevice.setSlot(deviceSlot, true);
+    }
 }
 
 ATDevice.setSlot = function (slot, dontSendToDevice) {
@@ -608,7 +624,7 @@ ATDevice.isSlotTestMode = function () {
 ATDevice.setSlotTestModeOptions = function (options) {
     options = options || {};
     if (!_testModeOptions.enabled && options.enabled) {
-        _curretSlotBackup = _currentSlot;
+        _currentSlotBackup = _currentSlot;
         _slotsBackup = JSON.parse(JSON.stringify(_slots));
     }
     _testModeOptions = Object.assign(_testModeOptions, options);
@@ -638,10 +654,51 @@ ATDevice.revertCurrentSlot = function () {
 }
 
 ATDevice.testCurrentSlot = function () {
-    _isTesting = true;
-    if (_currentSlot !== _curretSlotBackup) {
+    _currentlyTestingSlot = _currentSlot;
+    if (_currentSlot !== _currentSlotBackup) {
         ATDevice.sendAtCmdForce(C.AT_CMD_LOAD_SLOT, _currentSlot);
     }
+    applySlotChangesToDevice();
+    window.dispatchEvent(new CustomEvent(C.EVENT_REFRESH_MAIN));
+}
+
+ATDevice.isTesting = function () {
+    return !!_currentlyTestingSlot;
+}
+
+ATDevice.stopTestingCurrentSlot = function () {
+    if (_currentlyTestingSlot) {
+        _currentlyTestingSlot = '';
+        ATDevice.sendAtCmdForce(C.AT_CMD_LOAD_SLOT, _currentSlotBackup);
+        window.dispatchEvent(new CustomEvent(C.EVENT_REFRESH_MAIN));
+    }
+}
+
+ATDevice.approveCurrentSlot = function () {
+    if (!_currentlyTestingSlot) {
+        return;
+    }
+    let backupSlotNames = _slotsBackup.map(slot => slot.name);
+    let deviceSlot = _slotsBackup.filter(slot => slot.name === _currentSlot)[0];
+    let guiSlot = _slots.filter(slot => slot.name === _currentSlot)[0];
+    if (backupSlotNames.includes(_currentSlot)) {
+        _slotsBackup[_slotsBackup.indexOf((deviceSlot))] = JSON.parse(JSON.stringify(guiSlot));
+    } else {
+        _slotsBackup.push(JSON.parse(JSON.stringify(guiSlot)));
+    }
+    ATDevice.sendAtCmdForce(C.AT_CMD_SAVE_SLOT, _currentSlot);
+    _currentlyTestingSlot = '';
+    window.dispatchEvent(new CustomEvent(C.EVENT_REFRESH_MAIN));
+}
+
+ATDevice.hasUnsavedChanges = function () {
+    let guiSlotConfig = _slots.filter(slot => slot.name === _currentSlot)[0].config;
+    let deviceSlot = _slotsBackup.filter(slot => slot.name === _currentSlot)[0];
+    let deviceSlotConfig = deviceSlot ? deviceSlot.config : {};
+    return JSON.stringify(guiSlotConfig) !== JSON.stringify(deviceSlotConfig);
+}
+
+function applySlotChangesToDevice() {
     let guiSlotConfig = _slots.filter(slot => slot.name === _currentSlot)[0].config;
     let deviceSlot = _slotsBackup.filter(slot => slot.name === _currentSlot)[0];
     let deviceSlotConfig = deviceSlot ? deviceSlot.config : {};
@@ -655,40 +712,6 @@ ATDevice.testCurrentSlot = function () {
             }
         }
     });
-    window.dispatchEvent(new CustomEvent(C.EVENT_REFRESH_MAIN));
-}
-
-ATDevice.isTesting = function () {
-    return _isTesting;
-}
-
-ATDevice.stopTestingCurrentSlot = function () {
-    if (_isTesting) {
-        _isTesting = false;
-        ATDevice.sendAtCmdForce(C.AT_CMD_LOAD_SLOT, _curretSlotBackup);
-        window.dispatchEvent(new CustomEvent(C.EVENT_REFRESH_MAIN));
-    }
-}
-
-ATDevice.approveCurrentSlot = function () {
-    if (!_isTesting) {
-        return;
-    }
-    let backupSlotNames = _slotsBackup.map(slot => slot.name);
-    let deviceSlot = _slotsBackup.filter(slot => slot.name === _currentSlot)[0];
-    let guiSlot = _slots.filter(slot => slot.name === _currentSlot)[0];
-    if (backupSlotNames.includes(_currentSlot)) {
-        _slotsBackup[_slotsBackup.indexOf((deviceSlot))] = JSON.parse(JSON.stringify(guiSlot));
-    } else {
-        _slotsBackup.push(JSON.parse(JSON.stringify(guiSlot)));
-    }
-    ATDevice.sendAtCmdForce(C.AT_CMD_SAVE_SLOT, _currentSlot);
-    _isTesting = false;
-    window.dispatchEvent(new CustomEvent(C.EVENT_REFRESH_MAIN));
-}
-
-ATDevice.hasUnsavedChanges = function () {
-    return JSON.stringify(_slotsBackup) !== JSON.stringify(_slots) || _curretSlotBackup !== _currentSlot;
 }
 
 function emitSlotChange() {
