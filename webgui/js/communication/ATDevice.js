@@ -26,7 +26,6 @@ import(deviceClassPath).then(module => {
 let _slots = [];
 let _slotsBackup = [];
 let _currentSlot = null;
-let _currentSlotBackup = null;
 let _slotChangeHandler = null;
 let _lastSlotChangeTime = 0;
 let _SLOT_CONSTANT = 'Slot';
@@ -60,6 +59,7 @@ let _testModeOptions = localStorageService.get(TEST_MODE_OPTIONS) || {
 localStorageService.save(TEST_MODE_OPTIONS, _testModeOptions);
 let _currentlyTestingSlot = '';
 let _currentDeviceSlot = '';
+let _slotBeforeTest = '';
 
 /**
  * initializes the instance of the device
@@ -360,7 +360,6 @@ ATDevice.refreshConfig = function () {
             _slots = ATDevice.parseConfig(response);
             _slotsBackup = JSON.parse(JSON.stringify(_slots));
             _currentSlot = _currentSlot || _slots[0].name;
-            _currentSlotBackup = _currentSlot;
             emitConfigChange();
             resolve();
         }, function () {
@@ -624,7 +623,6 @@ ATDevice.isSlotTestMode = function () {
 ATDevice.setSlotTestModeOptions = function (options) {
     options = options || {};
     if (!_testModeOptions.enabled && options.enabled) {
-        _currentSlotBackup = _currentSlot;
         _slotsBackup = JSON.parse(JSON.stringify(_slots));
     }
     _testModeOptions = Object.assign(_testModeOptions, options);
@@ -654,8 +652,9 @@ ATDevice.revertCurrentSlot = function () {
 }
 
 ATDevice.testCurrentSlot = function () {
+    _slotBeforeTest = _currentDeviceSlot;
     _currentlyTestingSlot = _currentSlot;
-    if (_currentSlot !== _currentSlotBackup) {
+    if (_currentSlot !== _currentDeviceSlot) {
         ATDevice.sendAtCmdForce(C.AT_CMD_LOAD_SLOT, _currentSlot);
     }
     applySlotChangesToDevice();
@@ -669,15 +668,19 @@ ATDevice.isTesting = function () {
 ATDevice.stopTestingCurrentSlot = function () {
     if (_currentlyTestingSlot) {
         _currentlyTestingSlot = '';
-        ATDevice.sendAtCmdForce(C.AT_CMD_LOAD_SLOT, _currentSlotBackup);
+        ATDevice.sendAtCmdForce(C.AT_CMD_LOAD_SLOT, _slotBeforeTest);
         window.dispatchEvent(new CustomEvent(C.EVENT_REFRESH_MAIN));
     }
 }
 
 ATDevice.approveCurrentSlot = function () {
-    if (!_currentlyTestingSlot) {
-        return;
+    let originalSlot = _currentDeviceSlot;
+    if (_currentSlot !== _currentDeviceSlot) {
+        ATDevice.sendAtCmdForce(C.AT_CMD_LOAD_SLOT, _currentSlot);
     }
+    applySlotChangesToDevice();
+    ATDevice.sendAtCmdForce(C.AT_CMD_SAVE_SLOT, _currentSlot);
+    ATDevice.sendAtCmdForce(C.AT_CMD_LOAD_SLOT, originalSlot);
     let backupSlotNames = _slotsBackup.map(slot => slot.name);
     let deviceSlot = _slotsBackup.filter(slot => slot.name === _currentSlot)[0];
     let guiSlot = _slots.filter(slot => slot.name === _currentSlot)[0];
@@ -686,8 +689,6 @@ ATDevice.approveCurrentSlot = function () {
     } else {
         _slotsBackup.push(JSON.parse(JSON.stringify(guiSlot)));
     }
-    ATDevice.sendAtCmdForce(C.AT_CMD_SAVE_SLOT, _currentSlot);
-    _currentlyTestingSlot = '';
     window.dispatchEvent(new CustomEvent(C.EVENT_REFRESH_MAIN));
 }
 
@@ -761,7 +762,7 @@ window.addEventListener('beforeunload', () => {
         //sending in one command because two are not possible in beforeunload
         let cmd = C.AT_CMD_SAVE_SLOT + ' ' + _currentSlot + '\n' + C.AT_CMD_STOP_REPORTING_LIVE;
         if (_testModeOptions.enabled) {
-            cmd = C.AT_CMD_LOAD_SLOT + ' ' + _currentSlot + '\n' + C.AT_CMD_STOP_REPORTING_LIVE;
+            cmd = C.AT_CMD_LOAD_SLOT + ' ' + _currentDeviceSlot + '\n' + C.AT_CMD_STOP_REPORTING_LIVE;
         }
         ATDevice.sendAtCmdForce(cmd);
         //ATDevice.save();
