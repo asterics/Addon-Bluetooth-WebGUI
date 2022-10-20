@@ -159,7 +159,12 @@ firmwareUtil.getBTFWInfo = function () {
 }
 
 firmwareUtil.getDeviceFWInfo = function () {
-    return getFWInfo(`https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/releases/latest`, '.hex');
+    let repoName = C.CURRENT_DEVICE;
+    if (C.DEVICE_IS_FM && ATDevice.isMajorVersion(2)) {
+        repoName = "FLipMouse-v2";
+    }
+    log.warn(repoName)
+    return getFWInfo(`https://api.github.com/repos/asterics/${repoName}/releases/latest`, '.hex');
 }
 
 firmwareUtil.updateDeviceFirmware = function(progressHandler) {
