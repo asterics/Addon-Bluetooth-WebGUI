@@ -4,16 +4,16 @@ import {ATDevice} from "../../communication/ATDevice.js";
 import {FaIcon} from "./FaIcon.js";
 const html = htm.bind(h);
 
-let REVERT_TIME = 10
-
-class SafeModeDialog extends Component {
+class SlotTestModeDialog extends Component {
 
     constructor(props) {
         super();
         this.state = {
             actionPerforming: false,
             minimized: false,
-            revertTime: REVERT_TIME
+            revertTime: ATDevice.getSlotTestModeOptions().testSeconds,
+            coutdownTime: ATDevice.getSlotTestModeOptions().countdownSeconds,
+            coutdownIntervalHandler: null
         }
         this.props = props;
         window.addEventListener(C.EVENT_CONFIG_CHANGED, () => {
@@ -21,8 +21,26 @@ class SafeModeDialog extends Component {
         });
     }
 
+    startTestCountdown() {
+        this.stopTesting();
+        let intervalHandler = setInterval(() => {
+            let newTime = this.state.coutdownTime - 1;
+            if (newTime > 0) {
+                this.setState({
+                    coutdownTime: newTime
+                })
+            } else {
+                this.stopTesting();
+                this.testSlot();
+            }
+        }, 1000);
+        this.setState({
+            coutdownIntervalHandler: intervalHandler
+        });
+    }
+
     testSlot() {
-        ATDevice.testCurrentSlot()
+        ATDevice.testCurrentSlot();
         this.intervalHandler = setInterval(() => {
             let newTime = this.state.revertTime - 1;
             if (newTime > 0) {
@@ -37,10 +55,13 @@ class SafeModeDialog extends Component {
 
     stopTesting() {
         clearInterval(this.intervalHandler);
+        clearInterval(this.state.coutdownIntervalHandler);
         ATDevice.stopTestingCurrentSlot();
         this.setState({
-            revertTime: REVERT_TIME
-        })
+            revertTime: ATDevice.getSlotTestModeOptions().testSeconds,
+            coutdownTime: ATDevice.getSlotTestModeOptions().countdownSeconds,
+            coutdownIntervalHandler: null
+        });
     }
 
     addTime() {
@@ -56,7 +77,7 @@ class SafeModeDialog extends Component {
                 <div class="position-relative container-fluid">
                     <div class="row mb-2">
                         <span class="mr-3">
-                            <strong class="mr-2">${L.translate('Safe mode // Sicherer Modus')}</strong>
+                            <strong class="mr-2">${L.translate('Slot test mode // Slot-Test Modus')}</strong>
                             <span class="${ATDevice.hasUnsavedChanges() ? 'd-none' : ''}">${html`<${FaIcon} icon="fas check"/>`} <span class="d-none d-md-inline">${L.translate('(all saved) // (gespeichert)')}</span></span>
                             <span class="${!ATDevice.hasUnsavedChanges() ? 'd-none' : ''}">${html`<${FaIcon} icon="fas exclamation-triangle"/>`} <span class="d-none d-md-inline">${L.translate('(not saved) // (geändert)')}</span></span>
                         </span>
@@ -71,34 +92,42 @@ class SafeModeDialog extends Component {
                     </div>
                 </div>
                 <div class="position-relative container-fluid p-0">
-                    <div class="row ${state.minimized ? 'd-none' : ''}">
+                    <div class="row ${state.coutdownIntervalHandler ? '' : 'd-none'}">
+                        <div class="col-12">
+                            <span class="mr-2" style="font-size: 1.5em">${L.translate('Test starts in {?} seconds ... // Test startet in {?} Sekunden ...', state.coutdownTime)}</span>
+                            <button onclick="${() => this.stopTesting()}">${L.translate('Cancel // Abbrechen')}</button>
+                        </div>
+                    </div>
+                    <div class="row ${ATDevice.isTesting() ? '' : 'd-none'}">
+                        <div class="col-12">
+                            <span class="mr-2" style="font-size: 1.5em">${L.translate('Test is running! Revert in {?} seconds ... // Test läuft! Zurücksetzen in {?} Sekunden ...', state.revertTime)}</span>
+                            <button onclick="${() => this.stopTesting()}">${L.translate('Stop test // Test stoppen')}</button>
+                            <button class="col-12" onclick="${() => this.addTime()}">+30s</button>
+                        </div>
+                    </div>
+                    <div class="row ${state.minimized || state.coutdownIntervalHandler || ATDevice.isTesting() ? 'd-none' : ''}">
                         <div class="col-12 col-md-3 col-xl-3 d-flex">
                             <button class="col-12" onclick="${() => ATDevice.revertCurrentSlot()}" disabled="${!ATDevice.hasUnsavedChanges()}">${L.translate('Revert slot changes // Slot zurücksetzen')}</button>
                         </div>
                         <div class="col-12 col-md-3 col-xl-3 ${ATDevice.isTesting() ? 'd-none' : 'd-flex'}">
-                            <button class="col-12" onclick="${() => this.testSlot()}" disabled="${!ATDevice.hasUnsavedChanges()}">${L.translate('Test current slot // Aktuellen Slot testen')}</button>
+                            <button class="col-12" onclick="${() => this.startTestCountdown()}" disabled="${!ATDevice.hasUnsavedChanges()}">${L.translate('Test current slot // Aktuellen Slot testen')}</button>
                         </div>
-                        <div class="col-8 col-md-3 col-xl-3 ${!ATDevice.isTesting() ? 'd-none' : 'd-flex'}">
-                            <button class="col-12" onclick="${() => this.stopTesting()}">${L.translate('Stop testing // Test stoppen')} <span>${state.revertTime}s</span></button>
-                        </div>
-                        <div class="col-4 col-md col-xl-1 ${!ATDevice.isTesting() ? 'd-none' : 'd-flex'}">
-                            <button class="col-12" onclick="${() => this.addTime()}">+30s</button>
-                        </div>
-                        <div class="col-12 col-md-3 col-xl-3 ${!ATDevice.isTesting() ? 'd-none' : 'd-flex'}">
-                            <button class="col-12" onclick="${() => ATDevice.approveCurrentSlot()}">${L.translate('Save current slot // Aktuellen Slot speichern')}</button>
+                        <div class="col-12 col-md-3 col-xl-3 ${ATDevice.isTesting() ? 'd-none' : 'd-flex'}">
+                            <button class="col-12" onclick="${() => ATDevice.approveCurrentSlot()}" disabled="${!ATDevice.hasUnsavedChanges()}">${L.translate('Save current slot // Aktuellen Slot speichern')}</button>
                         </div>
                     </div>
                 </div>
             </aside>
-            ${SafeModeDialog.style}`;
+            ${SlotTestModeDialog.style}`;
     }
 }
 
-SafeModeDialog.style = html`<style>
+SlotTestModeDialog.style = html`<style>
     .safe-mode-dialog button {
         text-transform: none;
         line-height: 2em;
+        width: unset;
     }
 </style>`
 
-export {SafeModeDialog};
+export {SlotTestModeDialog};

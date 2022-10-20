@@ -131,7 +131,7 @@ function parseLiveData(data) {
         }
         if (valArray[8]) {
             let slot = ATDevice.getSlotName(parseInt(valArray[8]));
-            if (slot && slot !== ATDevice.getCurrentSlot() && !ATDevice.isSafeMode()) {
+            if (slot && slot !== ATDevice.getCurrentSlot() && !ATDevice.isSlotTestMode()) {
                 ATDevice.setSlot(slot, true);
             }
         }

@@ -5,7 +5,7 @@ import {localStorageService} from "../../localStorageService.js";
 import {FaIcon} from "../components/FaIcon.js";
 import {firmwareUtil} from "../../util/firmwareUtil.js";
 import {helpUtil} from "../../util/helpUtil.js";
-import {SafeModeDialog} from "../components/SafeModeDialog.js";
+import {SlotTestModeDialog} from "../components/SlotTestModeDialog.js";
 
 const html = htm.bind(h);
 
@@ -319,7 +319,7 @@ class MainView extends Component {
                     `)}
             </div>
         </footer>
-        ${ATDevice.isSafeMode() && state.showScreen === SCREENS.MAIN ? html`<${SafeModeDialog}/>` : ''}
+        ${ATDevice.isSlotTestMode() && state.showScreen === SCREENS.MAIN ? html`<${SlotTestModeDialog}/>` : ''}
         ${MainView.style}`;
     }
 }
