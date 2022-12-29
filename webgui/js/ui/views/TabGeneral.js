@@ -4,6 +4,7 @@ import {ATDevice} from "../../communication/ATDevice.js";
 import {FaIcon} from "../components/FaIcon.js";
 import {L} from "../../lquery.js";
 import {firmwareUtil} from "../../util/firmwareUtil.js";
+import {FirmwareUpdateModal} from "../modals/FirmwareUpdateModal.js";
 
 const html = htm.bind(h);
 let unknown = L.translate('(unknown) // (unbekannt)')
@@ -17,12 +18,14 @@ class TabGeneral extends Component {
         this.state = {
             mainVersion: unknown,
             newMainVersion: unknown,
+            mainVersionFWInfo: null,
             newMainVersionUrl: '',
             btVersion: unknown,
             newBtVersion: unknown,
             newBtVersionUrl: '',
             mainUpgradeProgress: null,
-            btUpgradeProgress: null
+            btUpgradeProgress: null,
+            showFirmwareModal: false
         }
 
         this.getVersions();
@@ -31,6 +34,7 @@ class TabGeneral extends Component {
     getVersions() {
         firmwareUtil.getDeviceFWInfo().then(result => {
             this.setState({
+                mainVersionFWInfo: result,
                 newMainVersion: result.version,
                 newMainVersionUrl: result.infoUrl
             });
@@ -84,9 +88,15 @@ class TabGeneral extends Component {
 
     updateFirmware() {
         let thiz = this;
-        firmwareUtil.updateDeviceFirmware(progress => {
-            thiz.setState({mainUpgradeProgress: progress || 1});
-        });
+        if (C.DEVICE_IS_FM && ATDevice.isMajorVersion(3)) {
+            this.setState({
+                showFirmwareModal: true
+            });
+        } else {
+            firmwareUtil.updateDeviceFirmware(progress => {
+                thiz.setState({mainUpgradeProgress: progress || 1});
+            });
+        }
     }
 
     resetConfig() {
@@ -127,6 +137,9 @@ class TabGeneral extends Component {
                     </button>   
                 </div>
             </div>
+        </div>
+        <div class="${state.showFirmwareModal ? '' : 'd-none'}">
+            ${html`<${FirmwareUpdateModal} close="${() => this.setState({showFirmwareModal: false})}" fwInfo="${state.mainVersionFWInfo}" currentFwVersion="${this.state.mainVersion}"/>`}
         </div>
         <h3 class="mt-5">Firmware Bluetooth-Addon</h3>
         <div class="container-fluid p-0">

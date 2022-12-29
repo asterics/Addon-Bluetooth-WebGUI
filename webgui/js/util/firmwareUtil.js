@@ -163,8 +163,8 @@ firmwareUtil.getDeviceFWInfo = function () {
     if (C.DEVICE_IS_FM && ATDevice.isMajorVersion(2)) {
         repoName = "FLipMouse-v2";
     }
-    log.warn(repoName)
-    return getFWInfo(`https://api.github.com/repos/asterics/${repoName}/releases/latest`, '.hex');
+    let fileType = C.DEVICE_IS_FM && ATDevice.isMajorVersion(3) ? '.uf2' : '.hex';
+    return getFWInfo(`https://api.github.com/repos/asterics/${repoName}/releases/latest`, fileType);
 }
 
 firmwareUtil.updateDeviceFirmware = function(progressHandler) {
@@ -186,7 +186,8 @@ function getFWInfo(apiUrl, binaryStringFilter) {
         return {
             version: L.formatVersion(result['tag_name']),
             infoUrl: result['html_url'],
-            downloadUrl: 'https://proxy.asterics-foundation.org/proxybase64url.php?csurl=' + encodeURIComponent(btoa(binaryAsset.browser_download_url))
+            downloadUrl: 'https://proxy.asterics-foundation.org/proxybase64url.php?csurl=' + encodeURIComponent(btoa(binaryAsset.browser_download_url)),
+            originalDownloadUrl: binaryAsset.browser_download_url
         };
     });
 }

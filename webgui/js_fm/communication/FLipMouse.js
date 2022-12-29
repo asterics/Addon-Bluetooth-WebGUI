@@ -1,6 +1,7 @@
 import {ATDevice} from "../../js/communication/ATDevice.js";
 import {TeensyFirmwareUpdater} from "./TeensyFirmwareUpdater.js";
 import {localStorageService} from "../../js/localStorageService.js";
+import {ProMicroFirmwareUpdater} from "../../js_fabi/communication/ProMicroFirmwareUpdater.js";
 
 let FLipMouse = {};
 FLipMouse.Updater = TeensyFirmwareUpdater;
@@ -101,6 +102,14 @@ FLipMouse.updateFirmware = async function (url, progressHandler, dontReset) {
         setTimeout(() => {
             window.location.reload();
         }, 100);
+    }
+}
+
+FLipMouse.enterFwDownloadMode = async function () {
+    if (ATDevice.isMajorVersion(3)) {
+        let serialCommunicator = ATDevice.getCommunicator();
+        await serialCommunicator.close();
+        await ProMicroFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
     }
 }
 
