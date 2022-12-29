@@ -52,10 +52,13 @@ function MockCommunicator() {
             } else if (value.indexOf('AT LO') > -1) {
                 let slotName = value.replace('AT LO ', '');
                 mock.deviceSlotNr = mock.slotNames.indexOf(slotName);
+                resolve('OK');
             } else if (value.indexOf('AT IL') > -1) {
                 resolve('IRCommand0:play\nIRCommand1:pause\nIRCommand2:stop');
             } else if (value.indexOf('AT ID') > -1) {
                 resolve('VERSION 3.14');
+            } else if (value.indexOf('AT SA') > -1) {
+                resolve('OK');
             }
             setTimeout(function () {
                 resolve();
