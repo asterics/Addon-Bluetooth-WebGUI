@@ -35,6 +35,7 @@ let _liveValueLastUpdate = 0;
 let _communicator;
 let _isInitialized = false;
 let _inRawMode = false;
+let _busyMethods = {};
 
 let _atCmdQueue = [];
 let _sendingAtCmds = false;
@@ -296,18 +297,32 @@ ATDevice.getConfig = function (constant, slotName) {
     return '';
 };
 
-ATDevice.setConfig = function (atCmd, value, debounceTimeout) {
-    value = value + '';
-    debounceTimeout = debounceTimeout === undefined ? 300 : debounceTimeout;
-    setConfigInternal(atCmd, value);
+ATDevice.setConfig = async function (atCmd, value, debounceTimeout, slot) {
     return new Promise(resolve => {
-        L.debounce(function () {
+        debounceTimeout = debounceTimeout === undefined ? 300 : debounceTimeout;
+        L.debounce(async function () {
+            if (_busyMethods['setConfig']) {
+                log.warn("not doing command because device is busy.");
+                return;
+            }
+            _busyMethods['setConfig'] = true;
+            if (slot !== _currentSlot) {
+                await ATDevice.setSlot(slot);
+            }
+            value = value + '';
+            setConfigInternal(atCmd, value);
             ATDevice.sendATCmd(atCmd, value);
+            _busyMethods['setConfig'] = false;
             resolve();
+            ATDevice.planSaving();
         }, debounceTimeout, atCmd);
-        ATDevice.planSaving();
     });
 };
+
+ATDevice.setConfigForSlot = async function(atCmd, value, slot, debounceTimeout) {
+    debounceTimeout = debounceTimeout || 0;
+    return ATDevice.setConfig(atCmd, value, debounceTimeout, slot);
+}
 
 /**
  * copies config values from one slot to all other slots
@@ -472,23 +487,31 @@ ATDevice.handleSlotChangeFromDevice = function (deviceSlot) {
     }
 }
 
-ATDevice.setSlot = function (slot, dontSendToDevice) {
+ATDevice.setSlot = async function (slot, dontSendToDevice) {
     let promise = Promise.resolve();
     if (slot === _currentSlot) {
         return Promise.resolve();
     }
+    if (_busyMethods['setSlot']) {
+        log.warn("not doing command because device is busy.");
+        return;
+    }
+    _busyMethods['setSlot'] = true;
     if (ATDevice.getSlots().includes(slot)) {
         if (!dontSendToDevice) {
             ATDevice.parseLiveData = false; //prevent to parse old slot from live values before new slot applied on device
-            ATDevice.save();
+            await ATDevice.save();
             promise = ATDevice.sendAtCmdWithResult(C.AT_CMD_LOAD_SLOT, slot);
-            promise.finally(() => ATDevice.parseLiveData = true);
             if (C.DEVICE_IS_FM_OR_PAD) {
                 ATDevice.sendATCmd(C.AT_CMD_CALIBRATION);
             }
         }
         _currentSlot = slot;
     }
+    promise.finally(() => {
+        ATDevice.parseLiveData = true;
+        _busyMethods['setSlot'] = false;
+    });
     emitSlotChange();
     return promise;
 };
@@ -572,17 +595,6 @@ ATDevice.restoreDefaultConfiguration = function () {
     })
     return promise;
 };
-
-ATDevice.setDeviceMode = function (modeNr, slot) {
-    if (slot !== _currentSlot) {
-        ATDevice.save();
-        ATDevice.setSlot(slot);
-    }
-    ATDevice.setConfig(C.AT_CMD_DEVICE_MODE, modeNr, 0).then(() => {
-        ATDevice.save();
-        ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, _currentSlot);
-    });
-}
 
 ATDevice.parseConfig = function(atCmdsString) {
     atCmdsString = atCmdsString.replace(/\n\s*\n/g, '\n'); //replace doubled linebreaks with single one
