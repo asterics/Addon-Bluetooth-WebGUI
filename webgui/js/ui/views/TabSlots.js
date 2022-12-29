@@ -165,14 +165,10 @@ class TabSlots extends Component {
         });
     }
 
-    colorChanged(slot, event) {
-        ATDevice.setSlot(slot);
-        ATDevice.setConfig(C.AT_CMD_SET_COLOR, event.target.value.replace('#', '0x'));
+    async colorChanged(slot, event) {
+        let colorValue = event.target.value.replace('#', '0x');
+        await ATDevice.setConfigForSlot(C.AT_CMD_SET_COLOR, colorValue, slot, 500);
         this.forceUpdate();
-        L.debounce(() => {
-            ATDevice.save();
-            ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, ATDevice.getCurrentSlot());
-        }, 500, "setcolordebounce");
     }
 
     demoSettingChanged(settingSha) {
@@ -202,6 +198,14 @@ class TabSlots extends Component {
         })
     }
 
+    async toggleConnectionMode(slot) {
+        let currentMode = ATDevice.getConfig(C.AT_CMD_DEVICE_MODE, slot);
+        let newMode = currentMode === C.DEVICE_MODE_USB ? C.DEVICE_MODE_BT : C.DEVICE_MODE_USB;
+        await ATDevice.setConfigForSlot(C.AT_CMD_DEVICE_MODE, newMode, slot);
+        this.forceUpdate();
+        window.dispatchEvent(new CustomEvent(C.EVENT_REFRESH_MAIN));
+    }
+
     render() {
         let state = this.state;
         let slots = state.slots;
@@ -209,48 +213,68 @@ class TabSlots extends Component {
 
         return html`
             <h2>${L.translate('Slot configuration // Slot-Konfiguration')}</h2>
-            <div class="container-fluid px-0">
+            <div class="container-fluid px-0 tab-slots">
                 <h3>${L.translate('Current slots // Aktuelle slots')}</h3>
-                <div class="row">
-                    <ol class="col-sm-12 col-lg-10">
+                <div class="row table d-none d-md-block">
+                    <div class="col-sm-12 col-lg-10">
+                        <div class="row d-flex align-items-center" style="font-style: italic">
+                            <div class="col-3">
+                                Name
+                            </div>
+                            <div class="col-2 ${state.showColorInput ? '' : 'd-none'}">
+                                ${L.translate('Color // Farbe')}
+                            </div>
+                            <div class="col-2">
+                                ${L.translate('Connection // Verbindung')}
+                            </div>
+                            <div class="col-2">
+                                ${L.translate('Actions // Aktionen')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-2 table">
+                    <ol class="col-md-12 col-lg-10">
                         ${slots.map((slot, index) => html`
-                            <li class="my-2" style="${index % 2 === 0 ? 'background-color: rgb(224 224 224)' : ''}">
+                            <li class="p-2" style="${index % 2 === 0 ? 'background-color: whitesmoke' : ''}; border: 1px solid lightgray;">
                                 <div class="row d-flex align-items-center">
-                                    <div class="col-4">
-                                        <span class="mx-2 px-3 ${state.showColorInput? '' : 'd-none'}"
-                                              style="background-color: ${ATDevice.getConfig(C.AT_CMD_SET_COLOR, slot).replace('0x', '#')}; border: 1px solid"></span>
-                                        <a title="${L.translate('Slot "{?}": click to activate // Slot "{?}": zum Aktivieren klicken', slot)}"
-                                           href="javascript:;" onclick="${() => ATDevice.setSlot(slot)}"
-                                           class="mx-2 ${slot === ATDevice.getCurrentSlot() ? 'd-none' : ''}">
-                                            <span>${slot}</span>
-                                        </a>
-                                        <span class="mx-2 ${slot === ATDevice.getCurrentSlot() ? 'd-inline-block' : 'd-none'}"
-                                              style="font-weight: bold"><span
-                                                class="sr-only">Slot: </span>${slot}</span>
+                                    <div class="col-12 col-md-3 d-flex mb-4 mb-md-0">
+                                        <span class="d-md-none col-5 col-sm-4 font-weight-bold">${L.translate('Slot: // Slot:')}</span>
+                                        <span class="sr-only">${L.translate('Slot: // Slot:')}</span>
+                                        <span style="${slot === ATDevice.getCurrentSlot() ? 'font-weight: bold' : ''}">
+                                            <span>${slot}</span> <em style="font-weight: normal" class="${slot === ATDevice.getCurrentSlot() ? '' : 'd-none'}">(active)</em>
+                                        </span>
                                     </div>
-                                    <div class="col-8">
-                                        <div class="row d-flex">
-                                            <div class="col">
-                                                <label for="colorinput${slot}"
-                                                       class="small-button button py-2 py-md-0 ${state.showColorInput ? '' : 'd-none'}">${html`
-                                                    <${FaIcon} icon="fas palette"/>`}<span
-                                                        class="d-none d-sm-inline">${L.translate('Set color // Farbe wählen')}</span></label>
-                                                <input id="colorinput${slot}" type="color" class="sr-only ${state.showColorInput ? '' : 'd-none'}"
-                                                       oninput="${(event) => this.colorChanged(slot, event)}"/>
-                                            </div>
-                                            <div class="col d-flex">
-                                                <button onclick="${() => this.deleteSlot(slot)}"
-                                                        disabled="${this.state.slots.length <= 1}"
-                                                        class="small-button py-2 py-md-0">${html`<${FaIcon} icon="fas trash-alt"/>`}<span class="d-none d-sm-inline">${L.translate('Delete // Löschen')}</span>
-                                                </button>
-                                            </div>
-                                            <div class="col d-flex">
-                                                <button onclick="${() => this.downloadSlot(slot)}"
-                                                        class="small-button py-2 py-md-0">${html`
-                                                    <${FaIcon} icon="fas download"/>`}<span
-                                                        class="d-none d-sm-inline">${L.translate('Download')}</span>
-                                                </button>
-                                            </div>
+                                    <div class="col-12 col-md-2 mb-2 mb-md-0 ${state.showColorInput ? 'd-flex' : 'd-none'}">
+                                        <span class="d-md-none col-5 col-sm-4">${L.translate('Color: // Farbe:')}</span>
+                                        <input id="colorinput${slot}" class="p-0 mb-0" type="color" oninput="${(event) => this.colorChanged(slot, event)}" value="${ATDevice.getConfig(C.AT_CMD_SET_COLOR, slot).replace('0x', '#')}"/>
+                                    </div>
+                                    <div class="col-12 col-md-2 d-flex mb-2 mb-md-0">
+                                        <span class="d-md-none col-5 col-sm-4">${L.translate('Connection: // Verbindung:')}</span>
+                                        <div>
+                                            <button onclick="${() => this.toggleConnectionMode(slot)}" class="p-1 p-md-0 mr-2 mb-0" title="${L.translate('Change connection mode // Verbindungsmodus ändern')}">
+                                                ${html`<${FaIcon} icon="fas arrows-alt-h"/>`}
+                                                <span class="d-none d-md-inline">${L.translate('')}</span>
+                                            </button>
+                                            <span class="${ATDevice.getConfig(C.AT_CMD_DEVICE_MODE, slot) === C.DEVICE_MODE_USB ? 'd-inline-flex' : 'd-none'}">USB</span>
+                                            <span class="${[C.DEVICE_MODE_BT, C.DEVICE_MODE_USB_BT].includes(ATDevice.getConfig(C.AT_CMD_DEVICE_MODE, slot)) ? 'd-inline-flex' : 'd-none'}" title="${L.translate('Slot uses Bluetooth // Slot verwendet Bluetooth')}">
+                                                BT <img class="mx-2" width="15" src="img/bt.svg"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-4 d-flex mb-2 mb-md-0">
+                                        <span class="d-md-none col-5 col-sm-4">${L.translate('Actions: // Aktionen:')}</span>
+                                        <div>
+                                            <button onclick="${() => ATDevice.setSlot(slot)}" disabled="${slot === ATDevice.getCurrentSlot()}" class="p-1 p-md-0 mr-2 mb-0" title="${L.translate('Activate slot // Slot aktivieren')}">
+                                                ${slot === ATDevice.getCurrentSlot() ? html`<${FaIcon} icon="fas check-circle"/>`: ''}
+                                                ${slot !== ATDevice.getCurrentSlot() ? html`<${FaIcon} icon="far check-circle"/>` : ''}
+                                            </button>
+                                            <button onclick="${() => this.deleteSlot(slot)}" class="p-1 p-md-0 mx-2 mb-0" title="${L.translate('Delete slot // Slot löschen')}">
+                                                ${html`<${FaIcon} icon="fas trash-alt"/>`}
+                                            </button>
+                                            <button onclick="${() => this.downloadSlot(slot)}" class="p-1 p-md-0 mx-2 mb-0" title="${L.translate('Download slot // Slot herunterladen')}">
+                                                ${html`<${FaIcon} icon="fas download"/>`}
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -425,6 +449,10 @@ TabSlots.style = html`<style>
         width: 100%;
         text-transform: none;
         margin: 0 !important;
+    }
+    
+    .tab-slots .table button {
+        width: unset;
     }
     
     ol {

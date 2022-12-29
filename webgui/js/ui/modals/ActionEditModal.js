@@ -267,7 +267,7 @@ class ActionEditModal extends Component {
 ActionEditModal.style = html`<style>
     .small-button {
         display: inline-block;
-        padding: 0 5px !important;
+        padding: 0 10px !important;
         line-height: unset;
         width: unset;
         margin: 0.5em 0.5em 0.5em 0;
