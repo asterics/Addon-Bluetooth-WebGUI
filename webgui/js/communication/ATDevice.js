@@ -412,13 +412,15 @@ ATDevice.getButtonActionATCmdSuffix = function (index, slot) {
     return action ? action.substring(C.LENGTH_ATCMD_PREFIX).trim() : null;
 }
 
-ATDevice.save = async function (slot) {
+ATDevice.save = async function (slot, force) {
     slot = slot || _currentSlot;
     if (!slot) {
         return;
     }
     ATDevice.abortAutoSaving();
-    return ATDevice.sendAtCmdWithResult(C.AT_CMD_SAVE_SLOT, slot);
+    return ATDevice.sendAtCmdWithResult(C.AT_CMD_SAVE_SLOT, slot, {
+        forceSend: force
+    });
 };
 
 ATDevice.planSaving = function () {
@@ -526,7 +528,7 @@ ATDevice.createSlot = function (slotName) {
         name: slotName,
         config: L.deepCopy(slotConfig)
     });
-    ATDevice.save(slotName);
+    ATDevice.save(slotName, true); //create new slot also in save mode
     ATDevice.sendATCmd(C.AT_CMD_LOAD_SLOT, slotName);
     emitSlotChange();
     return Promise.resolve();
@@ -570,7 +572,7 @@ ATDevice.uploadSlots = async function (slotObjects, progressHandler) {
                 ATDevice.sendATCmd(key, slotObject.config[key]);
             }
         });
-        await ATDevice.save(slotObject.name);
+        await ATDevice.save(slotObject.name, true);
         progressHandler(Math.round((i+1) / slotObjects.length * 100));
         _slots.push(slotObject);
     }
@@ -583,7 +585,7 @@ ATDevice.uploadSlots = async function (slotObjects, progressHandler) {
 }
 
 ATDevice.restoreDefaultConfiguration = function () {
-    ATDevice.sendATCmd(C.AT_CMD_RESET_DEVICE);
+    ATDevice.sendAtCmdForce(C.AT_CMD_RESET_DEVICE);
     _currentSlot = null;
     _slots = [];
     let promise = ATDevice.refreshConfig();
