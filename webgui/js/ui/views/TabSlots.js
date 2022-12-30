@@ -242,7 +242,9 @@ class TabSlots extends Component {
                                         <span class="d-md-none col-5 col-sm-4 font-weight-bold">${L.translate('Slot: // Slot:')}</span>
                                         <span class="sr-only">${L.translate('Slot: // Slot:')}</span>
                                         <span style="${slot === ATDevice.getCurrentSlot() ? 'font-weight: bold' : ''}">
-                                            <span>${slot}</span> <em style="font-weight: normal" class="${slot === ATDevice.getCurrentSlot() ? '' : 'd-none'}">(active)</em>
+                                            <a class="${slot !== ATDevice.getCurrentSlot() ? '' : 'd-none'}" href="javascript:" onclick="${() => {ATDevice.setSlot(slot)}}" title="${L.translate('Activate slot "{?}" // Slot "{?}" aktivieren', slot)}">${slot}</a>
+                                            <span class="${slot === ATDevice.getCurrentSlot() ? '' : 'd-none'}">${slot}</span><span> </span>
+                                            <em style="font-weight: normal" class="${slot === ATDevice.getCurrentSlot() ? '' : 'd-none'}">${L.translate('(active) // (aktiv)')}</em>
                                         </span>
                                     </div>
                                     <div class="col-12 col-md-2 mb-2 mb-md-0 ${state.showColorInput ? 'd-flex' : 'd-none'}">
@@ -265,10 +267,6 @@ class TabSlots extends Component {
                                     <div class="col-12 col-md-4 d-flex mb-2 mb-md-0">
                                         <span class="d-md-none col-5 col-sm-4">${L.translate('Actions: // Aktionen:')}</span>
                                         <div>
-                                            <button onclick="${() => ATDevice.setSlot(slot)}" disabled="${slot === ATDevice.getCurrentSlot()}" class="p-1 p-md-0 mr-2 mb-0" title="${L.translate('Activate slot // Slot aktivieren')}">
-                                                ${slot === ATDevice.getCurrentSlot() ? html`<${FaIcon} icon="fas check-circle"/>`: ''}
-                                                ${slot !== ATDevice.getCurrentSlot() ? html`<${FaIcon} icon="far check-circle"/>` : ''}
-                                            </button>
                                             <button onclick="${() => this.deleteSlot(slot)}" class="p-1 p-md-0 mx-2 mb-0" title="${L.translate('Delete slot // Slot löschen')}">
                                                 ${html`<${FaIcon} icon="fas trash-alt"/>`}
                                             </button>
