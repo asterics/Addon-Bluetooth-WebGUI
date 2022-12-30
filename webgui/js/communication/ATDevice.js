@@ -375,6 +375,7 @@ ATDevice.refreshConfig = function () {
             _slots = ATDevice.parseConfig(response);
             _slotsBackup = JSON.parse(JSON.stringify(_slots));
             _currentSlot = _currentSlot || _slots[0].name;
+            _currentDeviceSlot = _currentSlot;
             emitConfigChange();
             resolve();
         }, function () {
@@ -710,7 +711,7 @@ ATDevice.hasUnsavedChanges = function () {
     let guiSlotConfig = _slots.filter(slot => slot.name === _currentSlot)[0].config;
     let deviceSlot = _slotsBackup.filter(slot => slot.name === _currentSlot)[0];
     let deviceSlotConfig = deviceSlot ? deviceSlot.config : {};
-    return JSON.stringify(guiSlotConfig) !== JSON.stringify(deviceSlotConfig);
+    return JSON.stringify(guiSlotConfig) !== JSON.stringify(deviceSlotConfig) || _currentDeviceSlot !== _currentSlot;
 }
 
 function applySlotChangesToDevice() {
