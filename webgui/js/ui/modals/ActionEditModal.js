@@ -95,9 +95,9 @@ class ActionEditModal extends Component {
     }
 
     async save(forAllSlots) {
-        ATDevice.setSlot(this.props.slot);
+        await ATDevice.setSlot(this.props.slot);
         if (this.state.shouldChangeMode && ATDevice.Specific.setFlipmouseMode) {
-            ATDevice.Specific.setFlipmouseMode(C.DEVICE_IS_FLIPPAD ? C.FLIPPAD_MODE_PAD_ALTERNATIVE.value : C.FLIPMOUSE_MODE_ALT.value)
+            await ATDevice.Specific.setFlipmouseMode(C.DEVICE_IS_FLIPPAD ? C.FLIPPAD_MODE_PAD_ALTERNATIVE.value : C.FLIPMOUSE_MODE_ALT.value)
         }
         if (this.state.hasChanges) {
             let atCmd = this.state.atCmdSuffix ? this.state.atCmd.cmd + ' ' + this.state.atCmdSuffix : this.state.atCmd.cmd;

@@ -54,8 +54,8 @@ FLipMouse.setFlipmouseMode = function (index) {
     if (!C.FLIPMOUSE_MODES.map(mode => mode.value).includes(index)) {
         return;
     }
-    ATDevice.setConfig(C.AT_CMD_FLIPMOUSE_MODE, index, 0);
     ATDevice.planSaving();
+    return ATDevice.setConfig(C.AT_CMD_FLIPMOUSE_MODE, index, 0);
 };
 
 FLipMouse.startLiveValueListener = function (handler) {
