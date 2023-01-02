@@ -54,6 +54,11 @@ button:disabled, button:disabled div, label.disabled{
     background-color: whitesmoke;
 }
 
+button:active, .button:active {
+    filter: brightness(0.8);
+    box-shadow: 0 0 10px 2px #004562 !important;
+}
+
 button:disabled img, label.disabled img {
     filter: invert(0.5);
 }
