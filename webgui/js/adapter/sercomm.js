@@ -4,6 +4,7 @@ window.logReceived = false;
 
 function SerialCommunicator() {
     //serial port instance
+    let thiz = this;
     var _port;
     var _portWriter;
     var _textEncoder = new TextEncoder();
@@ -201,8 +202,8 @@ function SerialCommunicator() {
                 });
 
             } catch (e) {
-                console.warn(e)
-                _runReader = false;
+                console.warn(e);
+                thiz.close();
                 if (MainView.instance) MainView.instance.toConnectionScreen();
             }
         }
