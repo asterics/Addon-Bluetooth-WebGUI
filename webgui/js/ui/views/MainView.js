@@ -154,10 +154,6 @@ class MainView extends Component {
     }
 
     async disconnect() {
-        let comm = ATDevice.getCommunicator();
-        if(comm.close) {
-            await comm.close();
-        }
         window.location.reload();
     }
 
