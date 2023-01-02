@@ -96,7 +96,7 @@ class PositionVisualization extends Component {
     }
 
     getPercentLength(constant) {
-        return (this.state.liveData[constant] / 1024 * 100) / 2
+        return Math.min(50, (this.state.liveData[constant] / 1024 * 100) / 2);
     }
 
     setMaxPosZoom(value) {
