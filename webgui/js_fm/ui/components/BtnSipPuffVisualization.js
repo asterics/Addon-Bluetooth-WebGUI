@@ -85,7 +85,7 @@ class BtnSipPuffVisualization extends Component {
                         <div class="back-layer d-flex align-items-center justify-content-center" style="top: 65%; left: 0; width: 100%; ${fontStyle}">
                             <span class="mr-2 d-none d-md-flex">Slot:</span>
                             <span>${ATDevice.getCurrentSlot()}</span>
-                            <div class="ml-3 ${color ? '' : 'd-none'}" style="background-color: ${color}; width: 25px; height: 25px;"></div>
+                            <div class="ml-3 ${color ? '' : 'd-none'}" style="background-color: ${color}; width: 25px; height: 25px; border: 1px solid lightgray"></div>
                         </div>
                         <div class="back-layer" style="top: 30%; left: 100%; height: 40%; width: 350px; ; max-width: 45vw; border: medium solid;">
                             <div class="relative" style="width: 100%; height: 100%">
