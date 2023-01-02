@@ -241,7 +241,8 @@ class TabSlots extends Component {
                 <div class="row mb-2 table">
                     <ol class="col-md-12 col-lg-10">
                         ${slots.map((slot, index) => html`
-                            <li class="p-2" style="${index % 2 === 0 ? 'background-color: whitesmoke' : ''}; border: 1px solid lightgray;">
+                            <li class="p-2" style="${ATDevice.getCurrentSlot() === slot ? 'background-color: #cdf8d0' : index % 2 === 0 ? 'background-color: whitesmoke' : ''}; border: 1px solid lightgray;">
+                            <!--li class="p-2" style="${index % 2 === 0 ? 'background-color: whitesmoke' : ''}; border: ${ATDevice.getCurrentSlot() === slot ? '1px solid green' : '1px solid lightgray'};"-->
                                 <div class="row d-flex align-items-center">
                                     <div class="col-12 col-md-3 d-flex mb-4 mb-md-0">
                                         <span class="d-md-none col-5 col-sm-4 font-weight-bold">${L.translate('Slot: // Slot:')}</span>
