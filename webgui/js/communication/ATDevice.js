@@ -298,6 +298,8 @@ ATDevice.getConfig = function (constant, slotName) {
 };
 
 ATDevice.setConfig = async function (atCmd, value, debounceTimeout, slot) {
+    value = value + '';
+    setConfigInternal(atCmd, value);
     return new Promise(resolve => {
         debounceTimeout = debounceTimeout === undefined ? 300 : debounceTimeout;
         L.debounce(async function () {
@@ -309,8 +311,6 @@ ATDevice.setConfig = async function (atCmd, value, debounceTimeout, slot) {
             if (slot !== _currentSlot) {
                 await ATDevice.setSlot(slot);
             }
-            value = value + '';
-            setConfigInternal(atCmd, value);
             ATDevice.sendATCmd(atCmd, value);
             _busyMethods['setConfig'] = false;
             resolve();
