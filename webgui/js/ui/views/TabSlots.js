@@ -206,10 +206,15 @@ class TabSlots extends Component {
         window.dispatchEvent(new CustomEvent(C.EVENT_REFRESH_MAIN));
     }
 
+    getDeactivatedText() {
+        return L.translate('Deactivated in Slot-Test-Modus // Deaktiviert im Slot-Test-Modus');
+    }
+
     render() {
         let state = this.state;
         let slots = state.slots;
         let maxSlotsReached = this.state.slots.length === C.MAX_NUMBER_SLOTS;
+        let isSlotTestMode = ATDevice.isSlotTestMode();
 
         return html`
             <h2>${L.translate('Slot configuration // Slot-Konfiguration')}</h2>
@@ -267,7 +272,7 @@ class TabSlots extends Component {
                                     <div class="col-12 col-md-4 d-flex mb-2 mb-md-0">
                                         <span class="d-md-none col-5 col-sm-4">${L.translate('Actions: // Aktionen:')}</span>
                                         <div>
-                                            <button onclick="${() => this.deleteSlot(slot)}" class="p-1 p-md-0 mx-2 mb-0" title="${L.translate('Delete slot // Slot löschen')}">
+                                            <button onclick="${() => this.deleteSlot(slot)}" disabled="${isSlotTestMode}" class="p-1 p-md-0 mx-2 mb-0" title="${isSlotTestMode ? this.getDeactivatedText() : L.translate('Delete slot // Slot löschen')}">
                                                 ${html`<${FaIcon} icon="fas trash-alt"/>`}
                                             </button>
                                             <button onclick="${() => this.downloadSlot(slot)}" class="p-1 p-md-0 mx-2 mb-0" title="${L.translate('Download slot // Slot herunterladen')}">
@@ -302,8 +307,8 @@ class TabSlots extends Component {
                 <h3 class="mt-5">${L.translate('Upload slots from file // Slots aus Datei hochladen')}</h3>
                 <div class="row mt-4">
                     <div class="col-sm-6 col-lg-5">
-                        <label for="fileInputSlotUpload" class="button">${html`<${FaIcon} icon="fas file"/>`} ${L.translate('Select file // Datei auswählen')}</label>
-                        <input class="sr-only" type=file id="fileInputSlotUpload" accept=".set" onchange="${(event) => this.fileUploadChanged(event.target)}"/>
+                        <label for="fileInputSlotUpload" class="button ${isSlotTestMode ? 'disabled' : ''}" title="${isSlotTestMode ? this.getDeactivatedText() : ''}">${html`<${FaIcon} icon="fas file"/>`} ${L.translate('Select file // Datei auswählen')}</label>
+                        <input class="sr-only" disabled="${isSlotTestMode}" type=file id="fileInputSlotUpload" accept=".set" onchange="${(event) => this.fileUploadChanged(event.target)}"/>
                     </div>
                     <div class="col-sm-6 col-lg-5">
                         <span>${L.translate('Selected file: // Gewählte Datei:')}</span> <span>${this.state.selectedFile || L.translate('(none) // (keine)')}</span><br/>
@@ -410,7 +415,8 @@ class TabSlots extends Component {
                         <div class="col-sm-6 col-lg-5">
                             ${html`<${ActionButton} onclick="${() => this.applyDemoSettings()}"
                                             label="Apply settings preset // Voreinstellungen anwenden"
-                                            disabled="${state.demoSettingSlots.length === 0}"
+                                            title="${isSlotTestMode ? this.getDeactivatedText() : ''}"
+                                            disabled="${state.demoSettingSlots.length === 0 || isSlotTestMode}"
                                             progressLabel="${L.translate('Uploading slots {?}% ... // Slots hochladen {?}% ...', state.uploadProgress)}" faIcon="fas upload"/>`}
                         </div>
                     </div>

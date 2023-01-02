@@ -31,8 +31,9 @@ class ActionButton extends Component {
         props.progressLabel = props.progressLabel || this.props.label;
         props.disabled = props.disabled || false;
         props.faIcon = props.faIcon || '';
+        props.title = props.title || '';
         return html`
-            <button onclick="${() => this.doAction()}" disabled="${this.state.actionPerforming || props.disabled}">
+            <button onclick="${() => this.doAction()}" disabled="${this.state.actionPerforming || props.disabled}" title="${props.title}">
                 ${html`<${FaIcon} icon="${this.props.faIcon}"/>`}
                 ${L.translate(this.state.actionPerforming ? props.progressLabel : props.label)}
             </button>`;
