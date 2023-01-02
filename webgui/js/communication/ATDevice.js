@@ -153,6 +153,7 @@ ATDevice.getBTVersion = function () {
  * @param options.onlyIfNotBusy if set to true, the command is sent only if no other AT command is currently waiting for a response
  * @param options.dontLog if set to true, there are no logs to console for this command
  * @param options.forceSend if set to true, AT command is send also in safe mode
+ * @param options.close if set to true, the communicator is closed after sending the command
  * @return {Promise} which resolves to the result of the command or '' if no result was received.
  */
 ATDevice.sendATCmd = function (atCmd, param, options) {
@@ -183,7 +184,8 @@ ATDevice.sendATCmd = function (atCmd, param, options) {
             dontLog: options.dontLog,
             cmd: cmd.trim(),
             resolveFn: resolve,
-            rejectFn: reject
+            rejectFn: reject,
+            options: options
         };
     });
     queueElem.promise = promise;
@@ -207,7 +209,15 @@ ATDevice.sendATCmd = function (atCmd, param, options) {
             _timestampLastAtCmd = new Date().getTime();
             _communicator.sendData(nextQueueElem.cmd, nextQueueElem.timeout, nextQueueElem.dontLog).then(nextQueueElem.resolveFn, nextQueueElem.rejectFn);
             nextQueueElem.promise.finally(() => {
-                sendNext();
+                if (nextQueueElem.options.close) {
+                    let communicator = ATDevice.getCommunicator();
+                    if (communicator.close) {
+                        log.info("closing communicator...");
+                        communicator.close();
+                    }
+                } else {
+                    sendNext();
+                }
             });
         }, timeoutSend);
     }
@@ -779,9 +789,9 @@ window.addEventListener('beforeunload', () => {
         if (_testModeOptions.enabled) {
             cmd = C.AT_CMD_LOAD_SLOT + ' ' + _currentDeviceSlot + '\n' + C.AT_CMD_STOP_REPORTING_LIVE;
         }
-        ATDevice.sendAtCmdForce(cmd);
-        //ATDevice.save();
-        //ATDevice.sendATCmd(C.AT_CMD_STOP_REPORTING_LIVE);
+        ATDevice.sendAtCmdForce(cmd, "", {
+            close: true
+        });
     }
 });
 
