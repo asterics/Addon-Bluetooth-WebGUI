@@ -22,7 +22,8 @@ class InitDeviceView extends Component {
     flash() {
         let thiz = this;
         thiz.setState({success: false});
-        firmwareUtil.getDeviceFWInfo().then(async result => {
+        let majorVersion = C.DEVICE_IS_FM ? 2 : undefined;
+        firmwareUtil.getDeviceFWInfo(C.CURRENT_DEVICE, majorVersion).then(async result => {
             await ATDevice.Specific.Updater.resetDevice(null, []);
             if (C.DEVICE_IS_FM_OR_PAD) {
                 localStorageService.setFirmwareDownloadUrl(result.downloadUrl);

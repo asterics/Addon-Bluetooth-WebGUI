@@ -158,12 +158,15 @@ firmwareUtil.getBTFWInfo = function () {
     return getFWInfo('https://api.github.com/repos/asterics/esp32_mouse_keyboard/releases/latest', '.bin');
 }
 
-firmwareUtil.getDeviceFWInfo = function () {
+firmwareUtil.getDeviceFWInfo = function (device, majorVersion) {
+    device = device || C.CURRENT_DEVICE;
+    majorVersion = majorVersion || ATDevice.getMajorVersion();
+    let deviceIsFM = device === C.AT_DEVICE_FLIPMOUSE;
     let repoName = C.CURRENT_DEVICE;
-    if (C.DEVICE_IS_FM && ATDevice.isMajorVersion(2)) {
+    if (deviceIsFM && majorVersion === 2) {
         repoName = "FLipMouse-v2";
     }
-    let fileType = C.DEVICE_IS_FM && ATDevice.isMajorVersion(3) ? '.uf2' : '.hex';
+    let fileType = deviceIsFM && majorVersion === 3 ? '.uf2' : '.hex';
     return getFWInfo(`https://api.github.com/repos/asterics/${repoName}/releases/latest`, fileType);
 }
 
