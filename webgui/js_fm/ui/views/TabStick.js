@@ -182,10 +182,10 @@ class TabStick extends Component {
                     <label class="col-12" for="selectProfile">${L.translate('Sensitivity profile // Sensitivitäts-Profil')}</label>
                     <div class="col-12">
                         <select id="selectProfile" value="${ATDevice.getConfig(C.AT_CMD_SENSORBOARD)}" oninput="${(event) => {ATDevice.setConfig(C.AT_CMD_SENSORBOARD, event.target.value, 0)}}">
-                            <option value="0">1K-Sensorboard</option>
-                            <option value="1">10K-Sensorboard</option>
-                            <option value="2">100K-Sensorboard</option>
-                            <option value="3">StrainGauge-Sesorboard</option>
+                            <option value="0">${L.translate('High // Hoch')}</option>
+                            <option value="1">${L.translate('Medium // Mittel')}</option>
+                            <option value="2">${L.translate('Low // Gering')}</option>
+                            <option value="3">${L.translate('Very Low // Sehr gering')}</option>
                         </select>
                     </div>
                 </div>
