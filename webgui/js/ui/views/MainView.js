@@ -292,12 +292,16 @@ class MainView extends Component {
                     <div class="justify-content-end align-items-center ${state.connected ? 'd-flex' : 'd-none'}">
                         <span aria-hidden="true" title="connected" style="font-size: 2em">${'\u2713'}</span>
                         <span aria-live="assertive" role="status" class="d-none d-md-block ml-2">${L.translate(' connected //  verbunden')}</span>
-                        <button class="px-2 ml-2 mb-0" style="width: unset" onclick="${() => {this.disconnect()}}" title="${L.translate('disconnect // Verbindung trennen')}">X</button>
+                        <button class="px-2 ml-3 mb-0" style="width: unset" onclick="${() => {this.disconnect()}}" title="${L.translate('disconnect // Verbindung trennen')}">
+                            ${html`<${FaIcon} icon="fas times"/>`}
+                        </button>
                     </div>
                     <div class="justify-content-end align-items-center ${state.connected ? 'd-none' : 'd-flex'}">
                         <span aria-hidden="true" title="not connected" style="font-size: 2em">${'\u2717'}</span>
                         <span aria-live="assertive" role="status" class="d-none d-md-block ml-2">${L.translate('not connected // nicht verbunden')}</span>
-                        <button class="px-2 ml-2 mb-0" style="width: unset" onclick="${() => {this.disconnect()}}" title="${L.translate('disconnect // Verbindung trennen')}">X</button>
+                        <button class="px-2 ml-3 mb-0" style="width: unset" onclick="${() => {this.disconnect()}}" title="${L.translate('disconnect // Verbindung trennen')}">
+                            ${html`<${FaIcon} icon="fas times"/>`}
+                        </button>
                     </div>
                     
                 </div>

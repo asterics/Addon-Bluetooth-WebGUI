@@ -5,6 +5,7 @@ import {FaIcon} from "../components/FaIcon.js";
 import {L} from "../../lquery.js";
 import {firmwareUtil} from "../../util/firmwareUtil.js";
 import {FirmwareUpdateModal} from "../modals/FirmwareUpdateModal.js";
+import {Slider} from "../components/Slider.js";
 
 const html = htm.bind(h);
 let unknown = L.translate('(unknown) // (unbekannt)')
@@ -117,7 +118,27 @@ class TabGeneral extends Component {
         let state = this.state;
 
         return html`
-        <h2>${L.translate('Firmware versions // Firmware-Versionen')}</h2>
+        <h2>${L.translate('Slot test mode // Slot-Test Modus')}</h2>
+        <div class="row">
+            <div class="col-12">
+                <input id="safeMode" type="checkbox" class="mr-2" onchange="${(event) => ATDevice.setSlotTestModeOptions({enabled: event.target.checked})}" checked="${ATDevice.isSlotTestMode()}"/>
+                <label for="safeMode">${L.translate('Enable slot test mode // Slot-Test Modus aktivieren')}</label>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-sm-6 col-lg-5">
+                <${Slider} label="Countdown before Test [s] // Countdown vor Test [s]" oninput="${(value) => ATDevice.setSlotTestModeOptions({countdownSeconds: parseInt(value)})}"
+                           min="1" max="120" value="${ATDevice.getSlotTestModeOptions().countdownSeconds}"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6 col-lg-5">
+                <${Slider} label="Test duration [s] // Test-Dauer [s]" oninput="${(value) => ATDevice.setSlotTestModeOptions({testSeconds: parseInt(value)})}"
+                           min="1" max="600" value="${ATDevice.getSlotTestModeOptions().testSeconds}"/>
+            </div>
+        </div>
+        
+        <h2 class="mt-5">${L.translate('Firmware versions // Firmware-Versionen')}</h2>
         <h3>${C.CURRENT_DEVICE} Firmware</h3>
         <div class="container-fluid p-0">
             <div class="row">

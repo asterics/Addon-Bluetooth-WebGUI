@@ -55,7 +55,7 @@ button:disabled, button:disabled div, label.disabled{
 }
 
 button:active, .button:active {
-    filter: brightness(0.8);
+    filter: brightness(1.5);
     box-shadow: 0 0 10px 2px #004562 !important;
 }
 
