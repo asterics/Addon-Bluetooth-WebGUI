@@ -2,6 +2,8 @@ import { h, Component } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
 import {ATDevice} from "../../communication/ATDevice.js";
 import {FaIcon} from "./FaIcon.js";
+import {audioUtil} from "../../util/audioUtil.js";
+
 const html = htm.bind(h);
 
 class SlotTestModeDialog extends Component {
@@ -28,6 +30,7 @@ class SlotTestModeDialog extends Component {
         this.startCountdownTime = new Date().getTime();
         let intervalHandler = setInterval(() => {
             if (new Date().getTime() - this.startCountdownTime > this.state.coutdownTime * 1000) {
+                audioUtil.beepHigh();
                 this.stopTesting();
                 this.testSlot();
             } else {
@@ -46,6 +49,7 @@ class SlotTestModeDialog extends Component {
         this.startTestTime = new Date().getTime();
         this.intervalHandler = setInterval(() => {
             if (new Date().getTime() - this.startTestTime > this.state.revertTime * 1000) {
+                audioUtil.beep();
                 this.stopTesting();
             } else {
                 this.setState({
