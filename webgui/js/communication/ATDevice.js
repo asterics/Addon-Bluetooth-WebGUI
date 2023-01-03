@@ -240,6 +240,10 @@ window.sendATCmd = (cmd) => {
     ATDevice.sendAtCmdWithResultForce(cmd);
 }
 
+window.sendATCmdNoResult = (cmd) => {
+    ATDevice.sendAtCmdForce(cmd);
+}
+
 /**
  * Sends the given AT command to the device and waits for a response, details @see sendATCmd()
  *
@@ -733,16 +737,18 @@ function applySlotChangesToDevice() {
     let guiSlotConfig = _slots.filter(slot => slot.name === _currentSlot)[0].config;
     let deviceSlot = _slotsBackup.filter(slot => slot.name === _currentSlot)[0];
     let deviceSlotConfig = deviceSlot ? deviceSlot.config : {};
+    let cmd = '';
     Object.keys(guiSlotConfig).forEach(key => {
         if (deviceSlotConfig[key] !== guiSlotConfig[key]) {
             if (key.indexOf(C.AT_CMD_BTN_MODE) > -1) {
-                ATDevice.sendAtCmdForce(key);
-                ATDevice.sendAtCmdForce(guiSlotConfig[key]);
+                cmd += key + '\n';
+                cmd += guiSlotConfig[key] + '\n';
             } else {
-                ATDevice.sendAtCmdForce(key, guiSlotConfig[key]);
+                cmd += key + " " + guiSlotConfig[key] + '\n';
             }
         }
     });
+    ATDevice.sendAtCmdForce(cmd);
 }
 
 function emitSlotChange() {

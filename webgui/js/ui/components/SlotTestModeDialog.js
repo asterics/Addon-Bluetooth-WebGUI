@@ -13,6 +13,8 @@ class SlotTestModeDialog extends Component {
             minimized: false,
             revertTime: ATDevice.getSlotTestModeOptions().testSeconds,
             coutdownTime: ATDevice.getSlotTestModeOptions().countdownSeconds,
+            currentTestTime: ATDevice.getSlotTestModeOptions().testSeconds,
+            currentCountdown: ATDevice.getSlotTestModeOptions().countdownSeconds,
             coutdownIntervalHandler: null
         }
         this.props = props;
@@ -23,17 +25,17 @@ class SlotTestModeDialog extends Component {
 
     startTestCountdown() {
         this.stopTesting();
+        this.startCountdownTime = new Date().getTime();
         let intervalHandler = setInterval(() => {
-            let newTime = this.state.coutdownTime - 1;
-            if (newTime > 0) {
-                this.setState({
-                    coutdownTime: newTime
-                })
-            } else {
+            if (new Date().getTime() - this.startCountdownTime > this.state.coutdownTime * 1000) {
                 this.stopTesting();
                 this.testSlot();
+            } else {
+                this.setState({
+                    currentCountdownTime: Math.ceil(this.state.coutdownTime - (new Date().getTime() - this.startCountdownTime) / 1000)
+                })
             }
-        }, 1000);
+        }, 200);
         this.setState({
             coutdownIntervalHandler: intervalHandler
         });
@@ -41,16 +43,16 @@ class SlotTestModeDialog extends Component {
 
     testSlot() {
         ATDevice.testCurrentSlot();
+        this.startTestTime = new Date().getTime();
         this.intervalHandler = setInterval(() => {
-            let newTime = this.state.revertTime - 1;
-            if (newTime > 0) {
-                this.setState({
-                    revertTime: newTime
-                })
-            } else {
+            if (new Date().getTime() - this.startTestTime > this.state.revertTime * 1000) {
                 this.stopTesting();
+            } else {
+                this.setState({
+                    currentTestTime: Math.ceil(this.state.revertTime - (new Date().getTime() - this.startTestTime) / 1000)
+                })
             }
-        }, 1000);
+        }, 200);
     }
 
     stopTesting() {
@@ -60,7 +62,9 @@ class SlotTestModeDialog extends Component {
         this.setState({
             revertTime: ATDevice.getSlotTestModeOptions().testSeconds,
             coutdownTime: ATDevice.getSlotTestModeOptions().countdownSeconds,
-            coutdownIntervalHandler: null
+            coutdownIntervalHandler: null,
+            currentTestTime: ATDevice.getSlotTestModeOptions().testSeconds,
+            currentCountdownTime: ATDevice.getSlotTestModeOptions().countdownSeconds
         });
     }
 
@@ -94,13 +98,13 @@ class SlotTestModeDialog extends Component {
                 <div class="position-relative container-fluid p-0">
                     <div class="row ${state.coutdownIntervalHandler ? '' : 'd-none'}">
                         <div class="col-12">
-                            <span class="mr-2" style="font-size: 1.5em">${L.translate('Test starts in {?} seconds ... // Test startet in {?} Sekunden ...', state.coutdownTime)}</span>
+                            <span class="mr-2" style="font-size: 1.5em">${L.translate('Test starts in {?} seconds ... // Test startet in {?} Sekunden ...', state.currentCountdownTime)}</span>
                             <button onclick="${() => this.stopTesting()}">${L.translate('Cancel // Abbrechen')}</button>
                         </div>
                     </div>
                     <div class="row ${ATDevice.isTesting() ? '' : 'd-none'}">
                         <div class="col-12">
-                            <span class="mr-2" style="font-size: 1.5em">${L.translate('Test is running! Revert in {?} seconds ... // Test läuft! Zurücksetzen in {?} Sekunden ...', state.revertTime)}</span>
+                            <span class="mr-2" style="font-size: 1.5em">${L.translate('Test is running! Revert in {?} seconds ... // Test läuft! Zurücksetzen in {?} Sekunden ...', state.currentTestTime)}</span>
                             <button onclick="${() => this.stopTesting()}">${L.translate('Stop test // Test stoppen')}</button>
                             <button class="col-12" onclick="${() => this.addTime()}">+30s</button>
                         </div>
