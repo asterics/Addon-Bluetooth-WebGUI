@@ -131,6 +131,11 @@ ATDevice.isMajorVersion = function (numValue) {
     return currentVersion.major === numValue;
 }
 
+ATDevice.getMajorVersion = function () {
+    let currentVersion = _lastVersionResult || {};
+    return currentVersion.major;
+}
+
 ATDevice.getBTVersion = function () {
     ATDevice.sendAtCmdForce(C.AT_CMD_STOP_REPORTING_LIVE);
     return ATDevice.sendAtCmdWithResultForce(C.AT_CMD_ADDON_COMMAND, '$ID').then(result => {
