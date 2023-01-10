@@ -51,11 +51,6 @@ class MainView extends Component {
         window.addEventListener(C.EVENT_REFRESH_MAIN, () => {
             this.setState({});
         });
-        window.addEventListener(C.EVENT_SERIAL_CONNECT_FAILED, () => {
-            this.setState({
-                errorCode: C.ERROR_SERIAL_CONNECT_FAILED
-            });
-        });
     }
 
     toConnectionScreen() {

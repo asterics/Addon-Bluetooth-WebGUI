@@ -47,7 +47,9 @@ function SerialCommunicator() {
             console.log(error);
             return Promise.reject(C.ERROR_SERIAL_BUSY);
         });
-        listenToPort();
+        await listenToPort().catch(() => {
+            return Promise.reject(C.ERROR_SERIAL_CONNECT_FAILED);
+        });
         _portWriter = _port.writable.getWriter();
 
         return Promise.resolve();
@@ -173,45 +175,47 @@ function SerialCommunicator() {
         // Listen to data coming from the serial device.
         _runReader = true;
         var chunk = "";
-        while (_runReader) {
-            try {
-                const {value, done} = await _portReader.read();
-                if (done) {
-                    break;
-                }
-
-                if (window.logReceived) {
-                    log.info(value);
-                }
-                value.split("").forEach((part) => {
-                    chunk = chunk + part;
-                    if (_stringToReceive && chunk.indexOf(_stringToReceive.trim()) > -1) {
-                        _stringToReceiveResolve();
-                        _stringToReceive = null;
+        return new Promise(async (resolve, reject) => {
+            setTimeout(resolve, 200);
+            while (_runReader) {
+                try {
+                    const {value, done} = await _portReader.read();
+                    if (done) {
+                        break;
                     }
-                    if (part === '\n') {
-                        if (chunk.length > 2 && chunk.indexOf(C.LIVE_VALUE_CONSTANT) > -1) {
-                            if (L.isFunction(_valueHandler)) {
-                                _valueHandler(chunk.toString());
-                            }
-                        } else if (_internalValueFunction) {
-                            _internalValueFunction(chunk);
+
+                    if (window.logReceived) {
+                        log.info(value);
+                    }
+                    value.split("").forEach((part) => {
+                        chunk = chunk + part;
+                        if (_stringToReceive && chunk.indexOf(_stringToReceive.trim()) > -1) {
+                            _stringToReceiveResolve();
+                            _stringToReceive = null;
                         }
-                        chunk = "";
-                    }
-                });
+                        if (part === '\n') {
+                            if (chunk.length > 2 && chunk.indexOf(C.LIVE_VALUE_CONSTANT) > -1) {
+                                if (L.isFunction(_valueHandler)) {
+                                    _valueHandler(chunk.toString());
+                                }
+                            } else if (_internalValueFunction) {
+                                _internalValueFunction(chunk);
+                            }
+                            chunk = "";
+                        }
+                    });
 
-            } catch (e) {
-                console.warn(e);
-                thiz.close();
-                if (MainView.instance) {
-                    MainView.instance.toConnectionScreen();
-                } else {
-                    window.dispatchEvent(new CustomEvent(C.EVENT_SERIAL_CONNECT_FAILED));
+                } catch (e) {
+                    console.warn(e);
+                    thiz.close();
+                    if (MainView.instance) {
+                        MainView.instance.toConnectionScreen();
+                    }
+                    reject();
                 }
             }
-        }
-        _portReader.releaseLock();
+            _portReader.releaseLock();
+        });
     }
 }
 
