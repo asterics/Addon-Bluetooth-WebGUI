@@ -20,7 +20,7 @@ class MainView extends Component {
 
     constructor() {
         super();
-
+        log.info('last update: 10.01.2023');
         MainView.instance = this;
         MainView.lastViewHash = '';
         this.state = {
