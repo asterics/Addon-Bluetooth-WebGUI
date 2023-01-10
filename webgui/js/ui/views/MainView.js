@@ -51,6 +51,11 @@ class MainView extends Component {
         window.addEventListener(C.EVENT_REFRESH_MAIN, () => {
             this.setState({});
         });
+        window.addEventListener(C.EVENT_SERIAL_CONNECT_FAILED, () => {
+            this.setState({
+                errorCode: C.ERROR_SERIAL_CONNECT_FAILED
+            });
+        });
     }
 
     toConnectionScreen() {
@@ -243,6 +248,8 @@ class MainView extends Component {
                                 `;
                             case C.ERROR_CONNECTION_LOST:
                                 return html`<span>${L.translate('Connection to device lost! Please try to reconnect. // Verbindung zum Gerät verloren! Bitte versuchen Sie sich wieder zu verbinden.')}</span>`;
+                            case C.ERROR_SERIAL_CONNECT_FAILED:
+                                return html`<span>${L.translate('Couldn\'t connect to device! Please try to disconnect and reconnect the device to your computer. // Verbindung zum Gerät nicht möglich! Bitte trennen Sie das Gerät vom PC und verbinden Sie es danach erneut.')}</span>`;
                             case C.ERROR_WRONG_DEVICE:
                                 return html`
                                     <span>${L.translate("Detected wrong device! // Falsches Gerät erkannt!")}</span>

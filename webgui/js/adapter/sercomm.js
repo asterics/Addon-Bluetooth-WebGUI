@@ -204,7 +204,11 @@ function SerialCommunicator() {
             } catch (e) {
                 console.warn(e);
                 thiz.close();
-                if (MainView.instance) MainView.instance.toConnectionScreen();
+                if (MainView.instance) {
+                    MainView.instance.toConnectionScreen();
+                } else {
+                    window.dispatchEvent(new CustomEvent(C.EVENT_SERIAL_CONNECT_FAILED));
+                }
             }
         }
         _portReader.releaseLock();
