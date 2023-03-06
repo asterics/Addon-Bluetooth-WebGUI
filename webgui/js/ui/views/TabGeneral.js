@@ -162,8 +162,8 @@ class TabGeneral extends Component {
         <div class="${state.showFirmwareModal ? '' : 'd-none'}">
             ${html`<${FirmwareUpdateModal} close="${() => this.setState({showFirmwareModal: false})}" fwInfo="${state.mainVersionFWInfo}" currentFwVersion="${this.state.mainVersion}"/>`}
         </div>
-        <h3 class="mt-5">Firmware Bluetooth-Addon</h3>
-        <div class="container-fluid p-0">
+        <h3 class="mt-5 ${C.DEVICE_IS_FM && ATDevice.isMajorVersion(3) ? 'd-none' : ''}">Firmware Bluetooth-Addon</h3>
+        <div class="container-fluid p-0 ${C.DEVICE_IS_FM && ATDevice.isMajorVersion(3) ? 'd-none' : ''}">
             <div class="row">
                 <span class="col col-md-4">${L.translate('Installed version // Installierte Version')}</span>   
                 <span class="col col-md-3"> ${this.state.btVersion}</span>   
