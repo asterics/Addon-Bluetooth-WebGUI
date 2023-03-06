@@ -20,7 +20,8 @@ C.HELP_BASE_URL = 'https://github.com/asterics/FLipMouse/blob/master/Documentati
 
 C.USB_DEVICE_FILTERS =  [
     {usbVendorId: 0x16c0}, // Teensy
-    {usbVendorId: 0x2e8a} // RP2040
+    {usbVendorId: 0x2e8a}, // RP2040
+    {usbVendorId: 0x2341} // RP2040 (from 2023 on)
 ];
 
 C.VIEWS = [{
