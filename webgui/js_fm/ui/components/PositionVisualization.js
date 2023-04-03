@@ -115,7 +115,7 @@ class PositionVisualization extends Component {
         ctx.beginPath();
         let rectW = ctx.canvas.width * this.state.pDzX / 100;
         let rectH = ctx.canvas.height * this.state.pDzY / 100;
-        if (ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value) {
+        if (C.DEVICE_IS_FM && ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value) {
             ctx.rect(ctx.canvas.width / 2 - rectW / 2, ctx.canvas.height / 2 - rectH / 2, rectW, rectH);
         } else {
             ctx.ellipse(ctx.canvas.width / 2, ctx.canvas.height / 2, rectW / 2, rectH / 2, 0, 0, 2 * Math.PI);
