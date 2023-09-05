@@ -140,7 +140,6 @@ ATDevice.getBTVersion = function () {
     ATDevice.sendAtCmdForce(C.AT_CMD_STOP_REPORTING_LIVE);
     return ATDevice.sendAtCmdWithResultForce(C.AT_CMD_ADDON_COMMAND, '$ID').then(result => {
         result = result || '';
-        result = result.toUpperCase().replace('P32', ''); //remove ESP32 in order to prevent wrong version number parsing
         return Promise.resolve(result.trim() ? L.formatVersion(result) : '');
     }).finally(() => {
         if (!_dontGetLiveValues) ATDevice.sendAtCmdForce(C.AT_CMD_START_REPORTING_LIVE);
