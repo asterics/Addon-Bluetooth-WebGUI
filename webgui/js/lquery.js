@@ -367,7 +367,8 @@ L.CachedHTTPRequest = function (url, method, responseType, storeKey, timeToLive)
 
 L.parseVersion = function (versionString) {
     versionString = versionString || '';
-    versionString = versionString.replace(/[^0-9.]/g, ''); //only digits and dots
+    let items = versionString.split(/[ \n:]/g).map(e => e.replace(/[^0-9.]/g, '')).filter(e => !!e && e.includes('.')); //only parts with numbers and dots
+    versionString = items[0]; // assume first part with numbers and dots is version string
     if (!versionString) {
         return {};
     }
