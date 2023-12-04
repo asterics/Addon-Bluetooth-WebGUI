@@ -18,7 +18,8 @@ C.MAX_LENGTH_SLOTNAME = 11;
 C.HELP_BASE_URL = 'https://github.com/asterics/FABI/blob/master/Documentation/UserManual/Markdown/Fabi%20User%20Manual.md // https://github.com/asterics/FABI/blob/master/Documentation/UserManual/Markdown/Fabi%20Anwendungsanleitung.md';
 
 C.USB_DEVICE_FILTERS =  [
-    {usbVendorId: 0x2341, usbProductId: 0x8037} // Arduino Pro Micro
+    {usbVendorId: 0x2341, usbProductId: 0x8037}, // Arduino Pro Micro
+    {usbVendorId: 0x2E8A, usbProductId: 0xF10A} // RaspberryPi PicoW
 ];
 
 C.VIEWS = [{
