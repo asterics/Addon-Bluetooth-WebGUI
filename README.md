@@ -28,7 +28,7 @@ To adjust settings on your assistive device, please:
 ## Run WebGUI locally
 To run the WebGUIs locally you need to download this repository and start a local webserver to serve the data. Do the following steps:
 1. Clone the repository with `git clone https://github.com/asterics/Addon-Bluetooth-WebGUI.git`
-2. Install any local webserver, e.g. [http-server from npm](https://www.npmjs.com/package/http-server) with `npm install --global http-server`
+2. Install any local webserver, e.g. [http-server from npm](https://www.npmjs.com/package/http-server) with `npm install --global http-server` (or Python: `python3 -m http.server 8080`)
 3. Start the local webserver to serve documents from the webgui folder e.g. with `cd Addon-Bluetooth-WebGUI/webgui` and starting `http-server` in this directory
 4. Open `http://localhost:8080/index_fm.htm` or `http://localhost:8080/index_fabi.htm` in your browser
 
