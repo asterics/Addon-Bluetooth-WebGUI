@@ -19,7 +19,8 @@ C.HELP_BASE_URL = 'https://github.com/asterics/FABI/blob/master/Documentation/Us
 
 C.USB_DEVICE_FILTERS =  [
     {usbVendorId: 0x2341, usbProductId: 0x8037}, // Arduino Pro Micro
-    {usbVendorId: 0x2E8A, usbProductId: 0xF10A} // RaspberryPi PicoW
+    {usbVendorId: 0x2E8A, usbProductId: 0xF10A}, // RaspberryPi PicoW
+    {usbVendorId: 0x239A, usbProductId: 0xCAFE} // RaspberryPi PicoW - Adafruit TinyUSB Stack
 ];
 
 C.VIEWS = [{
