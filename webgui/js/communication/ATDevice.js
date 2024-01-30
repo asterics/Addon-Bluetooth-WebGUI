@@ -50,6 +50,7 @@ let _autoSaveTimeout = 750;
 let _dontGetLiveValues = false;
 
 let _lastVersionResult = null
+let _lastVersionRawString = null
 
 const TEST_MODE_OPTIONS = "TEST_MODE_OPTIONS";
 let _testModeOptions = localStorageService.get(TEST_MODE_OPTIONS) || {
@@ -86,6 +87,7 @@ ATDevice.init = function (dontGetLiveValues) {
         _isInitialized = true;
         return ATDevice.sendAtCmdWithResultForce(C.AT_CMD_VERSION);
     }).then((versionString) => {
+        _lastVersionRawString = versionString;
         _lastVersionResult = L.parseVersion(versionString);
         if (C.DEVICE_IS_FM && versionString.toLowerCase().includes("pad") ||
             C.DEVICE_IS_FLIPPAD && versionString.toLowerCase().includes("mouse")) {
@@ -121,9 +123,18 @@ ATDevice.isInitialized = function () {
 
 ATDevice.getVersion = function () {
     return ATDevice.sendAtCmdWithResultForce(C.AT_CMD_VERSION).then(result => {
+        _lastVersionRawString = result;
         _lastVersionResult = L.parseVersion(result);
         return Promise.resolve(L.formatVersion(result));
     });
+}
+
+ATDevice.getVersionSuffix = function () {
+    if (!_lastVersionRawString) {
+        return;
+    }
+    let parts = _lastVersionRawString.split(', ');
+    return parts.length > 1 ? parts[parts.length - 1] : null;
 }
 
 ATDevice.isMajorVersion = function (numValue) {

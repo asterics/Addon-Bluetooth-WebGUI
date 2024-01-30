@@ -18,6 +18,7 @@ class TabGeneral extends Component {
         TabGeneral.instance = this;
         this.state = {
             mainVersion: unknown,
+            versionSuffix: null,
             newMainVersion: unknown,
             mainVersionFWInfo: null,
             newMainVersionUrl: '',
@@ -56,6 +57,10 @@ class TabGeneral extends Component {
                 mainVersion: result
             });
         })
+        let result = ATDevice.getVersionSuffix();
+        this.setState({
+            versionSuffix: result
+        });
         ATDevice.getBTVersion().then(result => {
             this.setState({
                 btVersion: result || unknown
@@ -144,6 +149,10 @@ class TabGeneral extends Component {
             <div class="row">
                 <span class="col col-md-4">${L.translate('Installed version // Installierte Version')}</span>   
                 <span class="col col-md-3"> ${this.state.mainVersion}</span>   
+            </div>
+            <div class="row ${this.state.versionSuffix ? '' : 'd-none'}">
+                <span class="col col-md-4">${L.translate('Version suffix // Versions-Zusatz')}</span>
+                <span class="col col-md-3"> ${this.state.versionSuffix}</span>
             </div>
             <div class="row">
                 <span class="col col-md-4">${L.translate('Available version // Verfügbare Version')}</span>   
