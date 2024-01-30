@@ -179,13 +179,17 @@ class TabStick extends Component {
                     })()}
                 </div>
                 <div class="mt-4 row ${ATDevice.isMajorVersion(3) ? '' : 'd-none'}">
-                    <label class="col-12" for="selectProfile">${L.translate('Sensitivity profile // Sensitivitäts-Profil')}</label>
+                    <label class="col-12" for="selectProfile">${L.translate('Sensor-Profile // Sensor-Profil')}</label>
                     <div class="col-12">
                         <select id="selectProfile" value="${ATDevice.getConfig(C.AT_CMD_SENSORBOARD)}" oninput="${(event) => {ATDevice.setConfig(C.AT_CMD_SENSORBOARD, event.target.value, 0)}}">
-                            <option value="0">${L.translate('High // Hoch')}</option>
-                            <option value="1">${L.translate('Medium // Mittel')}</option>
-                            <option value="2">${L.translate('Low // Gering')}</option>
-                            <option value="3">${L.translate('Very Low // Sehr gering')}</option>
+                            <option value="0">${L.translate('High (SG) // Hoch (DMS)')}</option>
+                            <option value="1">${L.translate('Medium (SG) // Mittel (DMS)')}</option>
+                            <option value="2">${L.translate('Low (SG) // Gering (DMS)')}</option>
+                            <option value="3">${L.translate('Very Low (SG) // Sehr gering (DMS)')}</option>
+                            <option value="4">${L.translate('High (SMD) // Hoch (SMD)')}</option>
+                            <option value="5">${L.translate('Medium (SMD) // Mittel (SMD)')}</option>
+                            <option value="6">${L.translate('Low (SMD) // Gering (SMD)')}</option>
+                            <option value="7">${L.translate('Very Low (SMD) // Sehr gering (SMD)')}</option>
                         </select>
                     </div>
                 </div>
