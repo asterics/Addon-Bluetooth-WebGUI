@@ -147,17 +147,18 @@ class TabGeneral extends Component {
         <h3>${C.CURRENT_DEVICE} Firmware</h3>
         <div class="container-fluid p-0">
             <div class="row">
-                <span class="col col-md-4">${L.translate('Installed version // Installierte Version')}</span>   
-                <span class="col col-md-3"> ${this.state.mainVersion}</span>   
-            </div>
-            <div class="row ${this.state.versionSuffix ? '' : 'd-none'}">
-                <span class="col col-md-4">${L.translate('Version suffix // Versions-Zusatz')}</span>
-                <span class="col col-md-3"> ${this.state.versionSuffix}</span>
+                <span class="col col-md-3">${L.translate('Installed version // Installierte Version')}</span>   
+                <span class="col col-md-6">
+                    <span>${this.state.mainVersion}</span>
+                    <span class="${this.state.versionSuffix ? '' : 'd-none'}"> (${this.state.versionSuffix})</span>
+                </span>
             </div>
             <div class="row">
-                <span class="col col-md-4">${L.translate('Available version // Verfügbare Version')}</span>   
-                <a rel="noreferrer" href="${this.state.newMainVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newMainVersion}</a>   
-                <div class="col-12 col-md-4 mt-3 mt-md-0">
+                <span class="col col-md-3">${L.translate('Available version // Verfügbare Version')}</span>   
+                <a rel="noreferrer" href="${this.state.newMainVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newMainVersion}</a>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 col-md-4">
                     <button class="col-12" onclick="${() => this.updateFirmware()}" disabled="${this.state.mainUpgradeProgress}">
                         <span class="${this.state.mainUpgradeProgress ? 'd-none' : ''}">
                             <span class="sr-only">${C.CURRENT_DEVICE}: </span>

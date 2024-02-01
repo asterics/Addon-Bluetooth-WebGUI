@@ -134,7 +134,11 @@ ATDevice.getVersionSuffix = function () {
         return;
     }
     let parts = _lastVersionRawString.split(', ');
-    return parts.length > 1 ? parts[parts.length - 1] : null;
+    if (parts.length > 1) {
+        parts.shift();
+        return parts.join(', ');
+    }
+    return "";
 }
 
 ATDevice.isMajorVersion = function (numValue) {
