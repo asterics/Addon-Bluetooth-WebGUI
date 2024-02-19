@@ -81,6 +81,9 @@ C.AT_CMD_CATEGORIES = [{
     constant: C.AT_CMD_CAT_DEVICE,
     label: 'Device // Gerät'
 }, {
+    constant: C.AT_CMD_CAT_IR,
+    label: 'Infrared // Infrarot'
+}, {
     constant: C.AT_CMD_CAT_MACRO,
     label: 'Macro // Makro'
 }];
@@ -100,6 +103,49 @@ C.BTN_CATEGORIES = [{
 }]
 
 C.BTN_MODES = [{
+    index: 1,
+    label: 'Button 1',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 2,
+    label: 'Button 2',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 3,
+    label: 'Button 3',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 4,
+    label: 'Button 4',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 5,
+    label: 'Button 5',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 6,
+    label: 'Button 6',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 7,
+    label: 'Button 7',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 8,
+    label: 'Button 8',
+    category: C.BTN_CAT_BTN
+}, {
+    index: 10,
+    label: 'Sip // Ansaugen',
+    category: C.BTN_CAT_SIPPUFF
+}, {
+    index: 11,
+    label: 'Puff // Pusten',
+    category: C.BTN_CAT_SIPPUFF
+}];
+
+
+C.BTN_MODES_V3 = [{
     index: 1,
     label: 'Button 1',
     category: C.BTN_CAT_BTN
