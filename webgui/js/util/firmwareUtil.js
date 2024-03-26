@@ -155,7 +155,11 @@ firmwareUtil.parseIntelHex = function (data, bufferSize) {
 };
 
 firmwareUtil.getBTFWInfo = function () {
-    return getFWInfo('https://api.github.com/repos/asterics/esp32_mouse_keyboard/releases/latest', '.bin');
+    if (deviceIsFM && majorVersion === 3) {
+        return getFWInfo('https://api.github.com/repos/asterics/esp32_mouse_keyboard/releases/latest', '.fm3');
+    } else {
+        return getFWInfo('https://api.github.com/repos/asterics/esp32_mouse_keyboard/releases/latest', '.bin');
+    }
 }
 
 firmwareUtil.getDeviceFWInfo = function (device, majorVersion) {
