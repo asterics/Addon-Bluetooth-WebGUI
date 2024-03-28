@@ -137,7 +137,7 @@ class PositionVisualization extends Component {
                         <div style="display: ${this.getValue(props.showZoom, false) ? 'block' : 'none'};">
                             <div id="zoomButtons" style="top: 1%; left: 1%; position: absolute; width: 100%">
                                 <div class="relative">
-                                    <button title="${L.translate('zoom in // Vergrößern')}" onclick="${() => this.setMaxPosZoom(Math.max(state.maxPosZoom * 0.9, 20))}" style="width: 15%; height: 15%; opacity: 0.7; padding: 0">${html`<${FaIcon} height="0.9em" icon="fas plus"/>`}</button>
+                                    <button title="${L.translate('zoom in // Vergrößern')}" onclick="${() => this.setMaxPosZoom(Math.max(state.maxPosZoom * 0.9, 20))}" style="width: 15%; height: 15%; opacity: 0.7; padding: 0">${html`<${FaIcon} height="0.9em" icon="fas plus inverted-icon"/>`}</button>
                                     <button title="${L.translate('zoom out // Verkleinern')}" onclick="${() => this.setMaxPosZoom(Math.min(state.maxPosZoom * 1.1, 1024))}" style="width: 15%; height: 15%; opacity: 0.7; padding: 0">${html`<${FaIcon} height="0.9em" icon="fas minus"/>`}</button>
                                 </div>
                             </div>

@@ -1,27 +1,30 @@
 import { h, Component } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
-import {PositionVisualization} from "../components/PositionVisualization.js";
-import {preactUtil} from "../../util/preactUtil.js";
-import {RadioFieldset} from "../../../js/ui/components/RadioFieldset.js";
-import {Slider} from "../../../js/ui/components/Slider.js";
-import {ATDevice} from "../../../js/communication/ATDevice.js";
-import {FLipMouse} from "../../communication/FLipMouse.js";
-import {ActionButton} from "../../../js/ui/components/ActionButton.js";
-import {FaIcon} from "../../../js/ui/components/FaIcon.js";
-import {localStorageService} from "../../../js/localStorageService.js";
+import { PositionVisualization } from "../components/PositionVisualization.js";
+import { preactUtil } from "../../util/preactUtil.js";
+import { RadioFieldset } from "../../../js/ui/components/RadioFieldset.js";
+import { Slider } from "../../../js/ui/components/Slider.js";
+import { ATDevice } from "../../../js/communication/ATDevice.js";
+import { FLipMouse } from "../../communication/FLipMouse.js";
+import { ActionButton } from "../../../js/ui/components/ActionButton.js";
+import { FaIcon } from "../../../js/ui/components/FaIcon.js";
+import { localStorageService } from "../../../js/localStorageService.js";
+
 
 const html = htm.bind(h);
 
 const KEY_TAB_STICK_SHOW_ADVANCED = 'KEY_TAB_STICK_SHOW_ADVANCED';
 const KEY_TAB_STICK_SHOW_BARS = 'KEY_TAB_STICK_SHOW_BARS';
+
 class TabStick extends Component {
+
     constructor() {
         super();
 
         TabStick.instance = this;
         this.state = {};
         this.atCmds = [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y, C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y, C.AT_CMD_MAX_SPEED, C.AT_CMD_ACCELERATION,
-            C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP, C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP, C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP];
+        C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP, C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP, C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP];
         this.initValues();
     }
 
@@ -66,7 +69,7 @@ class TabStick extends Component {
             showAnalogBars: !this.state.showAnalogBars
         });
     }
-    
+
     render() {
         let state = this.state;
 
@@ -98,37 +101,37 @@ class TabStick extends Component {
             
             <div>
                 ${(() => {
-                    if (state.splitSensitivity) {
-                        return html`
+                if (state.splitSensitivity) {
+                    return html`
                         <${Slider} label="Horizontal Sensitivity: // Sensitivität horizontal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_X]}"
                             min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_X]}"
                             toggleFn="${() => this.toggleState('splitSensitivity', [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>
                         <${Slider} label="Vertical Sensitivity: // Sensitivität vertikal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_Y]}"
                                    min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_Y]}"/>`
-                    } else {
-                        return html`
+                } else {
+                    return html`
                         <${Slider} label="Sensitivity: // Sensitivität:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_SENSITIVITY_X]}"
                             min="0" max="255" updateConstants="${[C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y]}"
                             toggleFn="${() => this.toggleState('splitSensitivity', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
-                    }
-                })()}
+                }
+            })()}
             </div>
             <div class="mt-4">
                 ${(() => {
-                    if (state.splitDeadzone) {
-                        return html`
+                if (state.splitDeadzone) {
+                    return html`
                         <${Slider} label="Horizontal Deadzone: // <span lang="en">Deadzone</span> horizontal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
                             min="0" max="200" updateConstants="${[C.AT_CMD_DEADZONE_X]}"
                             toggleFn="${() => this.toggleState('splitDeadzone', [C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>
                         <${Slider} label="Vertical Deadzone: // <span lang="en">Deadzone</span> vertikal:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_Y]}"
                             min="0" max="200" updateConstants="${[C.AT_CMD_DEADZONE_Y]}"/>`
-                    } else {
-                        return html`
+                } else {
+                    return html`
                         <${Slider} label="<span lang="en">Deadzone:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_DEADZONE_X]}"
                             min="0" max="200" updateConstants="${[C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y]}"
                             toggleFn="${() => this.toggleState('splitDeadzone', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
-                    }
-                })()}
+                }
+            })()}
             </div>
             <div class="mt-4">
                 ${html`<${Slider} label="Maximum speed: // Maximale Geschwindigkeit:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_MAX_SPEED]}"
@@ -139,49 +142,49 @@ class TabStick extends Component {
                         min="0" max="100" updateConstants="${[C.AT_CMD_ACCELERATION]}"/>`}
             </div>
             <div class="my-5">
-                <a href="javascript:;" onclick="${() => {localStorageService.save(KEY_TAB_STICK_SHOW_ADVANCED, !state.showAdvanced); this.setState({showAdvanced: !state.showAdvanced})}}">
+                <a href="javascript:;" onclick="${() => { localStorageService.save(KEY_TAB_STICK_SHOW_ADVANCED, !state.showAdvanced); this.setState({ showAdvanced: !state.showAdvanced }) }}">
                     ${state.showAdvanced ? L.translate('Hide advanced options // Verstecke erweiterte Einstellungen') : L.translate('Show advanced options // Zeige erweiterte Einstellungen')}
                 </a>
             </div>
             <div class="${state.showAdvanced ? '' : 'd-none'}">
                 <div class="mt-4 ${ATDevice.isMajorVersion(2) ? '' : 'd-none'}">
                     ${(() => {
-                        if (state.splitDriftcompRange) {
-                            return html`
+                if (state.splitDriftcompRange) {
+                    return html`
                             <${Slider} label="<span lang="en">Horizontal drift compensation range:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
                                 min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
                                 toggleFn="${() => this.toggleState('splitDriftcompRange', [C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>
                             <${Slider} label="<span lang="en">Vertical drift compensation range:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"
                                 min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"/>`
-                        } else {
-                            return html`
+                } else {
+                    return html`
                             <${Slider} label="<span lang="en">Drift compensation range:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
                                 min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"
                                 toggleFn="${() => this.toggleState('splitDriftcompRange', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
-                        }
-                    })()}
+                }
+            })()}
                 </div>
                 <div class="mt-4 ${ATDevice.isMajorVersion(2) ? '' : 'd-none'}">
                     ${(() => {
-                        if (state.splitDriftcompGain) {
-                            return html`
+                if (state.splitDriftcompGain) {
+                    return html`
                             <${Slider} label="<span lang="en">Horizontal drift compensation gain:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
                                 min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
                                 toggleFn="${() => this.toggleState('splitDriftcompGain', [C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP, C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>
                             <${Slider} label="<span lang="en">Vertical drift compensation gain:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"
                                 min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"/>`
-                        } else {
-                            return html`
+                } else {
+                    return html`
                             <${Slider} label="<span lang="en">Drift compensation gain:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
                                 min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP, C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"
                                 toggleFn="${() => this.toggleState('splitDriftcompGain', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
-                        }
-                    })()}
+                }
+            })()}
                 </div>
                 <div class="mt-4 row ${ATDevice.isMajorVersion(3) ? '' : 'd-none'}">
                     <label class="col-12" for="selectProfile">${L.translate('Sensor-Profile // Sensor-Profil')}</label>
                     <div class="col-12">
-                        <select id="selectProfile" value="${ATDevice.getConfig(C.AT_CMD_SENSORBOARD)}" oninput="${(event) => {ATDevice.setConfig(C.AT_CMD_SENSORBOARD, event.target.value, 0)}}">
+                        <select id="selectProfile" value="${ATDevice.getConfig(C.AT_CMD_SENSORBOARD)}" oninput="${(event) => { ATDevice.setConfig(C.AT_CMD_SENSORBOARD, event.target.value, 0) }}">
                             <option value="0">${L.translate('High (SG) // Hoch (DMS)')}</option>
                             <option value="1">${L.translate('Medium (SG) // Mittel (DMS)')}</option>
                             <option value="2">${L.translate('Low (SG) // Gering (DMS)')}</option>
@@ -208,6 +211,7 @@ class TabStick extends Component {
             </div>
             `;
     }
+
 }
 
 TabStick.valueHandler = function (data) {
@@ -223,9 +227,11 @@ TabStick.slotChangeHandler = function (data) {
 };
 
 window.addEventListener(C.EVENT_REFRESH_MAIN, () => {
+
     if (TabStick.instance) {
         TabStick.instance.initValues();
+
     }
 });
 
-export {TabStick};
+export { TabStick };

@@ -86,6 +86,7 @@ FLipMouse.updateFirmware = async function (url, progressHandler, dontReset) {
     localStorageService.setFirmwareDownloadUrl(url);
     let serialCommunicator = ATDevice.getCommunicator();
     let failed = false;
+
     if (!dontReset) {
         await serialCommunicator.close();
         await TeensyFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
@@ -96,6 +97,7 @@ FLipMouse.updateFirmware = async function (url, progressHandler, dontReset) {
     });
     if (!failed) {
         localStorageService.setFirmwareDownloadUrl('');
+        
         if (!window.location.href.includes(C.SUCCESS_FIRMWAREUPDATE)) {
             window.location.replace(window.location.href = window.location.href + '?' + C.SUCCESS_FIRMWAREUPDATE);
         }
