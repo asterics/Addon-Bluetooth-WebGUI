@@ -312,50 +312,34 @@ C.BTN_MODES_FABI_V3 = [{
     category: C.BTN_CAT_STRONG_SIPPUFF
 }, {
     index: 15,
-    label: 'Stick Up // Stick nach oben',
-    category: C.BTN_CAT_STICK
-}, {
-    index: 16,
-    label: 'Stick Down // Stick nach unten',
-    category: C.BTN_CAT_STICK
-}, {
-    index: 17,
-    label: 'Stick Left // Stick nach links',
-    category: C.BTN_CAT_STICK
-}, {
-    index: 18,
-    label: 'Stick Right // Stick nach rechts',
-    category: C.BTN_CAT_STICK
-}, {
-    index: 19,
     label: 'Strong Sip + Button 2 // Stark ansaugen + Button 2',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 20,
+    index: 16,
     label: 'Strong Sip + Button 3 // Stark ansaugen + Button 3',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 21,
+    index: 17,
     label: 'Strong Sip + Button 4 // Stark ansaugen + Button 4',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 22,
+    index: 18,
     label: 'Strong Sip + Button 5 // Stark ansaugen + Button 5',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 23,
+    index: 19,
     label: 'Strong Puff + Button 2 // Stark pusten + Button 2',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 24,
+    index: 20,
     label: 'Strong Puff + Button 3 // Stark pusten + Button 3',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 25,
+    index: 21,
     label: 'Strong Puff + Button 4 // Stark pusten + Button 4',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 26,
+    index: 22,
     label: 'Strong Puff + Button 5 // Stark pusten + Button 5',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }];
@@ -476,50 +460,34 @@ C.BTN_MODES_FABI_V3_ACTIONLIST = [{ // This can be seen within the actions tab.
     category: C.BTN_CAT_STRONG_SIPPUFF
 }, {
     index: 15,
-    label: 'Stick Up // Stick nach oben',
-    category: C.BTN_CAT_STICK
-}, {
-    index: 16,
-    label: 'Stick Down // Stick nach unten',
-    category: C.BTN_CAT_STICK
-}, {
-    index: 17,
-    label: 'Stick Left // Stick nach links',
-    category: C.BTN_CAT_STICK
-}, {
-    index: 18,
-    label: 'Stick Right // Stick nach rechts',
-    category: C.BTN_CAT_STICK
-}, {
-    index: 19,
     label: 'Strong Sip + Button 2 // Stark ansaugen + Button 2',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 20,
+    index: 16,
     label: 'Strong Sip + Button 3 // Stark ansaugen + Button 3',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 21,
+    index: 17,
     label: 'Strong Sip + Button 4 // Stark ansaugen + Button 4',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 22,
+    index: 18,
     label: 'Strong Sip + Button 5 // Stark ansaugen + Button 5',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 23,
+    index: 19,
     label: 'Strong Puff + Button 2 // Stark pusten + Button 2',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 24,
+    index: 20,
     label: 'Strong Puff + Button 3 // Stark pusten + Button 3',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 25,
+    index: 21,
     label: 'Strong Puff + Button 4 // Stark pusten + Button 4',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 26,
+    index: 22,
     label: 'Strong Puff + Button 5 // Stark pusten + Button 5',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }];
