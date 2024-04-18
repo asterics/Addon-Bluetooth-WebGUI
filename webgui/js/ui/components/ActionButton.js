@@ -1,9 +1,9 @@
 import { h, Component } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
-import {FaIcon} from "./FaIcon.js";
+import { FaIcon } from "./FaIcon.js";
 const html = htm.bind(h);
 
-class ActionButton extends Component {
+class ActionButton extends Component { // ActionButton is a react component which is basically a button.
 
     constructor(props) {
         super();
@@ -14,17 +14,23 @@ class ActionButton extends Component {
     }
 
     doAction() {
-        this.props.onclick = this.props.onclick || (() => {
-        });
+        this.props.onclick = this.props.onclick || (() => { });
+        this.props.resetSlidersTiming = this.props.resetSlidersTiming || (() => { }); // props stands for properties and is possibly used for passing data and functions from a parent component to a child component in React.js.
+        this.props.resetSlidersPuffSip = this.props.resetSlidersPuffSip || (() => { }); 
+
         this.setState({
             actionPerforming: true
         });
         Promise.resolve(this.props.onclick()).then(() => {
+            this.props.resetSlidersTiming();
+            this.props.resetSlidersPuffSip();
+            
             this.setState({
                 actionPerforming: false
             });
         })
     }
+
 
     render(props) {
         props.label = props.label || '';
@@ -38,6 +44,7 @@ class ActionButton extends Component {
                 ${L.translate(this.state.actionPerforming ? props.progressLabel : props.label)}
             </button>`;
     }
+
 }
 
-export {ActionButton};
+export { ActionButton };

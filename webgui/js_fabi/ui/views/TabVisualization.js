@@ -12,10 +12,11 @@ class TabVisualization extends Component {
 
         TabVisualization.instance = this;
         if (ATDevice.isMajorVersion(3)) {
-          TabVisualization.BTN_NAMES = ["1", "2", "3", "4", "5", "Sip // Ansaugen", "Puff // Pusten"];
+          TabVisualization.BTN_NAMES = ["1", "2", "3", "4", "5", null, null, null, null, null, "Sip // Ansaugen", "Puff // Pusten", "Strong Sip // Starkes Ansaugen", "Strong Puff // Starkes Pusten"];
+
         } else {
           TabVisualization.BTN_NAMES = ["1", "2", "3", "4", "5", "6", "7", "8", null, "Sip // Ansaugen", "Puff // Pusten"];
-          TabVisualization.BTN_NAMES_LONGPRESS = ["1", "2", "3", "4", "5", "6", null, null, null, "Sip // Ansaugen", "Puff // Pusten"];
+          TabVisualization.BTN_NAMES_LONGPRESS = ["1", "2", "3", "4", "5", "6", "7", "8", null, "Sip // Ansaugen", "Puff // Pusten"];
         }
         this.setState({
             liveData: {}
@@ -37,6 +38,7 @@ class TabVisualization extends Component {
         let btnNames;
         if (ATDevice.isMajorVersion(3)) {
           btnNames = TabVisualization.BTN_NAMES;
+
         } else {
           btnNames = longpressActive ? TabVisualization.BTN_NAMES_LONGPRESS : TabVisualization.BTN_NAMES;
         }

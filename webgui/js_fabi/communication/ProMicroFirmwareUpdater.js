@@ -5,9 +5,9 @@ let ProMicroFirmwareUpdater = {}
 const MAX_WORDS_PROMICRO = 32768;
 
 //credits: https://www.30secondsofcode.org/articles/s/javascript-array-comparison
-const equals = (a, b) =>
-    a.length === b.length &&
-    a.every((v, i) => v === b[i]);
+const equals = (a, b) =>  // a and be are two arrays. 
+    a.length === b.length && 
+    a.every((v, i) => v === b[i]); // For every element v at the position i in the array a, it will be checked whether it is the same as b[i] in the array b.
 
 /****************/
 // 1.) reset TeensyLC into bootloader mode (user interaction required)

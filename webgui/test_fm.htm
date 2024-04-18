@@ -1,12 +1,13 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>FLipMouse Test</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="shortcut icon" href="favicon_fm.ico" type="image/x-icon">
     <link rel="icon" href="favicon_fm.ico" type="image/x-icon">
-    
+
     <script src="lib/loglevel.min.js"></script>
 
     <script>
@@ -24,315 +25,318 @@
     <script type="module" src="js/lquery.js"></script>
     <script type="module" src="js/adapter/sercomm.js"></script>
 </head>
+
 <body>
-<div class="top-layer-center">
-    <div class="top-layer-content">
-        <h1>FLipMouse Test</h1>
-        <button onclick="initAndStart(doAllTests)">Start All Tests</button>
-        <br/>
-        <br/>
-        <div>Start single test:</div>
-        <div id="singleTests"></div>
+    <div class="top-layer-center">
+        <div class="top-layer-content">
+            <h1>FLipMouse Test</h1>
+            <button onclick="initAndStart(doAllTests)">Start All Tests</button>
+            <br />
+            <br />
+            <div>Start single test:</div>
+            <div id="singleTests"></div>
+        </div>
+        <h2>Log</h2>
+        <button onclick="document.getElementById('log').innerHTML = ''">Clear Log</button>
+        <div id="log" class="mt-4">
+
+        </div>
     </div>
-    <h2>Log</h2>
-    <button onclick="document.getElementById('log').innerHTML = ''">Clear Log</button>
-    <div id="log" class="mt-4">
 
-    </div>
-</div>
+    <script type="module">
+        import { ATDevice } from "./js/communication/ATDevice.js";
 
-<script type="module">
-    import {ATDevice} from "./js/communication/ATDevice.js";
+        let PRINT_DEBUG = false;
+        let DEFAULT_CONFIG = "[{\"name\":\"mouse\",\"config\":{\"AT AX\":\"40\",\"AT AY\":\"40\",\"AT DX\":\"20\",\"AT DY\":\"20\",\"AT MS\":\"50\",\"AT AC\":\"20\",\"AT TS\":\"400\",\"AT TP\":\"600\",\"AT SP\":\"800\",\"AT SS\":\"10\",\"AT MM\":\"1\",\"AT GV\":\"40\",\"AT RV\":\"20\",\"AT RH\":\"20\",\"AT RO\":\"0\",\"AT BT\":\"1\",\"AT BM 1\":\"AT NE\",\"AT BM 2\":\"AT NC\",\"AT BM 3\":\"AT NC\",\"AT BM 4\":\"AT KP KEY_UP\",\"AT BM 5\":\"AT KP KEY_DOWN\",\"AT BM 6\":\"AT KP KEY_LEFT\",\"AT BM 7\":\"AT KP KEY_RIGHT\",\"AT BM 8\":\"AT HL\",\"AT BM 9\":\"AT NC\",\"AT BM 10\":\"AT CR\",\"AT BM 11\":\"AT CA\",\"AT BM 12\":\"AT NC\",\"AT BM 13\":\"AT NC\",\"AT BM 14\":\"AT NC\",\"AT BM 15\":\"AT NC\",\"AT BM 16\":\"AT NC\",\"AT BM 17\":\"AT NC\",\"AT BM 18\":\"AT NC\",\"AT BM 19\":\"AT NC\"}}]";
+        let DEFAULT_SLOTNAME = "mouse";
+        let DEFAULT_SLOT = JSON.parse(DEFAULT_CONFIG).filter(slot => slot.name === DEFAULT_SLOTNAME)[0].config;
+        let assertFails = 0;
+        let assertSuccess = 0;
+        let isTesting = false;
 
-    let PRINT_DEBUG = false;
-    let DEFAULT_CONFIG = "[{\"name\":\"mouse\",\"config\":{\"AT AX\":\"40\",\"AT AY\":\"40\",\"AT DX\":\"20\",\"AT DY\":\"20\",\"AT MS\":\"50\",\"AT AC\":\"20\",\"AT TS\":\"400\",\"AT TP\":\"600\",\"AT SP\":\"800\",\"AT SS\":\"10\",\"AT MM\":\"1\",\"AT GV\":\"40\",\"AT RV\":\"20\",\"AT RH\":\"20\",\"AT RO\":\"0\",\"AT BT\":\"1\",\"AT BM 1\":\"AT NE\",\"AT BM 2\":\"AT NC\",\"AT BM 3\":\"AT NC\",\"AT BM 4\":\"AT KP KEY_UP\",\"AT BM 5\":\"AT KP KEY_DOWN\",\"AT BM 6\":\"AT KP KEY_LEFT\",\"AT BM 7\":\"AT KP KEY_RIGHT\",\"AT BM 8\":\"AT HL\",\"AT BM 9\":\"AT NC\",\"AT BM 10\":\"AT CR\",\"AT BM 11\":\"AT CA\",\"AT BM 12\":\"AT NC\",\"AT BM 13\":\"AT NC\",\"AT BM 14\":\"AT NC\",\"AT BM 15\":\"AT NC\",\"AT BM 16\":\"AT NC\",\"AT BM 17\":\"AT NC\",\"AT BM 18\":\"AT NC\",\"AT BM 19\":\"AT NC\"}}]";
-    let DEFAULT_SLOTNAME = "mouse";
-    let DEFAULT_SLOT = JSON.parse(DEFAULT_CONFIG).filter(slot => slot.name === DEFAULT_SLOTNAME)[0].config;
-    let assertFails = 0;
-    let assertSuccess = 0;
-    let isTesting = false;
 
-    /////////////////////////
-    // test cases
-    /////////////////////////
-    let tests = [{
-        fn: testDefaultConfig,
-        name: 'testDefaultConfig'
-    }, {
-        fn: testChangeValueDeadzone,
-        name: 'testChangeValueDeadzone'
-    }, {
-        fn: testSecondSlot,
-        name: 'testSecondSlot'
-    }, {
-        fn: testIncreaseSlotLength,
-        name: 'testIncreaseSlotLength'
-    }, {
-        fn: testDecreaseSlotLength,
-        name: 'testDecreaseSlotLength'
-    }, {
-        fn: testDeleteSlot,
-        name: 'testDeleteSlot'
-    }, {
-        fn: addDelete10Slots,
-        name: 'addDelete10Slots'
-    }, {
-        fn: deleteMiddleSlot,
-        name: 'deleteMiddleSlot'
-    }, {
-        fn: differentValuesInSlots,
-        name: 'differentValuesInSlots'
-    }];
+        /////////////////////////
+        // test cases
+        /////////////////////////
+        let tests = [{
+            fn: testDefaultConfig,
+            name: 'testDefaultConfig'
+        }, {
+            fn: testChangeValueDeadzone,
+            name: 'testChangeValueDeadzone'
+        }, {
+            fn: testSecondSlot,
+            name: 'testSecondSlot'
+        }, {
+            fn: testIncreaseSlotLength,
+            name: 'testIncreaseSlotLength'
+        }, {
+            fn: testDecreaseSlotLength,
+            name: 'testDecreaseSlotLength'
+        }, {
+            fn: testDeleteSlot,
+            name: 'testDeleteSlot'
+        }, {
+            fn: addDelete10Slots,
+            name: 'addDelete10Slots'
+        }, {
+            fn: deleteMiddleSlot,
+            name: 'deleteMiddleSlot'
+        }, {
+            fn: differentValuesInSlots,
+            name: 'differentValuesInSlots'
+        }];
 
-    async function testDefaultConfig() {
-        let config = ATDevice.getAllSlotObjects();
-        log.info(JSON.stringify(config));
-        assertEqual(config, DEFAULT_CONFIG);
-    }
-
-    async function testChangeValueDeadzone() {
-        await ATDevice.sendATCmd('AT DX', 123);
-        await ATDevice.sendATCmd('AT SA mouse');
-        await ATDevice.refreshConfig();
-        assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X), 123);
-    }
-
-    async function testSecondSlot() {
-        await ATDevice.sendAtCmdWithResult('AT SA slot2');
-        await ATDevice.refreshConfig();
-        assertEqual(ATDevice.getSlotConfig(DEFAULT_SLOTNAME), DEFAULT_SLOT);
-        assertEqual(ATDevice.getSlotConfig('slot2'), DEFAULT_SLOT);
-    }
-
-    async function testIncreaseSlotLength() {
-        await ATDevice.sendAtCmdWithResult('AT SA slot2');
-        await ATDevice.sendATCmd('AT LO', DEFAULT_SLOTNAME);
-        await ATDevice.setButtonAction(1, 'AT KW 123'); // button mode for Slot mouse
-        await ATDevice.sendATCmd('AT SA', DEFAULT_SLOTNAME);
-        await ATDevice.refreshConfig();
-        let slot2 = ATDevice.getSlotConfig('slot2');
-        let slotMouse = ATDevice.getSlotConfig(DEFAULT_SLOTNAME);
-        assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
-        assertEqual(slot2, DEFAULT_SLOT);
-        assertEqual(ATDevice.getButtonAction(1), 'AT KW 123');
-        await ATDevice.setButtonAction(1, 'AT KW 12345'); // button mode for Slot mouse
-        await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
-        await ATDevice.refreshConfig();
-        slot2 = ATDevice.getSlotConfig('slot2');
-        slotMouse = ATDevice.getSlotConfig(DEFAULT_SLOTNAME);
-        assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
-        assertEqual(slot2, DEFAULT_SLOT);
-        assertEqual(ATDevice.getButtonAction(1), 'AT KW 12345');
-    }
-
-    async function testDecreaseSlotLength() {
-        await ATDevice.sendAtCmdWithResult('AT SA slot2');
-        await ATDevice.sendATCmd('AT LO', DEFAULT_SLOTNAME);
-        await ATDevice.setButtonAction(1, 'AT KW 1234567890'); // button mode for Slot mouse
-        await ATDevice.sendATCmd('AT SA', DEFAULT_SLOTNAME);
-        await ATDevice.refreshConfig();
-        let slot2 = ATDevice.getSlotConfig('slot2');
-        let slotMouse = ATDevice.getSlotConfig(DEFAULT_SLOTNAME);
-        assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
-        assertEqual(slot2, DEFAULT_SLOT);
-        assertEqual(ATDevice.getButtonAction(1), 'AT KW 1234567890');
-        await ATDevice.setButtonAction(1, 'AT KW 123'); // button mode for Slot mouse
-        await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
-        await ATDevice.refreshConfig();
-        slot2 = ATDevice.getSlotConfig('slot2');
-        slotMouse = ATDevice.getSlotConfig(DEFAULT_SLOTNAME);
-        assertEqual(slotMouse, DEFAULT_SLOT, {ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"]});
-        assertEqual(slot2, DEFAULT_SLOT);
-        assertEqual(ATDevice.getButtonAction(1), 'AT KW 123');
-    }
-
-    async function testDeleteSlot() {
-        await ATDevice.sendAtCmdWithResult('AT SA newSlot');
-        await ATDevice.refreshConfig();
-        assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
-        assertTrue(ATDevice.getSlots().includes('newSlot'));
-        await ATDevice.sendAtCmdWithResult('AT DE newSlot');
-        await ATDevice.refreshConfig();
-        assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
-        assertFalse(ATDevice.getSlots().includes('newSlot'));
-    }
-
-    async function addDelete10Slots() {
-        await ATDevice.sendATCmd('AT DE', DEFAULT_SLOTNAME);
-        let slotCount = 10;
-        for (let i = 1; i <= slotCount; i++) {
-            await ATDevice.sendAtCmdWithResult('AT SA slot' + i);
+        async function testDefaultConfig() {
+            let config = ATDevice.getAllSlotObjects();
+            log.info(JSON.stringify(config));
+            assertEqual(config, DEFAULT_CONFIG);
         }
-        await ATDevice.refreshConfig();
-        for (let i = 1; i <= slotCount; i++) {
-            assertTrue(ATDevice.getSlots().includes('slot' + i));
-            assertEqual(ATDevice.getSlotConfig('slot' + i), DEFAULT_SLOT);
+
+        async function testChangeValueDeadzone() {
+            await ATDevice.sendATCmd('AT DX', 123);
+            await ATDevice.sendATCmd('AT SA mouse');
+            await ATDevice.refreshConfig();
+            assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X), 123);
         }
-        for (let i = 2; i <= slotCount; i++) {
-            await ATDevice.sendAtCmdWithResult('AT DE slot' + i);
+
+        async function testSecondSlot() {
+            await ATDevice.sendAtCmdWithResult('AT SA slot2');
+            await ATDevice.refreshConfig();
+            assertEqual(ATDevice.getSlotConfig(DEFAULT_SLOTNAME), DEFAULT_SLOT);
+            assertEqual(ATDevice.getSlotConfig('slot2'), DEFAULT_SLOT);
         }
-        await ATDevice.refreshConfig();
-        assertEqual(ATDevice.getSlots().length, 1);
-        assertTrue(ATDevice.getSlots().includes('slot1'));
-        assertEqual(ATDevice.getSlotConfig('slot1'), DEFAULT_SLOT);
-    }
 
-    async function deleteMiddleSlot() {
-        await ATDevice.sendAtCmdWithResult('AT SA slot1');
-        await ATDevice.sendAtCmdWithResult('AT SA slot2');
-        await ATDevice.sendAtCmdWithResult('AT SA slot3');
-        await ATDevice.refreshConfig();
-        assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
-        assertTrue(ATDevice.getSlots().includes('slot1'));
-        assertTrue(ATDevice.getSlots().includes('slot2'));
-        assertTrue(ATDevice.getSlots().includes('slot3'));
-        await ATDevice.sendAtCmdWithResult('AT DE slot2');
-        await ATDevice.refreshConfig();
-        assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
-        assertEqual(ATDevice.getSlots().length, 3);
-        assertEqual(ATDevice.getSlotConfig('mouse'), DEFAULT_SLOT);
-        assertEqual(ATDevice.getSlotConfig('slot1'), DEFAULT_SLOT);
-        assertEqual(ATDevice.getSlotConfig('slot3'), DEFAULT_SLOT);
-    }
-
-    async function differentValuesInSlots() {
-        await ATDevice.sendATCmd('AT DX', 123);
-        await ATDevice.sendAtCmdWithResult('AT SA slot2');
-        await ATDevice.sendATCmd('AT LO', DEFAULT_SLOTNAME);
-        await ATDevice.sendATCmd('AT DX', 12);
-        await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
-        await ATDevice.refreshConfig();
-        assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X, 'slot2'), 123);
-        assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X, DEFAULT_SLOTNAME), 12);
-    }
-
-
-    /////////////////////////
-    // util functions
-    /////////////////////////
-    window.doAllTests = async function() {
-        if (isTesting) {
-            return;
+        async function testIncreaseSlotLength() {
+            await ATDevice.sendAtCmdWithResult('AT SA slot2');
+            await ATDevice.sendATCmd('AT LO', DEFAULT_SLOTNAME);
+            await ATDevice.setButtonAction(1, 'AT KW 123'); // button mode for Slot mouse
+            await ATDevice.sendATCmd('AT SA', DEFAULT_SLOTNAME);
+            await ATDevice.refreshConfig();
+            let slot2 = ATDevice.getSlotConfig('slot2');
+            let slotMouse = ATDevice.getSlotConfig(DEFAULT_SLOTNAME);
+            assertEqual(slotMouse, DEFAULT_SLOT, { ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"] });
+            assertEqual(slot2, DEFAULT_SLOT);
+            assertEqual(ATDevice.getButtonAction(1), 'AT KW 123');
+            await ATDevice.setButtonAction(1, 'AT KW 12345'); // button mode for Slot mouse
+            await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
+            await ATDevice.refreshConfig();
+            slot2 = ATDevice.getSlotConfig('slot2');
+            slotMouse = ATDevice.getSlotConfig(DEFAULT_SLOTNAME);
+            assertEqual(slotMouse, DEFAULT_SLOT, { ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"] });
+            assertEqual(slot2, DEFAULT_SLOT);
+            assertEqual(ATDevice.getButtonAction(1), 'AT KW 12345');
         }
-        isTesting = true;
-        for (let i = 0; i < tests.length; i++) {
-            await doTest(tests[i].fn, tests[i].name);
-        }
-        isTesting = false;
-    }
 
-    window.initAndStart = async function(runFn) {
-        if (ATDevice.isInitialized()) {
-            return runFn();
+        async function testDecreaseSlotLength() {
+            await ATDevice.sendAtCmdWithResult('AT SA slot2');
+            await ATDevice.sendATCmd('AT LO', DEFAULT_SLOTNAME);
+            await ATDevice.setButtonAction(1, 'AT KW 1234567890'); // button mode for Slot mouse
+            await ATDevice.sendATCmd('AT SA', DEFAULT_SLOTNAME);
+            await ATDevice.refreshConfig();
+            let slot2 = ATDevice.getSlotConfig('slot2');
+            let slotMouse = ATDevice.getSlotConfig(DEFAULT_SLOTNAME);
+            assertEqual(slotMouse, DEFAULT_SLOT, { ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"] });
+            assertEqual(slot2, DEFAULT_SLOT);
+            assertEqual(ATDevice.getButtonAction(1), 'AT KW 1234567890');
+            await ATDevice.setButtonAction(1, 'AT KW 123'); // button mode for Slot mouse
+            await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
+            await ATDevice.refreshConfig();
+            slot2 = ATDevice.getSlotConfig('slot2');
+            slotMouse = ATDevice.getSlotConfig(DEFAULT_SLOTNAME);
+            assertEqual(slotMouse, DEFAULT_SLOT, { ignoreProperties: [C.AT_CMD_BTN_MODE + " 1"] });
+            assertEqual(slot2, DEFAULT_SLOT);
+            assertEqual(ATDevice.getButtonAction(1), 'AT KW 123');
         }
-        ATDevice.init(true).then(function () {
-            runFn();
-        });
-    }
 
-    function prepareSingleTestButtons() {
-        for (let i = 0; i < tests.length; i++) {
-            let button = document.createElement('button');
-            button.onclick = function () {
-                initAndStart(async function() {
-                    if (isTesting) {
-                        return;
-                    }
-                    isTesting = true;
-                    await doTest(tests[i].fn, tests[i].name);
-                    isTesting = false;
-                });
+        async function testDeleteSlot() {
+            await ATDevice.sendAtCmdWithResult('AT SA newSlot');
+            await ATDevice.refreshConfig();
+            assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
+            assertTrue(ATDevice.getSlots().includes('newSlot'));
+            await ATDevice.sendAtCmdWithResult('AT DE newSlot');
+            await ATDevice.refreshConfig();
+            assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
+            assertFalse(ATDevice.getSlots().includes('newSlot'));
+        }
+
+        async function addDelete10Slots() {
+            await ATDevice.sendATCmd('AT DE', DEFAULT_SLOTNAME);
+            let slotCount = 10;
+            for (let i = 1; i <= slotCount; i++) {
+                await ATDevice.sendAtCmdWithResult('AT SA slot' + i);
             }
-            button.innerText = tests[i].name;
-            document.getElementById('singleTests').appendChild(button);
+            await ATDevice.refreshConfig();
+            for (let i = 1; i <= slotCount; i++) {
+                assertTrue(ATDevice.getSlots().includes('slot' + i));
+                assertEqual(ATDevice.getSlotConfig('slot' + i), DEFAULT_SLOT);
+            }
+            for (let i = 2; i <= slotCount; i++) {
+                await ATDevice.sendAtCmdWithResult('AT DE slot' + i);
+            }
+            await ATDevice.refreshConfig();
+            assertEqual(ATDevice.getSlots().length, 1);
+            assertTrue(ATDevice.getSlots().includes('slot1'));
+            assertEqual(ATDevice.getSlotConfig('slot1'), DEFAULT_SLOT);
         }
-    }
-    prepareSingleTestButtons();
 
-    async function doTest(testFn, testName) {
-        assertFails = 0;
-        assertSuccess = 0;
-        print(`Testing "${testName}"...`)
-        let value = await ATDevice.sendAtCmdWithResult('AT RS');
-        log.warn('done reset: ' + value);
-        await ATDevice.refreshConfig();
-        await testFn();
-        if (assertFails > 0) {
-            printWarn(`Test "${testName}" failed with ${assertFails} assertion violations and ${assertSuccess} successful assertions!`)
-        } else {
-            printSuccess(`Test "${testName}" was successful (${assertSuccess} successful assertions)!`)
+        async function deleteMiddleSlot() {
+            await ATDevice.sendAtCmdWithResult('AT SA slot1');
+            await ATDevice.sendAtCmdWithResult('AT SA slot2');
+            await ATDevice.sendAtCmdWithResult('AT SA slot3');
+            await ATDevice.refreshConfig();
+            assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
+            assertTrue(ATDevice.getSlots().includes('slot1'));
+            assertTrue(ATDevice.getSlots().includes('slot2'));
+            assertTrue(ATDevice.getSlots().includes('slot3'));
+            await ATDevice.sendAtCmdWithResult('AT DE slot2');
+            await ATDevice.refreshConfig();
+            assertTrue(ATDevice.getSlots().includes(DEFAULT_SLOTNAME));
+            assertEqual(ATDevice.getSlots().length, 3);
+            assertEqual(ATDevice.getSlotConfig('mouse'), DEFAULT_SLOT);
+            assertEqual(ATDevice.getSlotConfig('slot1'), DEFAULT_SLOT);
+            assertEqual(ATDevice.getSlotConfig('slot3'), DEFAULT_SLOT);
         }
-    }
 
-    function assertEqual(val1, val2, options) {
-        if (!isString(val1)) val1 = JSON.parse(JSON.stringify(val1));
-        if (!isString(val2)) val2 = JSON.parse(JSON.stringify(val2));
-        options = options || {};
-        if (options.ignoreProperties) {
-            options.ignoreProperties.forEach(ignore => {
-                if(!isString(val1)) delete val1[ignore];
-                if(!isString(val2)) delete val2[ignore];
+        async function differentValuesInSlots() {
+            await ATDevice.sendATCmd('AT DX', 123);
+            await ATDevice.sendAtCmdWithResult('AT SA slot2');
+            await ATDevice.sendATCmd('AT LO', DEFAULT_SLOTNAME);
+            await ATDevice.sendATCmd('AT DX', 12);
+            await ATDevice.sendAtCmdWithResult('AT SA', DEFAULT_SLOTNAME);
+            await ATDevice.refreshConfig();
+            assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X, 'slot2'), 123);
+            assertEqual(ATDevice.getConfig(C.AT_CMD_DEADZONE_X, DEFAULT_SLOTNAME), 12);
+        }
+
+
+        /////////////////////////
+        // util functions
+        /////////////////////////
+        window.doAllTests = async function () {
+            if (isTesting) {
+                return;
+            }
+            isTesting = true;
+            for (let i = 0; i < tests.length; i++) {
+                await doTest(tests[i].fn, tests[i].name);
+            }
+            isTesting = false;
+        }
+
+        window.initAndStart = async function (runFn) {
+            if (ATDevice.isInitialized()) {
+                return runFn();
+            }
+            ATDevice.init(true).then(function () {
+                runFn();
             });
         }
-        val1 = isString(val1) ? val1 : JSON.stringify(val1);
-        val2 = isString(val2) ? val2 : JSON.stringify(val2);
-        if (val1 !== val2) {
-            assertFails++;
-            printWarn('<b>Assert failed:</b>');
-            printWarn('Value 1: ' + highlightDiffs(val1, val2), 1);
-            printWarn('Value 2: ' + highlightDiffs(val2, val1), 2);
-            log.error('Assert failed!');
-        } else {
-            assertSuccess++;
-            printDebug('<b>Assert success</b>');
-            printDebug('Value 1: ' + val1, 1);
-            printDebug('Value 2: ' + val2, 2);
-        }
-    }
 
-    function assertTrue(value) {
-        assertEqual(!!value, true);
-    }
-
-    function assertFalse(value) {
-        assertEqual(!value, true);
-    }
-
-    function isString(str) {
-        return typeof str === 'string' || str instanceof String;
-    }
-
-    function print(text, color, breaks) {
-        breaks = breaks || 0;
-        color = color || 'black';
-        let html = `<div style="color: ${color}; overflow-wrap: break-word">${text}</div>`;
-        for (let i = 0; i < breaks; i++) html += "<br/>";
-        document.getElementById('log').innerHTML += html;
-    }
-
-    function printWarn(text, breaks) {
-        print(text, 'darkred', breaks);
-    }
-
-    function printSuccess(text, breaks) {
-        print(text, 'green', breaks);
-    }
-
-    function printDebug(text, breaks) {
-        if (PRINT_DEBUG) print(text, 'gray', breaks);
-    }
-
-    function highlightDiffs(compare, base) {
-        let result = '';
-        compare.split('').forEach(function (val, i) {
-            if (val !== base.charAt(i)) {
-                result += "<b>" + val + "</b>";
-            } else {
-                result += val;
+        function prepareSingleTestButtons() {
+            for (let i = 0; i < tests.length; i++) {
+                let button = document.createElement('button');
+                button.onclick = function () {
+                    initAndStart(async function () {
+                        if (isTesting) {
+                            return;
+                        }
+                        isTesting = true;
+                        await doTest(tests[i].fn, tests[i].name);
+                        isTesting = false;
+                    });
+                }
+                button.innerText = tests[i].name;
+                document.getElementById('singleTests').appendChild(button);
             }
-        });
-        return result;
-    }
-</script>
+        }
+        prepareSingleTestButtons();
+
+        async function doTest(testFn, testName) {
+            assertFails = 0;
+            assertSuccess = 0;
+            print(`Testing "${testName}"...`)
+            let value = await ATDevice.sendAtCmdWithResult('AT RS');
+            log.warn('done reset: ' + value);
+            await ATDevice.refreshConfig();
+            await testFn();
+            if (assertFails > 0) {
+                printWarn(`Test "${testName}" failed with ${assertFails} assertion violations and ${assertSuccess} successful assertions!`)
+            } else {
+                printSuccess(`Test "${testName}" was successful (${assertSuccess} successful assertions)!`)
+            }
+        }
+
+        function assertEqual(val1, val2, options) {
+            if (!isString(val1)) val1 = JSON.parse(JSON.stringify(val1));
+            if (!isString(val2)) val2 = JSON.parse(JSON.stringify(val2));
+            options = options || {};
+            if (options.ignoreProperties) {
+                options.ignoreProperties.forEach(ignore => {
+                    if (!isString(val1)) delete val1[ignore];
+                    if (!isString(val2)) delete val2[ignore];
+                });
+            }
+            val1 = isString(val1) ? val1 : JSON.stringify(val1);
+            val2 = isString(val2) ? val2 : JSON.stringify(val2);
+            if (val1 !== val2) {
+                assertFails++;
+                printWarn('<b>Assert failed:</b>');
+                printWarn('Value 1: ' + highlightDiffs(val1, val2), 1);
+                printWarn('Value 2: ' + highlightDiffs(val2, val1), 2);
+                log.error('Assert failed!');
+            } else {
+                assertSuccess++;
+                printDebug('<b>Assert success</b>');
+                printDebug('Value 1: ' + val1, 1);
+                printDebug('Value 2: ' + val2, 2);
+            }
+        }
+
+        function assertTrue(value) {
+            assertEqual(!!value, true);
+        }
+
+        function assertFalse(value) {
+            assertEqual(!value, true);
+        }
+
+        function isString(str) {
+            return typeof str === 'string' || str instanceof String;
+        }
+
+        function print(text, color, breaks) {
+            breaks = breaks || 0;
+            color = color || 'black';
+            let html = `<div style="color: ${color}; overflow-wrap: break-word">${text}</div>`;
+            for (let i = 0; i < breaks; i++) html += "<br/>";
+            document.getElementById('log').innerHTML += html;
+        }
+
+        function printWarn(text, breaks) {
+            print(text, 'darkred', breaks);
+        }
+
+        function printSuccess(text, breaks) {
+            print(text, 'green', breaks);
+        }
+
+        function printDebug(text, breaks) {
+            if (PRINT_DEBUG) print(text, 'gray', breaks);
+        }
+
+        function highlightDiffs(compare, base) {
+            let result = '';
+            compare.split('').forEach(function (val, i) {
+                if (val !== base.charAt(i)) {
+                    result += "<b>" + val + "</b>";
+                } else {
+                    result += val;
+                }
+            });
+            return result;
+        }
+    </script>
 </body>
+
 </html>

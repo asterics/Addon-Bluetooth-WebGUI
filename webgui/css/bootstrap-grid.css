@@ -353,6 +353,12 @@ html {
   margin-left: 91.666667%;
 }
 
+@media (min-width: 350px) {
+  #selectSlots{
+    width: 12em;
+  }
+}
+
 @media (min-width: 576px) {
   .col-sm {
     -ms-flex-preferred-size: 0;
@@ -553,6 +559,10 @@ html {
   .offset-sm-11 {
     margin-left: 91.666667%;
   }
+  
+  #selectSlots{
+    width: 12em;
+  }
 }
 
 @media (min-width: 768px) {
@@ -614,6 +624,7 @@ html {
     flex: 0 0 25%;
     max-width: 25%;
   }
+
   .col-md-4 {
     -ms-flex: 0 0 33.333333%;
     flex: 0 0 33.333333%;
@@ -754,6 +765,10 @@ html {
   }
   .offset-md-11 {
     margin-left: 91.666667%;
+  }
+  
+  #selectSlots{
+    width: 12em;
   }
 }
 
@@ -956,6 +971,9 @@ html {
   }
   .offset-lg-11 {
     margin-left: 91.666667%;
+  }
+  #selectSlots{
+    width: 12em;
   }
 }
 
