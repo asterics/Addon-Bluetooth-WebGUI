@@ -12,7 +12,8 @@ class TabTimings extends Component {
 
         TabTimings.instance = this;
         this.state = {};
-        this.atCmds = [C.AT_CMD_THRESHOLD_LONGPRESS];
+        this.atCmds = [C.AT_CMD_THRESHOLD_LONGPRESS, C.AT_CMD_THRESHOLD_DOUBLEPRESS,
+        C.AT_CMD_THRESHOLD_AUTODWELL, C.AT_CMD_ANTITREMOR_PRESS, C.AT_CMD_ANTITREMOR_RELEASE, C.AT_CMD_ANTITREMOR_IDLE];
         this.updateState();
     }
 
@@ -34,8 +35,9 @@ class TabTimings extends Component {
     }
 
     resetSlidersTiming() {
-        const newValue = 0;
-        const constants = [C.AT_CMD_THRESHOLD_LONGPRESS];
+        const newValue = 50;
+        const constants = [C.AT_CMD_THRESHOLD_LONGPRESS, C.AT_CMD_THRESHOLD_DOUBLEPRESS, C.AT_CMD_THRESHOLD_AUTODWELL,
+        C.AT_CMD_ANTITREMOR_PRESS, C.AT_CMD_ANTITREMOR_RELEASE, C.AT_CMD_ANTITREMOR_IDLE];
         this.valueChanged(newValue, constants);
     }
 
@@ -54,12 +56,72 @@ class TabTimings extends Component {
                 <${Slider}
                     id="slider" label="Threshold for long press [ms], 0=disable: // Schwellenwert für langes Drücken [ms], 0=deaktivieren:"
                     oninput="${(value, constants) => this.valueChanged(value, constants)}"
-                    value="${state[C.AT_CMD_THRESHOLD_LONGPRESS]}" min="0" max="10000" step="100"
+                    value="${state[C.AT_CMD_THRESHOLD_LONGPRESS]}" min="50" max="10000" step="10"
                     updateConstants="${[C.AT_CMD_THRESHOLD_LONGPRESS]}" />
                 `} <!-- AT_CMD_THRESHOLD_LONGPRESS is AT TT. -->
             </div>
 
-            <div class="row" style="margin-top: 4em">
+
+            ${(ATDevice.isMajorVersion(2) && C.AT_DEVICE_FABI) ? html`
+
+                <div class="mb-5 mb-md-2">
+                    ${html`
+                    <${Slider} label="Threshold for slot change by double press [ms], 0=disable: // Schwellenwert für Slot-Weiterschalten durch doppeltes Drücken [ms], 0=deaktivieren:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_THRESHOLD_DOUBLEPRESS]}"
+                                    min="0" max="10000" step="100" updateConstants="${[C.AT_CMD_THRESHOLD_DOUBLEPRESS]}"/>`}
+                </div>
+
+                <div class="mb-5 mb-md-2">
+                    ${html`
+                        <${Slider} label="Threshold automatic left click [ms], 0=disable: // Schwellenwert für automatischen Linksklick [ms], 0=deaktivieren:" 
+                        oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_THRESHOLD_AUTODWELL]}"
+                                        min="0" max="5000" step="100" updateConstants="${[C.AT_CMD_THRESHOLD_AUTODWELL]}"/>
+                    `}
+                </div>
+                
+                <h3>${L.translate('Antitremor settings // Antitremor-Einstellungen')}</h3>
+                <div class="mb-5 mb-md-2">
+                    ${html`
+                        <${Slider} label="Antitremor time for press [ms]: // Antitremor Schwellenwert für Drücken [ms]:" 
+                        oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_ANTITREMOR_PRESS]}"
+                                        min="1" max="500" updateConstants="${[C.AT_CMD_ANTITREMOR_PRESS]}"/>
+                    `}
+                    </div>
+
+                <div class="mb-5 mb-md-2">
+                    ${html`
+                        <${Slider} label="Antitremor time for release [ms]: // Antitremor Schwellenwert für Loslassen [ms]:" 
+                        oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_ANTITREMOR_RELEASE]}"
+                                        min="1" max="500" updateConstants="${[C.AT_CMD_ANTITREMOR_RELEASE]}"/>
+                    `}
+                </div>
+
+                <div class="mb-5 mb-md-2">
+                    ${html`
+                        <${Slider} label="Antitremor idle time [ms]: // Antitremor Wartezeit [ms]:" 
+                        oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_ANTITREMOR_IDLE]}"
+                                min="1" max="500" updateConstants="${[C.AT_CMD_ANTITREMOR_IDLE]}"/>
+                    `}
+                </div>
+
+                <div class="row" style="margin-top: 1em">
+                    <div class="col col-lg-6">
+                        <${ActionButton}  resetSlidersTiming="${() => this.resetSlidersTiming()}" 
+                        label="Resetting All Thresholds // Alle Schwellenwerte zurücksetzen" faIcon="fas undo" progressLabel="Resetting Thresholds... // Schwellenwerte werden zurückgesetzt..." /> <!-- fas undo is for the icon. -->
+                    </div>
+                </div>
+
+            ` : ''} 
+                
+            ${(ATDevice.isMajorVersion(3) && C.AT_DEVICE_FABI) ? html`
+                <div class="row" style="margin-top: 1em">
+                    <div class="col col-lg-6">
+                        <${ActionButton}  resetSlidersTiming="${() => this.resetSlidersTiming()}" 
+                        label="Resetting Threshold // Schwellenwert zurücksetzen" faIcon="fas undo" progressLabel="Resetting Threshold... // Schwellenwert wird zurückgesetzt..." /> <!-- fas undo is for the icon. -->
+                    </div>
+                </div>
+            ` : ''} 
+
+            <div class="row" style="margin-top: 1em">
                 <div class="col col-lg-6">
                     ${html`
                     <${ActionButton} onclick="${() => ATDevice.copyConfigToAllSlots(this.atCmds)}"
@@ -68,15 +130,7 @@ class TabTimings extends Component {
                     `}
                 </div>           
             </div>
-
-        
-            <div class="row" style="margin-top: 1em">
-                <div class="col col-lg-6">
-                    <${ActionButton}  resetSlidersTiming="${() => this.resetSlidersTiming()}" 
-                    label="Resetting Threshold // Schwellenwert zurücksetzen" faIcon="fas undo" progressLabel="Resetting Threshold... // Schwellenwert wird zurückgesetzt..." /> <!-- fas undo is for the icon. -->
-                </div>
-            </div>
-
+            
          `;
     }
 }
