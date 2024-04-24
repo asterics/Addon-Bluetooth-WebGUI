@@ -455,7 +455,7 @@ C.BTN_MODES_FABI_V3_ACTIONLIST = [{ // This can be seen within the actions tab.
     label: 'Strong Sip // Starkes Ansaugen',
     category: C.BTN_CAT_STRONG_SIPPUFF
 }, {
-    index: 14, // CHECK: No clue whether the index can simply be incremented (this applys to all strong Sip/Puffs).
+    index: 14,
     label: 'Strong Puff // Starks Pusten',
     category: C.BTN_CAT_STRONG_SIPPUFF
 }, {

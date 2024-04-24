@@ -134,7 +134,7 @@ ATDevice.getVersionSuffix = function () {
         return;
     }
     let parts = _lastVersionRawString.split(', ');
-    if (parts.length > 1) { //// ?
+    if (parts.length > 1) { 
         parts.shift();
         return parts.join(', ');
     }

@@ -172,7 +172,7 @@ class TabSlots extends Component {
 
     demoSettingChanged(settingSha) {
         let setting = this.state.demoSettings.filter(s => s.sha === settingSha)[0];
-        let settingText = this.state.demoSettings.filter(s => L.equalIgnoreCase(setting.name.replace('.set', ''), s.name.replace('.md', '')))[0];
+        let settingText = this.state.demoSettings.filter(s => L.equalIgnoreCase(setting.name.replace('.set', ''), s.name.replace('.md', '')))[0]; // equalIgnoreCase = Compares two strings in which the cases (lower case, upper case) are ignored.
         L.HTTPRequest(setting.download_url, 'GET', 'text').then(result => {
             let parsedSlots = ATDevice.parseConfig(result);
             this.setState({
