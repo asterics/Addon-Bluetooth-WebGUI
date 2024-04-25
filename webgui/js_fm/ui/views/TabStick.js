@@ -34,7 +34,7 @@ class TabStick extends Component {
 
     initValues() {
         this.setState({
-            splitSensitivity: ATDevice.getConfig(C.AT_CMD_SENSITIVITY_X) !== ATDevice.getConfig(C.AT_CMD_SENSITIVITY_Y),
+            splitSensitivity: ATDevice.getConfig(C.AT_CMD_SENSITIVITY_X) !== ATDevice.getConfig(C.AT_CMD_SENSITIVITY_Y), // splitSensitivity: is the key and the rest is the value.
             splitDeadzone: ATDevice.getConfig(C.AT_CMD_DEADZONE_X) !== ATDevice.getConfig(C.AT_CMD_DEADZONE_Y),
             splitDriftcompRange: ATDevice.getConfig(C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP) !== ATDevice.getConfig(C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP),
             splitDriftcompGain: ATDevice.getConfig(C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP) !== ATDevice.getConfig(C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP),

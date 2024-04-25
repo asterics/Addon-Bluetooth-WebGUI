@@ -114,7 +114,7 @@ C.AT_CMD_IR_LIST = 'AT IL';
 C.AT_CMD_IR_TIMEOUT = 'AT IT';
 
 // FABI-specific
-C.AT_CMD_THRESHOLD_LONGPRESS = 'AT TT';
+C.AT_CMD_THRESHOLD_LONGPRESS = 'AT LP'; // The Firmware also has to have the same name (LP) for this. Should be in either commands.h or in commands.cpp.
 C.AT_CMD_THRESHOLD_DOUBLEPRESS = 'AT DP';
 C.AT_CMD_THRESHOLD_AUTODWELL = 'AT AD';
 C.AT_CMD_ANTITREMOR_PRESS = 'AT AP';
