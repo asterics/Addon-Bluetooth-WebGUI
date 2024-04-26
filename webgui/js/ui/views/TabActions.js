@@ -67,7 +67,7 @@ class TabActions extends Component {
   }
 
   getBtnModeParam(btnMode, slot) {
-    return ATDevice.getButtonAction(btnMode.index, slot).substr(C.LENGTH_ATCMD_PREFIX);
+    return ATDevice.getButtonAction(btnMode.index, slot).substr(C.LENGTH_AT_CMD_PREFIX);
   }
 
   showFnName(btnMode, slot) {

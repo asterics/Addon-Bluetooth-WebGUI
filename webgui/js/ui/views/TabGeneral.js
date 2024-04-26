@@ -142,6 +142,23 @@ class TabGeneral extends Component {
                            min="1" max="600" value="${ATDevice.getSlotTestModeOptions().testSeconds}"/>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-sm-6 col-lg-5">
+             <h2>${L.translate('Language selection // Sprachen auswahl')}</h2> 
+                <select>
+                   <!-- <option>${L.translate('Englisch // English')}</option>  -->
+                    <option>Englisch / English</option> 
+                    <option>Deutsch / German</option>
+                    <option>Spanisch / Spanish</option>  
+                    <option>Französisch / French </option>  
+                    <option>Italienisch / Italian</option>  
+                    <option>Schwedisch / Swedish</option>   
+                    <option>Dänisch / Danish</option>
+                </select>
+            </div>
+        </div>
+
         
         <h2 class="mt-5">${L.translate('Firmware versions // Firmware-Versionen')}</h2>
         <h3>${C.CURRENT_DEVICE} Firmware</h3>

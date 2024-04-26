@@ -438,12 +438,12 @@ ATDevice.setButtonAction = function (buttonModeIndex, atCmd) {
 
 ATDevice.getButtonActionATCmd = function (index, slot) {
     let action = ATDevice.getButtonAction(index, slot);
-    return action ? action.substring(0, C.LENGTH_ATCMD_PREFIX).trim() : null;
+    return action ? action.substring(0, C.LENGTH_AT_CMD_PREFIX).trim() : null;
 }
 
 ATDevice.getButtonActionATCmdSuffix = function (index, slot) {
     let action = ATDevice.getButtonAction(index, slot);
-    return action ? action.substring(C.LENGTH_ATCMD_PREFIX).trim() : null;
+    return action ? action.substring(C.LENGTH_AT_CMD_PREFIX).trim() : null;
 }
 
 ATDevice.save = async function (slot, force) {
@@ -648,12 +648,12 @@ ATDevice.parseConfig = function(atCmdsString) {
             };
             parsedSlots.push(currentParsedSlot);
         } else {
-            let currentAtCmd = currentElement.substring(0, C.LENGTH_ATCMD_PREFIX - 1).trim();
+            let currentAtCmd = currentElement.substring(0, C.LENGTH_AT_CMD_PREFIX - 1).trim();
             if (currentAtCmd.indexOf(C.AT_CMD_BTN_MODE) > -1) {
-                let buttonModeIndex = parseInt(currentElement.substring(C.LENGTH_ATCMD_PREFIX - 1));
+                let buttonModeIndex = parseInt(currentElement.substring(C.LENGTH_AT_CMD_PREFIX - 1));
                 currentParsedSlot.config[C.AT_CMD_BTN_MODE + ' ' + buttonModeIndex] = nextElement.trim();
             } else if (C.AT_CMDS_SETTINGS.indexOf(currentAtCmd) > -1) {
-                currentParsedSlot.config[currentAtCmd] = currentElement.substring(C.LENGTH_ATCMD_PREFIX - 1).trim();
+                currentParsedSlot.config[currentAtCmd] = currentElement.substring(C.LENGTH_AT_CMD_PREFIX - 1).trim();
             }
         }
     }
