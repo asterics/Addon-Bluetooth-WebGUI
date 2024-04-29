@@ -143,22 +143,24 @@ class TabGeneral extends Component {
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-sm-6 col-lg-5">
-             <h2>${L.translate('Language selection // Sprachen auswahl')}</h2> 
-                <select>
-                   <!-- <option>${L.translate('Englisch // English')}</option>  -->
-                    <option>Englisch / English</option> 
-                    <option>Deutsch / German</option>
-                    <option>Spanisch / Spanish</option>  
-                    <option>Französisch / French </option>  
-                    <option>Italienisch / Italian</option>  
-                    <option>Schwedisch / Swedish</option>   
-                    <option>Dänisch / Danish</option>
-                </select>
+        ${(ATDevice.isMajorVersion(3) && C.AT_DEVICE_FABI) ? html`
+            <div class="row">
+                <div class="col-sm-6 col-lg-5">
+                <h2>${L.translate('Language selection // Sprachen auswahl')}</h2> 
+                    <select>
+                    <!-- <option>${L.translate('Englisch // English')}</option>  -->
+                        <option>${L.translate('(Choose a language) // (Suche eine Sprache aus)')}</option> 
+                        <option>Englisch / English</option> 
+                        <option>Deutsch / German</option>
+                        <option>Spanisch / Spanish</option>  
+                        <option>Französisch / French </option>  
+                        <option>Italienisch / Italian</option>  
+                        <option>Schwedisch / Swedish</option>   
+                        <option>Dänisch / Danish</option>
+                    </select>
+                </div>
             </div>
-        </div>
-
+        ` : ''}
         
         <h2 class="mt-5">${L.translate('Firmware versions // Firmware-Versionen')}</h2>
         <h3>${C.CURRENT_DEVICE} Firmware</h3>

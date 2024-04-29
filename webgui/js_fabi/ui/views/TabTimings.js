@@ -58,17 +58,17 @@ class TabTimings extends Component {
                     oninput="${(value, constants) => this.valueChanged(value, constants)}"
                     value="${state[C.AT_CMD_THRESHOLD_LONGPRESS]}" min="50" max="10000" step="10"
                     updateConstants="${[C.AT_CMD_THRESHOLD_LONGPRESS]}" />
-                `} <!-- AT_CMD_THRESHOLD_LONGPRESS is AT TT. -->
+                `} <!-- AT_CMD_THRESHOLD_LONGPRESS is AT LP. -->
             </div>
 
 
-            ${(ATDevice.isMajorVersion(2) && C.AT_DEVICE_FABI) ? html`
-
-                <div class="mb-5 mb-md-2">
-                    ${html`
+            <div class="mb-5 mb-md-2">
+                ${html`
                     <${Slider} label="Threshold for slot change by double press [ms], 0=disable: // Schwellenwert für Slot-Weiterschalten durch doppeltes Drücken [ms], 0=deaktivieren:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_THRESHOLD_DOUBLEPRESS]}"
-                                    min="0" max="10000" step="100" updateConstants="${[C.AT_CMD_THRESHOLD_DOUBLEPRESS]}"/>`}
-                </div>
+                                min="0" max="10000" step="100" updateConstants="${[C.AT_CMD_THRESHOLD_DOUBLEPRESS]}"/>`}
+            </div>
+
+            ${(ATDevice.isMajorVersion(2) && C.AT_DEVICE_FABI) ? html`
 
                 <div class="mb-5 mb-md-2">
                     ${html`
