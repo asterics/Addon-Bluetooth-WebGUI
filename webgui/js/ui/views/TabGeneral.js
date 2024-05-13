@@ -127,20 +127,22 @@ class TabGeneral extends Component {
         ${(ATDevice.isMajorVersion(3) && C.AT_DEVICE_FABI) ? html`
             <div class="row">
                 <div class="col-sm-6 col-lg-5">
-                <h2>${L.translate('Keyboard layout selection // Keyboard layout auswahl')}</h2> 
-                    <select>
-                        <option value="${state[C.AT_CMD_KEYBOARD_LAYOUT]}">${L.translate('English // Englisch')}</option> 
-                        <option value="${state[C.AT_CMD_KEYBOARD_LAYOUT]}">${L.translate('German // Deutsch')}</option>
-                        <option value="${state[C.AT_CMD_KEYBOARD_LAYOUT]}">${L.translate('Spanisch // Spanish')}</option>  
-                        <option value="fr_FR">${L.translate('French // Französisch')}</option>  
-                        <option value="it_IT">${L.translate('Italian // Italienisch')}</option>  
-                        <option value="sv_SE">${L.translate('Swedish // Schwedisch')}</option>   
-                        <option value="da_DK">${L.translate('Danish // Dänisch')}</option>
+                    <label for="keyboard-language-layout"><h2>${L.translate('Keyboard layout selection // Keyboard layout auswahl')}</h2></label>    
+                    <br/>
+                    <select id="keyboard-language-layout" value="${state.AT_CMD_KEYBOARD_LAYOUT}">
+                        <option value="es_ES" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'es_ES' ? 'selected' : ''}>${L.translate('Spanisch // Spanish')}</option>  
+                        <option value="en_US" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'en_US' ? 'selected' : ''}>${L.translate('English // Englisch')}</option>   
+                        <option value="de_DE" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'de_DE' ? 'selected' : ''}>${L.translate('German // Deutsch')}</option>
+                        <option value="fr_FR" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'fr_FR' ? 'selected' : ''}>${L.translate('French // Französisch')}</option>  
+                        <option value="it_IT" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'it_IT' ? 'selected' : ''}>${L.translate('Italian // Italienisch')}</option>  
+                        <option value="sv_SE" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'sv_SE' ? 'selected' : ''}>${L.translate('Swedish // Schwedisch')}</option>   
+                        <option value="da_DK" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'da_DK' ? 'selected' : ''}>${L.translate('Danish // Dänisch')}</option>
                     </select>
                 </div>
             </div>
+            <br/>
         ` : ''}
-
+       
 
         <h2>${L.translate('Slot test mode // Slot-Test Modus')}</h2>
          <div class="row">

@@ -64,8 +64,10 @@ class TabTimings extends Component {
 
             <div class="mb-5 mb-md-2">
                 ${html`
-                    <${Slider} label="Threshold for slot change by double press [ms], 0=disable: // Schwellenwert für Slot-Weiterschalten durch doppeltes Drücken [ms], 0=deaktivieren:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_THRESHOLD_DOUBLEPRESS]}"
-                                min="0" max="10000" step="100" updateConstants="${[C.AT_CMD_THRESHOLD_DOUBLEPRESS]}"/>`}
+                    <${Slider} id="slider" label="Threshold for slot change by double press [ms], 0=disable: // Schwellenwert für Slot-Weiterschalten durch doppeltes Drücken [ms], 0=deaktivieren:" 
+                    oninput="${(value, constants) => this.valueChanged(value, constants)}" 
+                    value="${state[C.AT_CMD_THRESHOLD_DOUBLEPRESS]}" min="0" max="10000" step="100" 
+                    updateConstants="${[C.AT_CMD_THRESHOLD_DOUBLEPRESS]}"/>`}
             </div>
 
             ${(ATDevice.isMajorVersion(2) && C.AT_DEVICE_FABI) ? html`
@@ -103,33 +105,20 @@ class TabTimings extends Component {
                     `}
                 </div>
 
+            ` : ''} 
+                
                 <div class="row" style="margin-top: 1em">
                     <div class="col col-lg-6">
                         <${ActionButton}  resetSlidersTiming="${() => this.resetSlidersTiming()}" 
                         label="Resetting All Thresholds // Alle Schwellenwerte zurücksetzen" faIcon="fas undo" progressLabel="Resetting Thresholds... // Schwellenwerte werden zurückgesetzt..." /> <!-- fas undo is for the icon. -->
                     </div>
-                </div>
 
-            ` : ''} 
-                
-            ${(ATDevice.isMajorVersion(3) && C.AT_DEVICE_FABI) ? html`
-                <div class="row" style="margin-top: 1em">
                     <div class="col col-lg-6">
-                        <${ActionButton}  resetSlidersTiming="${() => this.resetSlidersTiming()}" 
-                        label="Resetting Threshold // Schwellenwert zurücksetzen" faIcon="fas undo" progressLabel="Resetting Threshold... // Schwellenwert wird zurückgesetzt..." /> <!-- fas undo is for the icon. -->
-                    </div>
+                        <${ActionButton} onclick="${() => ATDevice.copyConfigToAllSlots(this.atCmds)}"
+                            label="Copy config to all slots // Konfiguration auf alle Slots anwenden"
+                            progressLabel="Applying to all slots... // Anwenden auf alle Slots..." faIcon="far clone" />
+                    </div>  
                 </div>
-            ` : ''} 
-
-            <div class="row" style="margin-top: 1em">
-                <div class="col col-lg-6">
-                    ${html`
-                    <${ActionButton} onclick="${() => ATDevice.copyConfigToAllSlots(this.atCmds)}"
-                        label="Copy config to all slots // Konfiguration auf alle Slots anwenden"
-                        progressLabel="Applying to all slots... // Anwenden auf alle Slots..." faIcon="far clone" />
-                    `}
-                </div>           
-            </div>
             
          `;
     }

@@ -285,8 +285,8 @@ class MainView extends Component {
                         <div class="col-10">
                             <select id="selectSlots" class="col-12" value="${state.currentSlot}" onchange="${(event) => ATDevice.setSlot(event.target.value)}">
                                 ${state.slots.map((slot) => html`
-                            <option value="${slot}">${slot}</option>
-                        `)}
+                                    <option value="${slot}">${slot}</option>
+                                 `)}
                             </select>
                         </div>
                         <div class="col-2 ${ATDevice.getConfig(C.AT_CMD_DEVICE_MODE) !== 1 ? '' : 'd-none'}">
