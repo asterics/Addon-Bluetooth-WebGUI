@@ -50,6 +50,7 @@ let _autoSaveTimeout = 750;
 let _dontGetLiveValues = false;
 
 let _lastVersionResult = null
+let _lastVersionRawString = null
 
 const TEST_MODE_OPTIONS = "TEST_MODE_OPTIONS";
 let _testModeOptions = localStorageService.get(TEST_MODE_OPTIONS) || {
@@ -86,6 +87,7 @@ ATDevice.init = function (dontGetLiveValues) {
         _isInitialized = true;
         return ATDevice.sendAtCmdWithResultForce(C.AT_CMD_VERSION);
     }).then((versionString) => {
+        _lastVersionRawString = versionString;
         _lastVersionResult = L.parseVersion(versionString);
         if (C.DEVICE_IS_FM && versionString.toLowerCase().includes("pad") ||
             C.DEVICE_IS_FLIPPAD && versionString.toLowerCase().includes("mouse")) {
@@ -121,9 +123,22 @@ ATDevice.isInitialized = function () {
 
 ATDevice.getVersion = function () {
     return ATDevice.sendAtCmdWithResultForce(C.AT_CMD_VERSION).then(result => {
+        _lastVersionRawString = result;
         _lastVersionResult = L.parseVersion(result);
         return Promise.resolve(L.formatVersion(result));
     });
+}
+
+ATDevice.getVersionSuffix = function () {
+    if (!_lastVersionRawString) {
+        return;
+    }
+    let parts = _lastVersionRawString.split(', ');
+    if (parts.length > 1) { 
+        parts.shift();
+        return parts.join(', ');
+    }
+    return "";
 }
 
 ATDevice.isMajorVersion = function (numValue) {
@@ -423,12 +438,12 @@ ATDevice.setButtonAction = function (buttonModeIndex, atCmd) {
 
 ATDevice.getButtonActionATCmd = function (index, slot) {
     let action = ATDevice.getButtonAction(index, slot);
-    return action ? action.substring(0, C.LENGTH_ATCMD_PREFIX).trim() : null;
+    return action ? action.substring(0, C.LENGTH_AT_CMD_PREFIX).trim() : null;
 }
 
 ATDevice.getButtonActionATCmdSuffix = function (index, slot) {
     let action = ATDevice.getButtonAction(index, slot);
-    return action ? action.substring(C.LENGTH_ATCMD_PREFIX).trim() : null;
+    return action ? action.substring(C.LENGTH_AT_CMD_PREFIX).trim() : null;
 }
 
 ATDevice.save = async function (slot, force) {
@@ -633,12 +648,12 @@ ATDevice.parseConfig = function(atCmdsString) {
             };
             parsedSlots.push(currentParsedSlot);
         } else {
-            let currentAtCmd = currentElement.substring(0, C.LENGTH_ATCMD_PREFIX - 1).trim();
+            let currentAtCmd = currentElement.substring(0, C.LENGTH_AT_CMD_PREFIX - 1).trim();
             if (currentAtCmd.indexOf(C.AT_CMD_BTN_MODE) > -1) {
-                let buttonModeIndex = parseInt(currentElement.substring(C.LENGTH_ATCMD_PREFIX - 1));
+                let buttonModeIndex = parseInt(currentElement.substring(C.LENGTH_AT_CMD_PREFIX - 1));
                 currentParsedSlot.config[C.AT_CMD_BTN_MODE + ' ' + buttonModeIndex] = nextElement.trim();
             } else if (C.AT_CMDS_SETTINGS.indexOf(currentAtCmd) > -1) {
-                currentParsedSlot.config[currentAtCmd] = currentElement.substring(C.LENGTH_ATCMD_PREFIX - 1).trim();
+                currentParsedSlot.config[currentAtCmd] = currentElement.substring(C.LENGTH_AT_CMD_PREFIX - 1).trim();
             }
         }
     }

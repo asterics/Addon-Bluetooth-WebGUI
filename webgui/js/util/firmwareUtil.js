@@ -1,5 +1,6 @@
-import {L} from "../lquery.js";
-import {ATDevice} from "../communication/ATDevice.js";
+import { L } from "../lquery.js";
+import { ATDevice } from "../communication/ATDevice.js";
+
 
 let firmwareUtil = {};
 
@@ -51,7 +52,9 @@ firmwareUtil.parseIntelHex = function (data, bufferSize) {
         startLinearAddress = null,
         lineNum = 0, //Line number in the Intel Hex string
         pos = 0; //Current position in the Intel Hex string
+
     const SMALLEST_LINE = 11;
+
     while (pos + SMALLEST_LINE <= data.length) {
         //Parse an entire line
         if (data.charAt(pos++) != ":")
@@ -170,11 +173,25 @@ firmwareUtil.getDeviceFWInfo = function (device, majorVersion) {
     return getFWInfo(`https://api.github.com/repos/asterics/${repoName}/releases/latest`, fileType);
 }
 
-firmwareUtil.updateDeviceFirmware = function(progressHandler) {
-    progressHandler = progressHandler || (() => {});
+firmwareUtil.updateDeviceFirmware = function (progressHandler) {
+    progressHandler = progressHandler || (() => { });
     firmwareUtil.getDeviceFWInfo().then(result => {
-        let message = 'Do you want to update the firmware to version {?}? After confirming this message you have to re-select the device ("{?}") in a browser popup. Keep this tab open and in foreground while updating! // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung müssen Sie das Gerät erneut in einem Browser-Popup auswählen ("{?}"). Lassen Sie diesen Tab während dem Update im Vordergrund geöffnet!';
-        let deviceName = C.DEVICE_IS_FM_OR_PAD ? L.translate('Unknown device // Unbekanntes Gerät') : 'Arduino Leonardo/Mirco';
+
+        let message, deviceName;
+
+        if ((ATDevice.isMajorVersion(2)) || (ATDevice.isMajorVersion(1)) && C.DEVICE_IS_FABI) {
+            message = 'Fabi V2 or older: Do you want to update the firmware to version {?}? After confirming this message you have to re-select the device ("{?}") in a browser popup. Keep this tab open and in foreground while updating! // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung müssen Sie das Gerät erneut in einem Browser-Popup auswählen ("{?}"). Lassen Sie diesen Tab während dem Update im Vordergrund geöffnet!';
+            deviceName = C.DEVICE_IS_FM_OR_PAD ? L.translate('Unknown device // Unbekanntes Gerät') : 'Arduino Leonardo/Mirco';
+
+        } else if (ATDevice.isMajorVersion(3) && C.DEVICE_IS_FABI) {
+            message = 'Fabi V3: Do you want to update the firmware to version {?}? After confirming this message you have to add the .UF2 file in the ("{?}") device and save it. // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung müssen Sie die .UF2 Datei im ("{?}") Gerät hinzufügen und speichern.';
+            deviceName = C.DEVICE_IS_FM_OR_PAD ? L.translate('Unknown device // Unbekanntes Gerät') : 'RPi PicoW'; // ASK: Whether the device is correct. 
+
+        } else if (C.DEVICE_IS_FM_OR_PAD) { // This is completely useless. For some weird reason it never comes in here and just uses the Modal (FirmwareUpdateModal).
+            message = 'Reset Firmware on FM.';
+            deviceName = C.DEVICE_IS_FABI ? L.translate('Unknown device // Unbekanntes Gerät') : 'Arduino Nano RP2040 Connect';
+        }
+
         if (!confirm(L.translate(message, result.version, deviceName))) {
             return;
         }
@@ -195,4 +212,4 @@ function getFWInfo(apiUrl, binaryStringFilter) {
     });
 }
 
-export {firmwareUtil};
+export { firmwareUtil };

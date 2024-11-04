@@ -301,7 +301,7 @@ L.getReadableATCMD = function (atCmd) {
     if (!atCmd) {
         return L.translate(C.AT_CMD_NO_CMD);
     }
-    let prefix = atCmd.substring(0, C.LENGTH_ATCMD_PREFIX - 1).trim();
+    let prefix = atCmd.substring(0, C.LENGTH_AT_CMD_PREFIX - 1).trim();
     let cmdObject = C.AT_CMDS_ACTIONS.filter(elem => elem.cmd === prefix)[0];
     let label = cmdObject ? (cmdObject.shortLabel || cmdObject.label) : atCmd;
     return L.translate(label);

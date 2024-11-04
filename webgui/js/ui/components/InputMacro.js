@@ -70,7 +70,7 @@ class InputMacro extends Component {
     }
 
     getAtCmdObject(cmd) {
-        let atCmd = cmd.trim().substring(0, C.LENGTH_ATCMD_PREFIX - 1).toUpperCase();
+        let atCmd = cmd.trim().substring(0, C.LENGTH_AT_CMD_PREFIX - 1).toUpperCase();
         return this.selectATCMDS.filter(cmd => cmd.cmd === atCmd)[0];
     }
 
@@ -78,7 +78,7 @@ class InputMacro extends Component {
         let errorList = await Promise.all(list.map(async cmd => {
             let atCmd = 'AT ' + cmd.trim();
             let atCmdObject = this.getAtCmdObject(atCmd);
-            let atCmdValue = atCmd.substring(C.LENGTH_ATCMD_PREFIX).trim();
+            let atCmdValue = atCmd.substring(C.LENGTH_AT_CMD_PREFIX).trim();
             let inputType = atCmdObject ? atCmdObject.input : null;
             let inputCategory = atCmdObject ? atCmdObject.category : null;
             let optionsFn = atCmdObject ? atCmdObject.optionsFn : null;

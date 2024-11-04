@@ -1,9 +1,9 @@
 import { h, Component, render } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js'
-import {ATDevice} from "../../communication/ATDevice.js";
-import {FaIcon} from "../components/FaIcon.js";
-import {ActionButton} from "../components/ActionButton.js";
-import {TextModal} from "../modals/TextModal.js";
+import { ATDevice } from "../../communication/ATDevice.js";
+import { FaIcon } from "../components/FaIcon.js";
+import { ActionButton } from "../components/ActionButton.js";
+import { TextModal } from "../modals/TextModal.js";
 
 const html = htm.bind(h);
 class TabSlots extends Component {
@@ -26,7 +26,15 @@ class TabSlots extends Component {
             selectedFileValid: undefined,
             showColorInput: C.DEVICE_IS_FABI || (C.DEVICE_IS_FM && ATDevice.isMajorVersion(3))
         }
-        let url = `https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/contents/Settings`;
+
+        let url;
+        if (C.DEVICE_IS_FABI && (ATDevice.isMajorVersion(3))) {
+            url = `https://api.github.com/repos/JacksonSmith43/FABI_V3.0/contents/Settings/V3?ref=SRC_v3.0`; // TODO: Possibly change the URL, after Pull request has been accepted and integrated with the Asterics Repository.
+
+        } else {
+            url = `https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/contents/Settings`;
+        }
+
         L.HTTPRequest(url, 'GET', 'json').then(result => {
             this.setState({
                 demoSettings: result
@@ -68,7 +76,7 @@ class TabSlots extends Component {
         }
         let reader = new FileReader();
         reader.readAsText(target.files[0]);
-        reader.onloadend = function(e) {
+        reader.onloadend = function (e) {
             let parsedSlots = ATDevice.parseConfig(e.target.result);
             let validConfig = parsedSlots.length > 0;
             validConfig = validConfig && C.DEVICE_IS_FM_OR_PAD ? !!parsedSlots[0].config[C.AT_CMD_DEADZONE_X] : !!parsedSlots[0].config[C.AT_CMD_ANTITREMOR_IDLE];
@@ -106,7 +114,7 @@ class TabSlots extends Component {
             return slot;
         });
         ATDevice.uploadSlots(uploadSlots, (progress) => {
-            thiz.setState({uploadProgress: progress})
+            thiz.setState({ uploadProgress: progress })
         }).then(() => {
             thiz.resetUploadFile();
         });
@@ -119,7 +127,7 @@ class TabSlots extends Component {
         }
         ATDevice.deleteAllSlots();
         await ATDevice.uploadSlots(this.state.uploadedSlots, (progress) => {
-            this.setState({uploadProgress: progress})
+            this.setState({ uploadProgress: progress })
         });
         this.resetUploadFile();
     }
@@ -171,8 +179,8 @@ class TabSlots extends Component {
     }
 
     demoSettingChanged(settingSha) {
-        let setting = this.state.demoSettings.filter(s => s.sha === settingSha)[0];
-        let settingText = this.state.demoSettings.filter(s => L.equalIgnoreCase(setting.name.replace('.set', ''), s.name.replace('.md', '')))[0];
+        let setting = this.state.demoSettings.filter(s => s.sha === settingSha)[0]; // [0], meaning that the first element that fits that description will be chosen.
+        let settingText = this.state.demoSettings.filter(s => L.equalIgnoreCase(setting.name.replace('.set', ''), s.name.replace('.md', '')))[0]; // equalIgnoreCase = Compares two strings in which the cases (lower case, upper case) are ignored. '' is here, so that only the extact part of the word, that is being searched for is being looked for.
         L.HTTPRequest(setting.download_url, 'GET', 'text').then(result => {
             let parsedSlots = ATDevice.parseConfig(result);
             this.setState({
@@ -190,7 +198,7 @@ class TabSlots extends Component {
         }
         ATDevice.deleteAllSlots();
         await ATDevice.uploadSlots(this.state.demoSettingSlots, (progress) => {
-            this.setState({uploadProgress: progress})
+            this.setState({ uploadProgress: progress })
         });
         this.setState({
             slots: ATDevice.getSlots()
@@ -247,7 +255,7 @@ class TabSlots extends Component {
                                         <span class="d-md-none col-5 col-sm-4 font-weight-bold">${L.translate('Slot: // Slot:')}</span>
                                         <span class="sr-only">${L.translate('Slot: // Slot:')}</span>
                                         <span style="${slot === ATDevice.getCurrentSlot() ? 'font-weight: bold' : ''}">
-                                            <a class="${slot !== ATDevice.getCurrentSlot() ? '' : 'd-none'}" href="javascript:" onclick="${() => {ATDevice.setSlot(slot)}}" title="${L.translate('Activate slot "{?}" // Slot "{?}" aktivieren', slot)}">${slot}</a>
+                                            <a class="${slot !== ATDevice.getCurrentSlot() ? '' : 'd-none'}" href="javascript:" onclick="${() => { ATDevice.setSlot(slot) }}" title="${L.translate('Activate slot "{?}" // Slot "{?}" aktivieren', slot)}">${slot}</a>
                                             <span class="${slot === ATDevice.getCurrentSlot() ? '' : 'd-none'}">${slot}</span><span> </span>
                                             <em style="font-weight: normal" class="${slot === ATDevice.getCurrentSlot() ? '' : 'd-none'}">${L.translate('(active) // (aktiv)')}</em>
                                         </span>
@@ -293,7 +301,7 @@ class TabSlots extends Component {
                 
                 <div class="row">
                     <div class="col-sm-6 col-lg-5">
-                        <input disabled="${maxSlotsReached}" id="newSlotLabel" class="col-12" value="${state.newSlotName}" oninput="${(event) => this.setState({newSlotName: event.target.value})}" type="text" 
+                        <input disabled="${maxSlotsReached}" id="newSlotLabel" class="col-12" value="${state.newSlotName}" oninput="${(event) => this.setState({ newSlotName: event.target.value })}" type="text" 
                                placeholder="${!maxSlotsReached ? L.translate('insert name for new slot // Namen für neuen Slot eingeben') : L.translate('Storage full, no space for more slots. // Speicher voll, kein Platz für weitere Slots.')}" maxlength="${C.MAX_LENGTH_SLOTNAME}"/>
                     </div>
                     <div class="col-sm-6 col-lg-5">
@@ -329,7 +337,7 @@ class TabSlots extends Component {
                 </div>
                 <div class="row mt-3 ${!state.selectedFileValid || maxSlotsReached ? 'd-none' : ''}">
                     <div class="col-12">
-                        <a href="javascript:;" onclick="${() => {this.setState({showAdvancedUpload: !state.showAdvancedUpload})}}">
+                        <a href="javascript:;" onclick="${() => { this.setState({ showAdvancedUpload: !state.showAdvancedUpload }) }}">
                             <span class="${!state.showAdvancedUpload ? '' : 'd-none'}">${L.translate("Show advanced options to upload single slots // Zeige erweiterte Optionen zum Hochladen einzelner Slots")}</span>
                             <span class="${state.showAdvancedUpload ? '' : 'd-none'}">${L.translate("Hide advanced options to upload single slots // Verstecke erweiterte Optionen zum Hochladen einzelner Slots")}</span>
                         </a>
@@ -341,15 +349,15 @@ class TabSlots extends Component {
                         <fieldset class="mt-3 col-12">
                             <legend>${L.translate('Choose slots to upload // Wähle Slots zum Hochladen')}</legend>
                             ${state.uploadedSlots.map(slot => {
-                                let disabled = !state.selectedUploadSlots.includes(slot) && state.selectedUploadSlots.length + state.slots.length >= C.MAX_NUMBER_SLOTS;
-                                return html`
+            let disabled = !state.selectedUploadSlots.includes(slot) && state.selectedUploadSlots.length + state.slots.length >= C.MAX_NUMBER_SLOTS;
+            return html`
                                     <div>
                                         <input disabled="${disabled}" id="${slot.dedupedName + 'checkbox'}"
                                                type="checkbox" class="mr-2"
                                                onchange="${(event) => this.uploadCheckboxChanged(slot, event.target.checked)}"/>
                                         <label for="${slot.dedupedName + 'checkbox'}">${'Slot "' + slot.dedupedName + '"'}</label>
                                     </div>`
-                            })}
+        })}
                         </fieldset>
                     </div>
                     <div class="row mb-5 ${state.selectedUploadSlots.length + state.slots.length >= C.MAX_NUMBER_SLOTS ? '' : 'd-none'}">
@@ -396,9 +404,9 @@ class TabSlots extends Component {
                     </div>
                     <div class="row ${state.demoSettingSelectedText.name ? '' : 'd-none'}">
                         <div class="col mb-4">
-                            <a href="javascript:;" onclick="${() => this.setState({showDemoDescription: true})}">${L.translate('Show description for "{?}" // Zeige Beschreibung für "{?}"', state.demoSettingSelected.name)}</a>
+                            <a href="javascript:;" onclick="${() => this.setState({ showDemoDescription: true })}">${L.translate('Show description for "{?}" // Zeige Beschreibung für "{?}"', state.demoSettingSelected.name)}</a>
                             <div class="${state.showDemoDescription ? '' : 'd-none'}">
-                                ${html`<${TextModal} close="${() => this.setState({showDemoDescription: false})}" header="${L.translate('Details for "{?}" // Details für "{?}"', state.demoSettingSelected.name)}" textUrl="${state.demoSettingSelectedText.download_url}"/>`}
+                                ${html`<${TextModal} close="${() => this.setState({ showDemoDescription: false })}" header="${L.translate('Details for "{?}" // Details für "{?}"', state.demoSettingSelected.name)}" textUrl="${state.demoSettingSelectedText.download_url}"/>`}
                             </div>
                         </div>
                     </div>
@@ -448,8 +456,8 @@ TabSlots.style = html`<style>
 
 window.addEventListener(C.EVENT_REFRESH_MAIN, () => {
     if (TabSlots.instance) {
-        TabSlots.instance.setState({slots: ATDevice.getSlots()});
+        TabSlots.instance.setState({ slots: ATDevice.getSlots() });
     }
 });
 
-export {TabSlots};
+export { TabSlots };

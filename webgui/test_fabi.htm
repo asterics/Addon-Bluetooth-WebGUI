@@ -42,7 +42,7 @@
     import {ATDevice} from "./js/communication/ATDevice.js";
 
     let PRINT_DEBUG = false;
-    let DEFAULT_CONFIG = "[{\"name\":\"slot1\",\"config\":{\"AT SC\":\"0xffffff\",\"AT TS\":\"0\",\"AT TP\":\"1023\",\"AT TT\":\"0\",\"AT AP\":\"5\",\"AT AR\":\"2\",\"AT AI\":\"1\",\"AT BT\":\"1\",\"AT DP\":\"0\",\"AT AD\":\"0\",\"AT BM 1\":\"AT HL\",\"AT BM 2\":\"AT HL\",\"AT BM 3\":\"AT HL\",\"AT BM 4\":\"AT HL\",\"AT BM 5\":\"AT HL\",\"AT BM 6\":\"AT HL\",\"AT BM 7\":\"AT HL\",\"AT BM 8\":\"AT HL\",\"AT BM 9\":\"AT HL\",\"AT BM 10\":\"AT HL\",\"AT BM 11\":\"AT HL\"}}]";
+    let DEFAULT_CONFIG = "[{\"name\":\"slot1\",\"config\":{\"AT SC\":\"0xffffff\",\"AT TS\":\"0\",\"AT TP\":\"1023\",\"AT LP\":\"0\",\"AT AP\":\"5\",\"AT AR\":\"2\",\"AT AI\":\"1\",\"AT BT\":\"1\",\"AT DP\":\"0\",\"AT AD\":\"0\",\"AT BM 1\":\"AT HL\",\"AT BM 2\":\"AT HL\",\"AT BM 3\":\"AT HL\",\"AT BM 4\":\"AT HL\",\"AT BM 5\":\"AT HL\",\"AT BM 6\":\"AT HL\",\"AT BM 7\":\"AT HL\",\"AT BM 8\":\"AT HL\",\"AT BM 9\":\"AT HL\",\"AT BM 10\":\"AT HL\",\"AT BM 11\":\"AT HL\"}}]";
     let DEFAULT_SLOTNAME = "slot1";
     let DEFAULT_SLOT = JSON.parse(DEFAULT_CONFIG).filter(slot => slot.name === DEFAULT_SLOTNAME)[0].config;
     let assertFails = 0;
