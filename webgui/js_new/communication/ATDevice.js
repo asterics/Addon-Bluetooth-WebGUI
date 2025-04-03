@@ -18,10 +18,10 @@ if (C.DEVICE_IS_FM) {
     deviceClassPath = '../../js_pad/communication/FLipPad.js';
 }
 
-import(deviceClassPath).then(module => {
+/*import(deviceClassPath).then(module => {
     //set ATDevice.Specific to instance of either FLipMouse, FLipPad or FABI class
     ATDevice.Specific = module.default;
-});
+});*/
 
 let _slots = [];
 let _slotsBackup = [];

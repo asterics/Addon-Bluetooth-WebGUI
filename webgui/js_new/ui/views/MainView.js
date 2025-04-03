@@ -161,6 +161,7 @@ class MainView extends Component {
         let state = this.state;
 
         return html`
+        <div>NEW GENERIC VERSION</div>
         <div class="top-layer-center ${state.showScreen === SCREENS.FIRMWARE_UPDATE ? '' : 'd-none'}">
             <div class="container-fluid top-layer-content">
                 <h1>${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
