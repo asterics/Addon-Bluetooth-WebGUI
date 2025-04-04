@@ -52,7 +52,8 @@ C.VIEWS = [{
     object: TabSipPuff,
     hash: '#tabPuff',
     label: 'Sip and Puff // Saug-Puste-Steuerung',
-    helpHash: '#sip-and-puff-tab-using-a-pressure-sensor // #verwendung-eines-drucksensors-sip-puff---reiter-saug-puste-steuerung'
+    helpHash: '#sip-and-puff-tab-using-a-pressure-sensor // #verwendung-eines-drucksensors-sip-puff---reiter-saug-puste-steuerung',
+    visibleFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]
 }, {
     object: TabGeneral,
     hash: '#tabGeneral',
