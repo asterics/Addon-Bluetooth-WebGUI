@@ -6,6 +6,19 @@ C.AT_DEVICE_FLIPMOUSE = 'FLipMouse';
 C.AT_DEVICE_FLIPPAD = 'FLipPad';
 C.AT_DEVICE_FABI = 'FABI';
 
+// HW specific constants, available sensors and their types
+C.PRESSURE_SENSOR = 'PRESSURE_SENSOR';
+C.PRESSURE_SENSOR_TYPE_NONE = 'PressureSensor=None';
+C.PRESSURE_SENSOR_TYPE_DPS310 = 'PressureSensor=DSP310';
+C.PRESSURE_SENSOR_TYPE_MPRLS = 'PressureSensor=MPRLS';
+C.PRESSURE_SENSOR_TYPE_ADC = 'PressureSensor=InternalADC';
+
+C.FORCE_SENSOR = 'FORCE_SENSOR';
+C.FORECE_SENSOR_TYPE_NONE = 'ForceSensor=None'
+C.FORCE_SENSOR_TYPE_NAU7802 = 'ForceSensor=NAU7802';
+C.FORCE_SENSOR_TYPE_ADC = 'ForceSensor=InternalADC';
+
+
 C.GUI_IS_HOSTED = window.location.href.indexOf('localhost') > -1 || window.location.href.indexOf('asterics.github.io') > -1 || window.location.href.indexOf('file://') > -1 || window.location.hostname.indexOf('asterics') > -1;
 C.GUI_IS_ON_DEVICE = !C.GUI_IS_HOSTED;
 C.GUI_IS_MOCKED_VERSION = window.location.href.indexOf('mock') > -1;
@@ -147,6 +160,8 @@ C.INPUTFIELD_TYPE_TEXT = 'INPUTFIELD_TYPE_TEXT';
 C.INPUTFIELD_TYPE_NUMBER = 'INPUTFIELD_TYPE_NUMBER';
 C.INPUTFIELD_TYPE_SELECT = 'INPUTFIELD_TYPE_SELECT';
 C.INPUTFIELD_TYPE_MACRO = 'INPUTFIELD_TYPE_MACRO';
+
+// AT commands, categories and desctiptions
 
 C.AT_CMDS_ACTIONS = [{
     cmd: C.AT_CMD_NO_CMD,

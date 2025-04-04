@@ -115,6 +115,12 @@ class MainView extends Component {
         viewHash = viewHash || window.location.hash;
         viewHash = viewHashes.includes(viewHash) ? viewHash : C.VIEW_START_HASH || viewHashes[0];
         let view = C.VIEWS.filter(el => el.hash === viewHash)[0];
+
+        // hide views which are not supported by the current device
+        if (view.visibleFn !== undefined && !view.visibleFn(ATDevice))  {
+            return '';
+        }
+            
         helpUtil.setHash(view.helpHash);
 
         this.setState({
@@ -259,6 +265,8 @@ class MainView extends Component {
                                         <a rel="noreferrer" href="${C.DEVICE_IS_FM ? 'https://flippad.asterics.eu/' : 'https://flipmouse.asterics.eu/'}">${L.translate('{?} config manager // {?} Config-Manager', C.DEVICE_IS_FM ? 'FLipPad' : 'FLipMouse')}</a>
                                     </div>
                                 `;
+                    default:
+                        return html`<span>${C.CURRENT_DEVICE} ${L.translate('Unknown Error! // Unbekannter Fehler!')} ${state.errorCode} </span>`;
                 }
             })()}
                 </div>
@@ -317,11 +325,17 @@ class MainView extends Component {
             <div class="container-fluid">
                 <nav class="row mb-5" id="tabMenu" role="tablist" tabindex="-1" accesskey="0">
                     <button id="toNavLink" onclick="${() => this.setState({ menuOpen: !state.menuOpen })}" class="col d-md-none button button-primary">${L.translate('\u2630 Menu // \u2630 Menü')}</button>
-                    ${C.VIEWS.map(view => html`
-                        <button role="tab" onclick="${() => this.toView(view.hash)}" class="col-md m-1 d-md-block menubutton button-primary ${state.menuOpen ? '' : 'd-none'} ${state.currentView.hash === view.hash ? 'selected' : ''}" aria-selected="${state.currentView.hash === view.hash}">
-                            ${L.translate(view.label)}
-                        </button>
-                    `)}
+                    ${C.VIEWS.map(view => {
+                        if (view.visibleFn !== undefined && !view.visibleFn(ATDevice)) {
+                            return '';
+                        }
+                        return html`
+                            <button role="tab" onclick="${() => this.toView(view.hash)}"
+                                    class="col-md m-1 d-md-block menubutton button-primary ${state.menuOpen ? '' : 'd-none'} ${state.currentView.hash === view.hash ? 'selected' : ''}"
+                                    aria-selected="${state.currentView.hash === view.hash}">
+                                ${L.translate(view.label)}
+                            </button>`;
+                    })}
                 </nav>
             </div>
         </header>

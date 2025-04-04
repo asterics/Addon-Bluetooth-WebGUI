@@ -9,7 +9,8 @@ import {localStorageService} from "../localStorageService.js";
 let ATDevice = {};
 ATDevice.parseLiveData = true;
 
-let deviceClassPath = '';
+let deviceClassPath = './FLipMouse.js';
+/*
 if (C.DEVICE_IS_FM) {
     deviceClassPath = '../../js_fm/communication/FLipMouse.js';
 } else if (C.DEVICE_IS_FABI) {
@@ -17,11 +18,12 @@ if (C.DEVICE_IS_FM) {
 } else if (C.DEVICE_IS_FLIPPAD) {
     deviceClassPath = '../../js_pad/communication/FLipPad.js';
 }
+*/
 
-/*import(deviceClassPath).then(module => {
+import(deviceClassPath).then(module => {
     //set ATDevice.Specific to instance of either FLipMouse, FLipPad or FABI class
     ATDevice.Specific = module.default;
-});*/
+});
 
 let _slots = [];
 let _slotsBackup = [];
@@ -31,6 +33,8 @@ let _lastSlotChangeTime = 0;
 let _SLOT_CONSTANT = 'Slot';
 let _valueHandler = null;
 let _liveValueLastUpdate = 0;
+let _sensorInfo = {};
+
 
 let _communicator;
 let _isInitialized = false;
@@ -98,6 +102,21 @@ ATDevice.init = function (dontGetLiveValues) {
             if (_communicator.close) _communicator.close();
             return Promise.reject(C.ERROR_FIRMWARE_OUTDATED);
         }
+        if (versionString.indexOf(C.PRESSURE_SENSOR_TYPE_NONE)>0) {
+            _sensorInfo[C.PRESSURE_SENSOR]=false;
+            console.log("No Pressure Sensor available");
+        } else {
+            _sensorInfo[C.PRESSURE_SENSOR]=true;
+            console.log("Pressure Sensor found");
+        }
+        _sensorInfo[C.FORCE_SENSOR]=false;
+        if ((versionString.indexOf(C.FORCE_SENSOR_TYPE_NAU7802)>0) ||
+            (versionString.indexOf(C.FORCE_SENSOR_TYPE_ADC)>0)) {
+            _sensorInfo[C.FORCE_SENSOR]=true;
+            console.log("Force Sensor found");
+        } else {
+            console.log("No Force Sensor available");
+        }
         return ATDevice.refreshConfig();
     }).then(() => {
         if (!_dontGetLiveValues) {
@@ -159,6 +178,11 @@ ATDevice.getBTVersion = function () {
     }).finally(() => {
         if (!_dontGetLiveValues) ATDevice.sendAtCmdForce(C.AT_CMD_START_REPORTING_LIVE);
     });
+}
+
+ATDevice.getSensorInfo = function () {
+    let currentSensorInfo = _sensorInfo || {};
+    return currentSensorInfo;
 }
 
 /**

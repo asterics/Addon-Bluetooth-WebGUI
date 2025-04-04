@@ -1,3 +1,4 @@
+import { TabStick } from "./ui/views/TabStick.js";
 import { TabSlots } from "./ui/views/TabSlots.js";
 import { TabActions } from "./ui/views/TabActions.js";
 import { TabGeneral } from "./ui/views/TabGeneral.js";
@@ -27,6 +28,12 @@ C.USB_DEVICE_FILTERS = [
 
 
 C.VIEWS = [{
+    object: TabStick,
+    hash: '#tabStick',
+    label: 'Stick-Config',
+    helpHash: '#stick-configuration-tab-stick-config // #stick-konfiguration-tab-stick-config',
+    visibleFn: (ATDevice) => ATDevice.getSensorInfo()[C.FORCE_SENSOR]
+}, {
     object: TabActions,
     hash: '#tabActions',
     label: 'Actions // Aktionen',
@@ -489,3 +496,43 @@ C.BTN_MODES_FABI_V3_ACTIONLIST = [{ // This can be seen within the actions tab.
     label: 'Strong Puff + Button 5 // Stark pusten + Button 5',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }];
+
+
+C.FLIPMOUSE_MODE_MOUSE = {
+    value: 1,
+    label: 'Mouse movement // Mausbewegung'
+};
+C.FLIPMOUSE_MODE_ALT = {
+    value: 0,
+    label: 'Alternative actions // Alternative Aktionen',
+};
+C.FLIPMOUSE_MODE_JOYSTICK_XY = {
+    value: 2,
+    label: 'Joystick (XY) // Joystick (XY)',
+};
+C.FLIPMOUSE_MODE_JOYSTICK_ZR = {
+    value: 3,
+    label: 'Joystick (ZR) // Joystick (ZR)'
+};
+C.FLIPMOUSE_MODE_JOYSTICK_SLIDERS = {
+    value: 4,
+    label: 'Joystick (Slider) // Joystick (Slider)'
+};
+C.FLIPPAD_MODE_MOUSE = {
+    value: 1,
+    label: 'Mouse (stick mode) // Maus (Stick-Modus)'
+};
+C.FLIPPAD_MODE_PAD = {
+    value: 5,
+    label: 'Mouse (pad mode) // Maus (Pad-Modus)'
+};
+C.FLIPPAD_MODE_STICK_ALTERNATIVE = {
+    value: 0,
+    label: 'Alternative actions (stick mode) // Alternative Aktionen (Stick-Modus)'
+};
+C.FLIPPAD_MODE_PAD_ALTERNATIVE = {
+    value: 6,
+    label: 'Alternative actions (pad mode) // Alternative Aktionen (Pad-Modus)'
+};
+
+C.FLIPMOUSE_MODES = [C.FLIPMOUSE_MODE_MOUSE, C.FLIPMOUSE_MODE_ALT, C.FLIPMOUSE_MODE_JOYSTICK_XY, C.FLIPMOUSE_MODE_JOYSTICK_ZR, C.FLIPMOUSE_MODE_JOYSTICK_SLIDERS];
