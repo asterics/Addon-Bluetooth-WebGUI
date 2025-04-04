@@ -1,8 +1,8 @@
 import { h, Component } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
-import { Slider } from "../../../js/ui/components/Slider.js";
-import { ATDevice } from "../../../js/communication/ATDevice.js";
-import { ActionButton } from "../../../js/ui/components/ActionButton.js";
+import { Slider } from "../components/Slider.js";
+import { ATDevice } from "../../communication/ATDevice.js";
+import { ActionButton } from "../components/ActionButton.js";
 
 const html = htm.bind(h);
 

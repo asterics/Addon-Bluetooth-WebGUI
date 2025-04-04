@@ -1,6 +1,6 @@
 import { h, Component } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
-import {ATDevice} from "../../../js/communication/ATDevice.js";
+import {ATDevice} from "../../communication/ATDevice.js";
 
 const html = htm.bind(h);
 

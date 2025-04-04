@@ -1,8 +1,8 @@
 import { h, Component, render } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
-import { styleUtil } from "../../../js/util/styleUtil.js";
-import { ATDevice } from "../../../js/communication/ATDevice.js";
-import { MouseAndKeyboardVisualization } from "../../../js/ui/components/MouseAndKeyboardVisualization.js";
+import { styleUtil } from "../../util/styleUtil.js";
+import { ATDevice } from "../../communication/ATDevice.js";
+import { MouseAndKeyboardVisualization } from "../components/MouseAndKeyboardVisualization.js";
 
 const html = htm.bind(h);
 

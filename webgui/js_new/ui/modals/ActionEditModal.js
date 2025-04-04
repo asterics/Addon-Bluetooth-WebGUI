@@ -1,7 +1,7 @@
 import { h, Component, render } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
 import {InputKeyboard} from "../components/InputKeyboard.js";
-import {ManageIR} from "../ui/components/ManageIR.js";
+import {ManageIR} from "../components/ManageIR.js";
 import {RadioFieldset} from "../components/RadioFieldset.js";
 import {ATDevice} from "../../communication/ATDevice.js";
 import {InputMacro} from "../components/InputMacro.js";
