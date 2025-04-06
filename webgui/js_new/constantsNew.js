@@ -8,14 +8,11 @@ import { TabVisualization } from "./ui/views/TabVisualization.js";
 
 window.C = window.C || {};
 
-C.CURRENT_DEVICE = C.AT_DEVICE_FABI;
-C.DEVICE_IS_FABI = C.CURRENT_DEVICE === C.AT_DEVICE_FABI;
-C.DEVICE_IS_FM = C.CURRENT_DEVICE === C.AT_DEVICE_FLIPMOUSE;
-C.DEVICE_IS_FLIPPAD = C.CURRENT_DEVICE === C.AT_DEVICE_FLIPPAD;
+C.CURRENT_DEVICE = C.AT_DEVICE_FABI;   // TBD: this is used as default for the start screen, until reply to the AT ID command is received, setting it to the correct device type
+
 C.MIN_FIRMWARE_VERSION = '3.7.0';
 C.MAX_NUMBER_SLOTS = 10;
 C.MAX_LENGTH_SLOTNAME = 11;
-C.HELP_BASE_URL = 'https://github.com/asterics/FABI/blob/master/Documentation/UserManual/Markdown/Fabi%20User%20Manual.md // https://github.com/asterics/FABI/blob/master/Documentation/UserManual/Markdown/Fabi%20Anwendungsanleitung.md';
 
 C.USB_DEVICE_FILTERS = [
     { usbVendorId: 0x2e8a }, // Arduino Nano 2040 Connect (RP2040)
@@ -68,16 +65,15 @@ C.VIEWS = [{
 
 C.VIEW_START_HASH = '#tabActions';
 
-
+// TBD: add dynamic links and labels for Flipmouse and Flippad
 C.ADDITIONAL_LINKS = [{
     label: 'More information about FABI // Mehr Infos zu FABI',
     url: 'https://www.asterics-foundation.org/projects/fabi/ // https://www.asterics-foundation.org/projekte-2/fabi/'
 }, {
     label: 'User manual // Benutzerhandbuch',
-    url: C.HELP_BASE_URL
-}, {
-    label: 'Ask questions about FABI // Eine Frage zu FABI stellen',
-    url: 'https://q2a.wbt.wien/ask'
+    url: 'https://github.com/asterics/FABI/blob/master/Documentation/UserManual/Markdown/Fabi%20User%20Manual.md // https://github.com/asterics/FABI/blob/master/Documentation/UserManual/Markdown/Fabi%20Anwendungsanleitung.md';
+    // url: 'https://github.com/asterics/FLipMouse/blob/master/Documentation/UserManual/Markdown/FLipMouseUserManual.md // https://github.com/asterics/FLipMouse/blob/master/Documentation/UserManual/Markdown/FLipMouseAnwendungsanleitung.md';
+
 }, {
     label: 'Licensing // Lizenzbestimmungen',
     url: 'https://github.com/asterics/FABI/blob/master/LICENSE'

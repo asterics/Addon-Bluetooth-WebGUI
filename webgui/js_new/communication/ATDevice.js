@@ -82,8 +82,11 @@ ATDevice.init = function (dontGetLiveValues) {
     }).then((versionString) => {
         _lastVersionRawString = versionString;
         _lastVersionResult = L.parseVersion(versionString);
-        if (C.DEVICE_IS_FM && versionString.toLowerCase().includes("pad") ||
-            C.DEVICE_IS_FLIPPAD && versionString.toLowerCase().includes("mouse")) {
+        console.log("VersionString: " + versionString);
+        if (versionString.toLowerCase().includes("fabi")) { C.CURRENT_DEVICE = C.AT_DEVICE_FABI; C.DEVICE_IS_FLIPPAD = false; C.DEVICE_IS_FLIPMOUSE = false; C.DEVICE_IS_FABI=true; }
+        else if (versionString.toLowerCase().includes("flipmouse")) { C.CURRENT_DEVICE = C.AT_DEVICE_FLIPMOUSE; C.DEVICE_IS_FLIPPAD = false; C.DEVICE_IS_FLIPMOUSE = true; C.DEVICE_IS_FABI=false; }
+        else if (versionString.toLowerCase().includes("flippad")) { C.CURRENT_DEVICE = C.AT_DEVICE_FLIPPAD; C.DEVICE_IS_FLIPPAD = true; C.DEVICE_IS_FLIPMOUSE = false; C.DEVICE_IS_FABI=false; }
+        else {
             if (_communicator.close) _communicator.close();
             return Promise.reject(C.ERROR_WRONG_DEVICE);
         }
