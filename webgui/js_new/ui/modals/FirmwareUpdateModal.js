@@ -17,8 +17,8 @@ class FirmwareUpdateModal extends Component {
     }
 
     enterDownloadMode() {
-        if (ATDevice.Specific.enterFwDownloadMode) {
-            ATDevice.Specific.enterFwDownloadMode();
+        if (ATDevice.enterFwDownloadMode) {
+            ATDevice.enterFwDownloadMode();
             this.setState({
                 enteredDownloadMode: true
             })

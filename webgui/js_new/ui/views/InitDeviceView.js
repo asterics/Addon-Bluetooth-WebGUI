@@ -24,11 +24,11 @@ class InitDeviceView extends Component {
         thiz.setState({success: false});
         let majorVersion = C.DEVICE_IS_FM ? 2 : undefined;
         firmwareUtil.getDeviceFWInfo(C.CURRENT_DEVICE, majorVersion).then(async result => {
-            await ATDevice.Specific.Updater.resetDevice(null, []);
+            await ATDevice.Updater.resetDevice(null, []);
             if (C.DEVICE_IS_FM_OR_PAD) {
                 localStorageService.setFirmwareDownloadUrl(result.downloadUrl);
             }
-            await ATDevice.Specific.Updater.uploadFirmware(result.downloadUrl, (progress) => {
+            await ATDevice.Updater.uploadFirmware(result.downloadUrl, (progress) => {
                 if (progress === 100) {
                     thiz.setState({updateProgress: null, success: true});
                     localStorageService.setFirmwareDownloadUrl('');

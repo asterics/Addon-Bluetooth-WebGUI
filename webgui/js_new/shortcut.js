@@ -6,7 +6,7 @@ if (C.DEVICE_IS_FM_OR_PAD) {
     window.addEventListener('keydown', event => {
         if (event.key === 'c' && event.ctrlKey) {
             if (ATDevice.isInitialized()) {
-                ATDevice.Specific.calibrate();
+                ATDevice.calibrate();
             }
         }
         if (event.key === 'b' && event.ctrlKey) {

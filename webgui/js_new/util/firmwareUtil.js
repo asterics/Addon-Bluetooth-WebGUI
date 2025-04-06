@@ -196,7 +196,7 @@ firmwareUtil.updateDeviceFirmware = function (progressHandler) {
             return;
         }
         progressHandler(1);
-        ATDevice.Specific.updateFirmware(result.downloadUrl, progressHandler);
+        ATDevice.updateFirmware(result.downloadUrl, progressHandler);
     });
 }
 

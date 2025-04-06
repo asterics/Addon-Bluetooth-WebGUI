@@ -5,7 +5,6 @@ import { preactUtil } from "../../util/preactUtil.js";
 import { RadioFieldset } from "../components/RadioFieldset.js";
 import { Slider } from "../components/Slider.js";
 import { ATDevice } from "../../communication/ATDevice.js";
-import { FLipMouse } from "../../communication/FLipMouse.js";
 import { ActionButton } from "../components/ActionButton.js";
 import { FaIcon } from "../components/FaIcon.js";
 import { localStorageService } from "../../localStorageService.js";
@@ -46,7 +45,7 @@ class TabStick extends Component {
             additionalState[atCmd] = ATDevice.getConfig(atCmd);
         });
         this.setState(additionalState);
-        FLipMouse.resetMinMaxLiveValues();
+        ATDevice.resetMinMaxLiveValues();
     }
 
     valueChanged(value, constants) {
@@ -75,20 +74,20 @@ class TabStick extends Component {
 
         return html`
             <h2>${L.translate('Stick configuration (slot "{?}") // Stick-Konfiguration (Slot "{?}")', ATDevice.getCurrentSlot())}</h2>
-            <span id="posLiveA11yLabel" class="sr-only">${L.translate('Current position of FLipMouse Stick // Aktuelle Position des Sticks der FLipMouse')}</span>
+            <span id="posLiveA11yLabel" class="sr-only">${L.translate('Current stick position // Aktuelle Position des Sticks')}</span>
             <span id="posLiveA11y" aria-describedby="posLiveA11yLabel" class="onlyscreenreader" role="status" aria-live="off" accesskey="q" tabindex="-1"></span>
 
             <div class="row mb-4">
                 <div class="col-12 col-md-6">
                     <div class="mb-5">
-                        ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => FLipMouse.setFlipmouseMode(value)}" elements="${C.FLIPMOUSE_MODES}" value="${ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE)}"/>`}
+                        ${html`<${RadioFieldset} legend="Use stick for: // Verwende Stick für:" onchange="${(value) => ATDevice.setStickMode(value)}" elements="${C.STICK_MODES}" value="${ATDevice.getConfig(C.AT_CMD_STICK_MODE)}"/>`}
                     </div>
                     <div class="mb-4">
-                        <button onclick="${() => FLipMouse.calibrate()}">
+                        <button onclick="${() => ATDevice.calibrate()}">
                             ${html`<${FaIcon} icon="far dot-circle"/>`}
                             <span>${L.translate('Calibrate middle position // Mittelposition kalibrieren')}</span>
                         </button>
-                        <button onclick="${() => FLipMouse.rotate()}">
+                        <button onclick="${() => ATDevice.rotate()}">
                             ${html`<${FaIcon} icon="fas redo"/>`}
                             <span>${L.translate('Rotate right // Nach rechts drehen')}</span>
                         </button>
@@ -204,7 +203,7 @@ class TabStick extends Component {
                                         progressLabel="Applying to all slots... // Anwenden auf alle Slots..." faIcon="far clone"/>`}
                 </div>
                 <div class="col">
-                    ${html`<${ActionButton} onclick="${() => ATDevice.copyConfigToAllSlots([C.AT_CMD_FLIPMOUSE_MODE])}"
+                    ${html`<${ActionButton} onclick="${() => ATDevice.copyConfigToAllSlots([C.AT_CMD_STICK_MODE])}"
                                         label="Copy stick usage to all slots // Stick-Verwendung auf alle Slots anwenden"
                                         progressLabel="Applying to all slots... // Anwenden auf alle Slots..." faIcon="far clone"/>`}
                 </div>

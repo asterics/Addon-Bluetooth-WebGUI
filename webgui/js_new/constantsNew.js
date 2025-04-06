@@ -499,31 +499,31 @@ C.BTN_MODES_FABI_V3_ACTIONLIST = [{ // This can be seen within the actions tab.
 }];
 
 
-C.FLIPMOUSE_MODE_MOUSE = {
+C.STICK_MODE_MOUSE = {
     value: 1,
     label: 'Mouse movement // Mausbewegung'
 };
-C.FLIPMOUSE_MODE_ALT = {
+C.STICK_MODE_ALT = {
     value: 0,
     label: 'Alternative actions // Alternative Aktionen',
 };
-C.FLIPMOUSE_MODE_JOYSTICK_XY = {
+C.STICK_MODE_JOYSTICK_XY = {
     value: 2,
     label: 'Joystick (XY) // Joystick (XY)',
 };
-C.FLIPMOUSE_MODE_JOYSTICK_ZR = {
+C.STICK_MODE_JOYSTICK_ZR = {
     value: 3,
     label: 'Joystick (ZR) // Joystick (ZR)'
 };
-C.FLIPMOUSE_MODE_JOYSTICK_SLIDERS = {
+C.STICK_MODE_JOYSTICK_SLIDERS = {
     value: 4,
     label: 'Joystick (Slider) // Joystick (Slider)'
 };
-C.FLIPPAD_MODE_MOUSE = {
+C.STICK_MODE_MOUSE = {
     value: 1,
     label: 'Mouse (stick mode) // Maus (Stick-Modus)'
 };
-C.FLIPPAD_MODE_PAD = {
+C.STICK_MODE_PAD = {
     value: 5,
     label: 'Mouse (pad mode) // Maus (Pad-Modus)'
 };
@@ -536,4 +536,4 @@ C.FLIPPAD_MODE_PAD_ALTERNATIVE = {
     label: 'Alternative actions (pad mode) // Alternative Aktionen (Pad-Modus)'
 };
 
-C.FLIPMOUSE_MODES = [C.FLIPMOUSE_MODE_MOUSE, C.FLIPMOUSE_MODE_ALT, C.FLIPMOUSE_MODE_JOYSTICK_XY, C.FLIPMOUSE_MODE_JOYSTICK_ZR, C.FLIPMOUSE_MODE_JOYSTICK_SLIDERS];
+C.STICK_MODES = [C.STICK_MODE_MOUSE, C.STICK_MODE_ALT, C.STICK_MODE_JOYSTICK_XY, C.STICK_MODE_JOYSTICK_ZR, C.STICK_MODE_JOYSTICK_SLIDERS];

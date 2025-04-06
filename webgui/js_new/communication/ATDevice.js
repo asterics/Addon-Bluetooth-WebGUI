@@ -1,29 +1,11 @@
 /**
- * ATDevice implements all functionality that is generic for both FLipMouse and FABI devices.
- * Specific functionality is implemented in modules FLipMouse and FABI.
- * ATDevice holds a reference to the current specific class (FLipMouse or FABI) in ATDevice.Specific
+ * ATDevice implements all functionality that is generic for FLipMouse, FABI and FlipPad devices.
  */
 import {SerialCommunicator} from "../adapter/sercomm.js";
 import {localStorageService} from "../localStorageService.js";
 
 let ATDevice = {};
 ATDevice.parseLiveData = true;
-
-let deviceClassPath = './FLipMouse.js';
-/*
-if (C.DEVICE_IS_FM) {
-    deviceClassPath = '../../js_fm/communication/FLipMouse.js';
-} else if (C.DEVICE_IS_FABI) {
-    deviceClassPath = '../../js_fabi/communication/FABI.js';
-} else if (C.DEVICE_IS_FLIPPAD) {
-    deviceClassPath = '../../js_pad/communication/FLipPad.js';
-}
-*/
-
-import(deviceClassPath).then(module => {
-    //set ATDevice.Specific to instance of either FLipMouse, FLipPad or FABI class
-    ATDevice.Specific = module.default;
-});
 
 let _slots = [];
 let _slotsBackup = [];
@@ -34,7 +16,6 @@ let _SLOT_CONSTANT = 'Slot';
 let _valueHandler = null;
 let _liveValueLastUpdate = 0;
 let _sensorInfo = {};
-
 
 let _communicator;
 let _isInitialized = false;
@@ -48,7 +29,12 @@ let _timestampLastAtCmd = new Date().getTime();
 let _connectionTestIntervalHandler = null;
 let _connectionTestCallbacks = [];
 let _connected = true;
+
 let _AT_CMD_BUSY_RESPONSE = 'BUSY';
+let _AT_CMD_IR_TIMEOUT_RESPONSE = 'IR_TIMEOUT';
+let _liveData = {};
+let _liveValueHandler = null;
+let _lastLiveValueParse = 0;
 
 let _autoSaveTimeout = 750;
 let _dontGetLiveValues = false;
@@ -56,16 +42,19 @@ let _dontGetLiveValues = false;
 let _lastVersionResult = null
 let _lastVersionRawString = null
 
+
 const TEST_MODE_OPTIONS = "TEST_MODE_OPTIONS";
 let _testModeOptions = localStorageService.get(TEST_MODE_OPTIONS) || {
     enabled: false,
     countdownSeconds: 10,
     testSeconds: 90
 };
+
 localStorageService.save(TEST_MODE_OPTIONS, _testModeOptions);
 let _currentlyTestingSlot = '';
 let _currentDeviceSlot = '';
 let _slotBeforeTest = '';
+
 
 /**
  * initializes the instance of the device
@@ -649,9 +638,7 @@ ATDevice.restoreDefaultConfiguration = function () {
     let promise = ATDevice.refreshConfig();
     promise.then(() => {
         emitSlotChange();
-        if (C.DEVICE_IS_FM_OR_PAD) {
-            ATDevice.Specific.calibrate();
-        }
+        ATDevice.calibrate();
     })
     return promise;
 };
@@ -812,6 +799,147 @@ function setConfigInternal(constant, value, slots) {
     emitConfigChange();
 }
 
+ATDevice.getIRCommands = function () {
+    return ATDevice.sendAtCmdWithResult(C.AT_CMD_IR_LIST).then(result => {
+        return Promise.resolve(result.split('\n').map(elem => elem.split(':')[1]).filter(elem => !!elem).map(e => e.trim()));
+    });
+};
+
+ATDevice.recordIrCommand = function (name) {
+    return ATDevice.sendAtCmdWithResult(C.AT_CMD_IR_RECORD, name, {timeout: 11000}).then(result => {
+        let success = result && result.indexOf(_AT_CMD_IR_TIMEOUT_RESPONSE) === -1;
+        return Promise.resolve(success);
+    });
+};
+
+ATDevice.rotate = function () {
+    let currentOrientation = ATDevice.getConfig(C.AT_CMD_ORIENTATION_ANGLE);
+    ATDevice.setConfig(C.AT_CMD_ORIENTATION_ANGLE, (currentOrientation + 90) % 360, 0);
+    ATDevice.sendATCmd('AT CA');
+    ATDevice.planSaving();
+};
+
+ATDevice.calibrate = function () {
+    ATDevice.sendAtCmdForce('AT CA');
+};
+
+ATDevice.setStickMode = function (index) {
+    index = parseInt(index);
+    if (!C.STICK_MODES.map(mode => mode.value).includes(index)) {
+        return;
+    }
+    ATDevice.planSaving();
+    return ATDevice.setConfig(C.AT_CMD_STICK_MODE, index, 0);
+};
+
+ATDevice.startLiveValueListener = function (handler) {
+    _liveValueHandler = handler;
+};
+
+ATDevice.stopLiveValueListener = function () {
+    _liveValueHandler = null;
+};
+
+ATDevice.getLiveData = function (constant) {
+    if (constant) {
+        return _liveData[constant];
+    }
+    return _liveData;
+};
+
+ATDevice.resetMinMaxLiveValues = function () {
+    _liveData[C.LIVE_PRESSURE_MIN] = 1024;
+    _liveData[C.LIVE_MOV_X_MIN] = 1024;
+    _liveData[C.LIVE_MOV_Y_MIN] = 1024;
+    _liveData[C.LIVE_PRESSURE_MAX] = -1;
+    _liveData[C.LIVE_MOV_X_MAX] = -1;
+    _liveData[C.LIVE_MOV_Y_MAX] = -1;
+};
+
+ATDevice.updateFirmware = async function (url, progressHandler, dontReset) {
+    localStorageService.setFirmwareDownloadUrl(url);
+    let serialCommunicator = ATDevice.getCommunicator();
+    let failed = false;
+
+    /*
+    if (!dontReset) {
+        await serialCommunicator.close();
+        await TeensyFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
+    }
+    await TeensyFirmwareUpdater.uploadFirmware(url, progressHandler).catch(() => {
+        failed = true;
+        window.location.reload();
+    });
+    if (!failed) {
+        localStorageService.setFirmwareDownloadUrl('');
+        
+        if (!window.location.href.includes(C.SUCCESS_FIRMWAREUPDATE)) {
+            window.location.replace(window.location.href = window.location.href + '?' + C.SUCCESS_FIRMWAREUPDATE);
+        }
+        setTimeout(() => {
+            window.location.reload();
+        }, 100);
+    }
+        */
+}
+
+ATDevice.enterFwDownloadMode = async function () {
+    if (ATDevice.isMajorVersion(3)) {
+        let serialCommunicator = ATDevice.getCommunicator();
+        await serialCommunicator.close();
+      //  await ProMicroFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
+    }
+}
+
+function parseLiveData(data) {
+    if (!ATDevice.parseLiveData) {
+        return;
+    }
+    if (Object.keys(_liveData).length === 0) {
+        ATDevice.resetMinMaxLiveValues()
+    }
+    if (!data) {
+        return;
+    }
+
+    let interval = _liveValueHandler ? 0 : 300;
+    if (new Date().getTime() - _lastLiveValueParse > interval) {
+        _lastLiveValueParse = new Date().getTime();
+        let valArray = data.split(':')[1].split(',');
+        _liveData[C.LIVE_PRESSURE] = parseInt(valArray[0]);
+        _liveData[C.LIVE_DOWN] = parseInt(valArray[1]);
+        _liveData[C.LIVE_UP] = parseInt(valArray[2]);
+        _liveData[C.LIVE_RIGHT] = parseInt(valArray[3]);
+        _liveData[C.LIVE_LEFT] = parseInt(valArray[4]);
+        _liveData[C.LIVE_MOV_X] = parseInt(valArray[5]);
+        _liveData[C.LIVE_MOV_Y] = parseInt(valArray[6]);
+        if (valArray[7]) {
+            _liveData[C.LIVE_BUTTONS] = valArray[7].split('').map(v => v === "1");
+        }
+        if (valArray[8]) {
+            let slot = ATDevice.getSlotName(parseInt(valArray[8]));
+            ATDevice.handleSlotChangeFromDevice(slot);
+        }
+        if (valArray[9]) {
+            _liveData[C.LIVE_DRIFTCOMP_X] = parseInt(valArray[9]);
+        }
+        if (valArray[10]) {
+            _liveData[C.LIVE_DRIFTCOMP_Y] = parseInt(valArray[10]);
+        }
+        _liveData[C.LIVE_PRESSURE_MIN] = L.robustMin(_liveData[C.LIVE_PRESSURE_MIN], _liveData[C.LIVE_PRESSURE]);
+        _liveData[C.LIVE_MOV_X_MIN] = L.robustMin(_liveData[C.LIVE_MOV_X_MIN], _liveData[C.LIVE_MOV_X]);
+        _liveData[C.LIVE_MOV_Y_MIN] = L.robustMin(_liveData[C.LIVE_MOV_Y_MIN], _liveData[C.LIVE_MOV_Y]);
+        _liveData[C.LIVE_PRESSURE_MAX] = L.robustMax(_liveData[C.LIVE_PRESSURE_MAX], _liveData[C.LIVE_PRESSURE]);
+        _liveData[C.LIVE_MOV_X_MAX] = L.robustMax(_liveData[C.LIVE_MOV_X_MAX], _liveData[C.LIVE_MOV_X]);
+        _liveData[C.LIVE_MOV_Y_MAX] = L.robustMax(_liveData[C.LIVE_MOV_Y_MAX], _liveData[C.LIVE_MOV_Y]);
+
+        if (_liveValueHandler) {
+            _liveValueHandler(_liveData);
+        }
+    }
+}
+
+
 function startTestingConnection() {
     if (_connectionTestIntervalHandler) {
         return;
@@ -843,5 +971,10 @@ window.addEventListener('beforeunload', () => {
         });
     }
 });
+
+
+if (C.DEVICE_IS_FM_OR_PAD) {
+    ATDevice.setLiveValueHandler(parseLiveData);
+}
 
 export {ATDevice};

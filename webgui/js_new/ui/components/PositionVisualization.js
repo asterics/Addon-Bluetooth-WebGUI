@@ -62,12 +62,12 @@ class PositionVisualization extends Component {
     }
 
     updateData(data) {
-        let x = data[ATDevice.Specific.LIVE_MOV_X];
-        let y = data[ATDevice.Specific.LIVE_MOV_Y];
-        let maxX = data[ATDevice.Specific.LIVE_MOV_X_MAX];
-        let maxY = data[ATDevice.Specific.LIVE_MOV_Y_MAX];
-        let minX = data[ATDevice.Specific.LIVE_MOV_X_MIN];
-        let minY = data[ATDevice.Specific.LIVE_MOV_Y_MIN];
+        let x = data[C.LIVE_MOV_X];
+        let y = data[C.LIVE_MOV_Y];
+        let maxX = data[C.LIVE_MOV_X_MAX];
+        let maxY = data[C.LIVE_MOV_Y_MAX];
+        let minX = data[C.LIVE_MOV_X_MIN];
+        let minY = data[C.LIVE_MOV_Y_MIN];
         let deadX = ATDevice.getConfig(C.AT_CMD_DEADZONE_X);
         let deadY = ATDevice.getConfig(C.AT_CMD_DEADZONE_Y);
         let pDzX = (L.getPercentage(ATDevice.getConfig(C.AT_CMD_DEADZONE_X), 0, this.state.maxPos));
@@ -75,8 +75,8 @@ class PositionVisualization extends Component {
         this.state.maxPos = this.getMaxPosManual() !== undefined ? this.getMaxPosManual() : Math.max(maxX, maxY, Math.abs(minX), Math.abs(minY), Math.round(deadX * 1.1), Math.round(deadY * 1.1), this.state.maxPos);
         let percentageX = L.limitValue(L.getPercentage(x, -this.state.maxPos, this.state.maxPos), 0, 100);
         let percentageY = L.limitValue(L.getPercentage(y, -this.state.maxPos, this.state.maxPos), 0, 100);
-        let driftCompX = L.limitValue(L.getPercentage(data[ATDevice.Specific.LIVE_DRIFTCOMP_X], -this.state.maxPos, this.state.maxPos), 0, 100);
-        let driftCompY = L.limitValue(L.getPercentage(data[ATDevice.Specific.LIVE_DRIFTCOMP_Y], -this.state.maxPos, this.state.maxPos), 0, 100);
+        let driftCompX = L.limitValue(L.getPercentage(data[C.LIVE_DRIFTCOMP_X], -this.state.maxPos, this.state.maxPos), 0, 100);
+        let driftCompY = L.limitValue(L.getPercentage(data[C.LIVE_DRIFTCOMP_Y], -this.state.maxPos, this.state.maxPos), 0, 100);
         let eX = percentageX - 50;
         let eY = percentageY - 50;
         let inDeadzone = (Math.pow(eX, 2) / Math.pow(pDzX/2, 2) + Math.pow(eY, 2) / Math.pow(pDzY/2, 2)) < 1;
@@ -115,7 +115,7 @@ class PositionVisualization extends Component {
         ctx.beginPath();
         let rectW = ctx.canvas.width * this.state.pDzX / 100;
         let rectH = ctx.canvas.height * this.state.pDzY / 100;
-        if (C.DEVICE_IS_FM && ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPMOUSE_MODE_ALT.value) {
+        if (C.DEVICE_IS_FM && ATDevice.getConfig(C.AT_CMD_STICK_MODE) === C.STICK_MODE_ALT.value) {
             ctx.rect(ctx.canvas.width / 2 - rectW / 2, ctx.canvas.height / 2 - rectH / 2, rectW, rectH);
         } else {
             ctx.ellipse(ctx.canvas.width / 2, ctx.canvas.height / 2, rectW / 2, rectH / 2, 0, 0, 2 * Math.PI);
@@ -153,23 +153,23 @@ class PositionVisualization extends Component {
                         </div>
                         <div class="analogBars" style="display: ${this.getValue(props.showAnalogBars, false) ? 'block' : 'none'}">
                             <div id="upPos" class="back-layer color-lightred"
-                                 style="top: ${50-this.getPercentLength(ATDevice.Specific.LIVE_UP)}%; left: 48.5%; height: ${this.getPercentLength(ATDevice.Specific.LIVE_UP)}%; width: 3%;"></div>
+                                 style="top: ${50-this.getPercentLength(C.LIVE_UP)}%; left: 48.5%; height: ${this.getPercentLength(C.LIVE_UP)}%; width: 3%;"></div>
                             <div id="downPos" class="back-layer color-lightred"
-                                 style="top: 50%; left: 48.5%; height: ${this.getPercentLength(ATDevice.Specific.LIVE_DOWN)}%; width: 3%;"></div>
+                                 style="top: 50%; left: 48.5%; height: ${this.getPercentLength(C.LIVE_DOWN)}%; width: 3%;"></div>
                             <div id="leftPos" class="back-layer color-lightred"
-                                 style="top: 48.5%; left: ${50-this.getPercentLength(ATDevice.Specific.LIVE_LEFT)}%; height: 3%; width: ${this.getPercentLength(ATDevice.Specific.LIVE_LEFT)}%;"></div>
+                                 style="top: 48.5%; left: ${50-this.getPercentLength(C.LIVE_LEFT)}%; height: 3%; width: ${this.getPercentLength(C.LIVE_LEFT)}%;"></div>
                             <div id="rightPos" class="back-layer color-lightred"
-                                 style="top: 48.5%; left: 50%; height: 3%; width: ${this.getPercentLength(ATDevice.Specific.LIVE_RIGHT)}%;"></div>
+                                 style="top: 48.5%; left: 50%; height: 3%; width: ${this.getPercentLength(C.LIVE_RIGHT)}%;"></div>
                         </div>
                         <div class="back-layer"
                              style="left: 50%; height: 100%; border-right-style: solid; border-right-width: thin;"></div>
                         <div class="back-layer"
                              style="top: 50%; width: 100%; border-bottom-style: solid; border-bottom-width: thin;"></div>
                         <div style="display: ${this.getValue(props.showAnalogValues, false) ? 'block' : 'none'}">
-                            <div id="upPosVal" class="back-layer" style="top: 0%; left: 52%">${data[ATDevice.Specific.LIVE_UP]}</div>
-                            <div id="downPosVal" class="back-layer" style="top: 90%; left: 52%">${data[ATDevice.Specific.LIVE_DOWN]}</div>
-                            <div id="leftPosVal" class="back-layer" style="top: 38%; left: 1%;">${data[ATDevice.Specific.LIVE_LEFT]}</div>
-                            <div id="rightPosVal" class="back-layer" style="top: 38%; left: 88%">${data[ATDevice.Specific.LIVE_RIGHT]}</div>
+                            <div id="upPosVal" class="back-layer" style="top: 0%; left: 52%">${data[C.LIVE_UP]}</div>
+                            <div id="downPosVal" class="back-layer" style="top: 90%; left: 52%">${data[C.LIVE_DOWN]}</div>
+                            <div id="leftPosVal" class="back-layer" style="top: 38%; left: 1%;">${data[C.LIVE_LEFT]}</div>
+                            <div id="rightPosVal" class="back-layer" style="top: 38%; left: 88%">${data[C.LIVE_RIGHT]}</div>
                         </div>
                         <div style="display: ${this.getValue(props.showMaxPos, false) ? 'block' : 'none'}">
                             <div id="cursorPosVal" class="back-layer" style="top: 90%; left: 2%;">${Math.round(this.state.maxPos)}</div>

@@ -29,7 +29,7 @@ class TabSipPuff extends Component {
       strongPuffThreshold: 0
     }
 
-    ATDevice.Specific.resetMinMaxLiveValues();
+    ATDevice.resetMinMaxLiveValues();
   }
 
   updateData(data) {
@@ -70,7 +70,7 @@ class TabSipPuff extends Component {
   sliderChanged(event, constant) {
     let newValue = parseInt(event.target.value);
     let oldValue = ATDevice.getConfig(constant);
-    let liveValue = ATDevice.Specific.getLiveData(C.LIVE_PRESSURE);
+    let liveValue = ATDevice.getLiveData(C.LIVE_PRESSURE);
 
     let validPuff = (newValue > liveValue || newValue > oldValue);
     let validSip = (newValue < liveValue || newValue < oldValue);

@@ -20,7 +20,7 @@ class ManageIR extends Component {
 
     recordIrCmd() {
         this.setState({isRecording: true});
-        ATDevice.Specific.recordIrCommand(this.state.irCmdName).then(success => {
+        ATDevice.recordIrCommand(this.state.irCmdName).then(success => {
             if (success) {
                 this.props.onchange(this.state.irCmdName);
                 this.setState({irCmdName: '', deleteIrName: this.state.irCmdName});

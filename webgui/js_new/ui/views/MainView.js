@@ -128,10 +128,10 @@ class MainView extends Component {
             menuOpen: false
         });
 
-        if (view.object.valueHandler && ATDevice.Specific.startLiveValueListener) {
-            ATDevice.Specific.startLiveValueListener(view.object.valueHandler);
-        } else if (ATDevice.Specific.stopLiveValueListener) {
-            ATDevice.Specific.stopLiveValueListener();
+        if (view.object.valueHandler && ATDevice.startLiveValueListener) {
+            ATDevice.startLiveValueListener(view.object.valueHandler);
+        } else if (ATDevice.stopLiveValueListener) {
+            ATDevice.stopLiveValueListener();
         }
 
         window.location.hash = viewHash;
@@ -147,7 +147,7 @@ class MainView extends Component {
 
     continueFirmwareUpdate() {
         let thiz = this;
-        ATDevice.Specific.updateFirmware(localStorageService.getFirmwareDownloadUrl(), (progress) => {
+        ATDevice.updateFirmware(localStorageService.getFirmwareDownloadUrl(), (progress) => {
             thiz.setState({ updateProgress: progress || 1 });
         }, true);
     }
