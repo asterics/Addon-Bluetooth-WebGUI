@@ -551,9 +551,7 @@ ATDevice.setSlot = async function (slot, dontSendToDevice) {
             ATDevice.parseLiveData = false; //prevent to parse old slot from live values before new slot applied on device
             await ATDevice.save();
             promise = ATDevice.sendAtCmdWithResult(C.AT_CMD_LOAD_SLOT, slot);
-            if (C.DEVICE_IS_FM_OR_PAD) {
-                ATDevice.sendATCmd(C.AT_CMD_CALIBRATION);
-            }
+            ATDevice.sendATCmd(C.AT_CMD_CALIBRATION);
         }
         _currentSlot = slot;
     }
@@ -971,8 +969,6 @@ window.addEventListener('beforeunload', () => {
 });
 
 
-if (C.DEVICE_IS_FM_OR_PAD) {
-    ATDevice.setLiveValueHandler(parseLiveData);
-}
+ATDevice.setLiveValueHandler(parseLiveData);
 
 export {ATDevice};

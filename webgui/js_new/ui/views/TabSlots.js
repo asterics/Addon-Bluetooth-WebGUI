@@ -74,7 +74,7 @@ class TabSlots extends Component {
         reader.onloadend = function (e) {
             let parsedSlots = ATDevice.parseConfig(e.target.result);
             let validConfig = parsedSlots.length > 0;
-            validConfig = validConfig && C.DEVICE_IS_FM_OR_PAD ? !!parsedSlots[0].config[C.AT_CMD_DEADZONE_X] : !!parsedSlots[0].config[C.AT_CMD_ANTITREMOR_IDLE];
+            validConfig = validConfig &&  !!parsedSlots[0].config[C.AT_CMD_DEADZONE_X];
             parsedSlots.forEach(slot => { //prevent duplicated names
                 slot.name = slot.name.substring(0, C.MAX_LENGTH_SLOTNAME);
                 let originalSlotname = slot.name;

@@ -105,7 +105,7 @@ class ActionEditModal extends Component {
         }
         if (forAllSlots) {
             let constants = [C.AT_CMD_BTN_MODE + " " + this.props.buttonMode.index];
-            if (C.DEVICE_IS_FM_OR_PAD && this.props.buttonMode.category === C.BTN_CAT_STICK) {
+            if (this.props.buttonMode.category === C.BTN_CAT_STICK) {
                 constants.push(C.AT_CMD_STICK_MODE)
             }
             await ATDevice.copyConfigToAllSlots(constants, this.props.slot, true);
@@ -143,7 +143,7 @@ class ActionEditModal extends Component {
         let flipmouseAltMode = C.DEVICE_IS_FM && ATDevice.getConfig(C.AT_CMD_STICK_MODE, props.slot) === C.STICK_MODE_ALT.value;
         let flipadAltMode = C.DEVICE_IS_FLIPPAD && [C.FLIPPAD_MODE_PAD_ALTERNATIVE.value, C.FLIPPAD_MODE_STICK_ALTERNATIVE.value].includes(ATDevice.getConfig(C.AT_CMD_STICK_MODE, props.slot));
         let showActionSelection = C.DEVICE_IS_FABI || flipmouseAltMode || flipadAltMode || btnMode.category !== C.BTN_CAT_STICK || state.shouldChangeMode;
-        let modeLabel = C.DEVICE_IS_FM_OR_PAD ? C.STICK_MODES.filter(mode => mode.value === ATDevice.getConfig(C.AT_CMD_STICK_MODE, props.slot))[0].label : '';
+        let modeLabel = C.STICK_MODES.filter(mode => mode.value === ATDevice.getConfig(C.AT_CMD_STICK_MODE, props.slot))[0].label;
 
         return html`
             <div class="modal-mask">
