@@ -75,9 +75,14 @@ class MouseAndKeyboardVisualization extends Component {
 
         return html`
             <div class="mouseKeyVisualization">
+                    <div class="mt-5">
+                        <b class="mr-2">${L.translate('Mouse buttons: // Maustasten:')}</b>
+                        <span class="mr-2 mouse ${state.pressedMouseButtons.includes(1) ? 'pressed' : ''}">${L.translate("Left // Links")}</span>
+                        <span class="mr-2 mouse ${state.pressedMouseButtons.includes(2) ? 'pressed' : ''}">${L.translate("Middle // Mitte")}</span>
+                        <span class="mr-2 mouse ${state.pressedMouseButtons.includes(3) ? 'pressed' : ''}">${L.translate("Right // Rechts")}</span>
+                    </div>
 
-                ${(ATDevice.isMajorVersion(2) && C.AT_DEVICE_FABI) ? html` <!-- ASK: Due to the keys also sticking (when right mouse and keys are pressed simultaneously) with V2, should it also exist for V2. -->
-                    <div>
+                    <div class="mt-5">
                         <b class="mr-2">${L.translate('Keyboard keys: // Tasten auf Tastatur:')}</b>
                         <span class=" ${state.pressedKeys.length > 0 ? 'd-none' : ''}">${L.translate("(none) // (keine)")}</span>
                         ${state.pressedKeys.map((keyCode, index) => {
@@ -87,14 +92,6 @@ class MouseAndKeyboardVisualization extends Component {
                                   <span class="mr-2 keyboard ${atKeycode ? '' : 'd-none'}">${atKeycode}</span>
                                  `
                         })}
-                    </div>
-                ` : ''} 
-
-                    <div class="mt-5">
-                        <b class="mr-2">${L.translate('Mouse buttons: // Maustasten:')}</b>
-                        <span class="mr-2 mouse ${state.pressedMouseButtons.includes(1) ? 'pressed' : ''}">${L.translate("Left // Links")}</span>
-                        <span class="mr-2 mouse ${state.pressedMouseButtons.includes(2) ? 'pressed' : ''}">${L.translate("Middle // Mitte")}</span>
-                        <span class="mr-2 mouse ${state.pressedMouseButtons.includes(3) ? 'pressed' : ''}">${L.translate("Right // Rechts")}</span>
                     </div>
             </div>
             <style>
@@ -111,6 +108,7 @@ class MouseAndKeyboardVisualization extends Component {
                 }
 
                 .mouseKeyVisualization .mouse.pressed {
+                    padding: 10px;
                     background-color: #fdfda5;
                     font-weight: bold;
                 }

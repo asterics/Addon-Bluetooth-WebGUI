@@ -146,41 +146,7 @@ class TabStick extends Component {
                 </a>
             </div>
             <div class="${state.showAdvanced ? '' : 'd-none'}">
-                <div class="mt-4 ${ATDevice.isMajorVersion(2) ? '' : 'd-none'}">
-                    ${(() => {
-                if (state.splitDriftcompRange) {
-                    return html`
-                            <${Slider} label="<span lang="en">Horizontal drift compensation range:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
-                                min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
-                                toggleFn="${() => this.toggleState('splitDriftcompRange', [C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>
-                            <${Slider} label="<span lang="en">Vertical drift compensation range:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"
-                                min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"/>`
-                } else {
-                    return html`
-                            <${Slider} label="<span lang="en">Drift compensation range:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP]}"
-                                min="0" max="100" updateConstants="${[C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP]}"
-                                toggleFn="${() => this.toggleState('splitDriftcompRange', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
-                }
-            })()}
-                </div>
-                <div class="mt-4 ${ATDevice.isMajorVersion(2) ? '' : 'd-none'}">
-                    ${(() => {
-                if (state.splitDriftcompGain) {
-                    return html`
-                            <${Slider} label="<span lang="en">Horizontal drift compensation gain:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
-                                min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
-                                toggleFn="${() => this.toggleState('splitDriftcompGain', [C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP, C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP])}" toggleFnLabel="hide separate x/y // zeige  x/y gemeinsam"/>
-                            <${Slider} label="<span lang="en">Vertical drift compensation gain:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"
-                                min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"/>`
-                } else {
-                    return html`
-                            <${Slider} label="<span lang="en">Drift compensation gain:</span>" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP]}"
-                                min="0" max="100" updateConstants="${[C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP, C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP]}"
-                                toggleFn="${() => this.toggleState('splitDriftcompGain', [])}" toggleFnLabel="show x/y separately // zeige x/y getrennt"/>`
-                }
-            })()}
-                </div>
-                <div class="mt-4 row ${ATDevice.isMajorVersion(3) ? '' : 'd-none'}">
+                <div class="mt-4 row ${C.DEVICE_IS_FM ? '' : 'd-none'}">
                     <label class="col-12" for="selectProfile">${L.translate('Sensor-Profile // Sensor-Profil')}</label>
                     <div class="col-12">
                         <select id="selectProfile" value="${ATDevice.getConfig(C.AT_CMD_SENSORBOARD)}" oninput="${(event) => { ATDevice.setConfig(C.AT_CMD_SENSORBOARD, event.target.value, 0) }}">

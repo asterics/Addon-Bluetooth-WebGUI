@@ -884,11 +884,9 @@ ATDevice.updateFirmware = async function (url, progressHandler, dontReset) {
 }
 
 ATDevice.enterFwDownloadMode = async function () {
-    if (ATDevice.isMajorVersion(3)) {
-        let serialCommunicator = ATDevice.getCommunicator();
-        await serialCommunicator.close();
-      //  await ProMicroFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
-    }
+    let serialCommunicator = ATDevice.getCommunicator();
+    await serialCommunicator.close();
+    //  await ProMicroFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
 }
 
 function parseLiveData(data) {

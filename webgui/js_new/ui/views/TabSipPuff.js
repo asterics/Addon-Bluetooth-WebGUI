@@ -146,18 +146,16 @@ class TabSipPuff extends Component {
                 min="${state.minRange}" max="${state.maxRange}" class="ten columns" accesskey="y" />
         </div>
 
-        ${(ATDevice.isMajorVersion(3)) || (C.DEVICE_IS_FM) ? html`
-          <label for="SIP_STRONG_THRESHOLD">${L.translate('Strong Sip Threshold: // Schwellenwert Saugen stark:')}</label>
-          <div id="SIP_STRONG_THRESHOLD_WRAPPER"
-              class="row ${state.value < state.SIP_STRONG_THRESHOLD ? 'colored-thumb' : ''}">
-              <span aria-hidden="true" id="SIP_STRONG_THRESHOLD_VAL"
-                  class="text-center two columns">${state.SIP_STRONG_THRESHOLD}</span>
-              <input type="range" value="${state.SIP_STRONG_THRESHOLD}"
-                  oninput="${(event) => this.sliderChanged(event, C.AT_CMD_SIP_STRONG_THRESHOLD)}"
-                  id="SIP_STRONG_THRESHOLD" min="${state.minRange}" max="${state.maxRange}" class="ten columns"
-                  accesskey="x" />
-          </div>
-        ` : ''} 
+        <label for="SIP_STRONG_THRESHOLD">${L.translate('Strong Sip Threshold: // Schwellenwert Saugen stark:')}</label>
+        <div id="SIP_STRONG_THRESHOLD_WRAPPER"
+            class="row ${state.value < state.SIP_STRONG_THRESHOLD ? 'colored-thumb' : ''}">
+            <span aria-hidden="true" id="SIP_STRONG_THRESHOLD_VAL"
+                class="text-center two columns">${state.SIP_STRONG_THRESHOLD}</span>
+            <input type="range" value="${state.SIP_STRONG_THRESHOLD}"
+                oninput="${(event) => this.sliderChanged(event, C.AT_CMD_SIP_STRONG_THRESHOLD)}"
+                id="SIP_STRONG_THRESHOLD" min="${state.minRange}" max="${state.maxRange}" class="ten columns"
+                accesskey="x" />
+        </div>
 
         <br />
         <label aria-hidden="true">${L.translate('Live values: // Aktuelle Werte:')}</label>
@@ -185,18 +183,16 @@ class TabSipPuff extends Component {
                 min="${state.minRange}" max="${state.maxRange}" class="ten columns" accesskey="c" />
         </div>
        
-       ${(ATDevice.isMajorVersion(3)) || (C.DEVICE_IS_FM) ? html`
-          <label for="PUFF_STRONG_THRESHOLD">${L.translate('Strong Puff Threshold: // Schwellenwert Pusten stark:')}</label>
-          <div id="PUFF_STRONG_THRESHOLD_WRAPPER" 
-              class="row ${state.value > state.PUFF_STRONG_THRESHOLD ? 'colored-thumb' : ''}">
-              <span aria-hidden="true" id="PUFF_STRONG_THRESHOLD_VAL"
-                  class="text-center two columns">${state.PUFF_STRONG_THRESHOLD}</span>
-              <input type="range" value="${state.PUFF_STRONG_THRESHOLD}"
-                  oninput="${(event) => this.sliderChanged(event, C.AT_CMD_PUFF_STRONG_THRESHOLD)}"
-                  id="PUFF_STRONG_THRESHOLD" min="${state.minRange}" max="${state.maxRange}" class="ten columns"
-                  accesskey="v" />
-          </div>
-        `: ''}
+        <label for="PUFF_STRONG_THRESHOLD">${L.translate('Strong Puff Threshold: // Schwellenwert Pusten stark:')}</label>
+        <div id="PUFF_STRONG_THRESHOLD_WRAPPER" 
+            class="row ${state.value > state.PUFF_STRONG_THRESHOLD ? 'colored-thumb' : ''}">
+            <span aria-hidden="true" id="PUFF_STRONG_THRESHOLD_VAL"
+                class="text-center two columns">${state.PUFF_STRONG_THRESHOLD}</span>
+            <input type="range" value="${state.PUFF_STRONG_THRESHOLD}"
+                oninput="${(event) => this.sliderChanged(event, C.AT_CMD_PUFF_STRONG_THRESHOLD)}"
+                id="PUFF_STRONG_THRESHOLD" min="${state.minRange}" max="${state.maxRange}" class="ten columns"
+                accesskey="v" />
+        </div>
 
     </div>
 

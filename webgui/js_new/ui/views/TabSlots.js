@@ -24,16 +24,11 @@ class TabSlots extends Component {
             demoSettings: [],
             showDemoDescription: false,
             selectedFileValid: undefined,
-            showColorInput: C.DEVICE_IS_FABI || (C.DEVICE_IS_FM && ATDevice.isMajorVersion(3))
+            showColorInput: true
         }
 
         let url;
-        if (C.DEVICE_IS_FABI && (ATDevice.isMajorVersion(3))) {
-            url = `https://api.github.com/repos/JacksonSmith43/FABI_V3.0/contents/Settings/V3?ref=SRC_v3.0`; // TODO: Possibly change the URL, after Pull request has been accepted and integrated with the Asterics Repository.
-
-        } else {
-            url = `https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/contents/Settings`;
-        }
+        url = `https://api.github.com/repos/asterics/${C.CURRENT_DEVICE}/contents/Settings`;  // URL to get the settings from the GitHub repository. TBD: update for unified GUI version
 
         L.HTTPRequest(url, 'GET', 'json').then(result => {
             this.setState({

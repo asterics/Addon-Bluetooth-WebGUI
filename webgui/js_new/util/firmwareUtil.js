@@ -162,15 +162,10 @@ firmwareUtil.getBTFWInfo = function () {
 }
 
 firmwareUtil.getDeviceFWInfo = function (device, majorVersion) {
-    device = device || C.CURRENT_DEVICE;
-    majorVersion = majorVersion || ATDevice.getMajorVersion();
-    let deviceIsFM = device === C.AT_DEVICE_FLIPMOUSE;
+    // TBD: handle new firmware versions for different RP2040 devices!
     let repoName = C.CURRENT_DEVICE;
-    if (deviceIsFM && majorVersion === 2) {
-        repoName = "FLipMouse-v2";
-    }
-    let fileType = deviceIsFM && majorVersion === 3 ? '.uf2' : '.hex';
-    return getFWInfo(`https://api.github.com/repos/asterics/${repoName}/releases/latest`, fileType);
+    let fileType = '.uf2';
+    return getFWInfo(`https://api.github.com/repos/asterics/${repoName}/releases/latest`, '.uf2');  
 }
 
 firmwareUtil.updateDeviceFirmware = function (progressHandler) {
@@ -179,17 +174,11 @@ firmwareUtil.updateDeviceFirmware = function (progressHandler) {
 
         let message, deviceName;
 
-        if ((ATDevice.isMajorVersion(2)) || (ATDevice.isMajorVersion(1)) && C.DEVICE_IS_FABI) {
-            message = 'Fabi V2 or older: Do you want to update the firmware to version {?}? After confirming this message you have to re-select the device ("{?}") in a browser popup. Keep this tab open and in foreground while updating! // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung müssen Sie das Gerät erneut in einem Browser-Popup auswählen ("{?}"). Lassen Sie diesen Tab während dem Update im Vordergrund geöffnet!';
-            deviceName = C.DEVICE_IS_FM_OR_PAD ? L.translate('Unknown device // Unbekanntes Gerät') : 'Arduino Leonardo/Mirco';
-
-        } else if (ATDevice.isMajorVersion(3) && C.DEVICE_IS_FABI) {
-            message = 'Fabi V3: Do you want to update the firmware to version {?}? After confirming this message you have to add the .UF2 file in the ("{?}") device and save it. // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung müssen Sie die .UF2 Datei im ("{?}") Gerät hinzufügen und speichern.';
-            deviceName = C.DEVICE_IS_FM_OR_PAD ? L.translate('Unknown device // Unbekanntes Gerät') : 'RPi PicoW'; // ASK: Whether the device is correct. 
-
-        } else if (C.DEVICE_IS_FM_OR_PAD) { // This is completely useless. For some weird reason it never comes in here and just uses the Modal (FirmwareUpdateModal).
-            message = 'Reset Firmware on FM.';
-            deviceName = C.DEVICE_IS_FABI ? L.translate('Unknown device // Unbekanntes Gerät') : 'Arduino Nano RP2040 Connect';
+        message = 'Do you want to update the firmware to version {?}? After confirming this message, put the downloaded .UF2 file to the ("{?}") drive. // Möchten Sie die Firmware auf Version {?} aktualisieren? Nach Bestätigung dieser Meldung bitte die heruntergeladene .UF2 Datei im ("{?}") Laufwerk ablegen.';
+        if (C.DEVICE_IS_FM) {
+            deviceName = 'Arduino Nano RP2040 Connect';
+        } else {
+            deviceName = 'Raspberry Pi Pico';
         }
 
         if (!confirm(L.translate(message, result.version, deviceName))) {
@@ -201,6 +190,7 @@ firmwareUtil.updateDeviceFirmware = function (progressHandler) {
 }
 
 function getFWInfo(apiUrl, binaryStringFilter) {
+    // TBD: handle new firmware versions for different RP2040 devices!
     return L.HTTPRequest(apiUrl, 'GET', 'json').then(result => {
         let binaryAsset = result.assets.filter(asset => asset.name.indexOf(binaryStringFilter) > -1)[0];
         return {

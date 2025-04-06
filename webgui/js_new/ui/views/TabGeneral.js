@@ -94,15 +94,9 @@ class TabGeneral extends Component {
 
     updateFirmware() {
         let thiz = this;
-        if (C.DEVICE_IS_FM && ATDevice.isMajorVersion(3)) {
             this.setState({
                 showFirmwareModal: true
             });
-        } else {
-            firmwareUtil.updateDeviceFirmware(progress => {
-                thiz.setState({ mainUpgradeProgress: progress || 1 });
-            });
-        }
     }
 
     resetConfig() {
@@ -124,25 +118,22 @@ class TabGeneral extends Component {
 
         return html`
         
-        ${(ATDevice.isMajorVersion(3) && C.AT_DEVICE_FABI) ? html`
-            <div class="row">
-                <div class="col-sm-6 col-lg-5">
-                    <label for="keyboard-language-layout"><h2>${L.translate('Keyboard layout selection // Keyboard layout auswahl')}</h2></label>    
-                    <br/>
-                    <select id="keyboard-language-layout" value="${state.AT_CMD_KEYBOARD_LAYOUT}">
-                        <option value="es_ES" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'es_ES' ? 'selected' : ''}>${L.translate('Spanisch // Spanish')}</option>  
-                        <option value="en_US" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'en_US' ? 'selected' : ''}>${L.translate('English // Englisch')}</option>   
-                        <option value="de_DE" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'de_DE' ? 'selected' : ''}>${L.translate('German // Deutsch')}</option>
-                        <option value="fr_FR" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'fr_FR' ? 'selected' : ''}>${L.translate('French // Französisch')}</option>  
-                        <option value="it_IT" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'it_IT' ? 'selected' : ''}>${L.translate('Italian // Italienisch')}</option>  
-                        <option value="sv_SE" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'sv_SE' ? 'selected' : ''}>${L.translate('Swedish // Schwedisch')}</option>   
-                        <option value="da_DK" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'da_DK' ? 'selected' : ''}>${L.translate('Danish // Dänisch')}</option>
-                    </select>
-                </div>
+        <div class="row">
+            <div class="col-sm-6 col-lg-5">
+                <label for="keyboard-language-layout"><h2>${L.translate('Keyboard layout selection // Keyboard layout auswahl')}</h2></label>    
+                <br/>
+                <select id="keyboard-language-layout" value="${state.AT_CMD_KEYBOARD_LAYOUT}">
+                    <option value="es_ES" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'es_ES' ? 'selected' : ''}>${L.translate('Spanisch // Spanish')}</option>  
+                    <option value="en_US" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'en_US' ? 'selected' : ''}>${L.translate('English // Englisch')}</option>   
+                    <option value="de_DE" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'de_DE' ? 'selected' : ''}>${L.translate('German // Deutsch')}</option>
+                    <option value="fr_FR" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'fr_FR' ? 'selected' : ''}>${L.translate('French // Französisch')}</option>  
+                    <option value="it_IT" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'it_IT' ? 'selected' : ''}>${L.translate('Italian // Italienisch')}</option>  
+                    <option value="sv_SE" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'sv_SE' ? 'selected' : ''}>${L.translate('Swedish // Schwedisch')}</option>   
+                    <option value="da_DK" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'da_DK' ? 'selected' : ''}>${L.translate('Danish // Dänisch')}</option>
+                </select>
             </div>
-            <br/>
-        ` : ''}
-       
+        </div>
+        <br/>
 
         <h2>${L.translate('Slot test mode // Slot-Test Modus')}</h2>
          <div class="row">
@@ -194,10 +185,9 @@ class TabGeneral extends Component {
             ${html`<${FirmwareUpdateModal} close="${() => this.setState({ showFirmwareModal: false })}" fwInfo="${state.mainVersionFWInfo}" currentFwVersion="${this.state.mainVersion}"/>`}
         </div> 
         
-    ${C.DEVICE_IS_FABI && !(ATDevice.isMajorVersion(3)) ? html` <!-- This is a glorified if. -->
 
-        <h3 class="mt-5 ${C.DEVICE_IS_FM && ATDevice.isMajorVersion(3) ? 'd-none' : ''}">Firmware Bluetooth-Addon</h3> <!-- ASK: Is this relevant for the FM. -->
-        <div class="container-fluid p-0 ${C.DEVICE_IS_FM && ATDevice.isMajorVersion(3) ? 'd-none' : ''}">
+        <h3 class="mt-5 ${C.DEVICE_IS_FM ? 'd-none' : ''}">Firmware Bluetooth-Addon</h3>
+        <div class="container-fluid p-0 ${C.DEVICE_IS_FM ? 'd-none' : ''}">
             <div class="row">
                 <span class="col col-md-3">${L.translate('Installed version // Installierte Version')}</span>   
                 <span class="col col-md-3"> ${this.state.btVersion}</span>   
@@ -220,8 +210,6 @@ class TabGeneral extends Component {
                 </div>
             </div>
         </div> 
-    ` : ''} <!-- '' incase it is false. -->
-
 
         <h2 class="mt-5">${L.translate('Reset to default configuration // Rücksetzen auf Defaulteinstellungen')}</h2>
         <div class="row mt-2">
@@ -237,11 +225,11 @@ class TabGeneral extends Component {
             <div class="col-12">
                 <span>${L.translate('The following keyboard shortcuts can be used on this page: // Die folgenden Tastenkombinationen können auf dieser Seite verwendet werden:')}</span>
                 <ul>
-                    <li class="${C.DEVICE_IS_FM_OR_PAD ? '' : 'd-none'}"><b>${L.translate('Ctrl + C // Strg + C')}:</b> <span>${L.translate('Calibrate FLipMouse middle position // Mittelposition der FLipMouse kalibrieren')}</span></li>
+                    <li class="${ATDevice.getSensorInfo()[C.FORCE_SENSOR] ? '' : 'd-none'}"><b>${L.translate('Ctrl + C // Strg + C')}:</b> <span>${L.translate('Calibrate middle position // Mittelposition kalibrieren')}</span></li>
                     <li><b>${L.translate('F1')}:</b> <span>${L.translate('Open manual section for the currently active tab // Benutzerhandbuch-Abschnitt zum aktuell geöffneten Tab öffnen')}</span></li>
                     <li><b>${L.translate('Ctrl + [1-{?}] // Strg + [1-{?}]', C.VIEWS.length)}:</b> <span>${L.translate('Jump to tab with the chosen number // Springe zu Tab mit der gewählten Nummer')}</span></li>
                     <li><b>${L.translate('Ctrl + Space // Strg + Leertaste')}:</b> <span>${L.translate('Jump to last tab // Springe zu vorherigem Tab')}</span></li>
-                    <li class="${C.DEVICE_IS_FM_OR_PAD ? '' : 'd-none'}"><b>${L.translate('Ctrl + B // Strg + B')}:</b> <span>${L.translate('Show / hide analog values in visualization // Zeigen / Verstecken der analogen Werte in der Visualisierung')}</span></li>
+                    <li class="${ATDevice.getSensorInfo()[C.FORCE_SENSOR] ? '' : 'd-none'}"><b>${L.translate('Ctrl + B // Strg + B')}:</b> <span>${L.translate('Show / hide analog values in visualization // Zeigen / Verstecken der analogen Werte in der Visualisierung')}</span></li>
                 </ul>
             </div>
         </div>
