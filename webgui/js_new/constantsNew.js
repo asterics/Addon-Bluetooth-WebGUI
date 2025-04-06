@@ -216,285 +216,185 @@ C.AT_CMDS_MACRO = C.AT_CMDS_MACRO.concat([{
 }]);
 
 
-C.BTN_MODES_FABI_V2 = [{
-    index: 1,
+let currentIndex = 1;
+C.BTN_MODES_FABI = [{
+    index: currentIndex++,
     label: 'Button 1',
     category: C.BTN_CAT_BTN
 }, {
-    index: 2,
+    index: currentIndex++,
     label: 'Button 2',
     category: C.BTN_CAT_BTN
 }, {
-    index: 3,
+    index: currentIndex++,
     label: 'Button 3',
     category: C.BTN_CAT_BTN
 }, {
-    index: 4,
+    index: currentIndex++,
     label: 'Button 4',
     category: C.BTN_CAT_BTN
 }, {
-    index: 5,
+    index: currentIndex++,
     label: 'Button 5',
     category: C.BTN_CAT_BTN
 }, {
-    index: 6,
-    label: 'Button 6',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 7,
-    label: 'Button 7',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 8,
-    label: 'Button 8',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 10,
-    label: 'Sip // Ansaugen',
-    category: C.BTN_CAT_SIPPUFF
-}, {
-    index: 11,
-    label: 'Puff // Pusten',
-    category: C.BTN_CAT_SIPPUFF
-}];
-
-
-
-C.BTN_MODES_FABI_V3 = [{
-    index: 1,
-    label: 'Button 1',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 2,
-    label: 'Button 2',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 3,
-    label: 'Button 3',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 4,
-    label: 'Button 4',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 5,
-    label: 'Button 5',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 6,
+/*    index: currentIndex++,
     label: 'Button 1 long press // Button 1 lange drücken',
     category: C.BTN_CAT_BTN_LONGPRESS
 }, {
-    index: 7,
+    index: currentIndex++,
     label: 'Button 2 long press // Button 2 lange drücken',
     category: C.BTN_CAT_BTN_LONGPRESS
 }, {
-    index: 8,
+    index: currentIndex++,
     label: 'Button 3 long press // Button 3 lange drücken',
     category: C.BTN_CAT_BTN_LONGPRESS
 }, {
-    index: 9,
+    index: currentIndex++,
     label: 'Button 4 long press // Button 4 lange drücken',
     category: C.BTN_CAT_BTN_LONGPRESS
 }, {
-    index: 10,
+    index: currentIndex++,
     label: 'Button 5 long press // Button 5 lange drücken',
     category: C.BTN_CAT_BTN_LONGPRESS
-}, {
-    index: 11,
+}, {   */
+    index: currentIndex++,
     label: 'Sip // Ansaugen',
     category: C.BTN_CAT_SIPPUFF
 }, {
-    index: 12,
+    index: currentIndex++,
     label: 'Puff // Pusten',
     category: C.BTN_CAT_SIPPUFF
 }, {
-    index: 13,
+    index: currentIndex++,
     label: 'Strong Sip // Starkes Ansaugen',
     category: C.BTN_CAT_STRONG_SIPPUFF
 }, {
-    index: 14,
+    index: currentIndex++,
     label: 'Strong Puff // Starks Pusten',
     category: C.BTN_CAT_STRONG_SIPPUFF
 }, {
-    index: 15,
-    label: 'Strong Sip + Button 2 // Stark ansaugen + Button 2',
+    index: currentIndex++,
+    label: 'Strong Sip + Up // Stark ansaugen + nach oben',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 16,
-    label: 'Strong Sip + Button 3 // Stark ansaugen + Button 3',
+    index: currentIndex++,
+    label: 'Strong Sip + Down // Stark ansaugen + nach unten',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 17,
-    label: 'Strong Sip + Button 4 // Stark ansaugen + Button 4',
+    index: currentIndex++,
+    label: 'Strong Sip + Left // Stark ansaugen + nach links',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 18,
-    label: 'Strong Sip + Button 5 // Stark ansaugen + Button 5',
+    index: currentIndex++,
+    label: 'Strong Sip + Right // Stark ansaugen + nach rechts',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 19,
-    label: 'Strong Puff + Button 2 // Stark pusten + Button 2',
+    index: currentIndex++,
+    label: 'Strong Puff +  Up // Stark pusten + nach oben',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 20,
-    label: 'Strong Puff + Button 3 // Stark pusten + Button 3',
+    index: currentIndex++,
+    label: 'Strong Puff + Down // Stark pusten + nach unten',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 21,
-    label: 'Strong Puff + Button 4 // Stark pusten + Button 4',
+    index: currentIndex++,
+    label: 'Strong Puff + Left // Stark pusten + nach links',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 22,
-    label: 'Strong Puff + Button 5 // Stark pusten + Button 5',
+    index: currentIndex++,
+    label: 'Strong Puff + Right // Stark pusten + nach rechts',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }];
 
-
-C.BTN_MODES_FABI_V2_ACTIONLIST = [{
-    index: 1,
+currentIndex = 1;
+C.BTN_MODES_FABI_ACTIONLIST = [{ // This can be seen within the actions tab. 
+    index: currentIndex++,
     label: 'Button 1',
     category: C.BTN_CAT_BTN
 }, {
-    index: 2,
+    index: currentIndex++,
     label: 'Button 2',
     category: C.BTN_CAT_BTN
 }, {
-    index: 3,
+    index: currentIndex++,
     label: 'Button 3',
     category: C.BTN_CAT_BTN
 }, {
-    index: 4,
+    index: currentIndex++,
     label: 'Button 4',
     category: C.BTN_CAT_BTN
 }, {
-    index: 5,
+    index: currentIndex++,
     label: 'Button 5',
     category: C.BTN_CAT_BTN
-}, {
-    index: 6,
-    label: 'Button 6',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 7,
-    label: 'Button 7',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 8,
-    label: 'Button 8',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 7,
+}, { /*
+    index: currentIndex++,
     label: 'Button 1 long press // Button 1 lange drücken',
     category: C.BTN_CAT_BTN_LONGPRESS
 }, {
-    index: 8,
+    index: currentIndex++,
     label: 'Button 2 long press // Button 2 lange drücken',
     category: C.BTN_CAT_BTN_LONGPRESS
 }, {
-    index: 9,
+    index: currentIndex++,
     label: 'Button 3 long press // Button 3 lange drücken',
     category: C.BTN_CAT_BTN_LONGPRESS
 }, {
-    index: 10,
-    label: 'Sip // Ansaugen',
-    category: C.BTN_CAT_SIPPUFF
-}, {
-    index: 11,
-    label: 'Puff // Pusten',
-    category: C.BTN_CAT_SIPPUFF
-}];
-
-
-
-
-C.BTN_MODES_FABI_V3_ACTIONLIST = [{ // This can be seen within the actions tab. 
-    index: 1,
-    label: 'Button 1',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 2,
-    label: 'Button 2',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 3,
-    label: 'Button 3',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 4,
-    label: 'Button 4',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 5,
-    label: 'Button 5',
-    category: C.BTN_CAT_BTN
-}, {
-    index: 6,
-    label: 'Button 1 long press // Button 1 lange drücken',
-    category: C.BTN_CAT_BTN_LONGPRESS
-}, {
-    index: 7,
-    label: 'Button 2 long press // Button 2 lange drücken',
-    category: C.BTN_CAT_BTN_LONGPRESS
-}, {
-    index: 8,
-    label: 'Button 3 long press // Button 3 lange drücken',
-    category: C.BTN_CAT_BTN_LONGPRESS
-}, {
-    index: 9,
+    index: currentIndex++,
     label: 'Button 4 long press // Button 4 lange drücken',
     category: C.BTN_CAT_BTN_LONGPRESS
 }, {
-    index: 10,
+    index: currentIndex++,
     label: 'Button 5 long press // Button 5 lange drücken',
     category: C.BTN_CAT_BTN_LONGPRESS
-}, {
-    index: 11,
+}, {  */
+    index: currentIndex++,
     label: 'Sip // Ansaugen',
     category: C.BTN_CAT_SIPPUFF
 }, {
-    index: 12,
+    index: currentIndex++,
     label: 'Puff // Pusten',
     category: C.BTN_CAT_SIPPUFF
 }, {
-    index: 13,
+    index: currentIndex++,
     label: 'Strong Sip // Starkes Ansaugen',
     category: C.BTN_CAT_STRONG_SIPPUFF
 }, {
-    index: 14,
+    index: currentIndex++,
     label: 'Strong Puff // Starks Pusten',
     category: C.BTN_CAT_STRONG_SIPPUFF
 }, {
-    index: 15,
-    label: 'Strong Sip + Button 2 // Stark ansaugen + Button 2',
+    index: currentIndex++,
+    label: 'Strong Sip + Up // Stark ansaugen + nach oben',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 16,
-    label: 'Strong Sip + Button 3 // Stark ansaugen + Button 3',
+    index: currentIndex++,
+    label: 'Strong Sip + Down // Stark ansaugen + nach unten',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 17,
-    label: 'Strong Sip + Button 4 // Stark ansaugen + Button 4',
+    index: currentIndex++,
+    label: 'Strong Sip + Left // Stark ansaugen + nach links',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 18,
-    label: 'Strong Sip + Button 5 // Stark ansaugen + Button 5',
+    index: currentIndex++,
+    label: 'Strong Sip + Right // Stark ansaugen + nach rechts',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 19,
-    label: 'Strong Puff + Button 2 // Stark pusten + Button 2',
+    index: currentIndex++,
+    label: 'Strong Puff + Up // Stark pusten + nach oben',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 20,
-    label: 'Strong Puff + Button 3 // Stark pusten + Button 3',
+    index: currentIndex++,
+    label: 'Strong Puff + Down // Stark pusten + nach unten',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 21,
-    label: 'Strong Puff + Button 4 // Stark pusten + Button 4',
+    index: currentIndex++,
+    label: 'Strong Puff + Left // Stark pusten + nach links',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }, {
-    index: 22,
-    label: 'Strong Puff + Button 5 // Stark pusten + Button 5',
+    index: currentIndex++,
+    label: 'Strong Puff + Right // Stark pusten + nach rechts',
     category: C.BTN_CAT_BTN_STRONG_SIPPUFF
 }];
 
@@ -527,6 +427,7 @@ C.STICK_MODE_PAD = {
     value: 5,
     label: 'Mouse (pad mode) // Maus (Pad-Modus)'
 };
+
 C.FLIPPAD_MODE_STICK_ALTERNATIVE = {
     value: 0,
     label: 'Alternative actions (stick mode) // Alternative Aktionen (Stick-Modus)'

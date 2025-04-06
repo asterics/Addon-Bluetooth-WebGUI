@@ -133,32 +133,9 @@ class TabActions extends Component {
            <span class="${mobileView ? 'col-12' : 'col'}">Bezeichnung</span>
            ${slots.map(slot => html`<span class="${mobileView ? 'col-12' : 'col'} ${this.getSlotStyle(slot)}">Slot "${slot}"</span>`)}
        </li>
-      
-       ${C.DEVICE_IS_FABI && !(ATDevice.isMajorVersion(3)) ? (() => {
-        let btnModesFabiV2 = C.BTN_MODES_FABI_V2_ACTIONLIST.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
-        return html`
-               ${btnModesFabiV2.map((btnMode, index) => html`
-                   <li class="row ${mobileView ? 'py-3' : 'py-0'}" style="${index % 2 === 0 ? 'background-color: rgb(224 224 224)' : ''}">
-                       <strong class="${mobileView ? 'col-12' : 'col'}">${L.translate(btnMode.label)}</strong>
-                       ${slots.map(slot => html`
-                           <span class="${mobileView ? 'col-12' : 'col'} ${this.getSlotStyle(slot)}">
-                               <span class="${mobileView ? '' : 'd-none'}">Slot "${slot}": </span>
-                               <span class="${this.isDisabled(btnMode, slot) ? '' : 'd-none'}" style="font-weight: normal" title="${L.translate('Go to tab "Timings" to configure long press threshold // Gehe zu Tab "Timings" um Schwellenwert für langes Drücken zu konfigurieren')}">
-                                   ${L.translate('(disabled) // (deaktiviert)')}
-                               </span>
-                               <a href="javascript:;" title="${this.getLinkTitle(btnMode, slot)}" class="${this.isDisabled(btnMode, slot) ? 'd-none' : ''}" onclick="${() => this.setState({ modalBtnMode: btnMode, modalSlot: slot })}">
-                                   <span style="${ATDevice.getButtonAction(btnMode.index, slot) === C.AT_CMD_NO_CMD ? 'font-weight: normal' : ''}">${this.getLinkLabel(btnMode, slot)}</span>
-                                   <span class="${!this.showFnName(btnMode, slot) || (!mobileView && state.viewMode === VIEW_MODE_ALL_SLOTS_TABLE && ATDevice.getSlots().length > 1) || !this.getBtnModeParam(btnMode, slot) ? 'd-none' : ''}" style="font-weight: normal"> (${this.getBtnModeParam(btnMode, slot)})</span>
-                               </a>
-                           </span>
-                       `)}
-                   </li>
-               `)}
-           `;
-      })() : ''} 
        
-       ${C.DEVICE_IS_FABI && (ATDevice.isMajorVersion(3)) ? (() => {
-        let btnModesFabiV3 = C.BTN_MODES_FABI_V3_ACTIONLIST.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
+       ${C.DEVICE_IS_FABI ? (() => {
+        let btnModesFabiV3 = C.BTN_MODES_FABI_ACTIONLIST.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
         return html`
                ${btnModesFabiV3.map((btnMode, index) => html`
                    <li class="row ${mobileView ? 'py-3' : 'py-0'}" style="${index % 2 === 0 ? 'background-color: rgb(224 224 224)' : ''}">
