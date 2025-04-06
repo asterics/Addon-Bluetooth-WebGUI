@@ -1,10 +1,10 @@
-import { FLipMouse } from "./communication/FLipMouse.js";
-import { TabStick } from "./ui/views/TabStick.js";
-import { TabSipPuff } from "../js/ui/views/TabSipPuff.js";
-import { TabSlots } from "../js/ui/views/TabSlots.js";
-import { TabActions } from "../js/ui/views/TabActions.js";
-import { TabGeneral } from "../js/ui/views/TabGeneral.js";
-import { TabVisualization } from "./ui/views/TabVisualization.js";
+import {FLipMouse} from "./communication/FLipMouse.js";
+import {TabStick} from "./ui/views/TabStick.js";
+import {TabSipPuff} from "../js/ui/views/TabSipPuff.js";
+import {TabSlots} from "../js/ui/views/TabSlots.js";
+import {TabActions} from "../js/ui/views/TabActions.js";
+import {TabGeneral} from "../js/ui/views/TabGeneral.js";
+import {TabVisualization} from "./ui/views/TabVisualization.js";
 
 window.C = window.C || {};
 
@@ -18,10 +18,10 @@ C.MAX_NUMBER_SLOTS = 10;
 C.MAX_LENGTH_SLOTNAME = 13;
 C.HELP_BASE_URL = 'https://github.com/asterics/FLipMouse/blob/master/Documentation/UserManual/Markdown/FLipMouseUserManual.md // https://github.com/asterics/FLipMouse/blob/master/Documentation/UserManual/Markdown/FLipMouseAnwendungsanleitung.md';
 
-C.USB_DEVICE_FILTERS = [
-    { usbVendorId: 0x16c0 }, // Teensy
-    { usbVendorId: 0x2e8a }, // RP2040
-    { usbVendorId: 0x2341 } // RP2040 (from 2023 on)
+C.USB_DEVICE_FILTERS =  [
+    {usbVendorId: 0x16c0}, // Teensy
+    {usbVendorId: 0x2e8a}, // RP2040
+    {usbVendorId: 0x2341} // RP2040 (from 2023 on)
 ];
 
 C.VIEWS = [{
@@ -75,7 +75,6 @@ C.ADDITIONAL_LINKS = [{
     label: 'Legal Notice // Impressum',
     url: 'https://www.asterics-foundation.org/legal-notice/ // https://www.asterics-foundation.org/impressum/'
 }]
-
 
 C.AT_CMD_CATEGORIES = [{
     constant: C.AT_CMD_CAT_KEYBOARD,
@@ -155,9 +154,7 @@ C.AT_CMDS_ACTIONS = C.AT_CMDS_ACTIONS.concat([{
     input: C.INPUTFIELD_TYPE_NUMBER
 }]);
 
-
 C.AT_CMDS_MACRO = C.AT_CMDS_MACRO || [];
-
 C.AT_CMDS_MACRO = C.AT_CMDS_MACRO.concat([{
     cmd: C.AT_CMD_JOYSTICK_BUTTON_RELEASE,
     label: 'Release joystick button // Joystick-Button auslassen',
@@ -175,7 +172,6 @@ C.BTN_CAT_BTN = 'BTN_CAT_BTN';
 C.BTN_CAT_STICK = 'BTN_CAT_STICK';
 C.BTN_CAT_SIPPUFF = 'BTN_CAT_SIPPUFF';
 C.BTN_CAT_STICKPLUS = 'BTN_CAT_STICKPLUS';
-
 C.BTN_CATEGORIES = [{
     constant: C.BTN_CAT_BTN,
     label: 'Buttons'
@@ -190,7 +186,7 @@ C.BTN_CATEGORIES = [{
     label: 'Advanced stick actions // Erweiterte Stick-Aktionen'
 }]
 
-C.BTN_MODES_FM = [{
+C.BTN_MODES = [{
     index: 1,
     label: 'Button 1',
     category: C.BTN_CAT_BTN
@@ -268,7 +264,7 @@ C.BTN_MODES_FM = [{
     category: C.BTN_CAT_STICKPLUS
 }];
 
-C.BTN_MODES_FM_ACTIONLIST = C.BTN_MODES_FM;
+C.BTN_MODES_ACTIONLIST = C.BTN_MODES;
 
 C.FLIPMOUSE_MODE_MOUSE = {
     value: 1,

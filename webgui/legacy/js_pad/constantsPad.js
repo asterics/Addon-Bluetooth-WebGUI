@@ -1,10 +1,10 @@
-import { FLipPad } from "./communication/FLipPad.js";
-import { TabPad } from "./ui/views/TabPad.js";
-import { TabSipPuff } from "../js/ui/views/TabSipPuff.js";
-import { TabSlots } from "../js/ui/views/TabSlots.js";
-import { TabActions } from "../js/ui/views/TabActions.js";
-import { TabGeneral } from "../js/ui/views/TabGeneral.js";
-import { TabVisualization } from "../js_fm/ui/views/TabVisualization.js";
+import {FLipPad} from "./communication/FLipPad.js";
+import {TabPad} from "./ui/views/TabPad.js";
+import {TabSipPuff} from "../js/ui/views/TabSipPuff.js";
+import {TabSlots} from "../js/ui/views/TabSlots.js";
+import {TabActions} from "../js/ui/views/TabActions.js";
+import {TabGeneral} from "../js/ui/views/TabGeneral.js";
+import {TabVisualization} from "../js_fm/ui/views/TabVisualization.js";
 
 window.C = window.C || {};
 
@@ -18,8 +18,8 @@ C.MAX_NUMBER_SLOTS = 10;
 C.MAX_LENGTH_SLOTNAME = 13;
 C.HELP_BASE_URL = '';
 
-C.USB_DEVICE_FILTERS = [
-    { usbVendorId: 0x16c0 } // Teensy
+C.USB_DEVICE_FILTERS =  [
+    {usbVendorId: 0x16c0} // Teensy
 ];
 
 C.VIEWS = [{
@@ -174,7 +174,7 @@ C.BTN_CATEGORIES = [{
     label: 'Tap + Slide // Tippen + Wischen'
 }]
 
-C.BTN_MODES_PAD = [{
+C.BTN_MODES = [{
     index: 1,
     label: 'Button 1',
     category: C.BTN_CAT_BTN
@@ -252,7 +252,7 @@ C.BTN_MODES_PAD = [{
     category: C.BTN_CAT_STICKPLUS
 }];
 
-C.BTN_MODES_PAD_ACTIONLIST = C.BTN_MODES_PAD;
+C.BTN_MODES_ACTIONLIST = C.BTN_MODES;
 
 C.FLIPPAD_MODE_MOUSE = {
     value: 1,

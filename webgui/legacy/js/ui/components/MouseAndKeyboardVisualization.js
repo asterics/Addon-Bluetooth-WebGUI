@@ -1,6 +1,5 @@
 import { h, Component, render } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
-import { ATDevice } from '../../communication/ATDevice.js';
 
 const html = htm.bind(h);
 
@@ -26,8 +25,8 @@ class MouseAndKeyboardVisualization extends Component {
     handleKeyPress(event) {
         let thiz = MouseAndKeyboardVisualization.instance;
         thiz.setState({
-            pressedKeys: [...new Set(thiz.state.pressedKeys.concat([event.code]))], // The newly created array gets converted into a Set. Set is a special data structure. Set makes sure that double entries are removed. 
-            pressedKeyCodes: [...new Set(thiz.state.pressedKeyCodes.concat([event.which]))] // which contains the numeric code for a particular key pressed.
+            pressedKeys: [...new Set(thiz.state.pressedKeys.concat([event.code]))],
+            pressedKeyCodes: [...new Set(thiz.state.pressedKeyCodes.concat([event.which]))]
         });
     }
 
@@ -75,27 +74,23 @@ class MouseAndKeyboardVisualization extends Component {
 
         return html`
             <div class="mouseKeyVisualization">
-
-                ${(ATDevice.isMajorVersion(2) && C.AT_DEVICE_FABI) ? html` <!-- ASK: Due to the keys also sticking (when right mouse and keys are pressed simultaneously) with V2, should it also exist for V2. -->
-                    <div>
-                        <b class="mr-2">${L.translate('Keyboard keys: // Tasten auf Tastatur:')}</b>
-                        <span class=" ${state.pressedKeys.length > 0 ? 'd-none' : ''}">${L.translate("(none) // (keine)")}</span>
-                        ${state.pressedKeys.map((keyCode, index) => {
-                            let atKeycode = C.KEYCODE_MAPPING[state.pressedKeyCodes[index]];
-                              return html`
-                                  <span class="mr-2 keyboard ${atKeycode ? 'd-none' : ''}">${keyCode}</span>
-                                  <span class="mr-2 keyboard ${atKeycode ? '' : 'd-none'}">${atKeycode}</span>
-                                 `
-                        })}
-                    </div>
-                ` : ''} 
-
-                    <div class="mt-5">
-                        <b class="mr-2">${L.translate('Mouse buttons: // Maustasten:')}</b>
-                        <span class="mr-2 mouse ${state.pressedMouseButtons.includes(1) ? 'pressed' : ''}">${L.translate("Left // Links")}</span>
-                        <span class="mr-2 mouse ${state.pressedMouseButtons.includes(2) ? 'pressed' : ''}">${L.translate("Middle // Mitte")}</span>
-                        <span class="mr-2 mouse ${state.pressedMouseButtons.includes(3) ? 'pressed' : ''}">${L.translate("Right // Rechts")}</span>
-                    </div>
+                <div>
+                    <b class="mr-2">${L.translate('Keyboard keys: // Tasten auf Tastatur:')}</b>
+                    <span class=" ${state.pressedKeys.length > 0 ? 'd-none' : ''}">${L.translate("(none) // (keine)")}</span>
+                    ${state.pressedKeys.map((keyCode, index) => {
+                        let atKeycode = C.KEYCODE_MAPPING[state.pressedKeyCodes[index]];
+                        return html`
+                            <span class="mr-2 keyboard ${atKeycode ? 'd-none' : ''}">${keyCode}</span>
+                            <span class="mr-2 keyboard ${atKeycode ? '' : 'd-none'}">${atKeycode}</span>
+                        `
+                    })}
+                </div>
+                <div class="mt-5">
+                    <b class="mr-2">${L.translate('Mouse buttons: // Maustasten:')}</b>
+                    <span class="mr-2 mouse ${state.pressedMouseButtons.includes(1) ? 'pressed' : ''}">${L.translate("Left // Links")}</span>
+                    <span class="mr-2 mouse ${state.pressedMouseButtons.includes(2) ? 'pressed' : ''}">${L.translate("Middle // Mitte")}</span>
+                    <span class="mr-2 mouse ${state.pressedMouseButtons.includes(3) ? 'pressed' : ''}">${L.translate("Right // Rechts")}</span>
+                </div>
             </div>
             <style>
                 .mouseKeyVisualization .keyboard {
@@ -118,4 +113,4 @@ class MouseAndKeyboardVisualization extends Component {
     }
 }
 
-export { MouseAndKeyboardVisualization };
+export {MouseAndKeyboardVisualization};

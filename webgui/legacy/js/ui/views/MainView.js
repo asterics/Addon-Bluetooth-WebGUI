@@ -1,11 +1,11 @@
-import { h, Component, render } from '../../../lib/preact.min.js';
+import {h, Component, render} from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
-import { ATDevice } from "../../communication/ATDevice.js";
-import { localStorageService } from "../../localStorageService.js";
-import { FaIcon } from "../components/FaIcon.js";
-import { firmwareUtil } from "../../util/firmwareUtil.js";
-import { helpUtil } from "../../util/helpUtil.js";
-import { SlotTestModeDialog } from "../components/SlotTestModeDialog.js";
+import {ATDevice} from "../../communication/ATDevice.js";
+import {localStorageService} from "../../localStorageService.js";
+import {FaIcon} from "../components/FaIcon.js";
+import {firmwareUtil} from "../../util/firmwareUtil.js";
+import {helpUtil} from "../../util/helpUtil.js";
+import {SlotTestModeDialog} from "../components/SlotTestModeDialog.js";
 
 const html = htm.bind(h);
 
@@ -38,7 +38,7 @@ class MainView extends Component {
         L('html')[0].lang = L.getLang();
         if (C.GUI_IS_MOCKED_VERSION || C.GUI_IS_ON_DEVICE) {
             this.initATDevice();
-        } else if (localStorageService.getFirmwareDownloadUrl()) {
+        } else if(localStorageService.getFirmwareDownloadUrl()) {
             this.setState({
                 showScreen: SCREENS.FIRMWARE_CONTINUE,
             });
@@ -142,14 +142,14 @@ class MainView extends Component {
     continueFirmwareUpdate() {
         let thiz = this;
         ATDevice.Specific.updateFirmware(localStorageService.getFirmwareDownloadUrl(), (progress) => {
-            thiz.setState({ updateProgress: progress || 1 });
+            thiz.setState({updateProgress: progress || 1});
         }, true);
     }
 
     startFirmwareUpdate() {
         let thiz = this;
         firmwareUtil.updateDeviceFirmware(progress => {
-            thiz.setState({ updateProgress: progress || 1 });
+            thiz.setState({updateProgress: progress || 1});
         });
     }
 
@@ -179,13 +179,13 @@ class MainView extends Component {
                     </div>
                 </div>
                 <div class="row">
-                    <a class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3 mt-3" href="javascript:;" onclick="${() => { this.setState({ showScreen: SCREENS.CONNECTION }) }}">
+                    <a class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3 mt-3" href="javascript:;" onclick="${() => {this.setState({showScreen: SCREENS.CONNECTION})}}">
                         ${L.translate('Cancel // Abbrechen')}
                     </a>
                 </div>
             </div>
         </div>
-        <div class="top-layer-center ${state.showScreen === SCREENS.FIRMWARE_CONTINUE ? '' : 'd-none'}">
+        <div class="top-layer-center ${state.showScreen === SCREENS.FIRMWARE_CONTINUE? '' : 'd-none'}">
             <div class="container-fluid top-layer-content">
                 <h1>${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
                 <div class="row mb-5">
@@ -203,24 +203,19 @@ class MainView extends Component {
                     </div>
                 </div>
                 <div class="row">
-                    <a class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3 mt-3" href="javascript:;" onclick="${() => { localStorageService.setFirmwareDownloadUrl(''); this.setState({ showScreen: SCREENS.CONNECTION }) }}">
+                    <a class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3 mt-3" href="javascript:;" onclick="${() => {localStorageService.setFirmwareDownloadUrl(''); this.setState({showScreen: SCREENS.CONNECTION})}}">
                         ${L.translate('Cancel firmware update // Firmware-Update abbrechen')}
                     </a>
                 </div>
             </div>
         </div>
-        <div class="top-layer-center ${state.showScreen === SCREENS.CONNECTION ? '' : 'd-none'}">
+        <div class="top-layer-center ${state.showScreen === SCREENS.CONNECTION? '' : 'd-none'}">
             <div class="container-fluid top-layer-content">
                 <h1 class="sr-only">
                     <span >${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</span>
                 </h1>
-
                 <div class="row mb-5" aria-hidden="true">
-                ${C.DEVICE_IS_FABI ? html` <!-- If it is a Fabi then the png image will be taken. The FM uses svg. -->
-                <img class="col-10 offset-1 col-md-6 offset-md-3 col-xl-4 offset-xl-4" src="./img/${C.CURRENT_DEVICE}_lowres.png" /> <!--Changed the svg logo to the png one due to the contrast being better in dark mode. -- >
-                ` : html`
-                    <img class="col-10 offset-1 col-md-6 offset-md-3 col-xl-4 offset-xl-4" src="./img/${C.CURRENT_DEVICE}_logo.svg" /> 
-                `}
+                    <img class="col-10 offset-1 col-md-6 offset-md-3 col-xl-4 offset-xl-4" src="./img/${C.CURRENT_DEVICE}_logo.svg"/>
                 </div>
                 <div class="row">
                     <div class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3"><button onclick="${() => this.initATDevice()}">${L.translate("Connect to {?} connected via USB // Verbinden zu {?} (über USB angeschlossen)", C.CURRENT_DEVICE)}</button></div>
@@ -231,13 +226,13 @@ class MainView extends Component {
                 <div class="row" class="${state.errorCode ? '' : 'd-none'}" style="color: darkred">
                     <strong>${L.translate('Error: // Fehler:')}</strong><span> </span>
                     ${(() => {
-                switch (state.errorCode) {
-                    case C.ERROR_SERIAL_DENIED:
-                        return html`<span>${L.translate('Connecting to device not allowed by user, please try again! // Verbindung zum Gerät nicht zugelassen, bitte erneut versuchen!')}</span>`;
-                    case C.ERROR_SERIAL_BUSY:
-                        return html`<span>${L.translate("Connecting to device not possible, maybe it's used by another program?! // Verbindung zum Gerät nicht möglich, vielleicht wird es von einem anderen Programm verwendet?!")}</span>`;
-                    case C.ERROR_SERIAL_NOT_SUPPORTED:
-                        return html`
+                        switch (state.errorCode) {
+                            case C.ERROR_SERIAL_DENIED: 
+                                return html`<span>${L.translate('Connecting to device not allowed by user, please try again! // Verbindung zum Gerät nicht zugelassen, bitte erneut versuchen!')}</span>`;
+                            case C.ERROR_SERIAL_BUSY: 
+                                return html`<span>${L.translate("Connecting to device not possible, maybe it's used by another program?! // Verbindung zum Gerät nicht möglich, vielleicht wird es von einem anderen Programm verwendet?!")}</span>`;
+                            case C.ERROR_SERIAL_NOT_SUPPORTED:
+                                return html`
                                     <span>${L.translate("Connecting to real device not supported by current browser! // Verbindung zu echtem Gerät wird von akuellem Browser nicht unterstützt!")}</span>
                                     <div>
                                         <span>${L.translate('Please try  // Bitte verwenden Sie den ')}</span>
@@ -246,20 +241,20 @@ class MainView extends Component {
                                     </div>
                                     <div><a rel="noreferrer" href="https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest" target="_blank">https://github.com/asterics/${C.CURRENT_DEVICE}/releases/latest</a></div>
                                 `;
-                    case C.ERROR_CONNECTION_LOST:
-                        return html`<span>${L.translate('Connection to device lost! Please try to reconnect. // Verbindung zum Gerät verloren! Bitte versuchen Sie sich wieder zu verbinden.')}</span>`;
-                    case C.ERROR_SERIAL_CONNECT_FAILED:
-                        return html`<span>${L.translate('Couldn\'t connect to device! Please try to disconnect and reconnect the device to your computer. // Verbindung zum Gerät nicht möglich! Bitte trennen Sie das Gerät vom PC und verbinden Sie es danach erneut.')}</span>`;
-                    case C.ERROR_WRONG_DEVICE:
-                        return html`
+                            case C.ERROR_CONNECTION_LOST:
+                                return html`<span>${L.translate('Connection to device lost! Please try to reconnect. // Verbindung zum Gerät verloren! Bitte versuchen Sie sich wieder zu verbinden.')}</span>`;
+                            case C.ERROR_SERIAL_CONNECT_FAILED:
+                                return html`<span>${L.translate('Couldn\'t connect to device! Please try to disconnect and reconnect the device to your computer. // Verbindung zum Gerät nicht möglich! Bitte trennen Sie das Gerät vom PC und verbinden Sie es danach erneut.')}</span>`;
+                            case C.ERROR_WRONG_DEVICE:
+                                return html`
                                     <span>${L.translate("Detected wrong device! // Falsches Gerät erkannt!")}</span>
                                     <div>
                                         <span>${L.translate('Try to use the  // Bitte verwenden Sie stattdessen den ')}</span>
                                         <a rel="noreferrer" href="${C.DEVICE_IS_FM ? 'https://flippad.asterics.eu/' : 'https://flipmouse.asterics.eu/'}">${L.translate('{?} config manager // {?} Config-Manager', C.DEVICE_IS_FM ? 'FLipPad' : 'FLipMouse')}</a>
                                     </div>
                                 `;
-                }
-            })()}
+                        }
+                    })()}
                 </div>
                 <div class="row" class="${!state.errorCode && state.showSuccessMsg ? '' : 'd-none'}" style="color: darkgreen">
                     <strong>${L.translate('Success: // Erfolg:')}</strong><span> </span>
@@ -277,16 +272,16 @@ class MainView extends Component {
         <header class="container-fluid p-0 mt-4 ${state.showScreen === SCREENS.MAIN ? '' : 'd-none'}">
             <div class="row">
                 <h1 id="mainHeading" tabindex="-1" class="col col-md-6">${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
-                <div class="d-md-inline-block col-md-3">
+                <div class="d-none d-md-inline-block col-md-3">
                     <div class="row">
-                        <label class="col-12" for="selectSlots" dangerouslySetInnerHTML="${{ __html: L.translate('Select Slot // <span lang="en">Slot</span> auswählen') }}"></label>
+                        <label class="col-12" for="selectSlots" dangerouslySetInnerHTML="${{__html: L.translate('Select Slot // <span lang="en">Slot</span> auswählen')}}"></label>
                     </div>
                     <div class="row">
                         <div class="col-10">
                             <select id="selectSlots" class="col-12" value="${state.currentSlot}" onchange="${(event) => ATDevice.setSlot(event.target.value)}">
                                 ${state.slots.map((slot) => html`
-                                    <option value="${slot}">${slot}</option>
-                                 `)}
+                            <option value="${slot}">${slot}</option>
+                        `)}
                             </select>
                         </div>
                         <div class="col-2 ${ATDevice.getConfig(C.AT_CMD_DEVICE_MODE) !== 1 ? '' : 'd-none'}">
@@ -299,14 +294,14 @@ class MainView extends Component {
                     <div class="justify-content-end align-items-center ${state.connected ? 'd-flex' : 'd-none'}">
                         <span aria-hidden="true" title="connected" style="font-size: 2em">${'\u2713'}</span>
                         <span aria-live="assertive" role="status" class="d-none d-md-block ml-2">${L.translate(' connected //  verbunden')}</span>
-                        <button class="px-2 ml-3 mb-0" style="width: unset" onclick="${() => { this.disconnect() }}" title="${L.translate('disconnect // Verbindung trennen')}">
+                        <button class="px-2 ml-3 mb-0" style="width: unset" onclick="${() => {this.disconnect()}}" title="${L.translate('disconnect // Verbindung trennen')}">
                             ${html`<${FaIcon} icon="fas times"/>`}
                         </button>
                     </div>
                     <div class="justify-content-end align-items-center ${state.connected ? 'd-none' : 'd-flex'}">
                         <span aria-hidden="true" title="not connected" style="font-size: 2em">${'\u2717'}</span>
                         <span aria-live="assertive" role="status" class="d-none d-md-block ml-2">${L.translate('not connected // nicht verbunden')}</span>
-                        <button class="px-2 ml-3 mb-0" style="width: unset" onclick="${() => { this.disconnect() }}" title="${L.translate('disconnect // Verbindung trennen')}">
+                        <button class="px-2 ml-3 mb-0" style="width: unset" onclick="${() => {this.disconnect()}}" title="${L.translate('disconnect // Verbindung trennen')}">
                             ${html`<${FaIcon} icon="fas times"/>`}
                         </button>
                     </div>
@@ -315,7 +310,7 @@ class MainView extends Component {
             </div>
             <div class="container-fluid">
                 <nav class="row mb-5" id="tabMenu" role="tablist" tabindex="-1" accesskey="0">
-                    <button id="toNavLink" onclick="${() => this.setState({ menuOpen: !state.menuOpen })}" class="col d-md-none button button-primary">${L.translate('\u2630 Menu // \u2630 Menü')}</button>
+                    <button id="toNavLink" onclick="${() => this.setState({menuOpen: !state.menuOpen})}" class="col d-md-none button button-primary">${L.translate('\u2630 Menu // \u2630 Menü')}</button>
                     ${C.VIEWS.map(view => html`
                         <button role="tab" onclick="${() => this.toView(view.hash)}" class="col-md m-1 d-md-block menubutton button-primary ${state.menuOpen ? '' : 'd-none'} ${state.currentView.hash === view.hash ? 'selected' : ''}" aria-selected="${state.currentView.hash === view.hash}">
                             ${L.translate(view.label)}
@@ -349,4 +344,4 @@ MainView.init = function () {
 MainView.style = html`<style>
 </style>`
 
-export { MainView };
+export {MainView};

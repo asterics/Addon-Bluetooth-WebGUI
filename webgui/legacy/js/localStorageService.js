@@ -1,5 +1,5 @@
 let localStorageService = {};
-let KEY_FIRMWARE_DOWNLOAD_URL = 'WEBGUI_KEY_FIRMWARE_DOWNLOAD_URL';
+let KEY_FRIMWARE_DOWNLOAD_URL = 'WEBGUI_KEY_FRIMWARE_DOWNLOAD_URL';
 let storage = null;
 
 if (typeof (Storage) !== "undefined") {
@@ -40,11 +40,11 @@ localStorageService.hasKey = function (key) {
 }
 
 localStorageService.getFirmwareDownloadUrl = function () {
-    return localStorageService.get(KEY_FIRMWARE_DOWNLOAD_URL) || "";
+    return localStorageService.get(KEY_FRIMWARE_DOWNLOAD_URL) || "";
 };
 
 localStorageService.setFirmwareDownloadUrl = function (downloadUrl) {
-    return localStorageService.save(KEY_FIRMWARE_DOWNLOAD_URL, downloadUrl);
+    return localStorageService.save(KEY_FRIMWARE_DOWNLOAD_URL, downloadUrl);
 };
 
 export {localStorageService};
