@@ -66,6 +66,11 @@ class TabActions extends Component {
     return isDisabledLongPress || isDisabledBtn;
   }
 
+  isVisible(btnMode) {
+    if (btnMode.visibleBtnFn !== undefined && !btnMode.visibleBtnFn(ATDevice)) return false;
+    return(true);
+  }
+
   getBtnModeParam(btnMode, slot) {
     return ATDevice.getButtonAction(btnMode.index, slot).substr(C.LENGTH_AT_CMD_PREFIX);
   }
@@ -103,7 +108,8 @@ class TabActions extends Component {
         let slots = state.viewMode !== VIEW_MODE_SINGLE_SLOT ? ATDevice.getSlots(): [ATDevice.getCurrentSlot()];
         let mobileView = slots.length > this.getMaxPrintableSlots() || state.viewMode === VIEW_MODE_ALL_SLOTS_LIST;
 
-        let btnModes = C.BTN_MODES_ACTIONLIST.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
+        // let btnModes = C.BTN_MODES_ACTIONLIST.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
+        let btnModes = C.BTN_MODES_ACTIONLIST.filter(mode => (!this.state.showCategory || mode.category === this.state.showCategory) && this.isVisible(mode));
         let modalOpen = !!state.modalBtnMode;
         if(modalOpen) {
             L.addClass('body', 'modal-open');

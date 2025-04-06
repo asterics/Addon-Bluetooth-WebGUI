@@ -30,6 +30,12 @@ C.VIEWS = [{
     helpHash: '#stick-configuration-tab-stick-config // #stick-konfiguration-tab-stick-config',
     visibleFn: (ATDevice) => ATDevice.getSensorInfo()[C.FORCE_SENSOR]
 }, {
+    object: TabSipPuff,
+    hash: '#tabPuff',
+    label: 'Sip and Puff // Saug-Puste-Steuerung',
+    helpHash: '#sip-and-puff-tab-using-a-pressure-sensor // #verwendung-eines-drucksensors-sip-puff---reiter-saug-puste-steuerung',
+    visibleFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]
+}, {
     object: TabActions,
     hash: '#tabActions',
     label: 'Actions // Aktionen',
@@ -44,12 +50,6 @@ C.VIEWS = [{
     hash: '#tabTimings',
     label: 'Timings',
     helpHash: '#timings-tab-antitremor-and-special-functions // #einstellmöglichkeiten-im-reiter-timings'
-}, {
-    object: TabSipPuff,
-    hash: '#tabPuff',
-    label: 'Sip and Puff // Saug-Puste-Steuerung',
-    helpHash: '#sip-and-puff-tab-using-a-pressure-sensor // #verwendung-eines-drucksensors-sip-puff---reiter-saug-puste-steuerung',
-    visibleFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]
 }, {
     object: TabGeneral,
     hash: '#tabGeneral',
@@ -232,76 +232,95 @@ C.BTN_MODES_ACTIONLIST = [{ // This can be seen within the actions tab.
     index: currentIndex++,
     label: 'Button 5',
     category: C.BTN_CAT_BTN
-}, { /*
+}, { 
     index: currentIndex++,
-    label: 'Button 1 long press // Button 1 lange drücken',
-    category: C.BTN_CAT_BTN_LONGPRESS
+    label: 'Stick Up // Stick rauf',
+    category: C.BTN_CAT_STICK,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.FORCE_SENSOR]
+}, { 
+    index: currentIndex++,
+    label: 'Stick Down // Stick runter',
+    category: C.BTN_CAT_STICK,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.FORCE_SENSOR]
+}, { 
+    index: currentIndex++,
+    label: 'Stick Left // Stick links',
+    category: C.BTN_CAT_STICK,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.FORCE_SENSOR]
+}, { 
+    index: currentIndex++,
+    label: 'Stick Right // Stick rechts',
+    category: C.BTN_CAT_STICK,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.FORCE_SENSOR]
 }, {
-    index: currentIndex++,
-    label: 'Button 2 long press // Button 2 lange drücken',
-    category: C.BTN_CAT_BTN_LONGPRESS
-}, {
-    index: currentIndex++,
-    label: 'Button 3 long press // Button 3 lange drücken',
-    category: C.BTN_CAT_BTN_LONGPRESS
-}, {
-    index: currentIndex++,
-    label: 'Button 4 long press // Button 4 lange drücken',
-    category: C.BTN_CAT_BTN_LONGPRESS
-}, {
-    index: currentIndex++,
-    label: 'Button 5 long press // Button 5 lange drücken',
-    category: C.BTN_CAT_BTN_LONGPRESS
-}, {  */
     index: currentIndex++,
     label: 'Sip // Ansaugen',
-    category: C.BTN_CAT_SIPPUFF
+    category: C.BTN_CAT_SIPPUFF,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]
 }, {
     index: currentIndex++,
     label: 'Puff // Pusten',
-    category: C.BTN_CAT_SIPPUFF
+    category: C.BTN_CAT_SIPPUFF,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]
 }, {
     index: currentIndex++,
     label: 'Strong Sip // Starkes Ansaugen',
-    category: C.BTN_CAT_STRONG_SIPPUFF
+    category: C.BTN_CAT_STRONG_SIPPUFF,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]
 }, {
     index: currentIndex++,
     label: 'Strong Puff // Starks Pusten',
-    category: C.BTN_CAT_STRONG_SIPPUFF
+    category: C.BTN_CAT_STRONG_SIPPUFF,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]
 }, {
     index: currentIndex++,
     label: 'Strong Sip + Up // Stark ansaugen + nach oben',
-    category: C.BTN_CAT_BTN_STRONG_SIPPUFF
+    category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
 }, {
     index: currentIndex++,
     label: 'Strong Sip + Down // Stark ansaugen + nach unten',
-    category: C.BTN_CAT_BTN_STRONG_SIPPUFF
+    category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
 }, {
     index: currentIndex++,
     label: 'Strong Sip + Left // Stark ansaugen + nach links',
-    category: C.BTN_CAT_BTN_STRONG_SIPPUFF
+    category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
 }, {
     index: currentIndex++,
     label: 'Strong Sip + Right // Stark ansaugen + nach rechts',
-    category: C.BTN_CAT_BTN_STRONG_SIPPUFF
+    category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
 }, {
     index: currentIndex++,
     label: 'Strong Puff + Up // Stark pusten + nach oben',
-    category: C.BTN_CAT_BTN_STRONG_SIPPUFF
+    category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
 }, {
     index: currentIndex++,
     label: 'Strong Puff + Down // Stark pusten + nach unten',
-    category: C.BTN_CAT_BTN_STRONG_SIPPUFF
+    category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
 }, {
     index: currentIndex++,
     label: 'Strong Puff + Left // Stark pusten + nach links',
-    category: C.BTN_CAT_BTN_STRONG_SIPPUFF
+    category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
 }, {
     index: currentIndex++,
     label: 'Strong Puff + Right // Stark pusten + nach rechts',
-    category: C.BTN_CAT_BTN_STRONG_SIPPUFF
+    category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
+    visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
 }];
 
+/*   TDB: handle long press / multiple press actions
+}, { 
+    index: currentIndex++,
+    label: 'Button 1 long press // Button 1 lange drücken',
+    category: C.BTN_CAT_BTN_LONGPRESS
+  (...)
+*/
 
 C.STICK_MODE_MOUSE = {
     value: 1,
