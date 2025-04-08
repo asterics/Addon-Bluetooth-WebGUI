@@ -62,7 +62,7 @@ function MockCommunicator() {
                 resolve('IRCommand0:play\nIRCommand1:pause\nIRCommand2:stop');
 
             } else if (value.indexOf('AT ID') > -1) {
-                resolve('VERSION 3.14');
+                resolve('FABI v3.7, PressureSensor=DSP310, ForceSensor=InternalADC, Board=Raspberry_Pi_Pico_2W');
 
             } else if (value.indexOf('AT SA') > -1) {
                 resolve('OK');
