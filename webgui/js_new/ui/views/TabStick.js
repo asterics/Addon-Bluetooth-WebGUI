@@ -22,8 +22,7 @@ class TabStick extends Component {
 
         TabStick.instance = this;
         this.state = {};
-        this.atCmds = [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y, C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y, C.AT_CMD_MAX_SPEED, C.AT_CMD_ACCELERATION,
-        C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP, C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP, C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP, C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP];
+        this.atCmds = [C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y, C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y, C.AT_CMD_MAX_SPEED, C.AT_CMD_ACCELERATION];
         this.initValues();
     }
 
@@ -35,8 +34,6 @@ class TabStick extends Component {
         this.setState({
             splitSensitivity: ATDevice.getConfig(C.AT_CMD_SENSITIVITY_X) !== ATDevice.getConfig(C.AT_CMD_SENSITIVITY_Y), // splitSensitivity: is the key and the rest is the value.
             splitDeadzone: ATDevice.getConfig(C.AT_CMD_DEADZONE_X) !== ATDevice.getConfig(C.AT_CMD_DEADZONE_Y),
-            splitDriftcompRange: ATDevice.getConfig(C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP) !== ATDevice.getConfig(C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP),
-            splitDriftcompGain: ATDevice.getConfig(C.AT_CMD_GAIN_HORIZONTAL_DRIFT_COMP) !== ATDevice.getConfig(C.AT_CMD_GAIN_VERTICAL_DRIFT_COMP),
             showAdvanced: localStorageService.hasKey(KEY_TAB_STICK_SHOW_ADVANCED) ? localStorageService.get(KEY_TAB_STICK_SHOW_ADVANCED) : false,
             showAnalogBars: localStorageService.hasKey(KEY_TAB_STICK_SHOW_BARS) ? localStorageService.get(KEY_TAB_STICK_SHOW_BARS) : false
         });
@@ -94,7 +91,7 @@ class TabStick extends Component {
                     </div>
                 </div>
                 <div class="col-12 col-md-6 mt-4 mt-md-0">
-                    <${PositionVisualization} showAnalogBars="${state.showAnalogBars}" showAnalogValues="${state.showAnalogBars}" showDeadzone="${true}" showDriftComp="${true}" showOrientation="${true}" showMaxPos="${true}" circleRadius="${10}" showZoom="${true}"/>
+                    <${PositionVisualization} showAnalogBars="${state.showAnalogBars}" showAnalogValues="${state.showAnalogBars}" showDeadzone="${true}" showOrientation="${true}" showMaxPos="${true}" circleRadius="${10}" showZoom="${true}"/>
                 </div>
             </div>
             

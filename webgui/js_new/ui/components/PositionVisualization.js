@@ -75,8 +75,6 @@ class PositionVisualization extends Component {
         this.state.maxPos = this.getMaxPosManual() !== undefined ? this.getMaxPosManual() : Math.max(maxX, maxY, Math.abs(minX), Math.abs(minY), Math.round(deadX * 1.1), Math.round(deadY * 1.1), this.state.maxPos);
         let percentageX = L.limitValue(L.getPercentage(x, -this.state.maxPos, this.state.maxPos), 0, 100);
         let percentageY = L.limitValue(L.getPercentage(y, -this.state.maxPos, this.state.maxPos), 0, 100);
-        let driftCompX = L.limitValue(L.getPercentage(data[C.LIVE_DRIFTCOMP_X], -this.state.maxPos, this.state.maxPos), 0, 100);
-        let driftCompY = L.limitValue(L.getPercentage(data[C.LIVE_DRIFTCOMP_Y], -this.state.maxPos, this.state.maxPos), 0, 100);
         let eX = percentageX - 50;
         let eY = percentageY - 50;
         let inDeadzone = (Math.pow(eX, 2) / Math.pow(pDzX/2, 2) + Math.pow(eY, 2) / Math.pow(pDzY/2, 2)) < 1;
@@ -85,12 +83,8 @@ class PositionVisualization extends Component {
             liveData: data,
             pX: percentageX,
             pY: percentageY,
-            driftCompX: driftCompX,
-            driftCompY: driftCompY,
             pDzX: pDzX,
             pDzY: pDzY,
-            pDriftX: (L.getPercentage(ATDevice.getConfig(C.AT_CMD_RANGE_HORIZONTAL_DRIFT_COMP), 0, this.state.maxPos)),
-            pDriftY: (L.getPercentage(ATDevice.getConfig(C.AT_CMD_RANGE_VERTICAL_DRIFT_COMP), 0, this.state.maxPos)),
             inDeadzone: inDeadzone
         });
     }
@@ -146,10 +140,6 @@ class PositionVisualization extends Component {
                             <div id="orientationSign" class="back-layer full-height full-width" style="transform: rotate(${(ATDevice.getConfig(C.AT_CMD_ORIENTATION_ANGLE))%360}deg);">
                                 <div class="back-layer" style="top:100%; left: 35%; width: 30%; height: 10%; background-color: black; z-index: 2"></div>
                             </div>
-                        </div>
-                        <div style="display: ${this.getValue(props.showDriftComp, false) ? 'block' : 'none'}">
-                            <div id="driftComp" class="back-layer"
-                                 style="top: ${Math.max(100 - this.state.pDriftY, 0) / 2}%; left: ${Math.max(100 - this.state.pDriftX, 0) / 2}%; height: ${Math.min(this.state.pDriftY, 100)}%; width: ${Math.min(this.state.pDriftX, 100)}%; background-color: transparent; border: 1px solid gray"></div>
                         </div>
                         <div class="analogBars" style="display: ${this.getValue(props.showAnalogBars, false) ? 'block' : 'none'}">
                             <div id="upPos" class="back-layer color-lightred"

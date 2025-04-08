@@ -12,8 +12,8 @@ class TabTimings extends Component {
 
         TabTimings.instance = this;
         this.state = {};
-        this.atCmds = [C.AT_CMD_THRESHOLD_LONGPRESS, C.AT_CMD_THRESHOLD_DOUBLEPRESS,
-        C.AT_CMD_THRESHOLD_AUTODWELL, C.AT_CMD_ANTITREMOR_PRESS, C.AT_CMD_ANTITREMOR_RELEASE, C.AT_CMD_ANTITREMOR_IDLE];
+        this.atCmds = [C.AT_CMD_THRESHOLD_LONGPRESS, C.AT_CMD_THRESHOLD_AUTODWELL];
+        // ,C.AT_CMD_THRESHOLD_DOUBLEPRESS,  C.AT_CMD_ANTITREMOR_PRESS, C.AT_CMD_ANTITREMOR_RELEASE, C.AT_CMD_ANTITREMOR_IDLE
         this.updateState();
     }
 
@@ -36,8 +36,8 @@ class TabTimings extends Component {
 
     resetSlidersTiming() {
         const newValue = 50;
-        const constants = [C.AT_CMD_THRESHOLD_LONGPRESS, C.AT_CMD_THRESHOLD_DOUBLEPRESS, C.AT_CMD_THRESHOLD_AUTODWELL,
-        C.AT_CMD_ANTITREMOR_PRESS, C.AT_CMD_ANTITREMOR_RELEASE, C.AT_CMD_ANTITREMOR_IDLE];
+        const constants = [C.AT_CMD_THRESHOLD_LONGPRESS, C.AT_CMD_THRESHOLD_AUTODWELL];
+            // C.AT_CMD_THRESHOLD_DOUBLEPRESS, C.AT_CMD_ANTITREMOR_PRESS, C.AT_CMD_ANTITREMOR_RELEASE, C.AT_CMD_ANTITREMOR_IDLE
         this.valueChanged(newValue, constants);
     }
 
@@ -58,7 +58,7 @@ class TabTimings extends Component {
                     oninput="${(value, constants) => this.valueChanged(value, constants)}"
                     value="${state[C.AT_CMD_THRESHOLD_LONGPRESS]}" min="50" max="10000" step="10"
                     updateConstants="${[C.AT_CMD_THRESHOLD_LONGPRESS]}" />
-                `} <!-- AT_CMD_THRESHOLD_LONGPRESS is AT LP. -->
+                `} 
             </div>
 
             <div class="mb-5 mb-md-2">
