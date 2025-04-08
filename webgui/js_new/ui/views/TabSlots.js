@@ -24,7 +24,10 @@ class TabSlots extends Component {
             demoSettings: [],
             showDemoDescription: false,
             selectedFileValid: undefined,
-            showColorInput: true
+            showColorInput: true,
+            voiceMessage: '',
+            voiceLanguage: 'en-US',
+            voiceGender: 'female'
         }
 
         let url;
@@ -155,6 +158,103 @@ class TabSlots extends Component {
         L.downloadasTextFile(`${C.CURRENT_DEVICE}-config-${datestr}.set`, configstr);
     };
 
+
+    // Function to convert PCM data to WAV format (22050Hz, mono, 16-bit)
+    convertToWav(audioBuffer) {
+        const numChannels = 1; // Mono
+        const sampleRate = 22050;
+        const bitsPerSample = 16;
+        const format = 1; // PCM
+
+        const numFrames = audioBuffer.length;
+        const buffer = new ArrayBuffer(44 + numFrames * 2);
+        const view = new DataView(buffer);
+
+        // WAV Header
+        const writeString = (offset, str) => {
+            for (let i = 0; i < str.length; i++) {
+                view.setUint8(offset + i, str.charCodeAt(i));
+            }
+        };
+
+        writeString(0, "RIFF");
+        view.setUint32(4, 36 + numFrames * 2, true);
+        writeString(8, "WAVE");
+        writeString(12, "fmt ");
+        view.setUint32(16, 16, true);
+        view.setUint16(20, format, true);
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * numChannels * (bitsPerSample / 8), true);
+        view.setUint16(32, numChannels * (bitsPerSample / 8), true);
+        view.setUint16(34, bitsPerSample, true);
+        writeString(36, "data");
+        view.setUint32(40, numFrames * 2, true);
+
+        // Write PCM data
+        const pcmData = audioBuffer.getChannelData(0);
+        let offset = 44;
+        for (let i = 0; i < numFrames; i++) {
+            const sample = Math.max(-1, Math.min(1, pcmData[i]));
+            view.setInt16(offset, sample * 0x7FFF, true);
+            offset += 2;
+        }
+
+        return new Uint8Array(buffer);
+    }
+
+
+    async createVoiceMessage() {
+        const message = this.state.voiceMessage;
+        const lang = this.state.voiceLanguage;
+        const gender = this.state.voiceGender;
+        console.log(`Generate Voice Message: ${message}, Voice: ${lang},${gender}`);
+ 
+        // TBD: remove CORS Anywhere proxy when hosted online!
+        const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+        const apiUrl = `https://texttospeech.responsivevoice.org/v1/text:synthesize?lang=${encodeURIComponent(lang)}&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=kvfbSITh&gender=${encodeURIComponent(gender)}&text=${encodeURIComponent(message)}`;
+
+        try {
+            // Fetch the MP3 file
+            console.log("Fetching Audio ...");
+            const response = await fetch(proxyUrl+ apiUrl);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            const mp3ArrayBuffer = await response.arrayBuffer();
+
+            // Decode MP3 to PCM using Web Audio API
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 22050 });
+            const audioBuffer = await audioContext.decodeAudioData(mp3ArrayBuffer);
+
+            // Convert PCM buffer to WAV format
+            const wavBuffer = this.convertToWav(audioBuffer);
+            
+            // Send WAV data over Web Serial API
+            await  ATDevice.sendAudio(wavBuffer);
+
+            // Play the WAV buffer
+            this.playWavBuffer(wavBuffer);
+
+
+        } catch (error) {
+            console.error("Error processing audio:", error);
+        }
+    }
+
+    playWavBuffer(wavBuffer) {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const wavArrayBuffer = wavBuffer.buffer; // Convert Uint8Array to ArrayBuffer
+    
+        // Decode the WAV buffer and play it
+        audioContext.decodeAudioData(wavArrayBuffer, (decodedData) => {
+            const source = audioContext.createBufferSource();
+            source.buffer = decodedData;
+            source.connect(audioContext.destination);
+            source.start(0);
+        }, (error) => {
+            console.error("Error decoding WAV buffer:", error);
+        });
+    }
+
     uploadCheckboxChanged(slot, selected) {
         let currentList = this.state.selectedUploadSlots;
         if (selected) {
@@ -217,6 +317,7 @@ class TabSlots extends Component {
         let slots = state.slots;
         let maxSlotsReached = this.state.slots.length === C.MAX_NUMBER_SLOTS;
         let isSlotTestMode = ATDevice.isSlotTestMode();
+        let audioAvailable = true;  // TBD: dynamically read this property from device!
 
         return html`
             <h2>${L.translate('Slot configuration // Slot-Konfiguration')}</h2>
@@ -283,7 +384,7 @@ class TabSlots extends Component {
                                             </button>
                                         </div>
                                     </div>
-                                </div>
+                                 </div>
                             </li>`)}
                     </ol>
                 </div>
@@ -305,6 +406,40 @@ class TabSlots extends Component {
                             <span>${L.translate('Create Slot // Slot anlegen')}</span>
                         </button>
                     </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <label for="newSlotLabel">${L.translate('Create voice message for active slot // Sprachausgabe für aktuellen Slot erzeugen')}</label>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-sm-3 col-lg-3">
+                        <input disabled="${!audioAvailable}" id="voiceMessage" class="col-12" oninput="${(event) => this.setState({voiceMessage: event.target.value })}" type="text" autocomplete="off"
+                               placeholder="${audioAvailable ? L.translate('Enter message // Nachricht eingeben') : L.translate('Audio output not supported // Audioausgabe nicht unterstützt')}" maxlength="${C.MAX_LENGTH_VOICEMESSAGE}"/>
+                    </div>
+                    <div class="col-sm-2 col-lg-2">
+                        <select class="form-control" style="width: 100%;" onchange="${(event) => this.setState({voiceLanguage: event.target.value })}">
+                            <option value="en-US">${L.translate('English // Englisch')}</option>
+                            <option value="de-DE">${L.translate('German // Deutsch')}</option>
+                        </select>
+                    </div>
+                   <div class="col-sm-2 col-lg-2">
+                        <select class="form-control" style="width: 100%;" onchange="${(event) => this.setState({voiceGender: event.target.value })}">
+                            <option value="male">${L.translate('Male // Männlich')}</option>
+                            <option value="female">${L.translate('Female // Weiblich')}</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-3 col-lg-3">
+                        <button disabled="${!state.voiceMessage || !audioAvailable}" onclick="${() => this.createVoiceMessage()}">
+                            ${html`<${FaIcon} icon="fas plus-circle"/>`}
+                            <span>${L.translate('Generate // Erzeugen ')}</span>
+                        </button>
+                    </div>
+
+                    <!-- TBD: Add Button to delete current Voice Message! -->
+
                 </div>
 
                 <h2 class="mt-5">${L.translate('Upload slots to device // Slots auf Gerät hochladen')}</h2>
@@ -344,15 +479,15 @@ class TabSlots extends Component {
                         <fieldset class="mt-3 col-12">
                             <legend>${L.translate('Choose slots to upload // Wähle Slots zum Hochladen')}</legend>
                             ${state.uploadedSlots.map(slot => {
-            let disabled = !state.selectedUploadSlots.includes(slot) && state.selectedUploadSlots.length + state.slots.length >= C.MAX_NUMBER_SLOTS;
-            return html`
+                                let disabled = !state.selectedUploadSlots.includes(slot) && state.selectedUploadSlots.length + state.slots.length >= C.MAX_NUMBER_SLOTS;
+                                return html`
                                     <div>
                                         <input disabled="${disabled}" id="${slot.dedupedName + 'checkbox'}"
                                                type="checkbox" class="mr-2"
                                                onchange="${(event) => this.uploadCheckboxChanged(slot, event.target.checked)}"/>
                                         <label for="${slot.dedupedName + 'checkbox'}">${'Slot "' + slot.dedupedName + '"'}</label>
                                     </div>`
-        })}
+                            })}
                         </fieldset>
                     </div>
                     <div class="row mb-5 ${state.selectedUploadSlots.length + state.slots.length >= C.MAX_NUMBER_SLOTS ? '' : 'd-none'}">
@@ -372,16 +507,16 @@ class TabSlots extends Component {
                 </div>
                 
                 <div class="${state.demoSettings.length > 0 ? '' : 'd-none'}">
-                    <h3 class="mt-5">${L.translate('Predefined settings // Demo-Voreinstellungen')}</h3>
+                    <h3 class="mt-5">${L.translate('Upload demo settings // Demo-Einstellungen hochladen')}</h3>
                     <div class="row mt-4">
                         <div class="col-12">
-                            <label for="selectDemoSettings">${L.translate('Select settings // Wähle Voreinstellung')}</label>
+                            <label for="selectDemoSettings">${L.translate('Select settings // Wähle Demo-Einstellung')}</label>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-6 col-lg-5">
                             <select id="selectDemoSettings" class="col-12" required onchange="${(event) => this.demoSettingChanged(event.target.value)}">
-                                <option value="" disabled selected hidden>${L.translate('(select setting preset) // (Voreinstellung auswählen)')}</option>
+                                <option value="" disabled selected hidden>${L.translate('(select setting preset) // (Demo-Einstellung auswählen)')}</option>
                                 ${state.demoSettings.filter(s => s.name.indexOf('.set') > -1).map(setting => html`<option value="${setting.sha}">${setting.name}</option>`)}
                             </select>
                         </div>
@@ -408,7 +543,7 @@ class TabSlots extends Component {
                     <div class="row">
                         <div class="col-sm-6 col-lg-5">
                             ${html`<${ActionButton} onclick="${() => this.applyDemoSettings()}"
-                                            label="Apply settings preset // Voreinstellungen anwenden"
+                                            label="Apply settings preset // Demo-Einstellungen anwenden"
                                             title="${isSlotTestMode ? this.getDeactivatedText() : ''}"
                                             disabled="${state.demoSettingSlots.length === 0 || isSlotTestMode}"
                                             progressLabel="${L.translate('Uploading slots {?}% ... // Slots hochladen {?}% ...', state.uploadProgress)}" faIcon="fas upload"/>`}

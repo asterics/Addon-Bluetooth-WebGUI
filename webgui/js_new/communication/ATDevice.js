@@ -299,7 +299,7 @@ ATDevice.upgradeBTAddon = async function (firmwareArrayBuffer, progressCallback)
     if (!_communicator.sendRawData) {
         log.warn('upgrade not supported by communicator!')
         return;
-    }
+    }    
     stopTestingConnection();
     ATDevice.sendAtCmdForce(C.AT_CMD_STOP_REPORTING_LIVE);
     ATDevice.sendAtCmdForce(C.AT_CMD_UPGRADE_ADDON);
@@ -604,6 +604,27 @@ ATDevice.deleteAllSlots = function () {
     _currentSlot = '';
     emitSlotChange();
 }
+
+ATDevice.sendAudio =  async function(wavBuffer) {
+
+    let serialCommunicator = ATDevice.getCommunicator();
+    let failed = false;
+    if (!serialCommunicator.sendRawData) {
+        log.warn('audio upload not supported by communicator!')
+        return;
+    }
+
+    try {
+        console.log("Sending Wav File to FABI");
+        await serialCommunicator.sendAudioData(wavBuffer);
+        // console.log("Sent to serial:", wavBuffer);
+        console.log("Done");
+    } catch (error) {
+        console.error("Error sending data to serial device:", error);
+    }
+}
+
+
 
 ATDevice.uploadSlots = async function (slotObjects, progressHandler) {
     ATDevice.save();
@@ -918,12 +939,6 @@ function parseLiveData(data) {
         if (valArray[8]) {
             let slot = ATDevice.getSlotName(parseInt(valArray[8]));
             ATDevice.handleSlotChangeFromDevice(slot);
-        }
-        if (valArray[9]) {
-            _liveData[C.LIVE_DRIFTCOMP_X] = parseInt(valArray[9]);
-        }
-        if (valArray[10]) {
-            _liveData[C.LIVE_DRIFTCOMP_Y] = parseInt(valArray[10]);
         }
         _liveData[C.LIVE_PRESSURE_MIN] = L.robustMin(_liveData[C.LIVE_PRESSURE_MIN], _liveData[C.LIVE_PRESSURE]);
         _liveData[C.LIVE_MOV_X_MIN] = L.robustMin(_liveData[C.LIVE_MOV_X_MIN], _liveData[C.LIVE_MOV_X]);

@@ -124,6 +124,28 @@ function SerialCommunicator() {
         _sendingRaw = false;
     }
 
+    /**
+     * sends raw audio data to serial port
+     * @param arrayBuffer the binary audio data (in wav format, 22Khz, mono) to send in an ArrayBuffer
+     * @return {Promise<void>}
+     */
+    this.sendAudioData = async function (arrayBuffer) {
+        if (!arrayBuffer) return;
+        if (!_port) {
+            throw 'sercomm: port not initialized. call init() before sending data.';
+        }
+        _sendingRaw = true;
+        try {
+            await _portWriter.write(_textEncoder.encode(C.AT_CMD_AUDIO_TRANSMISSION+"\n"));
+            await _portWriter.write(arrayBuffer);
+        } catch (error) {
+            console.error("Error sending data to serial device:", error);
+        }
+        _sendingRaw = false;
+
+    }
+
+
     //send data line based (for all AT commands)
     this.sendData = async function (value, timeout, dontLog) {
         if (!value || _sendingRaw) return;
