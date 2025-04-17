@@ -11,7 +11,7 @@ class TabVisualization extends Component {
         super(props);
 
         TabVisualization.instance = this;
-        TabVisualization.BTN_NAMES = ["1", "2", "3", "4", "5", "Up // Rauf", "Down // Runter", "Left // Links", "Right // Rechts", null, "Sip // Ansaugen", "Puff // Pusten", "Strong Sip // Starkes Ansaugen", "Strong Puff // Starkes Pusten"];
+        TabVisualization.BTN_NAMES = ["1", "2", "3", "4", "5", "Up // Rauf", "Down // Runter", "Left // Links", "Right // Rechts", "Sip // Ansaugen", "Strong Sip // Starkes Ansaugen", "Puff // Pusten", "Strong Puff // Starkes Pusten"];
 
         this.setState({
             liveData: {}
@@ -28,22 +28,31 @@ class TabVisualization extends Component {
             return;
         }
         let circleRadius = Math.min(70, window.innerWidth / 7);
-        let fontStyle = `text-align: center; line-height: ${circleRadius}px; font-size: 30px`;
-        let longpressActive = ATDevice.getConfig(C.AT_CMD_THRESHOLD_LONGPRESS) > 0;    // TBD: handle long press actions in unified GUI version
+        let fontStyle = `text-align: center; line-height: ${circleRadius}px; font-size: 25px`;
         let btnNames;
         btnNames = TabVisualization.BTN_NAMES;
+        // TBD: handle long press actions in unified GUI version
+        // let longpressActive = ATDevice.getConfig(C.AT_CMD_THRESHOLD_LONGPRESS) > 0;  
+        // let longPressStates = longpressActive ? data.LIVE_BUTTONS.slice(6, 9) : [];
 
-        let longPressStates = longpressActive ? data.LIVE_BUTTONS.slice(6, 9) : [];
         return html`<h2 id="tabVisHeader" style="margin-bottom: 1em">${L.translate('Visualization of current button state // Visualisierung aktueller Button-Status')}</h2>
         <div aria-hidden="true" style="display: flex; flex-wrap: wrap;">
             ${!data.LIVE_BUTTONS ? '' : data.LIVE_BUTTONS.map((buttonState, index) => {
             if (!btnNames[index]) {
                 return '';
             }
-            let color = buttonState ? 'orange' : 'transparent';
-            if (longpressActive && longPressStates[index]) {
-                color = 'orangered';
+            if ((!ATDevice.getSensorInfo()[C.FORCE_SENSOR]) && (index >= 5 && index < 9)) {
+                return '';
             }
+            if ((!ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]) && (index > 9)) {
+                return '';
+            }
+
+
+            let color = buttonState ? 'orange' : 'transparent';
+            // if (longpressActive && longPressStates[index]) {
+            //    color = 'orangered';
+            // }
             return html`<div style="margin: 10px; ${styleUtil.getCircleStyle(circleRadius, color, 'medium solid')}; ${fontStyle}">${L.translate(btnNames[index])}</div>`
         })}
         </div>
