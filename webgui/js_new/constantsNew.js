@@ -5,6 +5,7 @@ import { TabGeneral } from "./ui/views/TabGeneral.js";
 import { TabTimings } from "./ui/views/TabTimings.js";
 import { TabSipPuff } from "./ui/views/TabSipPuff.js";
 import { TabVisualization } from "./ui/views/TabVisualization.js";
+import { ATDevice } from "./communication/ATDevice.js";
 
 window.C = window.C || {};
 
@@ -146,13 +147,15 @@ C.AT_CMDS_ACTIONS = C.AT_CMDS_ACTIONS.concat([{ // These are visible, when press
     cmd: C.AT_CMD_IR_PLAY,
     label: 'Play infrared command // Infrarot-Kommando abspielen',
     category: C.AT_CMD_CAT_IR,
-    input: C.INPUTFIELD_TYPE_SELECT
+    input: C.INPUTFIELD_TYPE_SELECT,
+    optionsFn: ATDevice.getIRCommands
 }, {
     cmd: C.AT_CMD_IR_HOLD,
     label: 'Hold infrared command (as long as input action) // Infrarot-Kommando halten (für Dauer der Eingabe-Aktion)',
     shortLabel: 'Hold IR command // IR-Kommando halten',
     category: C.AT_CMD_CAT_IR,
-    input: C.INPUTFIELD_TYPE_SELECT
+    input: C.INPUTFIELD_TYPE_SELECT,
+    optionsFn: ATDevice.getIRCommands
 }, {
     cmd: C.AT_CMD_JOYSTICK_X,
     label: 'Joystick set x-axis // Joystick x-Achse setzen',
