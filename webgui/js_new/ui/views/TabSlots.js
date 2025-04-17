@@ -25,9 +25,10 @@ class TabSlots extends Component {
             showDemoDescription: false,
             selectedFileValid: undefined,
             showColorInput: true,
+            showWaitingPopup: false, 
             voiceMessage: '',
             voiceLanguage: 'en-US',
-            voiceGender: 'female'
+            voiceGender: 'male'
         }
 
         let url;
@@ -205,16 +206,22 @@ class TabSlots extends Component {
 
 
     async createVoiceMessage() {
-        const message = this.state.voiceMessage;
+        const message = this.state.voiceMessage.replaceAll(' ','-');
         const lang = this.state.voiceLanguage;
         const gender = this.state.voiceGender;
         console.log(`Generate Voice Message: ${message}, Voice: ${lang},${gender}`);
  
-        // TBD: remove CORS Anywhere proxy when hosted online!
-        const proxyUrl = "https://cors-anywhere.herokuapp.com/";
-        const apiUrl = `https://texttospeech.responsivevoice.org/v1/text:synthesize?lang=${encodeURIComponent(lang)}&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=kvfbSITh&gender=${encodeURIComponent(gender)}&text=${encodeURIComponent(message)}`;
+        // TBD: remove proxy when in production!
+        const proxyUrl = "https://proxy.asterics-foundation.org/proxy.php?csurl=";
+        const apiUrl = encodeURIComponent(`https://texttospeech.responsivevoice.org/v1/text:synthesize?lang=${lang}&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=kvfbSITh&gender=${gender}&text=${message}`);
+
+        // const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+        // const apiUrl = `https://texttospeech.responsivevoice.org/v1/text:synthesize?lang=${encodeURIComponent(lang)}&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=kvfbSITh&gender=${encodeURIComponent(gender)}&text=${encodeURIComponent(message)}`;
 
         try {
+            // Show the waiting popup  
+            this.setState({ showWaitingPopup: true });
+
             // Fetch the MP3 file
             console.log("Fetching Audio ...");
             const response = await fetch(proxyUrl+ apiUrl);
@@ -237,6 +244,9 @@ class TabSlots extends Component {
 
         } catch (error) {
             console.error("Error processing audio:", error);
+        } finally {
+            // Hide the waiting popup
+            this.setState({ showWaitingPopup: false });
         }
     }
 
@@ -322,6 +332,15 @@ class TabSlots extends Component {
         return html`
             <h2>${L.translate('Slot configuration // Slot-Konfiguration')}</h2>
             <div class="container-fluid px-0 tab-slots">
+                ${this.state.showWaitingPopup ? html`
+                <div class="popup-overlay">
+                    <div class="popup-content">
+                        <div class="spinner"></div>
+                        <p>${L.translate('Sending audio... Please wait. // Audio wird gesendet... Bitte warten.')}</p>
+                    </div>
+                </div>
+                ` : ''}
+            
                 <h3>${L.translate('Current slots // Aktuelle slots')}</h3>
                 <div class="row table d-none d-md-block">
                     <div class="col-sm-12 col-lg-10">
@@ -421,8 +440,8 @@ class TabSlots extends Component {
                     </div>
                     <div class="col-sm-2 col-lg-2">
                         <select class="form-control" style="width: 100%;" onchange="${(event) => this.setState({voiceLanguage: event.target.value })}">
-                            <option value="en-US">${L.translate('English // Englisch')}</option>
-                            <option value="de-DE">${L.translate('German // Deutsch')}</option>
+                                <option value="en-US">${L.translate('English // Englisch')}</option>
+                                <option value="de-DE">${L.translate('German // Deutsch')}</option>
                         </select>
                     </div>
                    <div class="col-sm-2 col-lg-2">
@@ -578,7 +597,43 @@ TabSlots.style = html`<style>
     .tab-slots .table button {
         width: unset;
     }
-    
+
+   .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .popup-content {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
     ol {
        list-style-type: none; 
     }
