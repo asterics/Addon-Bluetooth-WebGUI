@@ -48,7 +48,7 @@ class TabVisualization extends Component {
             if ((!ATDevice.getSensorInfo()[C.FORCE_SENSOR]) && (index >= C.PHYSICAL_BUTTON_COUNT && index < C.PHYSICAL_BUTTON_COUNT+4)) {  // up, down, left, right buttons (functions)
                 return '';
             }
-            if ((!ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]) && (index > C.PHYSICAL_BUTTON_COUNT+4)) {  // sip and puff buttons (functions)
+            if ((!ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]) && (index >= C.PHYSICAL_BUTTON_COUNT+4)) {  // sip and puff buttons (functions)
                 return '';
             }
 
