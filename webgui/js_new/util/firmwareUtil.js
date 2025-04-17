@@ -191,6 +191,7 @@ firmwareUtil.updateDeviceFirmware = function (progressHandler) {
 
 function getFWInfo(apiUrl, binaryStringFilter) {
     // TBD: handle new firmware versions for different RP2040 devices!
+    return null;
     return L.HTTPRequest(apiUrl, 'GET', 'json').then(result => {
         let binaryAsset = result.assets.filter(asset => asset.name.indexOf(binaryStringFilter) > -1)[0];
         return {
