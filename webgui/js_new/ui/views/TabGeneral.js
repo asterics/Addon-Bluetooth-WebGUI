@@ -118,9 +118,10 @@ class TabGeneral extends Component {
 
         return html`
         
+        <h2>${L.translate('Global settings // Allgemeine Einstellungen')}</h2>
         <div class="row">
             <div class="col-sm-6 col-lg-5">
-                <label for="keyboard-language-layout"><h2>${L.translate('Keyboard layout selection // Keyboard layout auswahl')}</h2></label>    
+                <label for="keyboard-language-layout"><h3>${L.translate('Keyboard layout selection // Keyboardlayout Auswahl')}</h2></label>    
                 <br/>
                 <select id="keyboard-language-layout" value="${state.AT_CMD_KEYBOARD_LAYOUT}">
                     <option value="es_ES" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'es_ES' ? 'selected' : ''}>${L.translate('Spanisch // Spanish')}</option>  
@@ -134,6 +135,16 @@ class TabGeneral extends Component {
             </div>
         </div>
         <br/>
+        
+
+        <h3>${L.translate('Audio Volume for Speech Output // Lautstärke der Sprachausgabe')}</h2>
+        <div class="row mt-4">
+            <div class="col-sm-6 col-lg-5">
+                <${Slider} label="Volume // Laustärke" oninput="${(volume) => ATDevice.setAudioVolume(volume)}"
+                           min="0" max="200" value="${ATDevice.getConfig(C.AT_CMD_AUDIO_VOLUME)}"/>
+            </div>
+        </div>
+
 
         <h2>${L.translate('Slot test mode // Slot-Test Modus')}</h2>
          <div class="row">

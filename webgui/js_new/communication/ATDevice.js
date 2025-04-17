@@ -854,6 +854,13 @@ ATDevice.setStickMode = function (index) {
     return ATDevice.setConfig(C.AT_CMD_STICK_MODE, index, 0);
 };
 
+ATDevice.setAudioVolume = function (volume) {
+    let vol = parseInt(volume);
+    // console.log("setAudioVolume", volume);
+    ATDevice.planSaving();
+    return ATDevice.setConfig(C.AT_CMD_AUDIO_VOLUME, vol, 0);
+};
+
 ATDevice.startLiveValueListener = function (handler) {
     _liveValueHandler = handler;
 };
