@@ -7,6 +7,8 @@ C.AT_DEVICE_FLIPPAD = 'FLipPad';
 C.AT_DEVICE_FABI = 'FABI';
 
 // HW specific constants, available sensors and their types
+C.PHYSICAL_BUTTON_COUNT = 5; // default value for fabi, can be overwritten by the device  
+
 C.PRESSURE_SENSOR = 'PRESSURE_SENSOR';
 C.PRESSURE_SENSOR_TYPE_NONE = 'PressureSensor=None';
 C.PRESSURE_SENSOR_TYPE_DPS310 = 'PressureSensor=DSP310';

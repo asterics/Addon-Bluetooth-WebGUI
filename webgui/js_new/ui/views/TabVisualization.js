@@ -11,7 +11,14 @@ class TabVisualization extends Component {
         super(props);
 
         TabVisualization.instance = this;
-        TabVisualization.BTN_NAMES = ["1", "2", "3", "4", "5", "Up // Rauf", "Down // Runter", "Left // Links", "Right // Rechts", "Sip // Ansaugen", "Strong Sip // Starkes Ansaugen", "Puff // Pusten", "Strong Puff // Starkes Pusten"];
+
+        // Dynamically initialize the first C.PHYSICAL_BUTTON_COUNT elements
+        const physicalButtonCount = C.PHYSICAL_BUTTON_COUNT; 
+        const physicalButtonNames = Array.from({ length: physicalButtonCount }, (_, i) => `${i + 1}`);
+
+        // Add the remaining button (virtual button function) names
+        const additionalButtonNames = ["Up // Rauf", "Down // Runter", "Left // Links", "Right // Rechts", "Sip // Ansaugen", "Strong Sip // Starkes Ansaugen", "Puff // Pusten", "Strong Puff // Starkes Pusten"];
+        TabVisualization.BTN_NAMES = [...physicalButtonNames, ...additionalButtonNames];
 
         this.setState({
             liveData: {}
@@ -31,9 +38,6 @@ class TabVisualization extends Component {
         let fontStyle = `text-align: center; line-height: ${circleRadius}px; font-size: 25px`;
         let btnNames;
         btnNames = TabVisualization.BTN_NAMES;
-        // TBD: handle long press actions in unified GUI version
-        // let longpressActive = ATDevice.getConfig(C.AT_CMD_THRESHOLD_LONGPRESS) > 0;  
-        // let longPressStates = longpressActive ? data.LIVE_BUTTONS.slice(6, 9) : [];
 
         return html`<h2 id="tabVisHeader" style="margin-bottom: 1em">${L.translate('Visualization of current button state // Visualisierung aktueller Button-Status')}</h2>
         <div aria-hidden="true" style="display: flex; flex-wrap: wrap;">
@@ -41,18 +45,14 @@ class TabVisualization extends Component {
             if (!btnNames[index]) {
                 return '';
             }
-            if ((!ATDevice.getSensorInfo()[C.FORCE_SENSOR]) && (index >= 5 && index < 9)) {
+            if ((!ATDevice.getSensorInfo()[C.FORCE_SENSOR]) && (index >= C.PHYSICAL_BUTTON_COUNT && index < C.PHYSICAL_BUTTON_COUNT+4)) {  // up, down, left, right buttons (functions)
                 return '';
             }
-            if ((!ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]) && (index > 9)) {
+            if ((!ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]) && (index > C.PHYSICAL_BUTTON_COUNT+4)) {  // sip and puff buttons (functions)
                 return '';
             }
-
 
             let color = buttonState ? 'orange' : 'transparent';
-            // if (longpressActive && longPressStates[index]) {
-            //    color = 'orangered';
-            // }
             return html`<div style="margin: 10px; ${styleUtil.getCircleStyle(circleRadius, color, 'medium solid')}; ${fontStyle}">${L.translate(btnNames[index])}</div>`
         })}
         </div>
