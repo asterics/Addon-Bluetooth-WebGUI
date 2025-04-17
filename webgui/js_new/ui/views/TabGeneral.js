@@ -34,6 +34,9 @@ class TabGeneral extends Component {
     }
 
     getVersions() {
+        this.getDeviceVersions();
+        return;
+        // TBD: include new firmware versions for different RP2040 devices!
         firmwareUtil.getDeviceFWInfo().then(result => {
             this.setState({
                 mainVersionFWInfo: result,
@@ -48,7 +51,6 @@ class TabGeneral extends Component {
                 newBtVersionDownloadUrl: result.downloadUrl
             });
         });
-        this.getDeviceVersions();
     }
 
     getDeviceVersions() {
@@ -197,8 +199,8 @@ class TabGeneral extends Component {
         </div> 
         
 
-        <h3 class="mt-5 ${C.DEVICE_IS_FM ? 'd-none' : ''}">Firmware Bluetooth-Addon</h3>
-        <div class="container-fluid p-0 ${C.DEVICE_IS_FM ? 'd-none' : ''}">
+        <h3 class="mt-5 ${C.DEVICE_IS_FABI ? 'd-none' : ''}">Firmware Bluetooth-Addon</h3>
+        <div class="container-fluid p-0 ${C.DEVICE_IS_FABI ? 'd-none' : ''}">
             <div class="row">
                 <span class="col col-md-3">${L.translate('Installed version // Installierte Version')}</span>   
                 <span class="col col-md-3"> ${this.state.btVersion}</span>   
