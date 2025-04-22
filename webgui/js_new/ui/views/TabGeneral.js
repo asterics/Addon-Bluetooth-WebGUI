@@ -23,6 +23,7 @@ class TabGeneral extends Component {
             mainVersionFWInfo: null,
             newMainVersionUrl: '',
             btVersion: unknown,
+            keyboardLayout: ATDevice.getConfig(C.AT_CMD_KEYBOARD_LAYOUT),
             newBtVersion: unknown,
             newBtVersionUrl: '',
             mainUpgradeProgress: null,
@@ -112,22 +113,30 @@ class TabGeneral extends Component {
     render() {
         let slots = ATDevice.getSlots();
         let state = this.state;
+        
 
         return html`
         
         <h2>${L.translate('Global settings // Allgemeine Einstellungen')}</h2>
         <div class="row">
             <div class="col-sm-6 col-lg-5">
-                <label for="keyboard-language-layout"><h3>${L.translate('Keyboard layout selection // Keyboardlayout Auswahl')}</h2></label>    
+                <label for="keyboard-language-layout"><h3>${L.translate('Keyboard layout selection // Keyboardlayout Auswahl')}</h3></label>    
                 <br/>
-                <select id="keyboard-language-layout" value="${state.AT_CMD_KEYBOARD_LAYOUT}">
-                    <option value="es_ES" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'es_ES' ? 'selected' : ''}>${L.translate('Spanisch // Spanish')}</option>  
-                    <option value="en_US" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'en_US' ? 'selected' : ''}>${L.translate('English // Englisch')}</option>   
-                    <option value="de_DE" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'de_DE' ? 'selected' : ''}>${L.translate('German // Deutsch')}</option>
-                    <option value="fr_FR" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'fr_FR' ? 'selected' : ''}>${L.translate('French // Französisch')}</option>  
-                    <option value="it_IT" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'it_IT' ? 'selected' : ''}>${L.translate('Italian // Italienisch')}</option>  
-                    <option value="sv_SE" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'sv_SE' ? 'selected' : ''}>${L.translate('Swedish // Schwedisch')}</option>   
-                    <option value="da_DK" ${state[C.AT_CMD_KEYBOARD_LAYOUT] === 'da_DK' ? 'selected' : ''}>${L.translate('Danish // Dänisch')}</option>
+                <select 
+                    id="keyboard-language-layout" 
+                    value="${state.keyboardLayout || ''}" 
+                    onchange="${(event) => {
+                        const newLayout = event.target.value;
+                        this.setState({ keyboardLayout: newLayout });
+                        ATDevice.setConfig(C.AT_CMD_KEYBOARD_LAYOUT, newLayout);
+                    }}">
+                    <option value="es_ES">${L.translate('Spanish // Spanisch')}</option>  
+                    <option value="en_US">${L.translate('English // Englisch')}</option>   
+                    <option value="de_DE">${L.translate('German // Deutsch')}</option>
+                    <option value="fr_FR">${L.translate('French // Französisch')}</option>  
+                    <option value="it_IT">${L.translate('Italian // Italienisch')}</option>  
+                    <option value="sv_SE">${L.translate('Swedish // Schwedisch')}</option>   
+                    <option value="da_DK">${L.translate('Danish // Dänisch')}</option>
                 </select>
             </div>
         </div>
