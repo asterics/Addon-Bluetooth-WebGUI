@@ -63,11 +63,6 @@ class TabGeneral extends Component {
         this.setState({
             versionSuffix: result
         });
-        ATDevice.getBTVersion().then(result => {
-            this.setState({
-                btVersion: result || unknown
-            });
-        })
     }
 
     updateBTFirmware() {

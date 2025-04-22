@@ -179,17 +179,6 @@ ATDevice.getMajorVersion = function () {
     let currentVersion = _lastVersionResult || {};
     return currentVersion.major;
 }
-
-ATDevice.getBTVersion = function () {
-    ATDevice.sendAtCmdForce(C.AT_CMD_STOP_REPORTING_LIVE);
-    return ATDevice.sendAtCmdWithResultForce(C.AT_CMD_ADDON_COMMAND, '$ID').then(result => {
-        result = result || '';
-        return Promise.resolve(result.trim() ? L.formatVersion(result) : '');
-    }).finally(() => {
-        if (!_dontGetLiveValues) ATDevice.sendAtCmdForce(C.AT_CMD_START_REPORTING_LIVE);
-    });
-}
-
 ATDevice.getSensorInfo = function () {
     let currentSensorInfo = _sensorInfo || {};
     return currentSensorInfo;
