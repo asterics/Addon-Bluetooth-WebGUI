@@ -56,7 +56,7 @@ class TabTimings extends Component {
                 <${Slider}
                     id="slider" label="Threshold for long press [ms], 0=disable: // Schwellenwert für langes Drücken [ms], 0=deaktivieren:"
                     oninput="${(value, constants) => this.valueChanged(value, constants)}"
-                    value="${state[C.AT_CMD_THRESHOLD_LONGPRESS]}" min="50" max="10000" step="10"
+                    value="${state[C.AT_CMD_THRESHOLD_LONGPRESS]}" min="0" max="10000" step="200"
                     updateConstants="${[C.AT_CMD_THRESHOLD_LONGPRESS]}" />
                 `} 
             </div>
@@ -107,7 +107,7 @@ class TabTimings extends Component {
             <div class="row" style="margin-top: 1em">
                 <div class="col col-lg-6">
                     <${ActionButton}  resetSlidersTiming="${() => this.resetSlidersTiming()}" 
-                    label="Resetting All Thresholds // Alle Schwellenwerte zurücksetzen" faIcon="fas undo" progressLabel="Resetting Thresholds... // Schwellenwerte werden zurückgesetzt..." /> <!-- fas undo is for the icon. -->
+                    label="Reset All Thresholds // Alle Schwellenwerte zurücksetzen" faIcon="fas undo" progressLabel="Resetting Thresholds... // Schwellenwerte werden zurückgesetzt..." /> <!-- fas undo is for the icon. -->
                 </div>
 
                 <div class="col col-lg-6">
