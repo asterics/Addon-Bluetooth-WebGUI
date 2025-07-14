@@ -16,11 +16,6 @@ class TabGeneral extends Component {
         super();
 
         TabGeneral.instance = this;
-        const buzzerModeRaw = ATDevice.getConfig(C.AT_CMD_BUZZER_MODE);
-        console.log('Buzzer mode raw:', buzzerModeRaw);
-        const validModes = ["0", "1", "2"];
-        const buzzerMode = validModes.includes(String(buzzerModeRaw)) ? String(buzzerModeRaw) : "0";
-
 
         this.state = {
             mainVersion: unknown,
@@ -30,7 +25,7 @@ class TabGeneral extends Component {
             newMainVersionUrl: '',
             btVersion: unknown,
             keyboardLayout: ATDevice.getConfig(C.AT_CMD_KEYBOARD_LAYOUT),
-            buzzerMode: buzzerMode,
+            buzzerMode: ATDevice.getConfig(C.AT_CMD_BUZZER_MODE),
             newBtVersion: unknown,
             newBtVersionUrl: '',
             mainUpgradeProgress: null,
@@ -39,10 +34,16 @@ class TabGeneral extends Component {
         }
 
         this.getVersions();
-         this.debouncedSetAudioVolume = this.debounce((volume) => {
+        this.debouncedSetAudioVolume = this.debounce((volume) => {
             ATDevice.setAudioVolume(volume);
         }, 200); // 200ms debounce delay
+
+        this.debouncedSetAutoDwell = this.debounce((dwelltime) => {
+            ATDevice.setAutoDwellTime(dwelltime);
+        }, 200); // 200ms debounce delay
+
     }
+
 
     // Debounce utility function
     debounce(func, wait) {
@@ -140,8 +141,7 @@ class TabGeneral extends Component {
         <h2>${L.translate('Global settings // Allgemeine Einstellungen')}</h2>
         <div class="row">
             <div class="col-sm-6 col-lg-5">
-                <label for="keyboard-language-layout"><h3>${L.translate('Keyboard layout selection // Keyboardlayout Auswahl')}</h3></label>    
-                <br/>
+                <label for="keyboard-language-layout" style="margin-right: 2em;"><h3>${L.translate('Keyboard layout selection: // Keyboardlayout Auswahl:')}</h3></label>    
                 <select 
                     id="keyboard-language-layout" 
                     value="${state.keyboardLayout || ''}" 
@@ -160,12 +160,10 @@ class TabGeneral extends Component {
                 </select>
             </div>
         </div>
-        <br/>
 
         <div class="row">
             <div class="col-sm-6 col-lg-5">
-                <label for="buzzer-mode-selection"><h3>${L.translate('Audio-Buzzer mode // Funktion des Summers (Buzzer)')}</h3></label>    
-                <br/>
+                <label for="buzzer-mode-selection" style="margin-right: 2em;"><h3>${L.translate('Audio-Buzzer mode: // Funktion des Summers (Buzzer):')}</h3></label>    
                 <select 
                     id="buzzer-mode-selection" 
                     value="${state.buzzerMode || ''}" 
@@ -180,13 +178,22 @@ class TabGeneral extends Component {
                 </select>
             </div>
         </div>
-        <br/>
 
-        <h3>${L.translate('Audio Volume for Voice Message on Slot Change // Lautstärke der Sprachnachricht bei Slotwechsel')}</h2>
-        <div class="row mt-4">
+        <div class="row">
             <div class="col-sm-6 col-lg-5">
-                <${Slider} label="Volume // Lautstärke" oninput="${(volume) => this.debouncedSetAudioVolume(volume)}"
+                <label for="audio-volume-slider" style="margin-right: 2em;"><h3>${L.translate('Audio volume for voice messages: // Lautstärke für Sprachnachrichten:')}</h3></label>  
+                <${Slider} id="audio-volume-slider" oninput="${(volume) => this.debouncedSetAudioVolume(volume)}"
                            min="0" max="200" value="${ATDevice.getConfig(C.AT_CMD_AUDIO_VOLUME)}"/>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-6 col-lg-5">
+                <label for="auto-dwell-slider" style="margin-right: 2em;"><h3>${L.translate('Automatic left click after mouse movement (ms): // Automatischer Linksclick nach einer Mausbewegung (ms):')}</h3></label>  
+                <${Slider} id="auto-dwell-slider" oninput="${(dwelltime) => this.debouncedSetAutoDwell(dwelltime)}"
+                           min="0" max="10000" step="100" value="${ATDevice.getConfig(C.AT_CMD_THRESHOLD_AUTODWELL)}"/>
+
             </div>
         </div>
 
@@ -211,18 +218,25 @@ class TabGeneral extends Component {
             </div>
         </div>
         
-        <h2 class="mt-5">${L.translate('Firmware versions // Firmware-Versionen')}</h2>
-        <h3>${C.CURRENT_DEVICE} Firmware</h3>
+        <h2 class="mt-5">${L.translate('Firmware Version and Device Features // Firmware Version und Gerätefunktionen ')}</h2>
         <div class="container-fluid p-0">
             <div class="row">
-                <span class="col col-md-3">${L.translate('Installed version // Installierte Version')}</span>   
-                <span class="col col-md-6">
-                    <span>${this.state.mainVersion}</span>
-                    <span class="${this.state.versionSuffix ? '' : 'd-none'}"> (${this.state.versionSuffix})</span>
-                </span>
+                <span class="col col-md-3">${L.translate('Detected Device: // Erkanntes Gerät:')}</span>   
+                <span class="col col-md-6"> <span>${C.CURRENT_DEVICE}</span> </span>
             </div>
+
             <div class="row">
-                <span class="col col-md-3">${L.translate('Available version // Verfügbare Version')}</span>   
+                <span class="col col-md-3">${L.translate('Features and Sensors: // Funktionen und Sensoren:')}</span>   
+                <span class="col col-md-6"> <span class="${this.state.versionSuffix ? '' : 'd-none'}"> ${this.state.versionSuffix}</span> </span>
+            </div>
+
+            <div class="row">
+                <span class="col col-md-3">${L.translate('Installed Firmware version: // Installierte Firmware Version:')}</span>   
+                <span class="col col-md-6"> <span>${this.state.mainVersion}</span> </span>
+            </div>
+
+            <div class="row">
+                <span class="col col-md-3">${L.translate('Available Firmware version: // Verfügbare Firmware Version:')}</span>   
                 <a rel="noreferrer" href="${this.state.newMainVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newMainVersion}</a>
             </div>
             <div class="row mt-3">

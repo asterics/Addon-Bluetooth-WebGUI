@@ -861,6 +861,13 @@ ATDevice.setStickMode = function (index) {
     return ATDevice.setConfig(C.AT_CMD_STICK_MODE, index, 0);
 };
 
+ATDevice.setAutoDwellTime = function (dwelltime) {
+    let vol = parseInt(dwelltime);
+    // console.log("setAutoDwellTime", dwelltime);
+    ATDevice.planSaving();
+    return ATDevice.setConfig(C.AT_CMD_THRESHOLD_AUTODWELL, dwelltime, 0);
+};
+
 ATDevice.setAudioVolume = function (volume) {
     let vol = parseInt(volume);
     // console.log("setAudioVolume", volume);
