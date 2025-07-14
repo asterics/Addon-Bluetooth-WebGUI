@@ -16,6 +16,12 @@ class TabGeneral extends Component {
         super();
 
         TabGeneral.instance = this;
+        const buzzerModeRaw = ATDevice.getConfig(C.AT_CMD_BUZZER_MODE);
+        console.log('Buzzer mode raw:', buzzerModeRaw);
+        const validModes = ["0", "1", "2"];
+        const buzzerMode = validModes.includes(String(buzzerModeRaw)) ? String(buzzerModeRaw) : "0";
+
+
         this.state = {
             mainVersion: unknown,
             versionSuffix: null,
@@ -24,6 +30,7 @@ class TabGeneral extends Component {
             newMainVersionUrl: '',
             btVersion: unknown,
             keyboardLayout: ATDevice.getConfig(C.AT_CMD_KEYBOARD_LAYOUT),
+            buzzerMode: buzzerMode,
             newBtVersion: unknown,
             newBtVersionUrl: '',
             mainUpgradeProgress: null,
@@ -32,7 +39,20 @@ class TabGeneral extends Component {
         }
 
         this.getVersions();
+         this.debouncedSetAudioVolume = this.debounce((volume) => {
+            ATDevice.setAudioVolume(volume);
+        }, 200); // 200ms debounce delay
     }
+
+    // Debounce utility function
+    debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+    
 
     getVersions() {
         this.getDeviceVersions();
@@ -141,12 +161,31 @@ class TabGeneral extends Component {
             </div>
         </div>
         <br/>
-        
 
-        <h3>${L.translate('Audio Volume for Speech Output // Lautstärke der Sprachausgabe')}</h2>
+        <div class="row">
+            <div class="col-sm-6 col-lg-5">
+                <label for="buzzer-mode-selection"><h3>${L.translate('Audio-Buzzer mode // Funktion des Summers (Buzzer)')}</h3></label>    
+                <br/>
+                <select 
+                    id="buzzer-mode-selection" 
+                    value="${state.buzzerMode || ''}" 
+                    onchange="${(event) => {
+                        const newBuzzerMode = event.target.value;
+                        this.setState({ buzzerMode: newBuzzerMode });
+                        ATDevice.setConfig(C.AT_CMD_BUZZER_MODE, newBuzzerMode);
+                    }}">
+                    <option value="0">${L.translate('Disabled // Nicht verwendet')}</option>  
+                    <option value="1">${L.translate('Tone height // Tonhöhe')}</option>   
+                    <option value="2">${L.translate('Tone height and count // Tonhöhe und Anzahl')}</option>
+                </select>
+            </div>
+        </div>
+        <br/>
+
+        <h3>${L.translate('Audio Volume for Voice Message on Slot Change // Lautstärke der Sprachnachricht bei Slotwechsel')}</h2>
         <div class="row mt-4">
             <div class="col-sm-6 col-lg-5">
-                <${Slider} label="Volume // Laustärke" oninput="${(volume) => ATDevice.setAudioVolume(volume)}"
+                <${Slider} label="Volume // Lautstärke" oninput="${(volume) => this.debouncedSetAudioVolume(volume)}"
                            min="0" max="200" value="${ATDevice.getConfig(C.AT_CMD_AUDIO_VOLUME)}"/>
             </div>
         </div>
