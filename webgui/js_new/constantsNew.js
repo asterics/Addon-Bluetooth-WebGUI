@@ -50,7 +50,8 @@ C.VIEWS = [{
     object: TabTimings,
     hash: '#tabTimings',
     label: 'Timings',
-    helpHash: '#timings-tab-antitremor-and-special-functions // #einstellmöglichkeiten-im-reiter-timings'
+    helpHash: '#timings-tab-antitremor-and-special-functions // #einstellmöglichkeiten-im-reiter-timings',
+    visibleFn: (ATDevice) => false // TODO: enable this tab, when the timing functionality is implemented
 }, {
     object: TabGeneral,
     hash: '#tabGeneral',
