@@ -45,14 +45,8 @@ class TabSipPuff extends Component {
 
     let border = (this.state.maxRange - this.state.minRange) * 0.1; // 10% space that is left and right of the min/max values on the sliders
     if (new Date().getTime() - this.lastSliderChangedTime > 500) {
-      if (C.DEVICE_IS_FM) {
-        this.state.minRange = Math.max(Math.min(newState.minValue - border, ATDevice.getConfig(C.AT_CMD_SIP_THRESHOLD) - border, ATDevice.getConfig(C.AT_CMD_SIP_STRONG_THRESHOLD) - border), 0);
-        this.state.maxRange = Math.min(Math.max(newState.maxValue + border, ATDevice.getConfig(C.AT_CMD_PUFF_THRESHOLD) + border, ATDevice.getConfig(C.AT_CMD_PUFF_STRONG_THRESHOLD) + border), 1023);
-
-      } else if (C.DEVICE_IS_FABI) {
-        this.state.minRange = Math.max(Math.min(newState.minValue - border, ATDevice.getConfig(C.AT_CMD_SIP_THRESHOLD) - border), 0);
-        this.state.maxRange = Math.min(Math.max(newState.maxValue + border, ATDevice.getConfig(C.AT_CMD_PUFF_THRESHOLD) + border), 1023);
-      }
+      this.state.minRange = Math.max(Math.min(newState.minValue - border, ATDevice.getConfig(C.AT_CMD_SIP_THRESHOLD) - border, ATDevice.getConfig(C.AT_CMD_SIP_STRONG_THRESHOLD) - border), 0);
+      this.state.maxRange = Math.min(Math.max(newState.maxValue + border, ATDevice.getConfig(C.AT_CMD_PUFF_THRESHOLD) + border, ATDevice.getConfig(C.AT_CMD_PUFF_STRONG_THRESHOLD) + border), 1023);
     }
 
     newState.percent = L.getPercentage(newState.value, this.state.minRange, this.state.maxRange);
