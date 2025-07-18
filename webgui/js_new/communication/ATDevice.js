@@ -86,21 +86,21 @@ ATDevice.init = function (dontGetLiveValues) {
         if (versionString.toLowerCase().includes("fabi")) { 
             C.CURRENT_DEVICE = C.AT_DEVICE_FABI; 
             C.DEVICE_IS_FLIPPAD = false; 
-            C.DEVICE_IS_FLIPMOUSE = false; 
+            C.DEVICE_IS_FM = false; 
             C.DEVICE_IS_FABI=true;
             C.PYHSICAL_BUTTON_COUNT = 5; // FABI has 5 physical buttons 
         }
         else if (versionString.toLowerCase().includes("flipmouse")) { 
             C.CURRENT_DEVICE = C.AT_DEVICE_FLIPMOUSE; 
             C.DEVICE_IS_FLIPPAD = false; 
-            C.DEVICE_IS_FLIPMOUSE = true; 
+            C.DEVICE_IS_FM = true; 
             C.DEVICE_IS_FABI=false; 
             C.PYHSICAL_BUTTON_COUNT = 2; // FlipMouse has 2 physical buttons
         }
         else if (versionString.toLowerCase().includes("flippad")) { 
             C.CURRENT_DEVICE = C.AT_DEVICE_FLIPPAD; 
             C.DEVICE_IS_FLIPPAD = true; 
-            C.DEVICE_IS_FLIPMOUSE = false; 
+            C.DEVICE_IS_FM = false; 
             C.DEVICE_IS_FABI=false; 
             C.PYHSICAL_BUTTON_COUNT = 2; // FlipPad has 2 physical buttons
         }
