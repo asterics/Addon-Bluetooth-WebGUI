@@ -7,6 +7,7 @@ import {localStorageService} from "../localStorageService.js";
 let ATDevice = {};
 ATDevice.parseLiveData = true;
 
+// TBD: seperate array for global settings (not slot specific) ?
 let _slots = [];
 let _slotsBackup = [];
 let _currentSlot = null;
@@ -95,14 +96,14 @@ ATDevice.init = function (dontGetLiveValues) {
             C.DEVICE_IS_FLIPPAD = false; 
             C.DEVICE_IS_FM = true; 
             C.DEVICE_IS_FABI=false; 
-            C.PYHSICAL_BUTTON_COUNT = 2; // FlipMouse has 2 physical buttons
+            C.PYHSICAL_BUTTON_COUNT = 3; // FlipMouse has 3 physical buttons
         }
         else if (versionString.toLowerCase().includes("flippad")) { 
             C.CURRENT_DEVICE = C.AT_DEVICE_FLIPPAD; 
             C.DEVICE_IS_FLIPPAD = true; 
             C.DEVICE_IS_FM = false; 
             C.DEVICE_IS_FABI=false; 
-            C.PYHSICAL_BUTTON_COUNT = 2; // FlipPad has 2 physical buttons
+            C.PYHSICAL_BUTTON_COUNT = 3; // FlipPad has 3 physical buttons
         }
         else {
             if (_communicator.close) _communicator.close();
