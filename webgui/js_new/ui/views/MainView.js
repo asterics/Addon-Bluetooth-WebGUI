@@ -6,6 +6,7 @@ import { FaIcon } from "../components/FaIcon.js";
 import { firmwareUtil } from "../../util/firmwareUtil.js";
 import { helpUtil } from "../../util/helpUtil.js";
 import { SlotTestModeDialog } from "../components/SlotTestModeDialog.js";
+import { getBtnModesActionList } from '../../constantsNew.js';
 
 const html = htm.bind(h);
 
@@ -16,11 +17,14 @@ const SCREENS = {
     FIRMWARE_CONTINUE: 'FIRMWARE_CONTINUE'
 }
 
+
+C.CURRENT_DEVICE = 'FABI';   // TBD: just a placeholder by now ... why is this not set via constantsNew.js?  (undefined..)
+
 class MainView extends Component {
 
     constructor() {
         super();
-        log.info('last update: 10.01.2023');
+        log.info('last update: 19.07.2025');
         MainView.instance = this;
         MainView.lastViewHash = '';
         this.state = {
@@ -34,6 +38,7 @@ class MainView extends Component {
             showSuccessMsg: window.location.href.indexOf(C.SUCCESS_FIRMWAREUPDATE) > -1,
             updateProgress: null
         }
+         C.BTN_MODES_ACTIONLIST = getBtnModesActionList();   // TBD: better ways to get a flexible action list?
 
         L('html')[0].lang = L.getLang();
         if (C.GUI_IS_MOCKED_VERSION || C.GUI_IS_ON_DEVICE) {
@@ -74,6 +79,7 @@ class MainView extends Component {
             showSuccessMsg: false
         });
         ATDevice.init().then(function () {
+            C.BTN_MODES_ACTIONLIST = getBtnModesActionList();
             thiz.toView();
             thiz.setState({
                 showScreen: SCREENS.MAIN,
