@@ -312,6 +312,73 @@ C.AT_CMDS_MACRO = [{
     cmd: C.AT_CMD_RELEASE_MOUSE_M,
     label: 'Release middle mouse button // Mittlere Maustaste loslassen',
     category: C.AT_CMD_CAT_MOUSE
+}, { 
+    cmd: C.AT_CMD_CALIBRATION,
+    label: 'Calibrate stick middle position // Stick-Mittelposition kalibrieren',
+    shortLabel: 'Calibrate stick // Stick kalibrieren',
+    category: C.AT_CMD_CAT_DEVICE
+}, {
+    cmd: C.AT_CMD_IR_PLAY,
+    label: 'Play infrared command // Infrarot-Kommando abspielen',
+    category: C.AT_CMD_CAT_IR,
+    input: C.INPUTFIELD_TYPE_SELECT,
+    optionsFn: ATDevice.getIRCommands
+}, {
+    cmd: C.AT_CMD_IR_HOLD,
+    label: 'Hold infrared command (as long as input action) // Infrarot-Kommando halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold IR command // IR-Kommando halten',
+    category: C.AT_CMD_CAT_IR,
+    input: C.INPUTFIELD_TYPE_SELECT,
+    optionsFn: ATDevice.getIRCommands
+}, {
+    cmd: C.AT_CMD_IR_STOP,
+    label: 'Stop infrared command // Infrarot-Kommando stoppen',
+    category: C.AT_CMD_CAT_IR
+}, {
+    cmd: C.AT_CMD_JOYSTICK_X,
+    label: 'Joystick set x-axis // Joystick x-Achse setzen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_JOYSTICK_Y,
+    label: 'Joystick set y-axis // Joystick y-Achse setzen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_JOYSTICK_Z,
+    label: 'Joystick set z-axis // Joystick z-Achse setzen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_JOYSTICK_ZTURN,
+    label: 'Joystick set z-turn // Joystick z-Drehung setzen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_JOYSTICK_SLIDER,
+    label: 'Joystick set slider // Joystick Regler setzen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_JOYSTICK_BUTTON_PRESS,
+    label: 'Hold joystick button (as long as input action) // Joystick-Button halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold joystick button // Joystick-Button halten',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER,
+    minValue: 1,
+    maxValue: 32
+}, {
+    cmd: C.AT_CMD_JOYSTICK_BUTTON_RELEASE,
+    label: 'Release joystick button // Joystick-Button auslassen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER,
+    minValue: 1,
+    maxValue: 32
+}, {
+    cmd: C.AT_CMD_JOYSTICK_HAT_POS,
+    label: 'Set joystick hat position // Joystick Hat-Position setzen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
 }];
 
 // keycode stuff
