@@ -327,7 +327,7 @@ class TabSlots extends Component {
         let slots = state.slots;
         let maxSlotsReached = this.state.slots.length === C.MAX_NUMBER_SLOTS;
         let isSlotTestMode = ATDevice.isSlotTestMode();
-        let audioAvailable = true;  // TBD: dynamically read this property from device!
+        let audioAvailable = C.CURRENT_DEVICE === 'FABI' ? true : false;  // TBD: dynamically read this property from device!
 
         return html`
             <h2>${L.translate('Slot configuration // Slot-Konfiguration')}</h2>
@@ -427,13 +427,13 @@ class TabSlots extends Component {
                     </div>
                 </div>
 
-                <div class="row mt-4">
+                <div class=${`row mt-4${C.DEVICE_IS_FABI ? '' : ' d-none'}`}>
                     <div class="col-12">
                         <label for="newSlotLabel">${L.translate('Create voice message for active slot // Sprachausgabe für aktuellen Slot erzeugen')}</label>
                     </div>
                 </div>
                 
-                <div class="row">
+                <div class=${`row mt-4${C.DEVICE_IS_FABI ? '' : ' d-none'}`}>
                     <div class="col-sm-3 col-lg-3">
                         <input disabled="${!audioAvailable}" id="voiceMessage" class="col-12" oninput="${(event) => this.setState({voiceMessage: event.target.value })}" type="text" autocomplete="off"
                                placeholder="${audioAvailable ? L.translate('Enter message // Nachricht eingeben') : L.translate('Audio output not supported // Audioausgabe nicht unterstützt')}" maxlength="${C.MAX_LENGTH_VOICEMESSAGE}"/>
