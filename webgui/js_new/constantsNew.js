@@ -1,90 +1,142 @@
-import { TabStick } from "./ui/views/TabStick.js";
-import { TabSlots } from "./ui/views/TabSlots.js";
-import { TabActions } from "./ui/views/TabActions.js";
-import { TabGeneral } from "./ui/views/TabGeneral.js";
-import { TabTimings } from "./ui/views/TabTimings.js";
-import { TabSipPuff } from "./ui/views/TabSipPuff.js";
-import { TabVisualization } from "./ui/views/TabVisualization.js";
 import { ATDevice } from "./communication/ATDevice.js";
 
-window.C = window.C || {};
+// AT commands - general
+C.AT_CMD_VERSION = 'AT ID';
+C.AT_CMD_BTN_MODE = 'AT BM';
 
-C.CURRENT_DEVICE = C.AT_DEVICE_FABI;   // TBD: this is used as default for the start screen, until reply to the AT ID command is received, setting it to the correct device type
+// AT commands - USB HID
+C.AT_CMD_CLICK_MOUSE_L = 'AT CL';
+C.AT_CMD_CLICK_MOUSE_R = 'AT CR';
+C.AT_CMD_CLICK_MOUSE_M = 'AT CM';
+C.AT_CMD_DOUBLECLICK_MOUSE_L = 'AT CD';
 
-C.MIN_FIRMWARE_VERSION = '3.7.0';
-C.MAX_NUMBER_SLOTS = 10;
-C.MAX_LENGTH_SLOTNAME = 11;
+C.AT_CMD_HOLD_MOUSE_L = 'AT HL';
+C.AT_CMD_HOLD_MOUSE_R = 'AT HR';
+C.AT_CMD_HOLD_MOUSE_M = 'AT HM';
 
-C.USB_DEVICE_FILTERS = [
-    { usbVendorId: 0x2e8a }, // Arduino Nano 2040 Connect (RP2040)
-    { usbVendorId: 0x2341 }, // Arduino Nano 2040 Connect (from 2023 on)
-    { usbVendorId: 0x2E8A, usbProductId: 0xF10A }, // RaspberryPi PicoW
-    { usbVendorId: 0x239A, usbProductId: 0xCAFE }, // RaspberryPi PicoW - Adafruit TinyUSB Stack
-	{ usbVendorId: 0x2E8A, usbProductId: 0xF10F }  // RaspberryPi Pico2W
-];
+C.AT_CMD_RELEASE_MOUSE_L = 'AT RL';
+C.AT_CMD_RELEASE_MOUSE_R = 'AT RR';
+C.AT_CMD_RELEASE_MOUSE_M = 'AT RM';
+
+C.AT_CMD_MOUSE_TOGGLE_L = 'AT TL';
+C.AT_CMD_MOUSE_TOGGLE_R = 'AT TR';
+C.AT_CMD_MOUSE_TOGGLE_M = 'AT TM';
+
+C.AT_CMD_MOUSEWHEEL_UP = 'AT WU';
+C.AT_CMD_MOUSEWHEEL_DOWN = 'AT WD';
+
+C.AT_CMD_MOUSE_MOVEX = 'AT MX';
+C.AT_CMD_MOUSE_MOVEY = 'AT MY';
+C.AT_CMD_ORIENTATION_ANGLE = 'AT RO';
+
+C.AT_CMD_JOYSTICK_X = 'AT JX';
+C.AT_CMD_JOYSTICK_Y = 'AT JY';
+C.AT_CMD_JOYSTICK_Z = 'AT JZ';
+C.AT_CMD_JOYSTICK_ZTURN = 'AT JT';
+C.AT_CMD_JOYSTICK_SLIDER = 'AT JS';
+C.AT_CMD_JOYSTICK_BUTTON_PRESS = 'AT JP';
+C.AT_CMD_JOYSTICK_BUTTON_RELEASE = 'AT JR';
+C.AT_CMD_JOYSTICK_HAT_POS = 'AT JH';
+
+C.AT_CMD_WRITEWORD = 'AT KW';
+C.AT_CMD_KEYPRESS = 'AT KP';
+C.AT_CMD_KEYHOLD = 'AT KH';
+C.AT_CMD_KEYTOGGLE = 'AT KT';
+C.AT_CMD_KEYRELEASE = 'AT KR';
+C.AT_CMD_KEYRELEASEALL = 'AT RA';
+
+// AT commands - Macro specific
+C.AT_CMD_MACRO = 'AT MA';
+C.AT_CMD_WAIT = 'AT WA';
+
+// AT commands - Housekeeping
+C.AT_CMD_SAVE_SLOT = 'AT SA';
+C.AT_CMD_LOAD_SLOT = 'AT LO';
+C.AT_CMD_LOAD_ALL = 'AT LA';
+C.AT_CMD_NEXT_SLOT = 'AT NE';
+C.AT_CMD_DELETE_SLOT = 'AT DE';
+C.AT_CMD_RESET_DEVICE = 'AT RS';
+C.AT_CMD_NO_CMD = 'AT NC';
+C.AT_CMD_DEVICE_MODE = 'AT BT';
+C.AT_CMD_BUZZER_MODE = 'AT AB';
+C.AT_CMD_SET_COLOR = 'AT SC';
+C.AT_CMD_KEYBOARD_LAYOUT = 'AT KL'; 
+
+C.DEVICE_MODE_USB = 1;
+C.DEVICE_MODE_BT = 2;
+C.DEVICE_MODE_USB_BT = 3;
+
+C.AT_CMD_STICK_MODE = 'AT MM';
+C.AT_CMD_START_REPORTING_LIVE = 'AT SR';
+C.AT_CMD_STOP_REPORTING_LIVE = 'AT ER';
+C.AT_CMD_CALIBRATION = 'AT CA';
+C.AT_CMD_SENSITIVITY_X = 'AT AX';
+C.AT_CMD_SENSITIVITY_Y = 'AT AY';
+C.AT_CMD_DEADZONE_X = 'AT DX';
+C.AT_CMD_DEADZONE_Y = 'AT DY';
+C.AT_CMD_MAX_SPEED = 'AT MS';
+C.AT_CMD_ACCELERATION = 'AT AC';
+C.AT_CMD_SENSORBOARD = 'AT SB';
+
+C.AT_CMD_SIP_THRESHOLD = 'AT TS';
+C.AT_CMD_PUFF_THRESHOLD = 'AT TP';
+C.AT_CMD_PUFF_STRONG_THRESHOLD = 'AT SP';
+C.AT_CMD_SIP_STRONG_THRESHOLD = 'AT SS';
+
+// AT commands - Infrared specific
+C.AT_CMD_IR_RECORD = 'AT IR';
+C.AT_CMD_IR_PLAY = 'AT IP';
+C.AT_CMD_IR_HOLD = 'AT IH';
+C.AT_CMD_IR_STOP = 'AT IS';
+C.AT_CMD_IR_DELETE = 'AT IC';
+C.AT_CMD_IR_WIPE = 'AT IW';
+C.AT_CMD_IR_LIST = 'AT IL';
+C.AT_CMD_IR_TIMEOUT = 'AT IT';
+
+// AT commands - Macro specific
+C.AT_CMD_MACRO = 'AT MA';
+C.AT_CMD_WAIT = 'AT WA';
+
+// AT commands - Audio specific
+C.AT_CMD_AUDIO_TRANSMISSION = 'AT AT';
+C.AT_CMD_AUDIO_VOLUME = 'AT AV';
+C.AT_CMD_AUDIO_REMOVE = 'AT AR';
+C.AT_CMD_AUDIO_PLAY   = 'AT AP';
+
+// AT commands - Timing specific
+C.AT_CMD_THRESHOLD_AUTODWELL = 'AT AD';
+C.AT_CMD_THRESHOLD_LONGPRESS = 'AT LP'; 
+C.AT_CMD_THRESHOLD_MULTIPRESS = 'AT MP';
+// TBD: handle long press / multi press  etc, decide if/how to integrate anti-tremor timings ...
+// C.AT_CMD_ANTITREMOR_PRESS = 'AT AP';
+// C.AT_CMD_ANTITREMOR_RELEASE = 'AT AR';
+// C.AT_CMD_ANTITREMOR_IDLE = 'AT AI';
 
 
-C.VIEWS = [{
-    object: TabStick,
-    hash: '#tabStick',
-    label: 'Stick-Config',
-    helpHash: '#stick-configuration-tab-stick-config // #stick-konfiguration-tab-stick-config',
-    visibleFn: (ATDevice) => ATDevice.getSensorInfo()[C.FORCE_SENSOR]
-}, {
-    object: TabSipPuff,
-    hash: '#tabPuff',
-    label: 'Sip and Puff // Saug-Puste-Steuerung',
-    helpHash: '#sip-and-puff-tab-using-a-pressure-sensor // #verwendung-eines-drucksensors-sip-puff---reiter-saug-puste-steuerung',
-    visibleFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]
-}, {
-    object: TabActions,
-    hash: '#tabActions',
-    label: 'Actions // Aktionen',
-    helpHash: '#actions-tab-assigning-button-functions // #zuweisung-der-taster-funktionen-reiter-aktionen'
-}, {
-    object: TabSlots,
-    hash: '#tabSlots',
-    label: 'Slots // Slots',
-    helpHash: '#slots-tab-using-configuration-slots // #verwendung-der-speicherplätze-reiter-slots'
-}, {
-    object: TabTimings,
-    hash: '#tabTimings',
-    label: 'Timings',
-    helpHash: '#timings-tab-antitremor-and-special-functions // #einstellmöglichkeiten-im-reiter-timings',
-    visibleFn: (ATDevice) => false // TODO: enable this tab, when the timing functionality is implemented
-}, {
-    object: TabGeneral,
-    hash: '#tabGeneral',
-    label: 'General // Allgemein',
-    helpHash: '#general-tab-bluetooth-and-firmware-options // #einstellmöglichkeiten-im-reiter-allgemein'
-}, {
-    object: TabVisualization,
-    hash: '#tabVis',
-    label: 'Visualization // Visualisierung',
-}];
+// Constants for live values (sent from the device)
+C.LIVE_VALUE_CONSTANT = 'VALUES:';
 
 
-
-C.VIEW_START_HASH = '#tabActions';
-
-// TBD: add dynamic links and labels for Flipmouse and Flippad
-C.ADDITIONAL_LINKS = [{
-    label: 'More information about FABI // Mehr Infos zu FABI',
-    url: 'https://www.asterics-foundation.org/projects/fabi/ // https://www.asterics-foundation.org/projekte-2/fabi/'
-}, {
-    label: 'User manual // Benutzerhandbuch',
-    url: 'https://github.com/asterics/FABI/blob/master/Documentation/UserManual/Markdown/Fabi%20User%20Manual.md // https://github.com/asterics/FABI/blob/master/Documentation/UserManual/Markdown/Fabi%20Anwendungsanleitung.md',
-    // url: 'https://github.com/asterics/FLipMouse/blob/master/Documentation/UserManual/Markdown/FLipMouseUserManual.md // https://github.com/asterics/FLipMouse/blob/master/Documentation/UserManual/Markdown/FLipMouseAnwendungsanleitung.md';
-
-}, {
-    label: 'Licensing // Lizenzbestimmungen',
-    url: 'https://github.com/asterics/FABI/blob/master/LICENSE'
-}, {
-    label: 'Legal Notice // Impressum',
-    url: 'https://www.asterics-foundation.org/legal-notice/ // https://www.asterics-foundation.org/impressum/'
-}]
+// AT command selection for slot settings (TBD: enable global settings in specific data structure, not only per slot-settings)
+C.AT_CMDS_SETTINGS = [C.AT_CMD_BTN_MODE, C.AT_CMD_DEVICE_MODE, C.AT_CMD_SENSITIVITY_X, C.AT_CMD_SENSITIVITY_Y, C.AT_CMD_DEADZONE_X, C.AT_CMD_DEADZONE_Y,
+C.AT_CMD_MAX_SPEED, C.AT_CMD_ACCELERATION, C.AT_CMD_STICK_MODE, C.AT_CMD_SIP_THRESHOLD, C.AT_CMD_PUFF_THRESHOLD, C.AT_CMD_PUFF_STRONG_THRESHOLD, 
+C.AT_CMD_SIP_STRONG_THRESHOLD, C.AT_CMD_ORIENTATION_ANGLE, C.AT_CMD_THRESHOLD_AUTODWELL, C.AT_CMD_THRESHOLD_LONGPRESS,  C.AT_CMD_THRESHOLD_MULTIPRESS,
+C.AT_CMD_SET_COLOR, C.AT_CMD_SENSORBOARD, C.AT_CMD_KEYBOARD_LAYOUT, C.AT_CMD_AUDIO_VOLUME, C.AT_CMD_BUZZER_MODE];
 
 
+// AT command categories
+C.AT_CMD_CAT_KEYBOARD = 'AT_CMD_CAT_KEYBOARD';
+C.AT_CMD_CAT_MOUSE = 'AT_CMD_CAT_MOUSE';
+C.AT_CMD_CAT_JOYSTICK = 'AT_CMD_CAT_JOYSTICK';
+C.AT_CMD_CAT_DEVICE = 'AT_CMD_CAT_DEVICE';
+C.AT_CMD_CAT_IR = 'AT_CMD_CAT_IR';
+C.AT_CMD_CAT_MACRO = 'AT_CMD_CAT_MACRO';
+
+C.INPUTFIELD_TYPE_KEYBOARD = 'INPUTFIELD_TYPE_KEYBOARD';
+C.INPUTFIELD_TYPE_TEXT = 'INPUTFIELD_TYPE_TEXT';
+C.INPUTFIELD_TYPE_NUMBER = 'INPUTFIELD_TYPE_NUMBER';
+C.INPUTFIELD_TYPE_SELECT = 'INPUTFIELD_TYPE_SELECT';
+C.INPUTFIELD_TYPE_MACRO = 'INPUTFIELD_TYPE_MACRO';
 
 C.AT_CMD_CATEGORIES = [{
     constant: C.AT_CMD_CAT_KEYBOARD,
@@ -107,195 +159,218 @@ C.AT_CMD_CATEGORIES = [{
 }];
 
 
-
-C.BTN_CAT_BTN = 'BTN_CAT_BTN';
-C.BTN_CAT_BTN_LONGPRESS = 'BTN_CAT_BTN_LONGPRESS';
-C.BTN_CAT_SIPPUFF = 'BTN_CAT_SIPPUFF';
-C.BTN_CAT_STRONG_SIPPUFF = "BTN_CAT_STRONG_SIPPUFF"
-C.BTN_CAT_STICK = 'BTN_CAT_STICK';
-C.BTN_CAT_BTN_STRONG_SIPPUFF = 'BTN_CAT_BTN_STRONG_SIPPUFF';
-
-
-C.BTN_CATEGORIES = [{
-    constant: C.BTN_CAT_BTN,
-    label: 'Buttons'
+// AT command selection for button actions and their description
+C.AT_CMDS_ACTIONS = [{
+    cmd: C.AT_CMD_NO_CMD,
+    label: 'No command (empty) // Keine Funktion (leer)',
+    shortLabel: '(empty) // (leer)',
+    category: C.AT_CMD_CAT_DEVICE
 }, {
-    constant: C.BTN_CAT_BTN_LONGPRESS,
-    label: 'Buttons long press // Buttons lange drücken'
+    cmd: C.AT_CMD_HOLD_MOUSE_L,
+    label: 'Hold left mouse button (as long as input action) // Linke Maustaste halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold left mouse button // Linke Maustaste halten',
+    macroLabel: 'Hold left mouse button // Linke Maustaste halten',
+    category: C.AT_CMD_CAT_MOUSE
 }, {
-    constant: C.BTN_CAT_SIPPUFF,
-    label: 'Sip/Puff // Ansaugen/Pusten'
+    cmd: C.AT_CMD_HOLD_MOUSE_R,
+    label: 'Hold right mouse button (as long as input action) // Rechte Maustaste halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold right mouse button // Rechte Maustaste halten',
+    macroLabel: 'Hold right mouse button // Rechte Maustaste halten',
+    category: C.AT_CMD_CAT_MOUSE
 }, {
-    constant: C.BTN_CAT_STRONG_SIPPUFF,
-    label: 'Strong Sip/Puff // Starkes Ansaugen/Pusten'
+    cmd: C.AT_CMD_HOLD_MOUSE_M,
+    label: 'Hold middle mouse button (as long as input action) // Mittlere Maustaste halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold middle mouse button // Mittlere Maustaste halten',
+    macroLabel: 'Hold middle mouse button // Mittlere Maustaste halten',
+    category: C.AT_CMD_CAT_MOUSE
 }, {
-    constant: C.BTN_CAT_STICK,
-    label: 'Stick actions // Stick-Aktionen'
+    cmd: C.AT_CMD_CLICK_MOUSE_L,
+    label: 'Click left mouse button // Klick linke Maustaste',
+    category: C.AT_CMD_CAT_MOUSE
 }, {
-    constant: C.BTN_CAT_BTN_STRONG_SIPPUFF,
-    label: 'Combine button and strong Sip/Puff actions // Kombiniere button und starke Ansaugen/Pusten Aktionen'
-}]
-
-
-export function getBtnModesActionList() {
-    let currentIndex = 1;
-    let list = [];
-    console.log("C.CURRENT_DEVICE=", C.CURRENT_DEVICE, "C.DEVICE_IS_FABI=", C.DEVICE_IS_FABI, "C.DEVICE_IS_FM=", C.DEVICE_IS_FM, "C.PYHSICAL_BUTTON_COUNT=", C.PYHSICAL_BUTTON_COUNT);
-    // Add buttons depending on device
-    if (C.DEVICE_IS_FABI === true) {
-        // FABI: 5 buttons
-        for (let i = 1; i <= 5; i++) {
-            list.push({
-                index: currentIndex++,
-                label: `Button ${i}`,
-                category: C.BTN_CAT_BTN
-            });
-        }
-    } else if (C.DEVICE_IS_FM === true) {
-        // FLIPMOUSE: 3 buttons
-        for (let i = 1; i <= 3; i++) {
-            list.push({
-                index: currentIndex++,
-                label: `Button ${i}`,
-                category: C.BTN_CAT_BTN
-            });
-        }
-    }
-
-    // Add the rest of the actions (stick, sip/puff, etc.) as before
-    list = list.concat([
-        {
-            index: currentIndex++,
-            label: 'Stick Up // Stick rauf',
-            category: C.BTN_CAT_STICK,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.FORCE_SENSOR]
-        }, { 
-            index: currentIndex++,
-            label: 'Stick Down // Stick runter',
-            category: C.BTN_CAT_STICK,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.FORCE_SENSOR]
-        }, { 
-            index: currentIndex++,
-            label: 'Stick Left // Stick links',
-            category: C.BTN_CAT_STICK,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.FORCE_SENSOR]
-        }, { 
-            index: currentIndex++,
-            label: 'Stick Right // Stick rechts',
-            category: C.BTN_CAT_STICK,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.FORCE_SENSOR]
-        }, {
-            index: currentIndex++,
-            label: 'Sip // Ansaugen',
-            category: C.BTN_CAT_SIPPUFF,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]
-        }, {
-            index: currentIndex++,
-            label: 'Puff // Pusten',
-            category: C.BTN_CAT_SIPPUFF,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]
-        }, {
-            index: currentIndex++,
-            label: 'Strong Sip // Starkes Ansaugen',
-            category: C.BTN_CAT_STRONG_SIPPUFF,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]
-        }, {
-            index: currentIndex++,
-            label: 'Strong Puff // Starks Pusten',
-            category: C.BTN_CAT_STRONG_SIPPUFF,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]
-        }, {
-            index: currentIndex++,
-            label: 'Strong Sip + Up // Stark ansaugen + nach oben',
-            category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
-        }, {
-            index: currentIndex++,
-            label: 'Strong Sip + Down // Stark ansaugen + nach unten',
-            category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
-        }, {
-            index: currentIndex++,
-            label: 'Strong Sip + Left // Stark ansaugen + nach links',
-            category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
-        }, {
-            index: currentIndex++,
-            label: 'Strong Sip + Right // Stark ansaugen + nach rechts',
-            category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
-        }, {
-            index: currentIndex++,
-            label: 'Strong Puff + Up // Stark pusten + nach oben',
-            category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
-        }, {
-            index: currentIndex++,
-            label: 'Strong Puff + Down // Stark pusten + nach unten',
-            category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
-        }, {
-            index: currentIndex++,
-            label: 'Strong Puff + Left // Stark pusten + nach links',
-            category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
-        }, {
-            index: currentIndex++,
-            label: 'Strong Puff + Right // Stark pusten + nach rechts',
-            category: C.BTN_CAT_BTN_STRONG_SIPPUFF,
-            visibleBtnFn: (ATDevice) => ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && ATDevice.getSensorInfo()[C.FORCE_SENSOR]
-        } ]);
-
-    return list;
-}
-// C.BTN_MODES_ACTIONLIST = getBtnModesActionList();
-
-
-
-/*   TDB: handle long press / multiple press actions
+    cmd: C.AT_CMD_CLICK_MOUSE_R,
+    label: 'Click right mouse button // Klick rechte Maustaste',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_CLICK_MOUSE_M,
+    label: 'Click middle mouse button (wheel) // Klick mittlere Maustaste (Mausrad)',
+    shortLabel: 'Click middle mouse button // Klick mittlere Maustaste',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_DOUBLECLICK_MOUSE_L,
+    label: 'Double click left mouse button // Doppelklick linke Maustaste',
+    shortLabel: 'Double click mouse left // Doppelklick linke Maustaste',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_MOUSE_TOGGLE_L,
+    label: 'Press or release left mouse button (toggle) // Drücken oder Loslassen linke Maustaste (umschalten)',
+    shortLabel: 'Toggle left mouse button // Umschalten linke Maustaste',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_MOUSE_TOGGLE_R,
+    label: 'Press or release right mouse button (toggle) // Drücken oder Loslassen rechte Maustaste (umschalten)',
+    shortLabel: 'Toggle right mouse button // Umschalten rechte Maustaste',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_MOUSE_TOGGLE_M,
+    label: 'Press or release middle mouse button (toggle) // Drücken oder Loslassen mittlere Maustaste (umschalten)',
+    shortLabel: 'Toggle middle mouse button // Umschalten mittlere Maustaste',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_MOUSEWHEEL_UP,
+    label: 'Scroll down // Nach unten scrollen',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_MOUSEWHEEL_DOWN,
+    label: 'Scroll up // Nach oben scrollen',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_MOUSE_MOVEX,
+    label: 'Move mouse horizontally (x-axis) // Maus horizontal bewegen (x-Achse)',
+    shortLabel: 'Move mouse x-axis // Mausbewegung x-Achse',
+    category: C.AT_CMD_CAT_MOUSE,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_MOUSE_MOVEY,
+    label: 'Move mouse vertically (y-axis) // Maus vertikal bewegen (y-Achse)',
+    shortLabel: 'Move mouse y-axis // Mausbewegung y-Achse',
+    category: C.AT_CMD_CAT_MOUSE,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_KEYHOLD,
+    label: 'Hold key(s) (as long as input action) // Taste(n) halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold key(s) // Taste(n) halten',
+    macroLabel: 'Hold key(s) // Taste(n) halten',
+    category: C.AT_CMD_CAT_KEYBOARD,
+    input: C.INPUTFIELD_TYPE_KEYBOARD
+}, {
+    cmd: C.AT_CMD_KEYPRESS,
+    label: 'Press key(s) + release automatically // Taste(n) drücken + wieder loslassen',
+    shortLabel: 'Press key(s) // Taste(n) drücken',
+    category: C.AT_CMD_CAT_KEYBOARD,
+    input: C.INPUTFIELD_TYPE_KEYBOARD
+}, {
+    cmd: C.AT_CMD_KEYTOGGLE,
+    label: 'Press or release key(s) (toggle) // Taste(n) drücken oder auslassen (umschalten)',
+    shortLabel: 'Press/release key(s) // Taste(n) drücken/auslassen',
+    category: C.AT_CMD_CAT_KEYBOARD,
+    input: C.INPUTFIELD_TYPE_KEYBOARD
+}, {
+    cmd: C.AT_CMD_WRITEWORD,
+    label: 'Write word // Schreibe Wort',
+    category: C.AT_CMD_CAT_KEYBOARD,
+    input: C.INPUTFIELD_TYPE_TEXT
+}, {
+    cmd: C.AT_CMD_NEXT_SLOT,
+    label: 'Load next slot // Nächsten Slot laden',
+    category: C.AT_CMD_CAT_DEVICE
+}, {
+    cmd: C.AT_CMD_LOAD_SLOT,
+    label: 'Load slot by name // Slot per Name laden',
+    category: C.AT_CMD_CAT_DEVICE,
+    input: C.INPUTFIELD_TYPE_SELECT,
+    optionsFn: ATDevice.getSlots
 }, { 
-    index: currentIndex++,
-    label: 'Button 1 long press // Button 1 lange drücken',
-    category: C.BTN_CAT_BTN_LONGPRESS
-  (...)
-*/
+    cmd: C.AT_CMD_CALIBRATION,
+    label: 'Calibrate stick middle position // Stick-Mittelposition kalibrieren',
+    shortLabel: 'Calibrate stick // Stick kalibrieren',
+    category: C.AT_CMD_CAT_DEVICE
+}, {
+    cmd: C.AT_CMD_IR_PLAY,
+    label: 'Play infrared command // Infrarot-Kommando abspielen',
+    category: C.AT_CMD_CAT_IR,
+    input: C.INPUTFIELD_TYPE_SELECT,
+    optionsFn: ATDevice.getIRCommands
+}, {
+    cmd: C.AT_CMD_IR_HOLD,
+    label: 'Hold infrared command (as long as input action) // Infrarot-Kommando halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold IR command // IR-Kommando halten',
+    category: C.AT_CMD_CAT_IR,
+    input: C.INPUTFIELD_TYPE_SELECT,
+    optionsFn: ATDevice.getIRCommands
+}, {
+    cmd: C.AT_CMD_JOYSTICK_X,
+    label: 'Joystick set x-axis // Joystick x-Achse setzen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_JOYSTICK_Y,
+    label: 'Joystick set y-axis // Joystick y-Achse setzen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_JOYSTICK_Z,
+    label: 'Joystick set z-axis // Joystick z-Achse setzen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_JOYSTICK_ZTURN,
+    label: 'Joystick set z-turn // Joystick z-Drehung setzen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_JOYSTICK_SLIDER,
+    label: 'Joystick set slider // Joystick Regler setzen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_JOYSTICK_BUTTON_PRESS,
+    label: 'Hold joystick button (as long as input action) // Joystick-Button halten (für Dauer der Eingabe-Aktion)',
+    shortLabel: 'Hold joystick button // Joystick-Button halten',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER,
+    minValue: 1,
+    maxValue: 32
+}, {
+    cmd: C.AT_CMD_JOYSTICK_HAT_POS,
+    label: 'Set joystick hat position // Joystick Hat-Position setzen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_MACRO,
+    label: 'Custom macro // Benutzerdefiniertes Makro',
+    category: C.AT_CMD_CAT_MACRO,
+    input: C.INPUTFIELD_TYPE_MACRO
+}];
 
-C.STICK_MODE_MOUSE = {
-    value: 1,
-    label: 'Mouse movement // Mausbewegung'
-};
-C.STICK_MODE_ALT = {
-    value: 0,
-    label: 'Alternative actions // Alternative Aktionen',
-};
-C.STICK_MODE_JOYSTICK_XY = {
-    value: 2,
-    label: 'Joystick (XY) // Joystick (XY)',
-};
-C.STICK_MODE_JOYSTICK_ZR = {
-    value: 3,
-    label: 'Joystick (ZR) // Joystick (ZR)'
-};
-C.STICK_MODE_JOYSTICK_SLIDERS = {
-    value: 4,
-    label: 'Joystick (Slider) // Joystick (Slider)'
-};
-C.STICK_MODE_MOUSE = {
-    value: 1,
-    label: 'Mouse (stick mode) // Maus (Stick-Modus)'
-};
-C.STICK_MODE_PAD = {
-    value: 5,
-    label: 'Mouse (pad mode) // Maus (Pad-Modus)'
-};
-
-C.FLIPPAD_MODE_STICK_ALTERNATIVE = {
-    value: 0,
-    label: 'Alternative actions (stick mode) // Alternative Aktionen (Stick-Modus)'
-};
-C.FLIPPAD_MODE_PAD_ALTERNATIVE = {
-    value: 6,
-    label: 'Alternative actions (pad mode) // Alternative Aktionen (Pad-Modus)'
-};
-
-C.STICK_MODES = [C.STICK_MODE_MOUSE, C.STICK_MODE_ALT, C.STICK_MODE_JOYSTICK_XY, C.STICK_MODE_JOYSTICK_ZR, C.STICK_MODE_JOYSTICK_SLIDERS];
+// AT command selection for macro actions (additional to the AT commands for button actions)
+C.AT_CMDS_MACRO = C.AT_CMDS_MACRO || [];
+C.AT_CMDS_MACRO = [{
+    cmd: C.AT_CMD_WAIT,
+    label: 'Wait time in milliseconds // Warten (Millisekunden)',
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_KEYRELEASE,
+    label: 'Release specific key(s) // Spezifische Taste(n) auslassen',
+    shortLabel: 'Release key(s) // Taste(n) auslassen',
+    category: C.AT_CMD_CAT_KEYBOARD,
+    input: C.INPUTFIELD_TYPE_KEYBOARD
+}, {
+    cmd: C.AT_CMD_KEYRELEASEALL,
+    label: 'Release all key(s) // Alle Taste(n) auslassen',
+    shortLabel: 'Release key(s) // Taste(n) auslassen',
+    category: C.AT_CMD_CAT_KEYBOARD
+}, {
+    cmd: C.AT_CMD_RELEASE_MOUSE_L,
+    label: 'Release left mouse button // Linke Maustaste loslassen',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_RELEASE_MOUSE_R,
+    label: 'Release right mouse button // Rechte Maustaste loslassen',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_RELEASE_MOUSE_M,
+    label: 'Release middle mouse button // Mittlere Maustaste loslassen',
+    category: C.AT_CMD_CAT_MOUSE
+}, {
+    cmd: C.AT_CMD_JOYSTICK_BUTTON_RELEASE,
+    label: 'Release joystick button // Joystick-Button auslassen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER,
+    minValue: 1,
+    maxValue: 32
+}, {
+    cmd: C.AT_CMD_IR_STOP,
+    label: 'Stop infrared command // Infrarot-Kommando stoppen',
+    category: C.AT_CMD_CAT_IR
+} ];

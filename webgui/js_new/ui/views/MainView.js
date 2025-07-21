@@ -6,7 +6,7 @@ import { FaIcon } from "../components/FaIcon.js";
 import { firmwareUtil } from "../../util/firmwareUtil.js";
 import { helpUtil } from "../../util/helpUtil.js";
 import { SlotTestModeDialog } from "../components/SlotTestModeDialog.js";
-import { getBtnModesActionList } from '../../constantsNew.js';
+import { getBtnModesActionList } from '../../constantsGeneric.js';
 
 const html = htm.bind(h);
 
@@ -18,7 +18,7 @@ const SCREENS = {
 }
 
 
-C.CURRENT_DEVICE = 'FABI';   // TBD: just a placeholder by now ... why is this not set via constantsNew.js?  (undefined..)
+C.CURRENT_DEVICE = 'FABI';   // TBD: just a placeholder by now ... why is this not set via constantsGeneric.js?  (undefined..)
 
 class MainView extends Component {
 
