@@ -7,6 +7,8 @@
     <script src="lib/loglevel.min.js"></script>
 
     <script>
+        // TBD: not sure about the test_fabi / test_fm implementations.. still support those in V3?
+    
         window.C = window.C || {}; //set those 2 constants here in order to get dynamic import in ATDevice working
         C.DEVICE_IS_FABI = href.includes("fabi");
         C.DEVICE_IS_FM = href.includes("flipmouse") || href.includes("fm.htm");
