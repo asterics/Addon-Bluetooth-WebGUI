@@ -185,6 +185,16 @@ ATDevice.getSensorInfo = function () {
     return currentSensorInfo;
 }
 
+ATDevice.getBTVersion = function () {
+    ATDevice.sendAtCmdForce(C.AT_CMD_STOP_REPORTING_LIVE);
+    return ATDevice.sendAtCmdWithResultForce(C.AT_CMD_ADDON_COMMAND, '$ID').then(result => {
+        result = result || '';
+        return Promise.resolve(result.trim() ? L.formatVersion(result) : '');
+    }).finally(() => {
+        if (!_dontGetLiveValues) ATDevice.sendAtCmdForce(C.AT_CMD_START_REPORTING_LIVE);
+    });
+}
+
 /**
  * Sends the given AT command to the device. If sending of the last command is not completed yet, the given AT command
  * is added to a queue and will be sent later.

@@ -114,6 +114,11 @@ C.AT_CMD_THRESHOLD_MULTIPRESS = 'AT MP';
 // C.AT_CMD_ANTITREMOR_IDLE = 'AT AI';
 
 
+// AT commands ESP32 BT-Addon specific (only supported by FlipMouse)
+C.AT_CMD_ADDON_COMMAND = 'AT BC';
+C.AT_CMD_UPGRADE_ADDON = 'AT UG';
+
+
 // Constants for live values (sent from the device)
 C.LIVE_VALUE_CONSTANT = 'VALUES:';
 

@@ -73,7 +73,7 @@ class FirmwareUpdateModal extends Component {
                                         </div>
                                     </div>
                                 </li>
-                                <li>${L.translate('Copy the file "{?}" you\'ve downloaded before to the storage device connected to your computer (like an USB flash drive)^. // Kopieren Sie die heruntergeladene Datei "{?}" auf den am PC angeschlossenen USB-Speicher (wie auf einen USB-Stick).', fwFileName)}</li>
+                                <li>${L.translate('Copy the file "{?}" you\'ve downloaded before to the storage device connected to your computer (like an USB flash drive). // Kopieren Sie die heruntergeladene Datei "{?}" auf den am PC angeschlossenen USB-Speicher (wie auf einen USB-Stick).', fwFileName)}</li>
                                 <li>${L.translate("The device will automatically reboot. Afterwards reload this page and connect again to the device. // Das Gerät wird automatisch neu starten. Laden Sie diese Seite danach neu und verbinden Sie sich erneut zum Gerät.")}</li>
                             </ol>
                             

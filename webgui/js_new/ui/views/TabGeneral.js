@@ -34,6 +34,8 @@ class TabGeneral extends Component {
         }
 
         this.getVersions();
+
+        // TBD: maybe a beter variant to prevent frequent calls to ATDevice (serial transfer) when slider is moved
         this.debouncedSetAudioVolume = this.debounce((volume) => {
             ATDevice.setAudioVolume(volume);
         }, 200); // 200ms debounce delay
@@ -57,7 +59,7 @@ class TabGeneral extends Component {
 
     getVersions() {
         this.getDeviceVersions();
-        return;
+        
         // TBD: include new firmware versions for different RP2040 devices!
         firmwareUtil.getDeviceFWInfo().then(result => {
             this.setState({
@@ -76,6 +78,7 @@ class TabGeneral extends Component {
     }
 
     getDeviceVersions() {
+        console.log('TabGeneral.getDeviceVersions()');
         ATDevice.getVersion().then(result => {
             this.setState({
                 mainVersion: result
@@ -85,11 +88,20 @@ class TabGeneral extends Component {
         this.setState({
             versionSuffix: result
         });
+
+        /* The Flipmouse BT firmware update is currently disabled
+        ATDevice.getBTVersion().then(result => {
+            this.setState({
+                btVersion: result || unknown
+            });
+        })        
+        */
     }
 
+    /* The Flipmouse BT firmware update is currently disabled because the update process for the Nano 2040 Connect's ESP32 module can brick the ESP32.
     updateBTFirmware() {
         let thiz = this;
-        if (!confirm(L.translate('Do you want to update the firmware version of the BT-Addon to version {?}? Hint: keep this tab open and in foreground while updating! // Möchten Sie die Version des BT-Addons auf Version {?} aktualisieren? Hinweis: lassen Sie diesen Tab während dem Update im Vordergrund geöffnet!', this.state.newBtVersion))) {
+        if (!confirm(L.translate('Do you want to update the Bluetooth firmware to version {?}? Hint: keep this tab open and in foreground while updating! // Möchten Sie die Bluetooth Firmware auf Version {?} aktualisieren? Hinweis: lassen Sie diesen Tab während dem Update im Vordergrund geöffnet!', this.state.newBtVersion))) {
             return;
         }
         L.HTTPRequest(this.state.newBtVersionDownloadUrl, 'GET', 'arraybuffer', 'BT_FIRMWARE').then(result => {
@@ -102,7 +114,7 @@ class TabGeneral extends Component {
                     thiz.getDeviceVersions();
                 }, 1000);
             }).catch(() => {
-                alert(L.translate('Update of BT-Addon firmware failed! Please try again and keep tab in foreground while updating. // Aktualisierung der Firmware des BT-Addons fehlgeschlagen! Bitte erneut versuchen und Tab während dem Vorgang im Vordergund geöffnet lassen.'));
+                alert(L.translate('Update of Bluetooth firmware failed! Please try again and keep tab in foreground while updating. // Aktualisierung der Firmware der Bluetooth Firmware fehlgeschlagen! Bitte erneut versuchen und Tab während dem Vorgang im Vordergund geöffnet lassen.'));
                 thiz.setState({
                     btVersion: unknown,
                     btUpgradeProgress: null
@@ -110,6 +122,7 @@ class TabGeneral extends Component {
             });
         });
     }
+    */
 
     updateFirmware() {
         let thiz = this;
@@ -218,7 +231,7 @@ class TabGeneral extends Component {
             </div>
         </div>
         
-        <h2 class="mt-5">${L.translate('Firmware Version and Device Features // Firmware Version und Gerätefunktionen ')}</h2>
+        <h2 class="mt-5">${L.translate('Firmware Update and Device Features // Firmware Aktualisierung und Gerätefunktionen ')}</h2>
         <div class="container-fluid p-0">
             <div class="row">
                 <span class="col col-md-3">${L.translate('Detected Device: // Erkanntes Gerät:')}</span>   
@@ -231,12 +244,12 @@ class TabGeneral extends Component {
             </div>
 
             <div class="row">
-                <span class="col col-md-3">${L.translate('Installed Firmware version: // Installierte Firmware Version:')}</span>   
+                <span class="col col-md-3">${L.translate('Installed device firmware version: // Installierte Geräte-Firmware Version:')}</span>   
                 <span class="col col-md-6"> <span>${this.state.mainVersion}</span> </span>
             </div>
 
             <div class="row">
-                <span class="col col-md-3">${L.translate('Available Firmware version: // Verfügbare Firmware Version:')}</span>   
+                <span class="col col-md-3">${L.translate('Available device firmware version: // Verfügbare Geräte-Firmware Version:')}</span>   
                 <a rel="noreferrer" href="${this.state.newMainVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newMainVersion}</a>
             </div>
             <div class="row mt-3">
@@ -244,7 +257,7 @@ class TabGeneral extends Component {
                     <button class="col-12" onclick="${() => this.updateFirmware()}" disabled="${this.state.mainUpgradeProgress}"> <!-- Once the button has been pressed, it will be deactivated. -->
                         <span class="${this.state.mainUpgradeProgress ? 'd-none' : ''}"> 
                             <span class="sr-only">${C.CURRENT_DEVICE}: </span>
-                            ${L.isVersionNewer(this.state.mainVersion, this.state.newMainVersion) ? L.translate('Update firmware // Firmware aktualisieren') : L.translate('Overwrite firmware // Firmware überschreiben')}
+                            ${L.isVersionNewer(this.state.mainVersion, this.state.newMainVersion) ? L.translate('Update device firmware // Geräte-Firmware aktualisieren') : L.translate('Overwrite device firmware // Geräte-Firmware überschreiben')}
                         </span>
                         <span class="${this.state.mainUpgradeProgress ? '' : 'd-none'}"><span class="sr-only">${C.CURRENT_DEVICE}: </span>${L.translate('Updating... {?}% // Aktualisiere... {?}%', state.mainUpgradeProgress)}</span>
                     </button>   
@@ -255,31 +268,32 @@ class TabGeneral extends Component {
             ${html`<${FirmwareUpdateModal} close="${() => this.setState({ showFirmwareModal: false })}" fwInfo="${state.mainVersionFWInfo}" currentFwVersion="${this.state.mainVersion}"/>`}
         </div> 
         
-
-        <h3 class="mt-5 ${C.DEVICE_IS_FABI ? 'd-none' : ''}">Firmware Bluetooth-Addon</h3>
+    <!-- The section for the FlipMouse BT firmware udpates is currently disabled because the update process for the Nano 2040 Connect's ESP32 module can brick the ESP32. 
+        <h3 class="mt-5 ${C.DEVICE_IS_FABI ? 'd-none' : ''}"> </h3>
         <div class="container-fluid p-0 ${C.DEVICE_IS_FABI ? 'd-none' : ''}">
             <div class="row">
-                <span class="col col-md-3">${L.translate('Installed version // Installierte Version')}</span>   
+                <span class="col col-md-3">${L.translate('Installed Bluetooth firmware version: // Installierte Bluetooth-Firmware-Version:')}</span>   
                 <span class="col col-md-3"> ${this.state.btVersion}</span>   
             </div>
             <div class="row">
-                <span class="col col-md-3">${L.translate('Available version // Verfügbare Version')}</span>   
+                <span class="col col-md-3">${L.translate('Available Bluetooth firmware version: // Verfügbare Bluetooth-Firmware-Version:')}</span>   
                 <a rel="noreferrer" href="${this.state.newBtVersionUrl}" target="_blank" class="col col-md-3"> ${this.state.newBtVersion}</a>   
             </div>
             <div class="row mt-3">
                 <div class="col-12 col-md-4 mt-3 mt-md-0">
                     <button class="col-12" onclick="${() => this.updateBTFirmware()}" disabled="${this.state.btUpgradeProgress}">    
                         <span class="${this.state.btUpgradeProgress ? 'd-none' : ''}">
-                            <span class="sr-only">Bluetooth-Addon: </span>
+                            <span class="sr-only">Bluetooth-Firmware: </span>
                                 ${L.isVersionNewer(this.state.btVersion, this.state.newBtVersion) ? L.translate('Update bluetooth firmware // Bluetooth-Firmware aktualisieren') : L.translate('Overwrite bluetooth firmware // Bluetooth-Firmware überschreiben')}
                         </span>
-                            <span class="${this.state.btUpgradeProgress ? '' : 'd-none'}"><span class="sr-only">Bluetooth-Addon: </span>
+                            <span class="${this.state.btUpgradeProgress ? '' : 'd-none'}"><span class="sr-only">Bluetooth-Firmware: </span>
                                 ${L.translate('Updating... {?}% // Aktualisiere... {?}%', state.btUpgradeProgress)}
                             </span>
                     </button>   
                 </div>
             </div>
         </div> 
+    -->
 
         <h2 class="mt-5">${L.translate('Reset to default configuration // Rücksetzen auf Defaulteinstellungen')}</h2>
         <div class="row mt-2">
