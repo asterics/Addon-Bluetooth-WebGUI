@@ -279,17 +279,17 @@ C.STICK_MODE_MOUSE = {
     value: 1,
     label: 'Mouse movement // Mausbewegung'
 };
-C.STICK_MODE_JOYSTICK_XY = {
+C.STICK_MODE_JOYSTICK_1 = {
     value: 2,
-    label: 'Joystick (XY) // Joystick (XY)',
+    label: 'Joystick 1  // Joystick 1',
 };
-C.STICK_MODE_JOYSTICK_ZR = {
+C.STICK_MODE_JOYSTICK_2 = {
     value: 3,
-    label: 'Joystick (ZR) // Joystick (ZR)'
+    label: 'Joystick 2 // Joystick 2'
 };
-C.STICK_MODE_JOYSTICK_SLIDERS = {
+C.STICK_MODE_JOYSTICK_3 = {
     value: 4,
-    label: 'Joystick (Slider) // Joystick (Slider)'
+    label: 'Joystick 3 // Joystick 3'
 };
 C.STICK_MODE_PAD_JOYSTICK = {
     value: 5,
@@ -309,7 +309,7 @@ C.FLIPPAD_MODE_PAD_ALTERNATIVE = {
     label: 'Alternative actions (pad mode) // Alternative Aktionen (Pad-Modus)'
 };
 
-C.STICK_MODES = [C.STICK_MODE_MOUSE, C.STICK_MODE_ALT, C.STICK_MODE_JOYSTICK_XY, C.STICK_MODE_JOYSTICK_ZR, C.STICK_MODE_JOYSTICK_SLIDERS];
+C.STICK_MODES = [C.STICK_MODE_MOUSE, C.STICK_MODE_ALT, C.STICK_MODE_JOYSTICK_1, C.STICK_MODE_JOYSTICK_2, C.STICK_MODE_JOYSTICK_3];
 
 
 // Events for refreshing views / configuration changes

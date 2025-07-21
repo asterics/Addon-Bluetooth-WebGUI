@@ -29,11 +29,12 @@ C.AT_CMD_MOUSE_MOVEX = 'AT MX';
 C.AT_CMD_MOUSE_MOVEY = 'AT MY';
 C.AT_CMD_ORIENTATION_ANGLE = 'AT RO';
 
-C.AT_CMD_JOYSTICK_X = 'AT JX';
-C.AT_CMD_JOYSTICK_Y = 'AT JY';
-C.AT_CMD_JOYSTICK_Z = 'AT JZ';
-C.AT_CMD_JOYSTICK_ZTURN = 'AT JT';
-C.AT_CMD_JOYSTICK_SLIDER = 'AT JS';
+C.AT_CMD_JOYSTICK_AXIS0 = 'AT J0';
+C.AT_CMD_JOYSTICK_AXIS1 = 'AT J1';
+C.AT_CMD_JOYSTICK_AXIS2 = 'AT J2';
+C.AT_CMD_JOYSTICK_AXIS3 = 'AT J3';
+C.AT_CMD_JOYSTICK_AXIS4 = 'AT J4';
+C.AT_CMD_JOYSTICK_AXIS5 = 'AT J5';
 C.AT_CMD_JOYSTICK_BUTTON_PRESS = 'AT JP';
 C.AT_CMD_JOYSTICK_BUTTON_RELEASE = 'AT JR';
 C.AT_CMD_JOYSTICK_HAT_POS = 'AT JH';
@@ -289,28 +290,33 @@ C.AT_CMDS_ACTIONS = [{
     input: C.INPUTFIELD_TYPE_SELECT,
     optionsFn: ATDevice.getIRCommands
 }, {
-    cmd: C.AT_CMD_JOYSTICK_X,
-    label: 'Joystick set x-axis // Joystick x-Achse setzen',
+    cmd: C.AT_CMD_JOYSTICK_AXIS0,
+    label: 'Joystick 1 set x-axis // Joystick 1 x-Achse setzen',
     category: C.AT_CMD_CAT_JOYSTICK,
     input: C.INPUTFIELD_TYPE_NUMBER
 }, {
-    cmd: C.AT_CMD_JOYSTICK_Y,
-    label: 'Joystick set y-axis // Joystick y-Achse setzen',
+    cmd: C.AT_CMD_JOYSTICK_AXIS1,
+    label: 'Joystick 1 set y-axis // Joystick 1 y-Achse setzen',
     category: C.AT_CMD_CAT_JOYSTICK,
     input: C.INPUTFIELD_TYPE_NUMBER
 }, {
-    cmd: C.AT_CMD_JOYSTICK_Z,
-    label: 'Joystick set z-axis // Joystick z-Achse setzen',
+    cmd: C.AT_CMD_JOYSTICK_AXIS2,
+    label: 'Joystick 2 set x-axis // Joystick 2 x-Achse setzen',
     category: C.AT_CMD_CAT_JOYSTICK,
     input: C.INPUTFIELD_TYPE_NUMBER
 }, {
-    cmd: C.AT_CMD_JOYSTICK_ZTURN,
-    label: 'Joystick set z-turn // Joystick z-Drehung setzen',
+    cmd: C.AT_CMD_JOYSTICK_AXIS3,
+    label: 'Joystick 2 set y-axis // Joystick 2 y-Achse setzen',
     category: C.AT_CMD_CAT_JOYSTICK,
     input: C.INPUTFIELD_TYPE_NUMBER
 }, {
-    cmd: C.AT_CMD_JOYSTICK_SLIDER,
-    label: 'Joystick set slider // Joystick Regler setzen',
+    cmd: C.AT_CMD_JOYSTICK_AXIS4,
+    label: 'Joystick 3 set x-axis // Joystick 3 x-Achse setzen',
+    category: C.AT_CMD_CAT_JOYSTICK,
+    input: C.INPUTFIELD_TYPE_NUMBER
+}, {
+    cmd: C.AT_CMD_JOYSTICK_AXIS5,
+    label: 'Joystick 3 set y-axis // Joystick 3 y-Achse setzen',
     category: C.AT_CMD_CAT_JOYSTICK,
     input: C.INPUTFIELD_TYPE_NUMBER
 }, {
