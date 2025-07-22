@@ -937,10 +937,26 @@ ATDevice.updateFirmware = async function (url, progressHandler, dontReset) {
         */
 }
 
+
+ATDevice.resetDevice = async function (existingPort, filters) {
+    //open & close
+    // Wait for the serial port to open.
+    let port = existingPort;
+    filters = filters || [];
+    if (!port) {
+        port = await navigator.serial.requestPort({filters});
+    }
+    await port.open({baudRate: 1200});
+    await firmwareUtil.wait(500);
+    await port.close();
+    log.info('reset done!');
+}
+
+
 ATDevice.enterFwDownloadMode = async function () {
     let serialCommunicator = ATDevice.getCommunicator();
     await serialCommunicator.close();
-    //  await ProMicroFirmwareUpdater.resetDevice(serialCommunicator.getSerialPort());
+    await ATDevice.resetDevice(serialCommunicator.getSerialPort());
 }
 
 function parseLiveData(data) {
