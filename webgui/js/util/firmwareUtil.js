@@ -184,7 +184,7 @@ firmwareUtil.getDeviceFWInfo = function (device, majorVersion) {
     }
 
     let apiUrl = `https://api.github.com/repos/asterics/${repoName}/releases/${releaseTag}`;
-    console.log("FirmwareUtil: Getting firmware for device " + device + " (Version: " + majorVersion + ", Filetype: " + fileType + ") from API-URL" + apiUrl);
+    console.log("FirmwareUtil: Getting firmware for device " + device + " (Version: " + majorVersion + ", Filetype: " + fileType + ") from API-URL:" + apiUrl);
     return getFWInfo(apiUrl, fileType);
 }
 
