@@ -59,8 +59,6 @@ class TabGeneral extends Component {
 
     getVersions() {
         this.getDeviceVersions();
-        
-        // TBD: include new firmware versions for different RP2040 devices!
         firmwareUtil.getDeviceFWInfo().then(result => {
             this.setState({
                 mainVersionFWInfo: result,
@@ -68,6 +66,7 @@ class TabGeneral extends Component {
                 newMainVersionUrl: result.infoUrl
             });
         });
+        /* 
         firmwareUtil.getBTFWInfo().then(result => {
             this.setState({
                 newBtVersion: result.version,
@@ -75,6 +74,7 @@ class TabGeneral extends Component {
                 newBtVersionDownloadUrl: result.downloadUrl
             });
         });
+        */ 
     }
 
     getDeviceVersions() {
