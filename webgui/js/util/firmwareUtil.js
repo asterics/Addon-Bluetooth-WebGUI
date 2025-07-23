@@ -167,11 +167,25 @@ firmwareUtil.getDeviceFWInfo = function (device, majorVersion) {
     majorVersion = majorVersion || ATDevice.getMajorVersion();
     let deviceIsFM = device === C.AT_DEVICE_FLIPMOUSE;
     let repoName = C.CURRENT_DEVICE;
-    if (deviceIsFM && majorVersion === 2) {
+    let releaseTag = 'lastest';
+    let fileType = '.hex';
+    if (C.DEVICE_IS_FM && majorVersion < 3) {
         repoName = "FLipMouse-v2";
     }
-    let fileType = deviceIsFM && majorVersion === 3 ? '.uf2' : '.hex';
-    return getFWInfo(`https://api.github.com/repos/asterics/${repoName}/releases/latest`, fileType);
+    else if (C.DEVICE_IS_FM && majorVersion === 3) {
+        releaseTag = 'tags/v3.6.2';
+        fileType = '.uf2'
+    }
+    else if (C.DEVICE_IS_FLIPPAD) {
+        releaseTag = 'tags/V1.4';    // note: capital V is important here, otherwise the request will fail
+    }
+    else if (C.DEVICE_IS_FABI) {
+        releaseTag = 'tags/v2.8';
+    }
+
+    let apiUrl = `https://api.github.com/repos/asterics/${repoName}/releases/${releaseTag}`;
+    console.log("FirmwareUtil: Getting firmware for device " + device + " (Version: " + majorVersion + ", Filetype: " + fileType + ") from API-URL" + apiUrl);
+    return getFWInfo(apiUrl, fileType);
 }
 
 firmwareUtil.updateDeviceFirmware = function(progressHandler) {
