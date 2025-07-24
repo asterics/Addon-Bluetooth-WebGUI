@@ -111,7 +111,8 @@ ATDevice.init = function (dontGetLiveValues) {
         }
         if (!L.isVersionNewer(C.MIN_FIRMWARE_VERSION, versionString) && !L.isVersionEqual(C.MIN_FIRMWARE_VERSION, versionString)) {
             if (_communicator.close) _communicator.close();
-            return Promise.reject(C.ERROR_FIRMWARE_OUTDATED);
+            // older than MIN_FW_VERSION
+            return Promise.reject(C.ERROR_LEGACY_FIRMWARE);
         }
         if (versionString.indexOf(C.PRESSURE_SENSOR_TYPE_NONE)>0) {
             _sensorInfo[C.PRESSURE_SENSOR]=false;
