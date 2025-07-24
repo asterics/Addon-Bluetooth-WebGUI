@@ -109,7 +109,7 @@ ATDevice.init = function (dontGetLiveValues) {
             if (_communicator.close) _communicator.close();
             return Promise.reject(C.ERROR_WRONG_DEVICE);
         }
-        if (!L.isVersionNewer(C.MIN_FIRMWARE_VERSION, versionString) && !L.isVersionEqual(C.MIN_FIRMWARE_VERSION, versionString)) {
+        if (!L.isVersionNewer(C.UNIFIED_GUI_MIN_FIRMWARE_VERSION, versionString) && !L.isVersionEqual(C.UNIFIED_GUI_MIN_FIRMWARE_VERSION, versionString)) {
             if (_communicator.close) _communicator.close();
             // older than MIN_FW_VERSION
             return Promise.reject(C.ERROR_LEGACY_FIRMWARE);

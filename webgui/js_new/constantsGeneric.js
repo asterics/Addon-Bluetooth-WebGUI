@@ -10,7 +10,7 @@ window.C = window.C || {};
 
 C.CURRENT_DEVICE = C.CURRENT_DEVICE || null;   // is set in index.html based on the hostname and in ATDevice.js based on the device type
 
-C.MIN_FIRMWARE_VERSION = '3.7.0';
+C.UNIFIED_GUI_MIN_FIRMWARE_VERSION = '3.7.0';
 C.MAX_NUMBER_SLOTS = 10;
 C.MAX_LENGTH_SLOTNAME = 11;
 
