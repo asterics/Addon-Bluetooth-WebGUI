@@ -35,6 +35,7 @@
     <div id="content">
     </div>
     <script type="module">
+
         if ('serviceWorker' in navigator && !location.href.includes('localhost')) {
             navigator.serviceWorker.register('serviceWorker.js');
             navigator.serviceWorker.addEventListener("message", (evt) => {
@@ -48,7 +49,7 @@
         } else if (window.location.hostname.indexOf('pad') > -1) {
             C.CURRENT_DEVICE = C.AT_DEVICE_FLIPPAD;
         } else if (window.location.hostname.indexOf('flipmouse') > -1) {
-            C.CURRENT_DEVICE = C.AT_DEVICE_FM;  
+            C.CURRENT_DEVICE = C.AT_DEVICE_FLIPMOUSE;  
         }
         import { MainView } from "./js_new/ui/views/MainView.js";
         MainView.init();
