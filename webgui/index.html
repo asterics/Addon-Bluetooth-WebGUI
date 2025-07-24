@@ -47,7 +47,7 @@
             C.CURRENT_DEVICE = C.AT_DEVICE_FABI;
         } else if (window.location.hostname.indexOf('pad') > -1) {
             C.CURRENT_DEVICE = C.AT_DEVICE_FLIPPAD;
-        } else if (window.location.hostname.indexOf('flipmouse')) {
+        } else if (window.location.hostname.indexOf('flipmouse') > -1) {
             C.CURRENT_DEVICE = C.AT_DEVICE_FM;  
         }
         import { MainView } from "./js_new/ui/views/MainView.js";
