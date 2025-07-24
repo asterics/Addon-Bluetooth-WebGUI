@@ -101,6 +101,10 @@ class MainView extends Component {
                 this.setState({
                     showScreen: SCREENS.FIRMWARE_UPDATE
                 });
+            } else if (error === C.ERROR_NON_LEGACY_FIRMWARE) {
+                // let url = window.location.origin + '/legacy/';
+                let url = window.location.origin.replace(/\/legacy\/?$/, '/');
+                window.location.replace(url);
             } else {
                 this.setState({
                     errorCode: error
@@ -161,6 +165,7 @@ class MainView extends Component {
         let state = this.state;
 
         return html`
+        <div style="color: red;">Note: You are using the WebGUI legacy variant for a ${C.CURRENT_DEVICE} device with firmware prior to version ${C.UNIFIED_GUI_MIN_FIRMWARE_VERSION} </div>
         <div class="top-layer-center ${state.showScreen === SCREENS.FIRMWARE_UPDATE ? '' : 'd-none'}">
             <div class="container-fluid top-layer-content">
                 <h1>${L.translate('{?} Configuration // {?} Konfiguration', C.CURRENT_DEVICE)}</h1>
@@ -218,7 +223,7 @@ class MainView extends Component {
                     <img class="col-10 offset-1 col-md-6 offset-md-3 col-xl-4 offset-xl-4" src="./img/${C.CURRENT_DEVICE}_logo.svg"/>
                 </div>
                 <div class="row">
-                    <div class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3"><button onclick="${() => this.initATDevice()}">${L.translate("Connect to {?} connected via USB // Verbinden zu {?} (über USB angeschlossen)", C.CURRENT_DEVICE)}</button></div>
+                    <div class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3"><button onclick="${() => this.initATDevice()}">${L.translate("Connect to {?} via USB // Verbinden zu {?} (über USB angeschlossen)", C.CURRENT_DEVICE)}</button></div>
                 </div>
                 <div class="row">
                     <div class="col-12 col-md-8 offset-md-2 col-xl-6 offset-xl-3"><button onclick="${() => this.testMode()}">${L.translate("Use Test mode without real {?} // Test-Modus ohne {?} verwenden", C.CURRENT_DEVICE)}</button></div>

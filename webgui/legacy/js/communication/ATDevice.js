@@ -98,6 +98,15 @@ ATDevice.init = function (dontGetLiveValues) {
             if (_communicator.close) _communicator.close();
             return Promise.reject(C.ERROR_FIRMWARE_OUTDATED);
         }
+        //console.log("ATDevice.init: version is " + versionString + ", unified min version is " + C.UNIFIED_GUI_MIN_FIRMWARE_VERSION);
+        //console.log("ATDevice.init: isVersionNewer: " + L.isVersionNewer(C.UNIFIED_GUI_MIN_FIRMWARE_VERSION, versionString));
+        if (L.isVersionNewer(C.UNIFIED_GUI_MIN_FIRMWARE_VERSION, versionString) || L.isVersionEqual(C.UNIFIED_GUI_MIN_FIRMWARE_VERSION, versionString)) {
+            if (_communicator.close) _communicator.close();
+            // newer than UNIFIED_GUI_MIN_FIRMWARE_VERSION -> switch to new generic version
+            alert("You connected a device with a newer firmware version. Switching to new WebGUI, please press Connect again.");
+            return Promise.reject(C.ERROR_NON_LEGACY_FIRMWARE);
+        }
+
         return ATDevice.refreshConfig();
     }).then(() => {
         if (!_dontGetLiveValues) {
