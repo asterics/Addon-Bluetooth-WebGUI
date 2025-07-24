@@ -100,16 +100,9 @@ class MainView extends Component {
                 }
             });
         }).catch(error => {
-            console.log("error in main view", error)
             if (error === C.ERROR_LEGACY_FIRMWARE) {
-                let base = '';
-                switch (C.CURRENT_DEVICE) {
-                    case C.AT_DEVICE_FABI: base = 'https://fabi.asterics.eu/'; break;
-                    case C.AT_DEVICE_FM: base = 'https://flipmouse.asterics.eu/'; break;
-                    case C.AT_DEVICE_FLIPPAD: base = 'https://flippad.asterics.eu/'; break;
-                }
-                console.log("redirect to 1", base)
-                window.location.replace(base); //  + 'legacy/');
+                let url = window.location.origin + '/legacy/';
+                window.location.replace(url);
             } else {
                 this.setState({
                     errorCode: error
