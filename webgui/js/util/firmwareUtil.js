@@ -167,7 +167,7 @@ firmwareUtil.getDeviceFWInfo = function (device, majorVersion) {
     majorVersion = majorVersion || ATDevice.getMajorVersion();
     let deviceIsFM = device === C.AT_DEVICE_FLIPMOUSE;
     let repoName = C.CURRENT_DEVICE;
-    let releaseTag = 'lastest';
+    let releaseTag = 'latest';
     let fileType = '.hex';
     if (C.DEVICE_IS_FM && majorVersion < 3) {
         repoName = "FLipMouse-v2";
