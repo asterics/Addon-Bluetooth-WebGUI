@@ -1,0 +1,10 @@
+button.button-primary, button.button-primary:hover, button.button-primary:focus {
+    color: white;
+    background-color: #000080;
+    border-color: #000080;
+}
+
+button.button-primary.selected {
+    color: white;
+    background-color: #000080;
+}
