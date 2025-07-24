@@ -8,19 +8,21 @@ import { TabVisualization } from "./ui/views/TabVisualization.js";
 
 window.C = window.C || {};
 
-C.CURRENT_DEVICE = C.AT_DEVICE_FABI;   // TBD: this is used as default for the start screen, until reply to the AT ID command is received, setting it to the correct device type
+C.CURRENT_DEVICE = C.CURRENT_DEVICE || null;   // is set in index.html based on the hostname and in ATDevice.js based on the device type
 
-C.MIN_FIRMWARE_VERSION = '3.7.0';
+C.MIN_FIRMWARE_VERSION = '3.8.0';
 C.MAX_NUMBER_SLOTS = 10;
 C.MAX_LENGTH_SLOTNAME = 11;
 
 // Device VID / PID filters for connection via USB (defines visible devices in connection dialog)
 C.USB_DEVICE_FILTERS = [
-    { usbVendorId: 0x2e8a }, // Arduino Nano 2040 Connect (RP2040)
-    { usbVendorId: 0x2341 }, // Arduino Nano 2040 Connect (from 2023 on)
-    { usbVendorId: 0x2E8A, usbProductId: 0xF10A }, // RaspberryPi PicoW
-    { usbVendorId: 0x239A, usbProductId: 0xCAFE }, // RaspberryPi PicoW - Adafruit TinyUSB Stack
-	{ usbVendorId: 0x2E8A, usbProductId: 0xF10F }  // RaspberryPi Pico2W
+    { usbVendorId: 0x2341, usbProductId: 0x8037 },  // Arduino Pro Micro for legacy FABI
+    { usbVendorId: 0x16c0 },                        // Teensy for legacy FlipMouse 
+    { usbVendorId: 0x2e8a },                        // Arduino Nano 2040 Connect (RP2040)
+    { usbVendorId: 0x2341 },                        // Arduino Nano 2040 Connect (from 2023 on)
+    { usbVendorId: 0x2E8A, usbProductId: 0xF10A },  // RaspberryPi PicoW
+    { usbVendorId: 0x239A, usbProductId: 0xCAFE },  // RaspberryPi PicoW - Adafruit TinyUSB Stack
+	{ usbVendorId: 0x2E8A, usbProductId: 0xF10F }   // RaspberryPi Pico2W
 ];
 
 C.AT_DEVICE_FLIPMOUSE = 'FLipMouse';
@@ -150,7 +152,7 @@ C.BTN_CATEGORIES = [{
 export function getBtnModesActionList() {
     let currentIndex = 1;
     let list = [];
-    console.log("C.CURRENT_DEVICE=", C.CURRENT_DEVICE, "C.DEVICE_IS_FABI=", C.DEVICE_IS_FABI, "C.DEVICE_IS_FM=", C.DEVICE_IS_FM, "C.PYHSICAL_BUTTON_COUNT=", C.PYHSICAL_BUTTON_COUNT);
+    // console.log("C.CURRENT_DEVICE=", C.CURRENT_DEVICE, "C.DEVICE_IS_FABI=", C.DEVICE_IS_FABI, "C.DEVICE_IS_FM=", C.DEVICE_IS_FM, "C.PYHSICAL_BUTTON_COUNT=", C.PYHSICAL_BUTTON_COUNT);
     // Add buttons depending on device
     if (C.DEVICE_IS_FABI === true) {
         // FABI: 5 buttons
@@ -393,6 +395,7 @@ for (var i = 0; i < 400; i++) {
 }
 
 C.ERROR_FIRMWARE_OUTDATED = 'ERROR_FIRMWARE_OUTDATED';
+C.ERROR_LEGACY_FIRMWARE = 'ERROR_LEGACY_FIRMWARE';
 C.ERROR_WRONG_DEVICE = 'ERROR_WRONG_DEVICE';
 C.ERROR_SERIAL_DENIED = 'ERROR_SERIAL_DENIED';
 C.ERROR_SERIAL_BUSY = 'ERROR_SERIAL_BUSY';
