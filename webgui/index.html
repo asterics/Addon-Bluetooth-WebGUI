@@ -1,19 +1,59 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-<head>
-    <title>FLipMouse/FABI Configuration</title>
-</head>
-<body>
-<script>
-    if (window.location.hostname.indexOf('fabi') > -1) {
-        window.location.replace("./index_fabi.htm");
 
-    } else if (window.location.hostname.indexOf('pad') > -1) {
-        window.location.replace("./index_pad.htm");
-        
-    } else {
-        window.location.replace("./index_fm.htm");
-    }
-</script>
+<head>
+    <title>Generic Configuration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="description" content="Page to configure your assistive FABI device from the AsTeRICS Foundation using a web browser">
+
+    <link rel="shortcut icon" href="favicon_fabi.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/normal.css">
+    <link rel="stylesheet" href="css/skeleton.css">
+    <link rel="stylesheet" href="css/custom.css">
+    <!--link rel="stylesheet" href="css/custom_fabi.css"-->
+    <link rel="stylesheet" href="css/modal.css">
+    <link rel="stylesheet" href="css/slider.css">
+    <link rel="stylesheet" href="css/bootstrap-custom.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.css">
+    <script src="lib/loglevel.min.js"></script>
+
+    <script> window.C = window.C || {}; </script>
+    <script type="module" src="js_new/constantsATCommands.js"></script>
+    <script type="module" src="js_new/constantsGeneric.js"></script>
+    <script type="module" src="js_new/communication/ATDevice.js"></script>
+    <script type="module" src="js_new/shortcut.js"></script>
+    <script type="module" src="js_new/lquery.js"></script>
+    <script src="js_new/adapter/wsutil.js"></script>
+    <script src="js_new/adapter/arecomm.js"></script>
+    <script type="module" src="js_new/adapter/sercomm.js"></script>
+    <script src="js_new/adapter/wscomm.js"></script>
+    <script src="js_new/adapter/mockcomm.js"></script>
+</head>
+
+<body>
+    <div id="content">
+    </div>
+    <script type="module">
+        if ('serviceWorker' in navigator && !location.href.includes('localhost')) {
+            navigator.serviceWorker.register('serviceWorker.js');
+            navigator.serviceWorker.addEventListener("message", (evt) => {
+                if (evt.data && evt.data.activated) {
+                    window.location.reload();
+                }
+            });
+        }
+        if (window.location.hostname.indexOf('fabi') > -1) {
+            C.CURRENT_DEVICE = C.AT_DEVICE_FABI;
+        } else if (window.location.hostname.indexOf('pad') > -1) {
+            C.CURRENT_DEVICE = C.AT_DEVICE_FLIPPAD;
+        } else if (window.location.hostname.indexOf('flipmouse')) {
+            C.CURRENT_DEVICE = C.AT_DEVICE_FM;  
+        }
+        import { MainView } from "./js_new/ui/views/MainView.js";
+        MainView.init();
+    </script>
+
 </body>
+
 </html>
