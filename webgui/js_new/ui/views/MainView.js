@@ -17,9 +17,6 @@ const SCREENS = {
     FIRMWARE_CONTINUE: 'FIRMWARE_CONTINUE'
 }
 
-
-C.CURRENT_DEVICE = 'FABI';   // TBD: just a placeholder by now ... why is this not set via constantsGeneric.js?  (undefined..)
-
 class MainView extends Component {
 
     constructor() {
@@ -103,10 +100,16 @@ class MainView extends Component {
                 }
             });
         }).catch(error => {
-            if (error === C.ERROR_FIRMWARE_OUTDATED) {
-                this.setState({
-                    showScreen: SCREENS.FIRMWARE_UPDATE
-                });
+            console.log("error in main view", error)
+            if (error === C.ERROR_LEGACY_FIRMWARE) {
+                let base = '';
+                switch (C.CURRENT_DEVICE) {
+                    case C.AT_DEVICE_FABI: base = 'https://fabi.asterics.eu/'; break;
+                    case C.AT_DEVICE_FM: base = 'https://flipmouse.asterics.eu/'; break;
+                    case C.AT_DEVICE_FLIPPAD: base = 'https://flippad.asterics.eu/'; break;
+                }
+                console.log("redirect to 1", base)
+                window.location.replace(base); //  + 'legacy/');
             } else {
                 this.setState({
                     errorCode: error
