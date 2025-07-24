@@ -112,6 +112,7 @@ ATDevice.init = function (dontGetLiveValues) {
         if (!L.isVersionNewer(C.UNIFIED_GUI_MIN_FIRMWARE_VERSION, versionString) && !L.isVersionEqual(C.UNIFIED_GUI_MIN_FIRMWARE_VERSION, versionString)) {
             if (_communicator.close) _communicator.close();
             // older than MIN_FW_VERSION
+            alert("You connected a device with an older firmware version. Switching to legacy WebGUI, please press Connect again.");
             return Promise.reject(C.ERROR_LEGACY_FIRMWARE);
         }
         if (versionString.indexOf(C.PRESSURE_SENSOR_TYPE_NONE)>0) {
