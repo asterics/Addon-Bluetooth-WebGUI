@@ -103,7 +103,7 @@ ATDevice.init = function (dontGetLiveValues) {
         if (L.isVersionNewer(C.UNIFIED_GUI_MIN_FIRMWARE_VERSION, versionString) || L.isVersionEqual(C.UNIFIED_GUI_MIN_FIRMWARE_VERSION, versionString)) {
             if (_communicator.close) _communicator.close();
             // newer than UNIFIED_GUI_MIN_FIRMWARE_VERSION -> switch to new generic version
-            alert("You connected a device with a newer firmware version. Switching to new WebGUI, please press Connect again.");
+            alert(L.translate("You connected a device with a firmware version newer than " + C.UNIFIED_GUI_MIN_FIRMWARE_VERSION + ". Switching to new WebGUI, please press Connect again. // Sie haben ein Gerät mit einer Firmware verbunden, die neuer ist als Version " + C.UNIFIED_GUI_MIN_FIRMWARE_VERSION + ". Um zur neuen WebGUI zu wechseln, bitte erneut Verbinden drücken."));
             return Promise.reject(C.ERROR_NON_LEGACY_FIRMWARE);
         }
 
