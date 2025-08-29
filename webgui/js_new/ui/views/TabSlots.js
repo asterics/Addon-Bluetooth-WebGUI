@@ -206,11 +206,18 @@ class TabSlots extends Component {
 
 
     async createVoiceMessage() {
-        const message = this.state.voiceMessage.replaceAll(' ','-');
+        let message = this.state.voiceMessage.replaceAll(' ','-');
+
+        // TBD: find out why encoding of special characters doesn't work (http error 400)
+        message = message.replaceAll('ä','ae'); message = message.replaceAll('Ä','Ae');
+        message = message.replaceAll('ö','oe'); message = message.replaceAll('Ö','Oe');
+        message = message.replaceAll('ü','ue'); message = message.replaceAll('Ü','Ue');
+        message = message.replaceAll('ß','ss');
+        
         const lang = this.state.voiceLanguage;
         const gender = this.state.voiceGender;
         console.log(`Generate Voice Message: ${message}, Voice: ${lang},${gender}`);
- 
+
         // TBD: remove proxy when in production!
         const proxyUrl = "https://proxy.asterics-foundation.org/proxy.php?csurl=";
         const apiUrl = encodeURIComponent(`https://texttospeech.responsivevoice.org/v1/text:synthesize?lang=${lang}&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=wlmYRdJY&gender=${gender}&text=${message}`);
@@ -439,13 +446,13 @@ class TabSlots extends Component {
                                placeholder="${audioAvailable ? L.translate('Enter message // Nachricht eingeben') : L.translate('Audio output not supported // Audioausgabe nicht unterstützt')}" maxlength="${C.MAX_LENGTH_VOICEMESSAGE}"/>
                     </div>
                     <div class="col-sm-2 col-lg-2">
-                        <select class="form-control" style="width: 100%;" onchange="${(event) => this.setState({voiceLanguage: event.target.value })}">
+                        <select class="form-control" style="width: 100%;" value="${state.voiceLanguage}" onchange="${(event) => this.setState({voiceLanguage: event.target.value })}">
                                 <option value="en-US">${L.translate('English // Englisch')}</option>
                                 <option value="de-DE">${L.translate('German // Deutsch')}</option>
                         </select>
                     </div>
                    <div class="col-sm-2 col-lg-2">
-                        <select class="form-control" style="width: 100%;" onchange="${(event) => this.setState({voiceGender: event.target.value })}">
+                        <select class="form-control" style="width: 100%;" value="${state.voiceGender}" onchange="${(event) => this.setState({voiceGender: event.target.value })}">
                             <option value="male">${L.translate('Male // Männlich')}</option>
                             <option value="female">${L.translate('Female // Weiblich')}</option>
                         </select>
