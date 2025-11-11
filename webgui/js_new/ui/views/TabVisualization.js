@@ -15,9 +15,14 @@ class TabVisualization extends Component {
         // Dynamically initialize the first C.PHYSICAL_BUTTON_COUNT elements
         const physicalButtonCount = C.PHYSICAL_BUTTON_COUNT; 
         const physicalButtonNames = Array.from({ length: physicalButtonCount }, (_, i) => `${i + 1}`);
+        let additionalButtonNames;
 
-        // Add the remaining button (virtual button function) names
-        const additionalButtonNames = ["Up // Rauf", "Down // Runter", "Left // Links", "Right // Rechts", "Sip // Ansaugen", "Strong Sip // Starkes Ansaugen", "Puff // Pusten", "Strong Puff // Starkes Pusten"];
+        // Add the remaining button (virtual button function) names; re-use sip/puff as 6.&7. button when using SDA/SCL as GPIOs.
+        if(ATDevice.getSensorInfo()[C.FORCE_SENSOR_TYPE_ADC] && !ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]) {
+            additionalButtonNames = ["Up // Rauf", "Down // Runter", "Left // Links", "Right // Rechts", "Btn-L // Btn Links", "Strong Sip // Starkes Ansaugen", "Btn-R // Btn Rechts", "Strong Puff // Starkes Pusten"];
+        } else {
+            additionalButtonNames = ["Up // Rauf", "Down // Runter", "Left // Links", "Right // Rechts", "Sip // Ansaugen", "Strong Sip // Starkes Ansaugen", "Puff // Pusten", "Strong Puff // Starkes Pusten"];
+        }
         TabVisualization.BTN_NAMES = [...physicalButtonNames, ...additionalButtonNames];
 
         this.setState({
@@ -48,9 +53,16 @@ class TabVisualization extends Component {
             if ((!ATDevice.getSensorInfo()[C.FORCE_SENSOR]) && (index >= C.PHYSICAL_BUTTON_COUNT && index < C.PHYSICAL_BUTTON_COUNT+4)) {  // up, down, left, right buttons (functions)
                 return '';
             }
-            if ((!ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]) && (index >= C.PHYSICAL_BUTTON_COUNT+4)) {  // sip and puff buttons (functions)
-                return '';
+
+            if(ATDevice.getSensorInfo()[C.FORCE_SENSOR_TYPE_ADC] && !ATDevice.getSensorInfo()[C.PRESSURE_SENSOR] && (index >= C.PHYSICAL_BUTTON_COUNT+4)) {
+                //show sip/puff as buttons; but others not
+                if(index != C.PHYSICAL_BUTTON_COUNT+4 && index != C.PHYSICAL_BUTTON_COUNT+6) return '';
+            } else {
+                if ((!ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]) && (index >= C.PHYSICAL_BUTTON_COUNT+4)) {  // sip and puff buttons (functions)
+                    return '';
+                }
             }
+            
 
             let color = buttonState ? 'orange' : 'transparent';
             return html`<div style="margin: 10px; ${styleUtil.getCircleStyle(circleRadius, color, 'medium solid')}; ${fontStyle}">${L.translate(btnNames[index])}</div>`
