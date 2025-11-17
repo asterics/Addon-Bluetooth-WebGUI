@@ -121,12 +121,19 @@ ATDevice.init = function (dontGetLiveValues) {
         } else {
             _sensorInfo[C.PRESSURE_SENSOR]=true;
             console.log("Pressure Sensor found");
+            //save the detected sensor
+            if (versionString.indexOf(C.PRESSURE_SENSOR_TYPE_ADC)>0) { _sensorInfo[C.PRESSURE_SENSOR_TYPE_ADC] = true; }
+            if (versionString.indexOf(C.PRESSURE_SENSOR_TYPE_DPS310)>0) { _sensorInfo[C.PRESSURE_SENSOR_TYPE_DPS310] = true; }
+            if (versionString.indexOf(C.PRESSURE_SENSOR_TYPE_MPRLS)>0) { _sensorInfo[C.PRESSURE_SENSOR_TYPE_MPRLS] = true; }
         }
         _sensorInfo[C.FORCE_SENSOR]=false;
         if ((versionString.indexOf(C.FORCE_SENSOR_TYPE_NAU7802)>0) ||
             (versionString.indexOf(C.FORCE_SENSOR_TYPE_ADC)>0)) {
             _sensorInfo[C.FORCE_SENSOR]=true;
             console.log("Force Sensor found");
+            //save the detected sensor
+            if (versionString.indexOf(C.FORCE_SENSOR_TYPE_ADC)>0) { _sensorInfo[C.FORCE_SENSOR_TYPE_ADC] = true; }
+            if (versionString.indexOf(C.FORCE_SENSOR_TYPE_NAU7802)>0) { _sensorInfo[C.FORCE_SENSOR_TYPE_NAU7802] = true; }
         } else {
             console.log("No Force Sensor available");
         }

@@ -5,6 +5,7 @@ import { TabGeneral } from "./ui/views/TabGeneral.js";
 import { TabTimings } from "./ui/views/TabTimings.js";
 import { TabSipPuff } from "./ui/views/TabSipPuff.js";
 import { TabVisualization } from "./ui/views/TabVisualization.js";
+import { ATDevice } from "./communication/ATDevice.js";
 
 window.C = window.C || {};
 
@@ -160,6 +161,19 @@ export function getBtnModesActionList() {
             list.push({
                 index: currentIndex++,
                 label: `Button ${i}`,
+                category: C.BTN_CAT_BTN
+            });
+        }
+        // analog joystick, no pressure sensor (use I2C as GPIO, 2 extra buttons mapped to sip/puff)
+        if(ATDevice.getSensorInfo()[C.FORCE_SENSOR_TYPE_ADC] && !ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]) {
+            list.push({
+                index: 10,
+                label: `Button left // Button links`,
+                category: C.BTN_CAT_BTN
+            });
+            list.push({
+                index: 12,
+                label: `Button right // Button rechts`,
                 category: C.BTN_CAT_BTN
             });
         }
