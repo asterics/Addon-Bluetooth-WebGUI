@@ -172,6 +172,8 @@ export function getBtnModesActionList() {
                 category: C.BTN_CAT_BTN
             });
         }
+        //overwrite button count for visu
+        C.PHYSICAL_BUTTON_COUNT = 3;
     }
 
     // Add the rest of the actions (stick, sip/puff, etc.) as before
