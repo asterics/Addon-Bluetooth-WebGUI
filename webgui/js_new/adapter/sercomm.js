@@ -11,6 +11,9 @@ function SerialCommunicator() {
     let _runReader = true;
     let _portReader = null;
 
+    // Flag to distinguish between user disconnect and error disconnect
+    let _isManualClose = false; 
+
     //value handler for reported ADC/mouthpiece values
     var _valueHandler;
     //internal value handler function for the returned data for an AT command.
@@ -29,18 +32,61 @@ function SerialCommunicator() {
     }
 
     this.init = async function () {
+        _isManualClose = false; // Reset flag on init
+
         if (!navigator.serial) {
             console.warn("Browser not supported, please use Chromium, Vivaldi, Edge or Chrome");
             return Promise.reject(C.ERROR_SERIAL_NOT_SUPPORTED);
         }
 
-        //filter for arduino/Teensy VID/PID and our own ones
-        const filters = C.USB_DEVICE_FILTERS;
+        console.log("Requesting serial port...");
+        _port=null;
+        const saved = localStorage.getItem("preferredPort");
+        if (saved) {
+            const savedInfo = JSON.parse(saved);
+            console.log(`Saved preferred port VID=${savedInfo.usbVendorId}, PID=${savedInfo.usbProductId}`);
 
-        _port = await navigator.serial.requestPort({filters}).catch((error) => {
-            console.log(error);
-            return Promise.reject(C.ERROR_SERIAL_DENIED);
-        });
+            const ports = await navigator.serial.getPorts();
+            if (ports.length === 0) {
+                console.log("No previously authorized ports found.");
+                return;
+            }
+
+            // Try to find the matching port
+            for (const p of ports) {
+                const info = p.getInfo();
+                console.log(`Found authorized port: VID=${info.usbVendorId}, PID=${info.usbProductId}`);
+
+                if (info.usbVendorId === savedInfo.usbVendorId &&
+                    info.usbProductId === savedInfo.usbProductId) {
+
+                    console.log("Matched saved port — opening...");
+                    _port = p;
+                    const info = _port.getInfo();
+                    console.log(`Re-opening port VID=${info.usbVendorId}, PID=${info.usbProductId}`);
+                    break;
+                }
+            }
+        }
+
+        if (!_port) {
+            console.log("Saved port not found, user must reconnect.");
+         
+            //filter for valid VID/PID combinations
+            const filters = C.USB_DEVICE_FILTERS;
+
+            _port = await navigator.serial.requestPort({filters}).catch((error) => {
+                console.log(error);
+                return Promise.reject(C.ERROR_SERIAL_DENIED);
+            });
+
+            const info = _port.getInfo();
+            console.log(`User selected port VID=${info.usbVendorId}, PID=${info.usbProductId}`);
+
+            // Save port identification to localStorage
+            localStorage.setItem("preferredPort", JSON.stringify(info));
+            console.log("Saved preferred port to localStorage.");
+        }
 
         // Wait for the serial port to open.
         await _port.open({baudRate: 115200}).catch((error) => {
@@ -189,6 +235,60 @@ function SerialCommunicator() {
         return Promise.resolve();
     };
 
+    async function tryAutoReconnect() {
+        console.log("Starting auto-reconnection loop...");
+        
+        while (!_isManualClose) {
+            try {
+                const saved = localStorage.getItem("preferredPort");
+                if (!saved) {
+                    console.log("No saved port to reconnect to.");
+                    break;
+                }
+                const savedInfo = JSON.parse(saved);
+                
+                // Check available ports
+                const ports = await navigator.serial.getPorts();
+                let foundPort = null;
+                
+                for (const p of ports) {
+                    const info = p.getInfo();
+                    if (info.usbVendorId === savedInfo.usbVendorId &&
+                        info.usbProductId === savedInfo.usbProductId) {
+                        foundPort = p;
+                        break;
+                    }
+                }
+
+                if (foundPort) {
+                    console.log("Found device, attempting to open...");
+
+                    await foundPort.open({baudRate: 115200});
+                    await foundPort.close(); // Close immediately to reset state
+                    console.log("port opened and closed successfully");
+
+                    // notify UI that we are back online, updated views
+                    if (MainView.instance) {
+                        MainView.instance.initATDevice();
+                    }
+                    return; // Exit loop on success
+                } else {
+                    console.log("Saved device not found in port list. Scanning...");
+                }
+            } catch (e) {
+                console.log("Reconnection attempt failed, retrying in 2s...", e);
+            }
+
+            // Wait 2 seconds before next attempt
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+        
+        // go back to connection screen because of manual close or no saved port
+        if (MainView.instance) {
+            MainView.instance.toConnectionScreen();
+        }
+    }
+
     async function listenToPort() {
         const textDecoder = new TextDecoderStream();
         _port.readable.pipeTo(textDecoder.writable);
@@ -228,12 +328,29 @@ function SerialCommunicator() {
                     });
 
                 } catch (e) {
-                    console.warn(e);
-                    thiz.close();
-                    if (MainView.instance) {
-                        MainView.instance.toConnectionScreen();
+                    console.warn("Serial port error/disconnect:", e);
+                    
+                    // Release locks and close port wrapper
+                    try {
+                        _runReader = false;
+                        if (_portReader) _portReader.releaseLock();
+                        if (_portWriter) _portWriter.releaseLock();
+                        if (_port) await _port.close(); 
+                    } catch (cleanupError) {
+                        console.log("Serial port cleanup error:", cleanupError);
                     }
-                    reject();
+
+                    if (!_isManualClose) {
+                        // Attempt to reconnect instead of showing connection screen immediately
+                        tryAutoReconnect();
+                        // We don't reject here, we let the reconnect loop handle it
+                        return; 
+                    } else {
+                        if (MainView.instance) {
+                            MainView.instance.toConnectionScreen();
+                        }
+                        reject();
+                    }
                 }
             }
             _portReader.releaseLock();
