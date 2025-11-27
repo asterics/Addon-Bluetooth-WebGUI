@@ -1,86 +1,97 @@
 import {MainView} from "../ui/views/MainView.js";
 
+// Service / characteristic UUIDs (as requested)
+const PUCK_AT_COMMAND_SERVICE = 0xBCDE;
+const PUCK_AT_COMMAND_WRITE_CHARACTERISTIC = 0xABCD; // TX from browser -> device
+const PUCK_AT_COMMAND_READ_CHARACTERISTIC = 0xABCE;  // RX notifications device -> browser
+
 window.logReceived = false;
 
-function SerialCommunicator() {
-    //serial port instance
+function BluetoothCommunicator() {
+    // BLE device and characteristics
     let thiz = this;
-    var _port;
-    var _portWriter;
-    var _textEncoder = new TextEncoder();
-    let _runReader = true;
-    let _portReader = null;
+    let _device = null;
+    let _server = null;
+    let _service = null;
+    let _txChar = null; // write characteristic (TX from browser)
+    let _rxChar = null; // notify characteristic (RX from device)
 
-    //value handler for reported ADC/mouthpiece values
-    var _valueHandler;
-    //internal value handler function for the returned data for an AT command.
-    var _internalValueFunction;
-    let _sendingRaw = false;
+    const _textEncoder = new TextEncoder();
+    const _textDecoder = new TextDecoder();
 
+    // handlers and state
+    let _valueHandler = null;
+    let _internalValueFunction = null;
     let _stringToReceive = null;
     let _stringToReceiveResolve = null;
+    let _receiveBuffer = "";
 
     this.setValueHandler = function (handler) {
         _valueHandler = handler;
     };
 
-    this.getSerialPort = function() {
-        return _port;
-    }
+    this.getSerialPort = function () {
+        return _device;
+    };
 
+    // Init: request and connect to BLE device, setup characteristics and notifications
     this.init = async function () {
-        if (!navigator.serial) {
-            console.warn("Browser not supported, please use Chromium, Vivaldi, Edge or Chrome");
-            return Promise.reject(C.ERROR_SERIAL_NOT_SUPPORTED);
+        if (!navigator.bluetooth) {
+            console.warn("Browser not supported, please use Chromium, Edge or Chrome");
+            return Promise.reject('BLE_NOT_SUPPORTED');
         }
 
-        //filter for arduino/Teensy VID/PID and our own ones
-        const filters = C.USB_DEVICE_FILTERS;
+        try {
+            _device = await navigator.bluetooth.requestDevice({
+                filters: [{services: [PUCK_AT_COMMAND_SERVICE]}],
+                optionalServices: [PUCK_AT_COMMAND_SERVICE]
+            });
 
-        _port = await navigator.serial.requestPort({filters}).catch((error) => {
-            console.log(error);
-            return Promise.reject(C.ERROR_SERIAL_DENIED);
-        });
+            _device.addEventListener('gattserverdisconnected', (ev) => {
+                if (MainView.instance) MainView.instance.toConnectionScreen();
+            });
 
-        // Wait for the serial port to open.
-        await _port.open({baudRate: 115200}).catch((error) => {
-            console.log(error);
-            return Promise.reject(C.ERROR_SERIAL_BUSY);
-        });
-        await listenToPort().catch(() => {
-            return Promise.reject(C.ERROR_SERIAL_CONNECT_FAILED);
-        });
-        _portWriter = _port.writable.getWriter();
+            _server = await _device.gatt.connect();
+            _service = await _server.getPrimaryService(PUCK_AT_COMMAND_SERVICE);
+            _txChar = await _service.getCharacteristic(PUCK_AT_COMMAND_WRITE_CHARACTERISTIC);
+            _rxChar = await _service.getCharacteristic(PUCK_AT_COMMAND_READ_CHARACTERISTIC);
 
-        return Promise.resolve();
+            await _rxChar.startNotifications();
+            _rxChar.addEventListener('characteristicvaluechanged', onCharacteristicValueChanged);
+
+            return Promise.resolve();
+        } catch (error) {
+            console.error('BLE init error', error);
+            return Promise.reject('BLE_INIT_FAILED');
+        }
     };
 
     this.cancel = function () {
-        _runReader = false;
-        if (_portReader) _portReader.cancel();
-        if (_portWriter) _portWriter.close();
-        if (_portReader) _portReader.releaseLock();
-        if (_portWriter) _portWriter.releaseLock();
-    }
+        if (_rxChar) {
+            try {
+                _rxChar.removeEventListener('characteristicvaluechanged', onCharacteristicValueChanged);
+                _rxChar.stopNotifications().catch(() => {});
+            } catch (e) {
+                // ignore
+            }
+        }
+    };
 
     this.close = function () {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             this.cancel();
             setTimeout(() => {
-                if (_port) _port.close();
-                setTimeout(() => {
-                    resolve();
-                }, 200);
+                try {
+                    if (_device && _device.gatt.connected) _device.gatt.disconnect();
+                } catch (e) {
+                    // ignore
+                }
+                setTimeout(() => resolve(), 200);
             }, 200);
         });
-    }
+    };
 
-    /**
-     * waits for a specific string to be received by serial port
-     * @param stringToReceive the string to wait for
-     * @param timeout timeout how long to wait
-     * @return {Promise<unknown>} Promise is resolved if string is received, otherwise rejected after given timeout
-     */
+    // waits for a specific string to be received
     this.waitForReceiving = function (stringToReceive, timeout) {
         timeout = timeout || 5000;
         _stringToReceive = stringToReceive;
@@ -92,94 +103,35 @@ function SerialCommunicator() {
                 reject(stringToReceive + ' not received.');
             }, timeout);
         });
-    }
+    };
 
-    /**
-     * sends raw data to serial port
-     * @param arrayBuffer the binary data to send in an ArrayBuffer
-     * @param progressCallback optional function that is called with current percentage value of progress (0-100)
-     * @return {Promise<void>}
-     */
-    this.sendRawData = async function (arrayBuffer, progressCallback) {
-        if (!arrayBuffer) return;
-        if (!_port) {
-            throw 'sercomm: port not initialized. call init() before sending data.';
+    // sendValue: send an AT command / line to the device (adds CRLF)
+    this.sendValue = async function (value, timeout, dontLog) {
+        if (!value) return;
+        if (!_txChar) {
+            throw 'blecomm: device not initialized. call init() before sending data.';
         }
-        _sendingRaw = true;
-        let array = new Int8Array(arrayBuffer);
-        let chunksize = 256;
-        let sent = 0;
-        let lastProgress = null;
-        for (let i = 0; i < array.length; i += chunksize) {
-            sent += chunksize;
-            await _portWriter.write(array.slice(i, i + chunksize));
-            let progress = Math.floor((sent / array.length) * 100);
-            if (progressCallback && progress !== lastProgress) {
-                progressCallback(progress);
-                lastProgress = progress;
-                log.info(progress + '%');
-            }
-            await new Promise(resolve => setTimeout(() => resolve(), 10));
-        }
-        _sendingRaw = false;
-    }
 
-    /**
-     * sends raw audio data to serial port
-     * @param arrayBuffer the binary audio data (in wav format, 22Khz, mono) to send in an ArrayBuffer
-     * @return {Promise<void>}
-     */
-    this.sendAudioData = async function (arrayBuffer) {
-        if (!arrayBuffer) return;
-        if (!_port) {
-            throw 'sercomm: port not initialized. call init() before sending data.';
-        }
-        _sendingRaw = true;
+        const output = value + "\r\n";
         try {
-            await _portWriter.write(_textEncoder.encode(C.AT_CMD_AUDIO_TRANSMISSION+"\n"));
-            await _portWriter.write(arrayBuffer);
+            await _txChar.writeValue(_textEncoder.encode(output));
         } catch (error) {
-            console.error("Error sending data to serial device:", error);
+            console.error('Error writing to TX characteristic', error);
+            throw error;
         }
-        _sendingRaw = false;
-
-    }
-
-
-    //send data line based (for all AT commands)
-    this.sendData = async function (value, timeout, dontLog) {
-        if (!value || _sendingRaw) return;
-        if (!_port) {
-            throw 'sercomm: port not initialized. call init() before sending data.';
-        }
-        timeout = timeout || 0;
-
-        //send data via serial port
-        var output = value + "\r\n";
-        await _portWriter.write(_textEncoder.encode(output));
-        //add NL/CR (not needed on websockets)
-        //await _portWriter.write('\r\n');
-
-        //_portWriter.releaseLock();
-        //wait for a response to this command
-        //(there might be a timeout for commands with no response)
 
         if (timeout > 0) {
             return new Promise(function (resolve) {
                 let result = '';
                 let timeoutHandler = setTimeout(function () {
-                    if (!dontLog) {
-                        console.log("timeout of command: " + value);
-                    }
+                    if (!dontLog) console.log("timeout of command: " + value);
                     resolve(result);
                 }, timeout);
                 _internalValueFunction = function (data) {
                     clearTimeout(timeoutHandler);
                     result += data;
                     timeoutHandler = setTimeout(function () {
-                        if (!dontLog) {
-                            console.log("got result: " + result);
-                        }
+                        if (!dontLog) console.log("got result: " + result);
                         resolve(result);
                         _internalValueFunction = null;
                     }, 200);
@@ -189,56 +141,37 @@ function SerialCommunicator() {
         return Promise.resolve();
     };
 
-    async function listenToPort() {
-        const textDecoder = new TextDecoderStream();
-        _port.readable.pipeTo(textDecoder.writable);
-        _portReader = textDecoder.readable.getReader();
+    function onCharacteristicValueChanged(event) {
+        try {
+            const value = event.target.value;
+            const chunk = _textDecoder.decode(value);
+            if (window.logReceived) console.info(chunk);
 
-        // Listen to data coming from the serial device.
-        _runReader = true;
-        var chunk = "";
-        return new Promise(async (resolve, reject) => {
-            setTimeout(resolve, 200);
-            while (_runReader) {
-                try {
-                    const {value, done} = await _portReader.read();
-                    if (done) {
-                        break;
-                    }
-
-                    if (window.logReceived) {
-                        log.info(value);
-                    }
-                    value.split("").forEach((part) => {
-                        chunk = chunk + part;
-                        if (_stringToReceive && chunk.indexOf(_stringToReceive.trim()) > -1) {
-                            _stringToReceiveResolve();
-                            _stringToReceive = null;
-                        }
-                        if (part === '\n') {
-                            if (chunk.length > 2 && chunk.indexOf(C.LIVE_VALUE_CONSTANT) > -1) {
-                                if (L.isFunction(_valueHandler)) {
-                                    _valueHandler(chunk.toString());
-                                }
-                            } else if (_internalValueFunction) {
-                                _internalValueFunction(chunk);
-                            }
-                            chunk = "";
-                        }
-                    });
-
-                } catch (e) {
-                    console.warn(e);
-                    thiz.close();
-                    if (MainView.instance) {
-                        MainView.instance.toConnectionScreen();
-                    }
-                    reject();
-                }
+            _receiveBuffer += chunk;
+            // Handle waiting promise
+            if (_stringToReceive && _receiveBuffer.indexOf(_stringToReceive.trim()) > -1) {
+                if (_stringToReceiveResolve) _stringToReceiveResolve();
+                _stringToReceive = null;
+                _stringToReceiveResolve = null;
             }
-            _portReader.releaseLock();
-        });
+
+            // split lines
+            let parts = _receiveBuffer.split(/\r?\n/);
+            // keep last partial chunk
+            _receiveBuffer = parts.pop();
+            parts.forEach((line) => {
+                if (!line) return;
+                if (line.indexOf && line.indexOf(window.C && window.C.LIVE_VALUE_CONSTANT) > -1) {
+                    if (typeof _valueHandler === 'function') _valueHandler(line + '\n');
+                } else if (_internalValueFunction) {
+                    _internalValueFunction(line + '\n');
+                }
+            });
+        } catch (e) {
+            console.warn('Error in notification handler', e);
+        }
     }
+
 }
 
-export {SerialCommunicator};
+export {BluetoothCommunicator};
