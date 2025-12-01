@@ -172,7 +172,7 @@ export function getBtnModesActionList() {
                 category: C.BTN_CAT_BTN
             });
             list.push({
-                index: 12,
+                index: 11,
                 label: `Button right // Button rechts`,
                 category: C.BTN_CAT_BTN
             });
