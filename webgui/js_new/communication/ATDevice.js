@@ -1,8 +1,9 @@
 /**
  * ATDevice implements all functionality that is generic for FLipMouse, FABI and FlipPad devices.
  */
-import {SerialCommunicator} from "../adapter/sercomm.js";
-import {localStorageService} from "../localStorageService.js";
+import { BluetoothCommunicator } from "../adapter/blecomm.js";
+import { SerialCommunicator } from "../adapter/sercomm.js";
+import { localStorageService } from "../localStorageService.js";
 
 let ATDevice = {};
 ATDevice.parseLiveData = true;
@@ -69,7 +70,7 @@ ATDevice.init = function (dontGetLiveValues) {
             _communicator = new MockCommunicator();
             return Promise.resolve();
         } else if (C.GUI_IS_HOSTED) {
-            _communicator = new SerialCommunicator();
+            _communicator = new BluetoothCommunicator();
             return _communicator.init();
         } else if (C.GUI_IS_ON_DEVICE) {
             return ws.initWebsocket(C.FLIP_WEBSOCKET_URL).then(function (socket) {
@@ -84,25 +85,25 @@ ATDevice.init = function (dontGetLiveValues) {
         _lastVersionRawString = versionString;
         _lastVersionResult = L.parseVersion(versionString);
         console.log("VersionString: " + versionString);
-        if (versionString.toLowerCase().includes("fabi")) { 
-            C.CURRENT_DEVICE = C.AT_DEVICE_FABI; 
-            C.DEVICE_IS_FLIPPAD = false; 
-            C.DEVICE_IS_FM = false; 
-            C.DEVICE_IS_FABI=true;
+        if (versionString.toLowerCase().includes("fabi")) {
+            C.CURRENT_DEVICE = C.AT_DEVICE_FABI;
+            C.DEVICE_IS_FLIPPAD = false;
+            C.DEVICE_IS_FM = false;
+            C.DEVICE_IS_FABI = true;
             C.PYHSICAL_BUTTON_COUNT = 5; // FABI has 5 physical buttons 
         }
-        else if (versionString.toLowerCase().includes("flipmouse")) { 
-            C.CURRENT_DEVICE = C.AT_DEVICE_FLIPMOUSE; 
-            C.DEVICE_IS_FLIPPAD = false; 
-            C.DEVICE_IS_FM = true; 
-            C.DEVICE_IS_FABI=false; 
+        else if (versionString.toLowerCase().includes("flipmouse")) {
+            C.CURRENT_DEVICE = C.AT_DEVICE_FLIPMOUSE;
+            C.DEVICE_IS_FLIPPAD = false;
+            C.DEVICE_IS_FM = true;
+            C.DEVICE_IS_FABI = false;
             C.PYHSICAL_BUTTON_COUNT = 3; // FlipMouse has 3 physical buttons
         }
-        else if (versionString.toLowerCase().includes("flippad")) { 
-            C.CURRENT_DEVICE = C.AT_DEVICE_FLIPPAD; 
-            C.DEVICE_IS_FLIPPAD = true; 
-            C.DEVICE_IS_FM = false; 
-            C.DEVICE_IS_FABI=false; 
+        else if (versionString.toLowerCase().includes("flippad")) {
+            C.CURRENT_DEVICE = C.AT_DEVICE_FLIPPAD;
+            C.DEVICE_IS_FLIPPAD = true;
+            C.DEVICE_IS_FM = false;
+            C.DEVICE_IS_FABI = false;
             C.PYHSICAL_BUTTON_COUNT = 3; // FlipPad has 3 physical buttons
         }
         else {
@@ -115,25 +116,25 @@ ATDevice.init = function (dontGetLiveValues) {
             alert(L.translate("You connected a device using a firmware older than version " + C.UNIFIED_GUI_MIN_FIRMWARE_VERSION + ". For switching to the legacy WebGUI, please press Connect again. // Sie haben ein Gerät mit einer Firmware verbunden, die älter ist als Version " + C.UNIFIED_GUI_MIN_FIRMWARE_VERSION + ". Um zur Legacy-WebGUI zu wechseln, bitte erneut Verbinden drücken."));
             return Promise.reject(C.ERROR_LEGACY_FIRMWARE);
         }
-        if (versionString.indexOf(C.PRESSURE_SENSOR_TYPE_NONE)>0) {
-            _sensorInfo[C.PRESSURE_SENSOR]=false;
+        if (versionString.indexOf(C.PRESSURE_SENSOR_TYPE_NONE) > 0) {
+            _sensorInfo[C.PRESSURE_SENSOR] = false;
             console.log("No Pressure Sensor available");
         } else {
-            _sensorInfo[C.PRESSURE_SENSOR]=true;
+            _sensorInfo[C.PRESSURE_SENSOR] = true;
             console.log("Pressure Sensor found");
             //save the detected sensor
-            if (versionString.indexOf(C.PRESSURE_SENSOR_TYPE_ADC)>0) { _sensorInfo[C.PRESSURE_SENSOR_TYPE_ADC] = true; }
-            if (versionString.indexOf(C.PRESSURE_SENSOR_TYPE_DPS310)>0) { _sensorInfo[C.PRESSURE_SENSOR_TYPE_DPS310] = true; }
-            if (versionString.indexOf(C.PRESSURE_SENSOR_TYPE_MPRLS)>0) { _sensorInfo[C.PRESSURE_SENSOR_TYPE_MPRLS] = true; }
+            if (versionString.indexOf(C.PRESSURE_SENSOR_TYPE_ADC) > 0) { _sensorInfo[C.PRESSURE_SENSOR_TYPE_ADC] = true; }
+            if (versionString.indexOf(C.PRESSURE_SENSOR_TYPE_DPS310) > 0) { _sensorInfo[C.PRESSURE_SENSOR_TYPE_DPS310] = true; }
+            if (versionString.indexOf(C.PRESSURE_SENSOR_TYPE_MPRLS) > 0) { _sensorInfo[C.PRESSURE_SENSOR_TYPE_MPRLS] = true; }
         }
-        _sensorInfo[C.FORCE_SENSOR]=false;
-        if ((versionString.indexOf(C.FORCE_SENSOR_TYPE_NAU7802)>0) ||
-            (versionString.indexOf(C.FORCE_SENSOR_TYPE_ADC)>0)) {
-            _sensorInfo[C.FORCE_SENSOR]=true;
+        _sensorInfo[C.FORCE_SENSOR] = false;
+        if ((versionString.indexOf(C.FORCE_SENSOR_TYPE_NAU7802) > 0) ||
+            (versionString.indexOf(C.FORCE_SENSOR_TYPE_ADC) > 0)) {
+            _sensorInfo[C.FORCE_SENSOR] = true;
             console.log("Force Sensor found");
             //save the detected sensor
-            if (versionString.indexOf(C.FORCE_SENSOR_TYPE_ADC)>0) { _sensorInfo[C.FORCE_SENSOR_TYPE_ADC] = true; }
-            if (versionString.indexOf(C.FORCE_SENSOR_TYPE_NAU7802)>0) { _sensorInfo[C.FORCE_SENSOR_TYPE_NAU7802] = true; }
+            if (versionString.indexOf(C.FORCE_SENSOR_TYPE_ADC) > 0) { _sensorInfo[C.FORCE_SENSOR_TYPE_ADC] = true; }
+            if (versionString.indexOf(C.FORCE_SENSOR_TYPE_NAU7802) > 0) { _sensorInfo[C.FORCE_SENSOR_TYPE_NAU7802] = true; }
         } else {
             console.log("No Force Sensor available");
         }
@@ -173,7 +174,7 @@ ATDevice.getVersionSuffix = function () {
         return;
     }
     let parts = _lastVersionRawString.split(', ');
-    if (parts.length > 1) { 
+    if (parts.length > 1) {
         parts.shift();
         return parts.join(', ');
     }
@@ -326,7 +327,7 @@ ATDevice.upgradeBTAddon = async function (firmwareArrayBuffer, progressCallback)
     if (!_communicator.sendRawData) {
         log.warn('upgrade not supported by communicator!')
         return;
-    }    
+    }
     stopTestingConnection();
     ATDevice.sendAtCmdForce(C.AT_CMD_STOP_REPORTING_LIVE);
     ATDevice.sendAtCmdForce(C.AT_CMD_UPGRADE_ADDON);
@@ -395,7 +396,7 @@ ATDevice.setConfig = async function (atCmd, value, debounceTimeout, slot) {
     });
 };
 
-ATDevice.setConfigForSlot = async function(atCmd, value, slot, debounceTimeout) {
+ATDevice.setConfigForSlot = async function (atCmd, value, slot, debounceTimeout) {
     debounceTimeout = debounceTimeout || 0;
     return ATDevice.setConfig(atCmd, value, debounceTimeout, slot);
 }
@@ -632,7 +633,7 @@ ATDevice.deleteAllSlots = function () {
     emitSlotChange();
 }
 
-ATDevice.sendAudio =  async function(wavBuffer) {
+ATDevice.sendAudio = async function (wavBuffer) {
 
     let serialCommunicator = ATDevice.getCommunicator();
     let failed = false;
@@ -656,7 +657,7 @@ ATDevice.sendAudio =  async function(wavBuffer) {
 ATDevice.uploadSlots = async function (slotObjects, progressHandler) {
     ATDevice.save();
     let slotObject = null;
-    progressHandler = progressHandler || (() => {});
+    progressHandler = progressHandler || (() => { });
     progressHandler(1);
     for (let i = 0; i < slotObjects.length; i++) {
         slotObject = slotObjects[i];
@@ -669,7 +670,7 @@ ATDevice.uploadSlots = async function (slotObjects, progressHandler) {
             }
         });
         await ATDevice.save(slotObject.name, true);
-        progressHandler(Math.round((i+1) / slotObjects.length * 100));
+        progressHandler(Math.round((i + 1) / slotObjects.length * 100));
         _slots.push(slotObject);
     }
     progressHandler(100);
@@ -692,7 +693,7 @@ ATDevice.restoreDefaultConfiguration = function () {
     return promise;
 };
 
-ATDevice.parseConfig = function(atCmdsString) {
+ATDevice.parseConfig = function (atCmdsString) {
     atCmdsString = atCmdsString.replace(/\n\s*\n/g, '\n'); //replace doubled linebreaks with single one
     let elements = atCmdsString.split('\n');
     let parsedSlots = [];
@@ -855,7 +856,7 @@ ATDevice.getIRCommands = function () {
 };
 
 ATDevice.recordIrCommand = function (name) {
-    return ATDevice.sendAtCmdWithResult(C.AT_CMD_IR_RECORD, name, {timeout: 11000}).then(result => {
+    return ATDevice.sendAtCmdWithResult(C.AT_CMD_IR_RECORD, name, { timeout: 11000 }).then(result => {
         let success = result && result.indexOf(_AT_CMD_IR_TIMEOUT_RESPONSE) === -1;
         return Promise.resolve(success);
     });
@@ -953,9 +954,9 @@ ATDevice.resetDevice = async function (existingPort, filters) {
     let port = existingPort;
     filters = filters || [];
     if (!port) {
-        port = await navigator.serial.requestPort({filters});
+        port = await navigator.serial.requestPort({ filters });
     }
-    await port.open({baudRate: 1200});
+    await port.open({ baudRate: 1200 });
     await firmwareUtil.wait(500);
     await port.close();
     log.info('reset done!');
@@ -1046,4 +1047,4 @@ window.addEventListener('beforeunload', () => {
 
 ATDevice.setLiveValueHandler(parseLiveData);
 
-export {ATDevice};
+export { ATDevice };
