@@ -105,8 +105,8 @@ function BluetoothCommunicator() {
         });
     };
 
-    // sendValue: send an AT command / line to the device (adds CRLF)
-    this.sendValue = async function (value, timeout, dontLog) {
+    // sendData: send an AT command / line to the device (adds CRLF)
+    this.sendData = async function (value, timeout, dontLog) {
         if (!value) return;
         if (!_txChar) {
             throw 'blecomm: device not initialized. call init() before sending data.';
