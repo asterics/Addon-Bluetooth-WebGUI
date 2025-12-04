@@ -25,6 +25,7 @@ function BluetoothCommunicator() {
     let _stringToReceive = null;
     let _stringToReceiveResolve = null;
     let _receiveBuffer = "";
+    let _charChunk = "";
 
     this.setValueHandler = function (handler) {
         _valueHandler = handler;
@@ -57,7 +58,7 @@ function BluetoothCommunicator() {
             _rxChar = await _service.getCharacteristic(PUCK_AT_COMMAND_READ_CHARACTERISTIC);
 
             await _rxChar.startNotifications();
-            _rxChar.addEventListener('characteristicvaluechanged', onCharacteristicValueChanged);
+            _rxChar.addEventListener('characteristicvaluechanged', listenToPort);
 
             return Promise.resolve();
         } catch (error) {
@@ -69,7 +70,7 @@ function BluetoothCommunicator() {
     this.cancel = function () {
         if (_rxChar) {
             try {
-                _rxChar.removeEventListener('characteristicvaluechanged', onCharacteristicValueChanged);
+                _rxChar.removeEventListener('characteristicvaluechanged', listenToPort);
                 _rxChar.stopNotifications().catch(() => {});
             } catch (e) {
                 // ignore
@@ -141,32 +142,39 @@ function BluetoothCommunicator() {
         return Promise.resolve();
     };
 
-    function onCharacteristicValueChanged(event) {
+    function listenToPort(event) {
         try {
             const value = event.target.value;
             const chunk = _textDecoder.decode(value);
             if (window.logReceived) console.info(chunk);
 
+            // accumulate into receive buffer for waitForReceiving
             _receiveBuffer += chunk;
-            // Handle waiting promise
-            if (_stringToReceive && _receiveBuffer.indexOf(_stringToReceive.trim()) > -1) {
-                if (_stringToReceiveResolve) _stringToReceiveResolve();
-                _stringToReceive = null;
-                _stringToReceiveResolve = null;
-            }
+            // process per-character (like listenToPort)
+            for (const ch of chunk) {
+                _charChunk += ch;
 
-            // split lines
-            let parts = _receiveBuffer.split(/\r?\n/);
-            // keep last partial chunk
-            _receiveBuffer = parts.pop();
-            parts.forEach((line) => {
-                if (!line) return;
-                if (line.indexOf && line.indexOf(window.C && window.C.LIVE_VALUE_CONSTANT) > -1) {
-                    if (typeof _valueHandler === 'function') _valueHandler(line + '\n');
-                } else if (_internalValueFunction) {
-                    _internalValueFunction(line + '\n');
+                // check waiting-for substring on the running chunk
+                if (_stringToReceive && _charChunk.indexOf(_stringToReceive.trim()) > -1) {
+                    if (_stringToReceiveResolve) _stringToReceiveResolve();
+                    _stringToReceive = null;
+                    _stringToReceiveResolve = null;
                 }
-            });
+
+                if (ch === '\n') {
+                    const line = _charChunk;
+                    // deliver live values to value handler
+                    if (line.length > 2 && line.indexOf(window.C && window.C.LIVE_VALUE_CONSTANT) > -1) {
+                        if (typeof _valueHandler === 'function') {
+                            try { _valueHandler(line); } catch (e) { console.warn('valueHandler error', e); }
+                        }
+                    } else if (_internalValueFunction) {
+                        try { _internalValueFunction(line); } catch (e) { console.warn('internal handler error', e); }
+                    }
+                    // reset char chunk for next line
+                    _charChunk = "";
+                }
+            }
         } catch (e) {
             console.warn('Error in notification handler', e);
         }
