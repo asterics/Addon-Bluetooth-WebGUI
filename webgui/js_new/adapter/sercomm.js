@@ -1,4 +1,6 @@
 import {MainView} from "../ui/views/MainView.js";
+import 'https://cdn.skypack.dev/web-serial-polyfill';
+
 
 window.logReceived = false;
 
@@ -44,27 +46,29 @@ function SerialCommunicator() {
         const saved = localStorage.getItem("preferredPort");
         if (saved) {
             const savedInfo = JSON.parse(saved);
-            console.log(`Saved preferred port VID=${savedInfo.usbVendorId}, PID=${savedInfo.usbProductId}`);
+            console.log(`Found a preferred port VID=${savedInfo.usbVendorId}, PID=${savedInfo.usbProductId}`);
 
             const ports = await navigator.serial.getPorts();
             if (ports.length === 0) {
-                console.log("No previously authorized ports found.");
-                return;
+                console.log("No previously authorized ports found in current session.");
             }
+            else {
+                console.log(`Found ${ports.length} authorized port(s) in current session.`);
 
-            // Try to find the matching port
-            for (const p of ports) {
-                const info = p.getInfo();
-                console.log(`Found authorized port: VID=${info.usbVendorId}, PID=${info.usbProductId}`);
+                // Try to find the matching port
+                for (const p of ports) {
+                    const info = p.getInfo();
+                    console.log(`Found authorized port: VID=${info.usbVendorId}, PID=${info.usbProductId}`);
 
-                if (info.usbVendorId === savedInfo.usbVendorId &&
-                    info.usbProductId === savedInfo.usbProductId) {
+                    if (info.usbVendorId === savedInfo.usbVendorId &&
+                        info.usbProductId === savedInfo.usbProductId) {
 
-                    console.log("Matched saved port — opening...");
-                    _port = p;
-                    const info = _port.getInfo();
-                    console.log(`Re-opening port VID=${info.usbVendorId}, PID=${info.usbProductId}`);
-                    break;
+                        console.log("Matched saved port — opening...");
+                        _port = p;
+                        const info = _port.getInfo();
+                        console.log(`Re-opening port VID=${info.usbVendorId}, PID=${info.usbProductId}`);
+                        break;
+                    }
                 }
             }
         }
