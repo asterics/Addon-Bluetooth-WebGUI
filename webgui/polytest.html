@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>WebUSB-Backed Web Serial Demo</title>
+
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    button { padding: 10px 16px; margin-bottom: 10px; }
+    textarea { width: 100%; height: 120px; margin-top: 10px; }
+    #log { 
+      white-space: pre-wrap; 
+      font-family: monospace; 
+      background: #f5f5f5; 
+      padding: 10px; 
+      height: 200px; 
+      overflow-y: scroll;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>WebUSB-Backed Web Serial Demo</h2>
+<p>This demo uses the Web Serial API if available, or a WebUSB polyfill if not (e.g., on Android).</p>
+
+<button id="connectBtn">Connect to Serial Device</button>
+
+<h3>Received:</h3>
+<div id="log"></div>
+
+<h3>Send Text:</h3>
+<textarea id="sendText"></textarea>
+<button id="sendBtn">Send</button>
+
+<script type="module">
+
+  // Load the polyfill (safe on all browsers; only activates if needed)
+  console.log("Loading Web Serial polyfill...");
+  await import('https://cdn.skypack.dev/web-serial-polyfill');
+
+  console.log("navigator.serial available:", !!navigator.serial);
+
+  let port;
+  let reader;
+  let writer;
+
+  document.getElementById("connectBtn").addEventListener("click", async () => {
+    try {
+      port = await navigator.serial.requestPort();
+      await port.open({ baudRate: 115200 });
+      log("Port opened.");
+
+      // Start read loop
+      reader = port.readable.getReader();
+      readLoop();
+
+      // Create writer
+      writer = port.writable.getWriter();
+
+    } catch (err) {
+      log("Error: " + err);
+    }
+  });
+
+  async function readLoop() {
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) {
+          break;
+        }
+        if (value) {
+          const text = new TextDecoder().decode(value);
+          log("RX: " + text);
+        }
+      }
+    } catch (err) {
+      log("Read error: " + err);
+    }
+  }
+
+  document.getElementById("sendBtn").addEventListener("click", async () => {
+    const text = document.getElementById("sendText").value;
+    if (!text) return;
+    if (!writer) return;
+
+    const data = new TextEncoder().encode(text + "\n");
+    await writer.write(data);
+    log("TX: " + text);
+  });
+
+  function log(msg) {
+    const logEl = document.getElementById("log");
+    logEl.textContent += msg + "\n";
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+</script>
+
+</body>
+</html>
