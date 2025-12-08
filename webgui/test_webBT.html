@@ -1,0 +1,412 @@
+
+
+<html>
+
+<head>
+  <title>BLE WiFi Provisioning - Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 1em;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    .container {
+      padding: 10px;
+      border: 1px solid lightgray;
+      margin: 10px;
+    }
+
+    input {
+      width: 300px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>BLE WiFi Provisioning - Demo</h1>
+
+  <p>
+    This demo is based upon the blog series  <a href="blog.sjain.dev/ble-rpi-pico-provision-wifi-tldr/" target="_blank"> blog.sjain.dev/ble-rpi-pico-provision-wifi-tldr</a>. 
+  </p>
+
+  <div class="container">
+    <p>
+      Custom Service or Characteristic UUIDs:
+    </p>
+    <form>
+      <label>
+        Service UUID: <input id="service-uuid" value="b8e06067-62ad-41ba-9231-206ae80ab551" />
+      </label>
+      <br />
+      <label>
+        Read characteristic UUID: <input id="readData-uuid" value="f897177b-aee8-4767-8ecc-cc694fd5fcef" />
+      </label>
+      <br />
+      </label>Write characteristic UUID: <input id="writeData-uuid" value="f897177b-aee8-4767-8ecc-cc694fd5fce0" />
+      </label>
+      <br />
+      <label>
+        Status characteristic UUID (notify): <input id="status-uuid" value="f897177b-aee8-4767-8ecc-cc694fd5fcf1" />
+      </label>
+    </form>
+  </div>
+
+  <div class="container">
+    <p>Once you've set your UUIDs (above), click the button below to connect to your peripheral and see the advertised
+      characteristics:</p>
+    <button type="button" id="connect">Connect</button>
+    <br />
+    <div>
+      Discovered characteristics:
+      <ul id="characteristics" class="hidden"></ul>
+    </div>
+  </div>
+
+  <div class="container">
+    Once you've connected (above), and if you've enabled the READ characteristic on your BLE service, clicking the below
+    button should show an alert with the characteristic values:
+    <br /><br />
+    <button id="read" >Read string from device</button>
+  </div>
+
+  <div class="container">
+    Live Status (from NOTIFY):
+    <br />
+    <input id="status-value" readonly placeholder="Counter appears here after connect" />
+  </div>
+
+  <div class="container">
+    Once you've connected (above), and If you've enabled the WRITE characteristic on your BLE service, clicking the
+    button below should write to the characteristics:
+    <form>
+      <label>Send: <input id='writeLabel' /></label>
+      <br />
+      <button type="button" id="writeButton" >Send to Pico</button>
+    </form>
+  </div>
+
+  <script type='text/javascript'>
+    let characteristics = {};
+
+    function getCharacteristicUuids() {
+      return {
+        [document.getElementById('readData-uuid').value]: 'read',
+        [document.getElementById('writeData-uuid').value]: 'write',
+        [document.getElementById('status-uuid').value]: 'status'
+      };
+    }
+
+    async function connect() {
+      const serviceUuid = document.getElementById('service-uuid').value;
+      const device = await navigator.bluetooth.requestDevice({
+        acceptAllDevices: true,
+        optionalServices: [serviceUuid],
+      });
+      const server = await device.gatt.connect();
+      const service = await server.getPrimaryService(serviceUuid);
+      const discoveredCharacteristics = await service.getCharacteristics();
+
+      characteristics = {};
+      discoveredCharacteristics.forEach(characteristic => {
+        if (characteristic.uuid === document.getElementById('readData-uuid').value) {
+          characteristics.read = characteristic;
+        } else if (characteristic.uuid === document.getElementById('writeData-uuid').value) {
+          characteristics.write = characteristic;
+        } else if (characteristic.uuid === document.getElementById('status-uuid').value) {
+          characteristics.status = characteristic;
+        } else {
+          characteristics[characteristic.uuid] = characteristic;
+        }
+      });
+      console.log(characteristics);
+
+      // Subscribe to status notifications if available
+      if (characteristics.status) {
+        try {
+          // Read initial value (expect 4-byte little-endian counter)
+          const initial = await characteristics.status.readValue();
+          updateStatusField(initial);
+          // Start notifications
+          await characteristics.status.startNotifications();
+          characteristics.status.addEventListener('characteristicvaluechanged', (e) => {
+            updateStatusField(e.target.value);
+          });
+        } catch (err) {
+          console.warn('Status subscribe/read failed:', err);
+        }
+      }
+    }
+
+    async function read() {
+      const decoder = new TextDecoder('utf-8');
+      const read = decoder.decode(await characteristics.read?.readValue());
+      window.alert(`received: ${read}`);
+    }
+
+    async function write() {
+      const encoder = new TextEncoder('utf-8');
+      const write = document.getElementById('writeLabel').value;
+
+      if (write) {
+        await characteristics.write?.writeValue(encoder.encode(write));
+      } else {
+        window.alert('Please enter your text');
+      }
+    }
+
+    document.getElementById('connect').addEventListener('click', async () => {
+      await connect();
+
+      const characteristicListElement = document.getElementById('characteristics');
+
+      const uuids = getCharacteristicUuids();
+      if (characteristics.read?.properties.read && characteristics.write?.properties.read) {
+        document.getElementById('read').disabled = false;
+      }
+      if (characteristics.read?.properties.write && characteristics.write?.properties.write) {
+        document.getElementById('write').disabled = false;
+      }
+
+      if (Object.keys(characteristics).length) characteristicListElement.classList.remove('hidden');
+      else characteristicListElement.classList.add('hidden');
+
+      Object.entries(characteristics)?.forEach(([uuidOrName, characteristic]) => {
+        const node = document.createElement('li');
+        node.innerText = `[${uuidOrName}] - ${characteristic.properties.read ? 'readable' : 'not readable'}, ${characteristic.properties.write ? 'writable' : 'not writable'}`;
+        characteristicListElement.append(node);
+      });
+    });
+
+    document.getElementById('writeButton').addEventListener('click', async () => {
+      if (!characteristics) await connect();
+      await write();
+    });
+
+    document.getElementById('read').addEventListener('click', async () => {
+      if (!characteristics) await connect();
+      await read();
+    });
+
+    function updateStatusField(dataView) {
+      try {
+        const v = new DataView(dataView.buffer);
+        const cnt = v.getUint32(0, true);
+        document.getElementById('status-value').value = String(cnt);
+      } catch (e) {
+        // Fallback: show hex
+        const arr = new Uint8Array(dataView.buffer);
+        document.getElementById('status-value').value = Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join(' ');
+      }
+    }
+  </script>
+</body>
+
+</html>
+
+
+<!--  
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pico2 BLE Communication</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin: 10px 0;
+        }
+        button:hover:not(:disabled) {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .disconnect {
+            background-color: #f44336;
+        }
+        .disconnect:hover {
+            background-color: #da190b;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+            display: block;
+            margin-top: 15px;
+        }
+        #status {
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .status-disconnected {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .status-connected {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pico2 BLE Interface</h1>
+        
+        <div id="status" class="status-disconnected">Disconnected</div>
+        
+        <button id="connectBtn" onclick="connect()">Connect to Pico2</button>
+        <button id="disconnectBtn" class="disconnect" onclick="disconnect()" disabled>Disconnect</button>
+        
+        <label for="sendText">Send Text (will be echoed in uppercase):</label>
+        <textarea id="sendText" rows="3" placeholder="Type text to send..."></textarea>
+        <button id="sendBtn" onclick="sendText()" disabled>Send</button>
+        
+        <label for="receiveText">Received Text:</label>
+        <textarea id="receiveText" rows="5" readonly placeholder="Received messages will appear here..."></textarea>
+    </div>
+
+    <script>
+        const SERVICE_UUID = 'b8e06067-62ad-41ba-9231-206ae80ab551';
+        const CHARACTERISTIC_UUID_RX = 'f897177b-aee8-4767-8ecc-cc694fd5fcef';
+        const CHARACTERISTIC_UUID_TX = 'f897177b-aee8-4767-8ecc-cc694fd5fce0';
+
+        let bleDevice;
+        let bleServer;
+        let rxCharacteristic;
+        let txCharacteristic;
+
+        async function connect() {
+            try {
+                document.getElementById('status').textContent = 'Connecting...';
+                
+                bleDevice = await navigator.bluetooth.requestDevice({
+                    filters: [{ name: 'Pico2' }],
+                    optionalServices: [SERVICE_UUID]
+                });
+
+                bleDevice.addEventListener('gattserverdisconnected', onDisconnected);
+
+                bleServer = await bleDevice.gatt.connect();
+                const service = await bleServer.getPrimaryService(SERVICE_UUID);
+                
+                rxCharacteristic = await service.getCharacteristic(CHARACTERISTIC_UUID_RX);
+                txCharacteristic = await service.getCharacteristic(CHARACTERISTIC_UUID_TX);
+                
+                await txCharacteristic.startNotifications();
+                txCharacteristic.addEventListener('characteristicvaluechanged', handleNotification);
+
+                updateUIConnected();
+                document.getElementById('status').textContent = 'Connected to Pico2';
+                document.getElementById('status').className = 'status-connected';
+            } catch (error) {
+                console.error('Connection failed:', error);
+                document.getElementById('status').textContent = 'Connection failed: ' + error;
+                document.getElementById('status').className = 'status-disconnected';
+            }
+        }
+
+        async function disconnect() {
+            if (bleDevice && bleDevice.gatt.connected) {
+                await bleDevice.gatt.disconnect();
+            }
+        }
+
+        function onDisconnected() {
+            updateUIDisconnected();
+            document.getElementById('status').textContent = 'Disconnected';
+            document.getElementById('status').className = 'status-disconnected';
+            document.getElementById('receiveText').value += '\n--- Disconnected ---\n';
+        }
+
+        async function sendText() {
+            const text = document.getElementById('sendText').value;
+            if (!text || !rxCharacteristic) return;
+
+            try {
+                const encoder = new TextEncoder();
+                await rxCharacteristic.writeValue(encoder.encode(text));
+                document.getElementById('sendText').value = '';
+            } catch (error) {
+                console.error('Send failed:', error);
+                alert('Failed to send: ' + error);
+            }
+        }
+
+        function handleNotification(event) {
+            const decoder = new TextDecoder();
+            const value = decoder.decode(event.target.value);
+            const receiveBox = document.getElementById('receiveText');
+            receiveBox.value += value;
+            receiveBox.scrollTop = receiveBox.scrollHeight;
+        }
+
+        function updateUIConnected() {
+            document.getElementById('connectBtn').disabled = true;
+            document.getElementById('disconnectBtn').disabled = false;
+            document.getElementById('sendBtn').disabled = false;
+        }
+
+        function updateUIDisconnected() {
+            document.getElementById('connectBtn').disabled = false;
+            document.getElementById('disconnectBtn').disabled = true;
+            document.getElementById('sendBtn').disabled = true;
+        }
+
+        // Allow Enter key to send in textarea
+        document.getElementById('sendText').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendText();
+            }
+        });
+    </script>
+</body>
+</html>
+
+-->
