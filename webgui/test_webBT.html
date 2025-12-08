@@ -213,200 +213,191 @@
 
 
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pico2 BLE Communication</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #f0f0f0;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100%;
-            margin: 10px 0;
-        }
-        button:hover:not(:disabled) {
-            background-color: #45a049;
-        }
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        .disconnect {
-            background-color: #f44336;
-        }
-        .disconnect:hover {
-            background-color: #da190b;
-        }
-        textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: monospace;
-            box-sizing: border-box;
-            resize: vertical;
-        }
-        label {
-            font-weight: bold;
-            color: #555;
-            display: block;
-            margin-top: 15px;
-        }
-        #status {
-            padding: 10px;
-            margin: 15px 0;
-            border-radius: 4px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .status-disconnected {
-            background-color: #ffebee;
-            color: #c62828;
-        }
-        .status-connected {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Pico2 BLE Interface</h1>
-        
-        <div id="status" class="status-disconnected">Disconnected</div>
-        
-        <button id="connectBtn" onclick="connect()">Connect to Pico2</button>
-        <button id="disconnectBtn" class="disconnect" onclick="disconnect()" disabled>Disconnect</button>
-        
-        <label for="sendText">Send Text (will be echoed in uppercase):</label>
-        <textarea id="sendText" rows="3" placeholder="Type text to send..."></textarea>
-        <button id="sendBtn" onclick="sendText()" disabled>Send</button>
-        
-        <label for="receiveText">Received Text:</label>
-        <textarea id="receiveText" rows="5" readonly placeholder="Received messages will appear here..."></textarea>
-    </div>
+// RP Pico(2)W LE Peripheral Example implementation with status notifications
+// works with PlatformIO, using the following setup:
 
-    <script>
-        const SERVICE_UUID = 'b8e06067-62ad-41ba-9231-206ae80ab551';
-        const CHARACTERISTIC_UUID_RX = 'f897177b-aee8-4767-8ecc-cc694fd5fcef';
-        const CHARACTERISTIC_UUID_TX = 'f897177b-aee8-4767-8ecc-cc694fd5fce0';
+/*
+  [env:WebBle]
+  platform = https://github.com/maxgerhardt/platform-raspberrypi.git
+  board = rpipico2w
+  framework = arduino
+  board_build.core = earlephilhower
+  platform_packages = 
+    framework-arduinopico@https://github.com/earlephilhower/arduino-pico.git#4.7.1
+  build_flags = 
+    -DPIO_FRAMEWORK_ARDUINO_ENABLE_BLUETOOTH ; enable Bluetooth Stack for BTC and BLE
+*/
 
-        let bleDevice;
-        let bleServer;
-        let rxCharacteristic;
-        let txCharacteristic;
 
-        async function connect() {
-            try {
-                document.getElementById('status').textContent = 'Connecting...';
-                
-                bleDevice = await navigator.bluetooth.requestDevice({
-                    filters: [{ name: 'Pico2' }],
-                    optionalServices: [SERVICE_UUID]
-                });
+#include <BTstackLib.h>
+#include <SPI.h>
+extern "C" {
+  #include "btstack.h"
+}
 
-                bleDevice.addEventListener('gattserverdisconnected', onDisconnected);
+static uint16_t string_value_handle = 0;
+static uint16_t status_value_handle = 0;
+static hci_con_handle_t g_con_handle = HCI_CON_HANDLE_INVALID;
+static uint32_t statusCounter = 2;
+static uint32_t lastStatusMs = 0;
 
-                bleServer = await bleDevice.gatt.connect();
-                const service = await bleServer.getPrimaryService(SERVICE_UUID);
-                
-                rxCharacteristic = await service.getCharacteristic(CHARACTERISTIC_UUID_RX);
-                txCharacteristic = await service.getCharacteristic(CHARACTERISTIC_UUID_TX);
-                
-                await txCharacteristic.startNotifications();
-                txCharacteristic.addEventListener('characteristicvaluechanged', handleNotification);
 
-                updateUIConnected();
-                document.getElementById('status').textContent = 'Connected to Pico2';
-                document.getElementById('status').className = 'status-connected';
-            } catch (error) {
-                console.error('Connection failed:', error);
-                document.getElementById('status').textContent = 'Connection failed: ' + error;
-                document.getElementById('status').className = 'status-disconnected';
-            }
-        }
+/*
+   Device Connected Callback
+   When a remote device connects, the device connected callback is called.
+*/
+void deviceConnectedCallback(BLEStatus status, BLEDevice *device) {
+  (void) device;
+  switch (status) {
+    case BLE_STATUS_OK:
+      Serial.println("Device connected!");
+      break;
+    default:
+      break;
+  }
+}
+/*
+   Device Disconnected Callback
+   If the connection to a device breaks, the device disconnected callback is called.
+*/
+void deviceDisconnectedCallback(BLEDevice * device) {
+  (void) device;
+  Serial.println("Disconnected.");
+}
 
-        async function disconnect() {
-            if (bleDevice && bleDevice.gatt.connected) {
-                await bleDevice.gatt.disconnect();
-            }
-        }
+/*
+   The Read Callback is first called to query the size of the
+   Characteristic Value, before it is called to provide the data.
+   Both times, the size has to be returned. The data is only stored in the provided
+   buffer, if the buffer argument is not NULL.
+   If more than one dynamic Characteristics is used, the value handle is used
+   to distinguish them.
+*/
+uint16_t gattReadCallback(uint16_t value_handle, uint8_t * buffer, uint16_t buffer_size) {
+  const char *kStr = "This is a String!";
+  uint16_t strLen = (uint16_t)strlen(kStr);
 
-        function onDisconnected() {
-            updateUIDisconnected();
-            document.getElementById('status').textContent = 'Disconnected';
-            document.getElementById('status').className = 'status-disconnected';
-            document.getElementById('receiveText').value += '\n--- Disconnected ---\n';
-        }
+  // Prefer learning status handle first: try2.html reads status on connect
+  static bool learnedStatus = false;
+  if (!learnedStatus) {
+    status_value_handle = value_handle;
+    learnedStatus = true;
+  } else if (string_value_handle == 0 && value_handle != status_value_handle) {
+    string_value_handle = value_handle;
+  }
 
-        async function sendText() {
-            const text = document.getElementById('sendText').value;
-            if (!text || !rxCharacteristic) return;
+  if (value_handle == status_value_handle) {
+    Serial.println("gattReadCallback: status value requested");
+    // 4-byte little-endian counter
+    uint8_t buf[4] = {
+      (uint8_t)(statusCounter & 0xFF),
+      (uint8_t)((statusCounter >> 8) & 0xFF),
+      (uint8_t)((statusCounter >> 16) & 0xFF),
+      (uint8_t)((statusCounter >> 24) & 0xFF)
+    };
+    if (buffer) {
+      uint16_t to_copy = buffer_size < 4 ? buffer_size : 4;
+      memcpy(buffer, buf, to_copy);
+    }
+    return 4;
+  }
 
-            try {
-                const encoder = new TextEncoder();
-                await rxCharacteristic.writeValue(encoder.encode(text));
-                document.getElementById('sendText').value = '';
-            } catch (error) {
-                console.error('Send failed:', error);
-                alert('Failed to send: ' + error);
-            }
-        }
+  // Default to returning the demo string
+  if (buffer) {
+    Serial.println("gattReadCallback: string requested");
+    uint16_t to_copy = buffer_size < strLen ? buffer_size : strLen;
+    memcpy(buffer, kStr, to_copy);
+  }
+  return strLen;
+}
 
-        function handleNotification(event) {
-            const decoder = new TextDecoder();
-            const value = decoder.decode(event.target.value);
-            const receiveBox = document.getElementById('receiveText');
-            receiveBox.value += value;
-            receiveBox.scrollTop = receiveBox.scrollHeight;
-        }
+/*
+   Write Callback
+*/
+int gattWriteCallback(uint16_t value_handle, uint8_t *buffer, uint16_t size) {
+  (void) value_handle;
+  (void) size;
+  Serial.print("gattWriteCallback , value: ");
 
-        function updateUIConnected() {
-            document.getElementById('connectBtn').disabled = true;
-            document.getElementById('disconnectBtn').disabled = false;
-            document.getElementById('sendBtn').disabled = false;
-        }
+  for (int i=0;i<size;i++) {
+    char c=buffer[i];
+    Serial.print(c);
+    //Serial.print(characteristic_data, HEX);
+  }
+  Serial.println();
+  return 0;
+}
 
-        function updateUIDisconnected() {
-            document.getElementById('connectBtn').disabled = false;
-            document.getElementById('disconnectBtn').disabled = true;
-            document.getElementById('sendBtn').disabled = true;
-        }
+// Hook BTstack events to learn connection handle for att_server_notify
+static void bt_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size) {
+    (void)channel; (void)size;
+    if (packet_type != HCI_EVENT_PACKET) return;
+    uint8_t event = hci_event_packet_get_type(packet);
+    if (event == ATT_EVENT_CONNECTED) {
+      g_con_handle = att_event_connected_get_handle(packet);
+      Serial.println("ATT connected; notifications enabled when subscribed.");
+    } else if (event == HCI_EVENT_DISCONNECTION_COMPLETE) {
+      g_con_handle = HCI_CON_HANDLE_INVALID;
+      Serial.println("ATT disconnected.");
+    }
+  }
 
-        // Allow Enter key to send in textarea
-        document.getElementById('sendText').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendText();
-            }
-        });
-    </script>
-</body>
-</html>
+
+
+void setup(void) {
+
+  Serial.begin(9600);
+
+  // set callbacks
+  BTstack.setBLEDeviceConnectedCallback(deviceConnectedCallback);
+  BTstack.setBLEDeviceDisconnectedCallback(deviceDisconnectedCallback);
+  BTstack.setGATTCharacteristicRead(gattReadCallback);
+  BTstack.setGATTCharacteristicWrite(gattWriteCallback);
+
+  // setup GATT Database
+  BTstack.addGATTService(new UUID("B8E06067-62AD-41BA-9231-206AE80AB551"));
+  // Change static read characteristic to dynamic so reads invoke gattReadCallback
+  BTstack.addGATTCharacteristicDynamic(new UUID("f897177b-aee8-4767-8ecc-cc694fd5fcef"), ATT_PROPERTY_READ, 17);
+  // RX: allow WRITE from central
+  BTstack.addGATTCharacteristicDynamic(new UUID("f897177b-aee8-4767-8ecc-cc694fd5fce0"), ATT_PROPERTY_WRITE , 0);
+  // Status: READ + NOTIFY (4-byte counter)
+  BTstack.addGATTCharacteristicDynamic(new UUID("f897177b-aee8-4767-8ecc-cc694fd5fcf1"), ATT_PROPERTY_READ | ATT_PROPERTY_NOTIFY, 4);
+
+  // startup Bluetooth and activate advertisements
+  BTstack.setup();
+
+  // Receive ATT events (CONNECTED/DISCONNECTED) to capture connection handle
+  att_server_register_packet_handler(bt_packet_handler);
+  BTstack.startAdvertising();
+}
+
+
+void loop(void) {
+  BTstack.loop();
+
+  // Periodic 1Hz status notification
+  uint32_t now = millis();
+  if (now - lastStatusMs >= 1000) {
+    lastStatusMs = now;
+    statusCounter++;
+
+    if (g_con_handle != HCI_CON_HANDLE_INVALID && status_value_handle != 0) {
+        uint8_t buf[4] = {
+          (uint8_t)(statusCounter & 0xFF),
+          (uint8_t)((statusCounter >> 8) & 0xFF),
+          (uint8_t)((statusCounter >> 16) & 0xFF),
+          (uint8_t)((statusCounter >> 24) & 0xFF)
+        };
+        att_server_notify(g_con_handle, status_value_handle, buf, 4);
+        Serial.println(statusCounter);
+      }
+      else {
+        Serial.print("Not connected, handle= ");
+        Serial.print(g_con_handle);
+        Serial.print(", status_value_handle= ");
+        Serial.println(status_value_handle);
+      }
+    }
+}
 
 -->
