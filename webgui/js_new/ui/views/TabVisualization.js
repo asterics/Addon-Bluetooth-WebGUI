@@ -21,7 +21,7 @@ class TabVisualization extends Component {
         if(ATDevice.getSensorInfo()[C.FORCE_SENSOR_TYPE_ADC] && !ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]) {
             additionalButtonNames = ["Up // Rauf", "Down // Runter", "Left // Links", "Right // Rechts", "Btn-L // Btn Links", "Btn-R // Btn Rechts", "Strong Sip // Starkes Ansaugen", "Strong Puff // Starkes Pusten"];
         } else {
-            additionalButtonNames = ["Up // Rauf", "Down // Runter", "Left // Links", "Right // Rechts", "Sip // Ansaugen", "Strong Sip // Starkes Ansaugen", "Puff // Pusten", "Strong Puff // Starkes Pusten"];
+            additionalButtonNames = ["Up // Rauf", "Down // Runter", "Left // Links", "Right // Rechts", "Sip // Ansaugen", "Puff // Pusten", "Strong Sip // Starkes Ansaugen", "Strong Puff // Starkes Pusten"];
         }
         TabVisualization.BTN_NAMES = [...physicalButtonNames, ...additionalButtonNames];
 
