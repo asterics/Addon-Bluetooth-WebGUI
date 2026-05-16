@@ -3,6 +3,7 @@ import { ATDevice } from "./communication/ATDevice.js";
 // AT commands - general
 C.AT_CMD_VERSION = 'AT ID';
 C.AT_CMD_BTN_MODE = 'AT BM';
+C.AT_CMD_TRIGGER = 'AT TG';
 
 // AT commands - USB HID
 C.AT_CMD_CLICK_MOUSE_L = 'AT CL';

@@ -1,9 +1,10 @@
 import { h, Component, render } from '../../../lib/preact.min.js';
 import htm from '../../../lib/htm.min.js';
-import { ActionEditModal } from "../modals/ActionEditModal.js";
 import { RadioFieldset } from "../components/RadioFieldset.js";
 import { ATDevice } from "../../communication/ATDevice.js";
 import { localStorageService } from "../../localStorageService.js";
+import { FaIcon } from "../components/FaIcon.js";
+import { TriggerEditModal } from "../modals/TriggerEditModal.js";
 
 const html = htm.bind(h);
 
@@ -20,10 +21,12 @@ class TabActions extends Component {
 
     TabActions.instance = this;
     this.state = {
-      showCategory: null,
       viewMode: localStorageService.hasKey(KEY_TAB_ACTIONS_VIEW_MODE) ? localStorageService.get(KEY_TAB_ACTIONS_VIEW_MODE) : 'VIEW_MODE_SINGLE_SLOT',
-      modalBtnMode: null,
-      modalSlot: null,
+      editingTrigger: null,
+      editingSlot: null,
+      isNewTrigger: false,
+      busy: false,
+      error: '',
       widthEm: window.innerWidth / parseFloat(getComputedStyle(document.querySelector('body'))['font-size'])
     }
     window.addEventListener('resize', this.onresize);
@@ -42,44 +45,25 @@ class TabActions extends Component {
     }, 200, 'RESIZE_TAB_ACTIONS')
   }
 
-  getLinkTitle(btnMode, slot) {
-    if (!this.showFnName(btnMode, slot)) {
-      return L.translate(btnMode.label);
-    } else {
-      return L.translate(btnMode.label) + (ATDevice.getButtonAction(btnMode.index, slot) ? ': ' + ATDevice.getButtonAction(btnMode.index, slot) : '');
+  getReadableTriggerAction(action) {
+    return L.getReadableATCMD(action || C.AT_CMD_NO_CMD);
+  }
+
+  getButtonOptions() {
+    let options = [];
+    let physicalCount = C.PYHSICAL_BUTTON_COUNT || C.PHYSICAL_BUTTON_COUNT || 0;
+    for (let i = 1; i <= physicalCount; i++) {
+      options.push('B' + i);
     }
-  }
-
-  getLinkLabel(btnMode, slot) {
-    if (!this.showFnName(btnMode, slot)) {
-      let modeValue = ATDevice.getConfig(C.AT_CMD_STICK_MODE, slot);
-      let mode = C.STICK_MODES.filter(mode => mode.value === modeValue)[0] || {};
-      return L.translate(mode.label);
-    } else {
-      return L.getReadableATCMD(ATDevice.getButtonAction(btnMode.index, slot));
+    if (ATDevice.getSensorInfo()[C.FORCE_SENSOR]) {
+      options = options.concat(['up', 'down', 'left', 'right']);
     }
+    if (ATDevice.getSensorInfo()[C.PRESSURE_SENSOR]) {
+      options = options.concat(['sip', 'puff', 'strongsip', 'strongpuff']);
+    }
+    return options;
   }
 
-  isDisabled(btnMode, slot) {
-    let isDisabledLongPress = C.DEVICE_IS_FABI && btnMode.category === C.BTN_CAT_BTN_LONGPRESS && ATDevice.getConfig(C.AT_CMD_THRESHOLD_LONGPRESS, slot) === 0;
-    let isDisabledBtn = C.DEVICE_IS_FABI && btnMode.category !== C.BTN_CAT_BTN_LONGPRESS && (btnMode.index === 7 || btnMode.index === 8) && ATDevice.getConfig(C.AT_CMD_THRESHOLD_LONGPRESS, slot) > 0;
-    return isDisabledLongPress || isDisabledBtn;
-  }
-
-  isVisible(btnMode) {
-    if (btnMode.visibleBtnFn !== undefined && !btnMode.visibleBtnFn(ATDevice)) return false;
-    return(true);
-  }
-
-  getBtnModeParam(btnMode, slot) {
-    return ATDevice.getButtonAction(btnMode.index, slot).substr(C.LENGTH_AT_CMD_PREFIX);
-  }
-
-  showFnName(btnMode, slot) {
-    let flipmouseAltMode = C.DEVICE_IS_FM && ATDevice.getConfig(C.AT_CMD_STICK_MODE, slot) === C.STICK_MODE_ALT.value;
-    let flipadAltMode = C.DEVICE_IS_FLIPPAD && [C.FLIPPAD_MODE_PAD_ALTERNATIVE.value, C.FLIPPAD_MODE_STICK_ALTERNATIVE.value].includes(ATDevice.getConfig(C.AT_CMD_STICK_MODE, slot));
-    return C.DEVICE_IS_FABI || flipmouseAltMode || flipadAltMode || btnMode.category !== C.BTN_CAT_STICK;
-  }
 
   getSlotStyle(slot) {
     return ATDevice.getCurrentSlot() === slot ? 'font-weight-bold' : '';
@@ -103,67 +87,174 @@ class TabActions extends Component {
     localStorageService.save(KEY_TAB_ACTIONS_VIEW_MODE, value);
   }
 
+  openEditTrigger(slot, trigger) {
+    L.addClass('body', 'modal-open');
+    this.setState({ editingTrigger: trigger, editingSlot: slot, isNewTrigger: false });
+  }
+
+  openNewTrigger(slot) {
+    L.addClass('body', 'modal-open');
+    this.setState({ editingTrigger: null, editingSlot: slot, isNewTrigger: true });
+  }
+
+  handleModalClose(changed) {
+    L.removeClass('body', 'modal-open');
+    this.setState({ editingTrigger: null, editingSlot: null, isNewTrigger: false });
+  }
+
+  async clearTrigger(slot, trigger) {
+    this.setState({ busy: true, error: '' });
+    try {
+      await ATDevice.clearTrigger(trigger, slot);
+      this.setState({ busy: false, error: '' });
+    } catch (error) {
+      console.warn(error);
+      this.setState({ busy: false, error: L.translate('Could not delete trigger. // Trigger konnte nicht gelöscht werden.') });
+    }
+  }
+
+  async clearAll(slot) {
+    this.setState({ busy: true, error: '' });
+    try {
+      await ATDevice.clearAllTriggers(slot);
+      this.setState({ busy: false, error: '' });
+    } catch (error) {
+      console.warn(error);
+      this.setState({ busy: false, error: L.translate('Could not clear triggers. // Trigger konnten nicht gelöscht werden.') });
+    }
+  }
+
+  async reloadSlot(slot) {
+    this.setState({ busy: true, error: '' });
+    try {
+      await ATDevice.reloadTriggersFromDevice(slot);
+      this.setState({ busy: false, error: '' });
+    } catch (error) {
+      console.warn(error);
+      this.setState({ busy: false, error: L.translate('Could not load triggers from device. // Trigger konnten nicht vom Gerät geladen werden.') });
+    }
+  }
+
+  async copyTriggersToAllSlots(slot) {
+    this.setState({ busy: true, error: '' });
+    try {
+      await ATDevice.copyConfigToAllSlots([C.AT_CMD_TRIGGER], slot, false);
+      this.setState({ busy: false, error: '' });
+    } catch (error) {
+      console.warn(error);
+      this.setState({ busy: false, error: L.translate('Could not copy triggers to all slots. // Trigger konnten nicht auf alle Slots kopiert werden.') });
+    }
+  }
+
     render() {
         let state = this.state;
         let slots = state.viewMode !== VIEW_MODE_SINGLE_SLOT ? ATDevice.getSlots(): [ATDevice.getCurrentSlot()];
-        let mobileView = slots.length > this.getMaxPrintableSlots() || state.viewMode === VIEW_MODE_ALL_SLOTS_LIST;
-
-        // let btnModes = C.BTN_MODES_ACTIONLIST.filter(mode => !this.state.showCategory || mode.category === this.state.showCategory);
-        let btnModes = C.BTN_MODES_ACTIONLIST.filter(mode => (!this.state.showCategory || mode.category === this.state.showCategory) && this.isVisible(mode));
-        let modalOpen = !!state.modalBtnMode;
-        if(modalOpen) {
-            L.addClass('body', 'modal-open');
-        } else {
-            L.removeClass('body', 'modal-open');
-        }
-        let categoryElements = C.BTN_CATEGORIES.map(cat => {return {value: cat.constant, label: cat.label}});
-        categoryElements = [{value: null, label: 'All categories // Alle Kategorien'}].concat(categoryElements);
         let slotElements = [{value: VIEW_MODE_SINGLE_SLOT, label: 'Current slot // Aktueller Slot'}, {value: VIEW_MODE_ALL_SLOTS_TABLE, label: 'All slots (table) // Alle Slots (Tabelle)'}, {value: VIEW_MODE_ALL_SLOTS_LIST, label: 'All slots (list) // Alle Slots (Liste)'}];
 
         return html`<div id="tabActions">
-             <h2>${L.translate('Action configuration // Aktionen-Konfiguration')}</h2>
+            <h2>${L.translate('Trigger configuration // Trigger-Konfiguration')}</h2>
             <div class="filter-buttons mb-3">
                 ${html`<${RadioFieldset} legend="Show slots: // Zeige Slots:" onchange="${(value) => this.setViewMode(value)}" elements="${slotElements}" value="${state.viewMode}"/>`}
-            </div> 
-            <div class="${mobileView ? '' : 'd-none'} filter-buttons mb-3">
-                ${html`<${RadioFieldset} legend="Show categories: // Zeige Kategorien:" onchange="${(value) => this.setState({showCategory: value})}" elements="${categoryElements}" value="${state.showCategory}"/>`}
-             </div>
-             
-             <ul>
-                <li class="row ${mobileView ? 'd-none' : 'd-flex'}" aria-hidden="true" style="font-style: italic; font-size: 1.2em">
-                    <span class="${mobileView ? 'col-12' : 'col'}">Bezeichnung</span>
-                    ${slots.map(slot => html`<span class="${mobileView ? 'col-12' : 'col'} ${this.getSlotStyle(slot)}">Slot "${slot}"</span>`)}
-                </li>
-                ${btnModes.map((btnMode, index) => html`
-                    <li class="row ${mobileView ? 'py-3' : 'py-0'}" style="${index % 2 === 0 ? 'background-color: rgb(224 224 224)' : ''}">
-                        <strong class="${mobileView ? 'col-12' : 'col'}">${L.translate(btnMode.label)}</strong>
-                        ${slots.map(slot => html`
-                            <span class="${mobileView ? 'col-12' : 'col'} ${this.getSlotStyle(slot)}">
-                                <span class="${mobileView ? '' : 'd-none'}">Slot "${slot}": </span>
-                                <span class="${this.isDisabled(btnMode, slot) ? '' : 'd-none'}" style="font-weight: normal" title="${L.translate('Go to tab "Timings" to configure long press threshold // Gehe zu Tab "Timings" um Schwellenwert für langes Drücken zu konfigurieren')}">
-                                    ${L.translate('(disabled) // (deaktiviert)')}
-                                </span>
-                                <a href="javascript:;" title="${this.getLinkTitle(btnMode, slot)}" class="${this.isDisabled(btnMode, slot) ? 'd-none' : ''}" onclick="${() => this.setState({modalBtnMode: btnMode, modalSlot: slot})}">
-                                    <span style="${ATDevice.getButtonAction(btnMode.index, slot) === C.AT_CMD_NO_CMD ? 'font-weight: normal' : ''}">${this.getLinkLabel(btnMode, slot)}</span>
-                                    <span class="${!this.showFnName(btnMode, slot) || (!mobileView && state.viewMode === VIEW_MODE_ALL_SLOTS_TABLE && ATDevice.getSlots().length > 1) || !this.getBtnModeParam(btnMode, slot) ? 'd-none' : ''}" style="font-weight: normal"> (${this.getBtnModeParam(btnMode, slot)})</span>
-                                </a>
-                            </span>
-                        `)}
-                    </li>`)}
-            </ul>
-            ${modalOpen ? html`<${ActionEditModal} buttonMode="${state.modalBtnMode}" slot="${state.modalSlot}" closeHandler="${() => this.setState({modalBtnMode: ''})}"/>` : ''}
+            </div>
+
+            <div class="ta-error-msg ${state.error ? '' : 'd-none'}">${state.error}</div>
+
+            ${slots.map(slot => {
+                let triggers = ATDevice.getSlotTriggers(slot);
+                return html`
+                <div class="trigger-slot mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h3 class="${this.getSlotStyle(slot)}">${L.translate('Slot // Slot')} "${slot}"</h3>
+                        <div>
+                            <button class="small-button" disabled="${state.busy}" onclick="${() => this.reloadSlot(slot)}">${L.translate('Reload // Neu laden')}</button>
+                            <button class="small-button" disabled="${state.busy}" onclick="${() => this.copyTriggersToAllSlots(slot)}">${L.translate('Copy to all slots // Auf alle Slots kopieren')}</button>
+                            <button class="small-button" disabled="${state.busy || triggers.length === 0}" onclick="${() => this.clearAll(slot)}">${L.translate('Clear all // Alle löschen')}</button>
+                        </div>
+                    </div>
+
+                    <div class="row table d-none d-md-block">
+                        <div class="col-12">
+                            <div class="row d-flex align-items-center" style="font-style: italic">
+                                <div class="col-5">${L.translate('Trigger // Trigger')}</div>
+                                <div class="col-5">${L.translate('Action // Aktion')}</div>
+                                <div class="col-2"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            ${triggers.length === 0 ? html`
+                                <div class="p-2" style="color: #666; font-style: italic;">
+                                    ${L.translate('(no triggers configured) // (keine Trigger konfiguriert)')}
+                                </div>
+                            ` : ''}
+                            ${triggers.map((trigger, index) => html`
+                                <div class="row d-flex align-items-center p-1" style="background-color: ${index % 2 === 0 ? 'whitesmoke' : '#ffffff'}; border: 1px solid lightgray;">
+                                    <div class="col-12 col-md-5 mb-1 mb-md-0">
+                                        <span class="d-md-none" style="font-style: italic">${L.translate('Trigger: // Trigger:')}</span>
+                                        <a href="#" onclick="${(e) => { e.preventDefault(); this.openEditTrigger(slot, trigger); }}">
+                                            <strong>${trigger.listIndex || index + 1}.</strong> ${trigger.expression}
+                                        </a>
+                                    </div>
+                                    <div class="col-12 col-md-5 mb-1 mb-md-0">
+                                        <span class="d-md-none" style="font-style: italic">${L.translate('Action: // Aktion:')}</span>
+                                        <a href="#" onclick="${(e) => { e.preventDefault(); this.openEditTrigger(slot, trigger); }}">
+                                            ${this.getReadableTriggerAction(trigger.action)}
+                                        </a>
+                                    </div>
+                                    <div class="col-12 col-md-2 text-md-right">
+                                        <button onclick="${() => this.clearTrigger(slot, trigger)}" disabled="${state.busy}" class="p-1 mb-0" title="${L.translate('Delete trigger // Trigger löschen')}">
+                                            ${html`<${FaIcon} icon="fas trash-alt"/>`}
+                                        </button>
+                                    </div>
+                                </div>
+                            `)}
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <a href="#" onclick="${(e) => { e.preventDefault(); this.openNewTrigger(slot); }}">
+                                        ${html`<${FaIcon} icon="fas plus"/>`} ${L.translate('Add trigger // Trigger hinzufügen')}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            })}
+
+            ${(state.editingTrigger !== null || state.isNewTrigger) ? html`
+                <${TriggerEditModal}
+                    trigger="${state.editingTrigger}"
+                    slot="${state.editingSlot}"
+                    buttonOptions="${this.getButtonOptions()}"
+                    closeHandler="${(changed) => this.handleModalClose(changed)}"/>
+            ` : ''}
+
             ${TabActions.style}
         </div>`;
     }
 }
 
 TabActions.style = html`<style>
-    #tabActions ul {
-        list-style-type: none;
+    #tabActions .trigger-slot {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 10px;
     }
-    
-    #tabActions ul li a {
-        white-space: nowrap;
+
+    #tabActions .small-button {
+        display: inline-block;
+        padding: 0 10px !important;
+        line-height: unset;
+        width: unset;
+        margin-left: 0.5em;
+        text-transform: none;
+    }
+
+    #tabActions .ta-error-msg {
+        color: #b00020;
+        margin-bottom: 12px;
     }
 </style>`
 

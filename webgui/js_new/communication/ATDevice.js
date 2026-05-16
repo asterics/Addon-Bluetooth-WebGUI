@@ -43,6 +43,124 @@ let _dontGetLiveValues = false;
 let _lastVersionResult = null
 let _lastVersionRawString = null
 
+function findTopLevelComma(text) {
+    let level = 0;
+    for (let i = 0; i < text.length; i++) {
+        let ch = text.charAt(i);
+        if (ch === '(') level++;
+        if (ch === ')') level = Math.max(0, level - 1);
+        if (ch === ',' && level === 0) return i;
+    }
+    return -1;
+}
+
+function parseTriggerInlineDefinition(triggerDef) {
+    let commaPos = findTopLevelComma(triggerDef || '');
+    if (commaPos < 0) {
+        return null;
+    }
+    let triggerExpr = triggerDef.substring(0, commaPos).trim();
+    let action = triggerDef.substring(commaPos + 1).trim();
+    if (!triggerExpr || !action) {
+        return null;
+    }
+    if (action.toUpperCase().indexOf('AT ') !== 0) {
+        action = 'AT ' + action;
+    }
+    return {
+        expression: triggerExpr,
+        action: action
+    };
+}
+
+function parseTriggerListLine(line, listIndex) {
+    line = (line || '').trim();
+    if (!line || line === 'OK' || line.indexOf('TG:') !== 0) {
+        return null;
+    }
+    if (line.indexOf('TG: (none)') === 0) {
+        return null;
+    }
+    let payload = line.substring(3).trim();
+    let separator = payload.indexOf('->');
+    if (separator < 0) {
+        return null;
+    }
+    let expression = payload.substring(0, separator).trim();
+    let action = payload.substring(separator + 2).trim();
+    if (!expression || !action) {
+        return null;
+    }
+    return {
+        expression: expression,
+        action: action,
+        source: 'list',
+        listIndex: listIndex,
+        triggerId: 'tg-' + listIndex
+    };
+}
+
+function getSlotObject(slotName) {
+    return _slots.filter(slot => slot.name === slotName)[0] || null;
+}
+
+function normalizeTriggerAction(action) {
+    action = (action || '').trim();
+    if (!action) {
+        return '';
+    }
+    return action.toUpperCase().indexOf('AT ') === 0 ? action.substring(3).trim() : action;
+}
+
+function ensureTriggerArray(slotObject) {
+    if (!slotObject) {
+        return [];
+    }
+    if (!Array.isArray(slotObject.triggers)) {
+        slotObject.triggers = [];
+    }
+    return slotObject.triggers;
+}
+
+function getTriggerInlinePayload(trigger) {
+    if (!trigger || !trigger.expression || !trigger.action) {
+        return null;
+    }
+    let action = normalizeTriggerAction(trigger.action);
+    if (!action) {
+        return null;
+    }
+    return trigger.expression + ', ' + action;
+}
+
+function triggerEquals(a, b) {
+    if (!a || !b) {
+        return false;
+    }
+    let actionA = normalizeTriggerAction(a.action);
+    let actionB = normalizeTriggerAction(b.action);
+    return (a.expression || '').trim() === (b.expression || '').trim() && actionA === actionB;
+}
+
+function assignLocalTriggerIds(triggers) {
+    (triggers || []).forEach((trigger, idx) => {
+        if (!trigger.triggerId) {
+            trigger.triggerId = 'local-' + (idx + 1) + '-' + ((trigger.expression || '').length + (trigger.action || '').length);
+        }
+    });
+}
+
+function sendTriggersForSlot(slotObject) {
+    let triggers = ensureTriggerArray(slotObject);
+    ATDevice.sendATCmd(C.AT_CMD_TRIGGER, 'clear');
+    triggers.forEach(trigger => {
+        let payload = getTriggerInlinePayload(trigger);
+        if (payload) {
+            ATDevice.sendATCmd(C.AT_CMD_TRIGGER, payload);
+        }
+    });
+}
+
 
 const TEST_MODE_OPTIONS = "TEST_MODE_OPTIONS";
 let _testModeOptions = localStorageService.get(TEST_MODE_OPTIONS) || {
@@ -422,6 +540,16 @@ ATDevice.copyConfigToAllSlots = async function (configConstants, sourceSlot, ski
             await ATDevice.sendAtCmdWithResult(C.AT_CMD_LOAD_SLOT, slotObject.name);
             let slotChanged = false;
             for (let constant of configConstants) {
+                if (constant === C.AT_CMD_TRIGGER) {
+                    let sourceTriggers = ensureTriggerArray(sourceSlotObject);
+                    let targetTriggers = ensureTriggerArray(slotObject);
+                    if (JSON.stringify(sourceTriggers) !== JSON.stringify(targetTriggers)) {
+                        slotChanged = true;
+                        slotObject.triggers = JSON.parse(JSON.stringify(sourceTriggers));
+                        sendTriggersForSlot(slotObject);
+                    }
+                    continue;
+                }
                 if (slotObject.config[constant] !== sourceSlotObject.config[constant]) {
                     slotChanged = true;
                     slotObject.config[constant] = sourceSlotObject.config[constant];
@@ -489,6 +617,124 @@ ATDevice.getButtonActionATCmdSuffix = function (index, slot) {
     return action ? action.substring(C.LENGTH_AT_CMD_PREFIX).trim() : null;
 }
 
+ATDevice.getSlotTriggers = function (slotName) {
+    slotName = slotName || _currentSlot;
+    let slotObject = getSlotObject(slotName);
+    let triggers = ensureTriggerArray(slotObject);
+    return JSON.parse(JSON.stringify(triggers));
+}
+
+ATDevice.getCurrentSlotTriggers = function () {
+    return ATDevice.getSlotTriggers(_currentSlot);
+}
+
+ATDevice.addTrigger = async function (triggerExpression, action, slotName) {
+    slotName = slotName || _currentSlot;
+    triggerExpression = (triggerExpression || '').trim();
+    let normalizedAction = normalizeTriggerAction(action);
+    if (!slotName || !triggerExpression || !normalizedAction) {
+        return Promise.reject('invalid trigger payload');
+    }
+
+    await ATDevice.setSlot(slotName);
+    await ATDevice.sendAtCmdWithResult(C.AT_CMD_TRIGGER, triggerExpression + ', ' + normalizedAction);
+
+    let slotObject = getSlotObject(slotName);
+    let triggers = ensureTriggerArray(slotObject);
+    triggers.push({ expression: triggerExpression, action: 'AT ' + normalizedAction, source: 'inline' });
+    assignLocalTriggerIds(triggers);
+    emitConfigChange();
+    ATDevice.planSaving();
+    return Promise.resolve();
+}
+
+ATDevice.resolveTriggerListIndex = async function (triggerRef, slotName) {
+    slotName = slotName || _currentSlot;
+    if (!slotName || !triggerRef) {
+        return Promise.resolve(null);
+    }
+
+    if (typeof triggerRef === 'number') {
+        return Promise.resolve(triggerRef > 0 ? triggerRef : null);
+    }
+
+    if (triggerRef.listIndex && triggerRef.listIndex > 0) {
+        return Promise.resolve(triggerRef.listIndex);
+    }
+
+    let list = await ATDevice.reloadTriggersFromDevice(slotName);
+    let idx = list.findIndex(elem => triggerEquals(elem, triggerRef));
+    return Promise.resolve(idx >= 0 ? (idx + 1) : null);
+}
+
+ATDevice.clearTrigger = async function (triggerRef, slotName) {
+    slotName = slotName || _currentSlot;
+    let triggerIndex = await ATDevice.resolveTriggerListIndex(triggerRef, slotName);
+    if (!slotName || !triggerIndex) {
+        return Promise.reject('invalid trigger reference');
+    }
+
+    await ATDevice.setSlot(slotName);
+    await ATDevice.sendAtCmdWithResult(C.AT_CMD_TRIGGER, 'clear(' + triggerIndex + ')');
+
+    let slotObject = getSlotObject(slotName);
+    let triggers = ensureTriggerArray(slotObject);
+    if (typeof triggerRef === 'number') {
+        if (triggers[triggerRef - 1]) {
+            triggers.splice(triggerRef - 1, 1);
+        }
+    } else {
+        let localIdx = triggers.findIndex(elem => triggerEquals(elem, triggerRef));
+        if (localIdx >= 0) {
+            triggers.splice(localIdx, 1);
+        }
+    }
+    assignLocalTriggerIds(triggers);
+    emitConfigChange();
+    ATDevice.planSaving();
+    return Promise.resolve();
+}
+
+ATDevice.clearTriggerByIndex = async function (triggerIndex, slotName) {
+    triggerIndex = parseInt(triggerIndex);
+    return ATDevice.clearTrigger(triggerIndex, slotName);
+}
+
+ATDevice.clearAllTriggers = async function (slotName) {
+    slotName = slotName || _currentSlot;
+    if (!slotName) {
+        return Promise.reject('no slot selected');
+    }
+
+    await ATDevice.setSlot(slotName);
+    await ATDevice.sendAtCmdWithResult(C.AT_CMD_TRIGGER, 'clear');
+
+    let slotObject = getSlotObject(slotName);
+    slotObject.triggers = [];
+    assignLocalTriggerIds(slotObject.triggers);
+    emitConfigChange();
+    ATDevice.planSaving();
+    return Promise.resolve();
+}
+
+ATDevice.reloadTriggersFromDevice = async function (slotName) {
+    slotName = slotName || _currentSlot;
+    await ATDevice.setSlot(slotName);
+
+    let result = await ATDevice.sendAtCmdWithResult(C.AT_CMD_TRIGGER, 'list');
+    let parsed = [];
+    (result || '').split('\n').forEach(line => {
+        let elem = parseTriggerListLine(line, parsed.length + 1);
+        if (elem) parsed.push(elem);
+    });
+
+    let slotObject = getSlotObject(slotName);
+    slotObject.triggers = parsed;
+    assignLocalTriggerIds(slotObject.triggers);
+    emitConfigChange();
+    return Promise.resolve(parsed);
+}
+
 ATDevice.save = async function (slot, force) {
     slot = slot || _currentSlot;
     if (!slot) {
@@ -538,6 +784,8 @@ ATDevice.getCurrentSlot = function () {
 
 ATDevice.getSlotConfigText = function (slotName) {
     let config = ATDevice.getSlotConfig(slotName);
+    let slotObject = getSlotObject(slotName);
+    let triggers = ensureTriggerArray(slotObject);
     let ret = "Slot:" + slotName + "\n";
 
     Object.keys(config).forEach(function (key) {
@@ -545,6 +793,14 @@ ATDevice.getSlotConfigText = function (slotName) {
             ret = ret + key + '\n' + config[key] + "\n";
         } else {
             ret = ret + key + ' ' + config[key] + "\n";
+        }
+    });
+
+    ret = ret + C.AT_CMD_TRIGGER + " clear\n";
+    triggers.forEach(trigger => {
+        let payload = getTriggerInlinePayload(trigger);
+        if (payload) {
+            ret = ret + C.AT_CMD_TRIGGER + " " + payload + "\n";
         }
     });
 
@@ -668,6 +924,7 @@ ATDevice.uploadSlots = async function (slotObjects, progressHandler) {
                 ATDevice.sendATCmd(key, slotObject.config[key]);
             }
         });
+        sendTriggersForSlot(slotObject);
         await ATDevice.save(slotObject.name, true);
         progressHandler(Math.round((i+1) / slotObjects.length * 100));
         _slots.push(slotObject);
@@ -704,7 +961,8 @@ ATDevice.parseConfig = function(atCmdsString) {
             let slotName = currentElement.substring(currentElement.indexOf(':') + 1).trim();
             currentParsedSlot = {
                 name: slotName,
-                config: {}
+                config: {},
+                triggers: []
             };
             parsedSlots.push(currentParsedSlot);
         } else {
@@ -712,11 +970,24 @@ ATDevice.parseConfig = function(atCmdsString) {
             if (currentAtCmd.indexOf(C.AT_CMD_BTN_MODE) > -1) {
                 let buttonModeIndex = parseInt(currentElement.substring(C.LENGTH_AT_CMD_PREFIX - 1));
                 currentParsedSlot.config[C.AT_CMD_BTN_MODE + ' ' + buttonModeIndex] = nextElement.trim();
+            } else if (currentAtCmd === C.AT_CMD_TRIGGER) {
+                let triggerDef = currentElement.substring(C.LENGTH_AT_CMD_PREFIX - 1).trim();
+                if (triggerDef.toLowerCase() === 'clear') {
+                    currentParsedSlot.triggers = [];
+                } else {
+                    let parsed = parseTriggerInlineDefinition(triggerDef);
+                    if (parsed) {
+                        currentParsedSlot.triggers.push(parsed);
+                    }
+                }
             } else if (C.AT_CMDS_SETTINGS.indexOf(currentAtCmd) > -1) {
                 currentParsedSlot.config[currentAtCmd] = currentElement.substring(C.LENGTH_AT_CMD_PREFIX - 1).trim();
             }
         }
     }
+    parsedSlots.forEach(slot => {
+        assignLocalTriggerIds(ensureTriggerArray(slot));
+    });
     return parsedSlots;
 }
 
@@ -811,6 +1082,9 @@ function applySlotChangesToDevice() {
     let guiSlotConfig = _slots.filter(slot => slot.name === _currentSlot)[0].config;
     let deviceSlot = _slotsBackup.filter(slot => slot.name === _currentSlot)[0];
     let deviceSlotConfig = deviceSlot ? deviceSlot.config : {};
+    let guiSlotObject = _slots.filter(slot => slot.name === _currentSlot)[0];
+    let guiTriggers = ensureTriggerArray(guiSlotObject);
+    let deviceTriggers = ensureTriggerArray(deviceSlot);
     let cmd = '';
     Object.keys(guiSlotConfig).forEach(key => {
         if (deviceSlotConfig[key] !== guiSlotConfig[key]) {
@@ -823,6 +1097,16 @@ function applySlotChangesToDevice() {
         }
     });
     ATDevice.sendAtCmdForce(cmd);
+
+    if (JSON.stringify(guiTriggers) !== JSON.stringify(deviceTriggers)) {
+        ATDevice.sendAtCmdForce(C.AT_CMD_TRIGGER, 'clear');
+        guiTriggers.forEach(trigger => {
+            let payload = getTriggerInlinePayload(trigger);
+            if (payload) {
+                ATDevice.sendAtCmdForce(C.AT_CMD_TRIGGER, payload);
+            }
+        });
+    }
 }
 
 function emitSlotChange() {
