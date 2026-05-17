@@ -21,14 +21,12 @@ class TabActions extends Component {
 
     TabActions.instance = this;
     this.state = {
-      viewMode: localStorageService.hasKey(KEY_TAB_ACTIONS_VIEW_MODE) ? localStorageService.get(KEY_TAB_ACTIONS_VIEW_MODE) : 'VIEW_MODE_SINGLE_SLOT',
-      editingTrigger: null,
-      editingSlot: null,
-      isNewTrigger: false,
+      viewMode: localStorageService.hasKey(KEY_TAB_ACTIONS_VIEW_MODE) ? localStorageService.get(KEY_TAB_ACTIONS_VIEW_MODE) : VIEW_MODE_SINGLE_SLOT,
+      editModal: null,
       busy: false,
       error: '',
       widthEm: window.innerWidth / parseFloat(getComputedStyle(document.querySelector('body'))['font-size'])
-    }
+    };
     window.addEventListener('resize', this.onresize);
   }
 
@@ -45,8 +43,15 @@ class TabActions extends Component {
     }, 200, 'RESIZE_TAB_ACTIONS')
   }
 
-  getReadableTriggerAction(action) {
-    return L.getReadableATCMD(action || C.AT_CMD_NO_CMD);
+  getReadableActionLabel(action) {
+    let label = L.getReadableATCMD(action || C.AT_CMD_NO_CMD);
+    let normalized = (action || '').trim();
+    if (!normalized) return label;
+    if (normalized.toUpperCase().indexOf('AT ') !== 0) {
+      normalized = 'AT ' + normalized;
+    }
+    let suffix = normalized.substring(C.LENGTH_AT_CMD_PREFIX - 1).trim();
+    return suffix ? `${label} (${suffix})` : label;
   }
 
   getButtonOptions() {
@@ -63,7 +68,6 @@ class TabActions extends Component {
     }
     return options;
   }
-
 
   getSlotStyle(slot) {
     return ATDevice.getCurrentSlot() === slot ? 'font-weight-bold' : '';
@@ -87,25 +91,55 @@ class TabActions extends Component {
     localStorageService.save(KEY_TAB_ACTIONS_VIEW_MODE, value);
   }
 
-  openEditTrigger(slot, trigger) {
+  openEditModal(slot, trigger, index) {
     L.addClass('body', 'modal-open');
-    this.setState({ editingTrigger: trigger, editingSlot: slot, isNewTrigger: false });
+    this.setState({ editModal: { slot, trigger, index } });
   }
 
-  openNewTrigger(slot) {
+  openNewTriggerModal(slot) {
     L.addClass('body', 'modal-open');
-    this.setState({ editingTrigger: null, editingSlot: slot, isNewTrigger: true });
+    this.setState({ editModal: { slot, trigger: null, index: null } });
   }
 
-  handleModalClose(changed) {
+  closeModal() {
     L.removeClass('body', 'modal-open');
-    this.setState({ editingTrigger: null, editingSlot: null, isNewTrigger: false });
+    this.setState({ editModal: null });
+  }
+
+  normalizeAction(a) {
+    a = (a || '').trim().toUpperCase();
+    return a.startsWith('AT ') ? a.substring(3).trim() : a;
+  }
+
+  async resolveAndClear(slot, trigger) {
+    let freshTriggers = await ATDevice.reloadTriggersFromDevice(slot);
+    let toDelete = freshTriggers.find(t =>
+      (t.expression || '').trim().toLowerCase() === (trigger.expression || '').trim().toLowerCase() &&
+      this.normalizeAction(t.action) === this.normalizeAction(trigger.action)
+    );
+    await ATDevice.clearTrigger(toDelete || trigger, slot);
+  }
+
+  async handleSave(slot, expression, action, oldTrigger) {
+    this.setState({ busy: true, error: '' });
+    try {
+      if (oldTrigger) {
+        await this.resolveAndClear(slot, oldTrigger);
+      }
+      await ATDevice.addTrigger(expression, action, slot);
+      await ATDevice.reloadTriggersFromDevice(slot);
+      L.removeClass('body', 'modal-open');
+      this.setState({ editModal: null, busy: false, error: '' });
+    } catch (error) {
+      console.warn(error);
+      this.setState({ busy: false, error: L.translate('Could not save trigger. Check syntax and device response. // Trigger konnte nicht gespeichert werden. Syntax und Geräteantwort prüfen.') });
+    }
   }
 
   async clearTrigger(slot, trigger) {
     this.setState({ busy: true, error: '' });
     try {
-      await ATDevice.clearTrigger(trigger, slot);
+      await this.resolveAndClear(slot, trigger);
       this.setState({ busy: false, error: '' });
     } catch (error) {
       console.warn(error);
@@ -150,18 +184,27 @@ class TabActions extends Component {
         let state = this.state;
         let slots = state.viewMode !== VIEW_MODE_SINGLE_SLOT ? ATDevice.getSlots(): [ATDevice.getCurrentSlot()];
         let slotElements = [{value: VIEW_MODE_SINGLE_SLOT, label: 'Current slot // Aktueller Slot'}, {value: VIEW_MODE_ALL_SLOTS_TABLE, label: 'All slots (table) // Alle Slots (Tabelle)'}, {value: VIEW_MODE_ALL_SLOTS_LIST, label: 'All slots (list) // Alle Slots (Liste)'}];
+        let buttonOptions = this.getButtonOptions();
 
         return html`<div id="tabActions">
-            <h2>${L.translate('Trigger configuration // Trigger-Konfiguration')}</h2>
+             <h2>${L.translate('Trigger configuration // Trigger-Konfiguration')}</h2>
             <div class="filter-buttons mb-3">
                 ${html`<${RadioFieldset} legend="Show slots: // Zeige Slots:" onchange="${(value) => this.setViewMode(value)}" elements="${slotElements}" value="${state.viewMode}"/>`}
             </div>
 
-            <div class="ta-error-msg ${state.error ? '' : 'd-none'}">${state.error}</div>
+            <div class="error-message ${state.error ? '' : 'd-none'}">${state.error}</div>
+
+            ${state.editModal ? html`<${TriggerEditModal}
+                slot="${state.editModal.slot}"
+                trigger="${state.editModal.trigger}"
+                buttonOptions="${buttonOptions}"
+                busy="${state.busy}"
+                onSave="${(expression, action) => this.handleSave(state.editModal.slot, expression, action, state.editModal.trigger)}"
+                closeHandler="${() => this.closeModal()}"/>` : ''}
 
             ${slots.map(slot => {
-                let triggers = ATDevice.getSlotTriggers(slot);
-                return html`
+              let triggers = ATDevice.getSlotTriggers(slot);
+              return html`
                 <div class="trigger-slot mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h3 class="${this.getSlotStyle(slot)}">${L.translate('Slot // Slot')} "${slot}"</h3>
@@ -172,64 +215,69 @@ class TabActions extends Component {
                         </div>
                     </div>
 
-                    <div class="row table d-none d-md-block">
-                        <div class="col-12">
+                    <div class="row d-none d-md-block mb-1">
+                        <div class="col-12 col-lg-10">
                             <div class="row d-flex align-items-center" style="font-style: italic">
-                                <div class="col-5">${L.translate('Trigger // Trigger')}</div>
-                                <div class="col-5">${L.translate('Action // Aktion')}</div>
-                                <div class="col-2"></div>
+                                <div class="col-md-1">#</div>
+                                <div class="col-md-4">${L.translate('Trigger // Trigger')}</div>
+                                <div class="col-md-5">${L.translate('Action // Aktion')}</div>
+                                <div class="col-md-2"></div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row mb-2">
-                        <div class="col-12">
-                            ${triggers.length === 0 ? html`
-                                <div class="p-2" style="color: #666; font-style: italic;">
-                                    ${L.translate('(no triggers configured) // (keine Trigger konfiguriert)')}
-                                </div>
-                            ` : ''}
-                            ${triggers.map((trigger, index) => html`
-                                <div class="row d-flex align-items-center p-1" style="background-color: ${index % 2 === 0 ? 'whitesmoke' : '#ffffff'}; border: 1px solid lightgray;">
-                                    <div class="col-12 col-md-5 mb-1 mb-md-0">
-                                        <span class="d-md-none" style="font-style: italic">${L.translate('Trigger: // Trigger:')}</span>
-                                        <a href="#" onclick="${(e) => { e.preventDefault(); this.openEditTrigger(slot, trigger); }}">
-                                            <strong>${trigger.listIndex || index + 1}.</strong> ${trigger.expression}
+                    <ol class="trigger-list col-12 col-lg-10 px-0">
+                        ${triggers.length === 0 ? html`
+                            <li class="p-2" style="border: 1px solid lightgray; background-color: whitesmoke; font-style: italic; color: #666;">
+                                ${L.translate('(no triggers configured) // (keine Trigger konfiguriert)')}
+                            </li>` : ''}
+                        ${triggers.map((trigger, index) => html`
+                            <li class="p-2" style="${index % 2 === 0 ? 'background-color: whitesmoke' : ''}; border: 1px solid lightgray;">
+                                <div class="row d-flex align-items-center">
+                                    <div class="col-12 col-md-1 mb-1 mb-md-0">
+                                        <span class="d-md-none font-weight-bold"># </span>
+                                        <span>${trigger.listIndex || index + 1}</span>
+                                    </div>
+                                    <div class="col-12 col-md-4 mb-1 mb-md-0">
+                                        <span class="d-md-none font-weight-bold">${L.translate('Trigger: // Trigger:')} </span>
+                                        <a href="javascript:;"
+                                           onclick="${() => this.openEditModal(slot, trigger, index + 1)}"
+                                           title="${L.translate('Edit trigger // Trigger bearbeiten')}">
+                                            ${trigger.expression}
                                         </a>
                                     </div>
                                     <div class="col-12 col-md-5 mb-1 mb-md-0">
-                                        <span class="d-md-none" style="font-style: italic">${L.translate('Action: // Aktion:')}</span>
-                                        <a href="#" onclick="${(e) => { e.preventDefault(); this.openEditTrigger(slot, trigger); }}">
-                                            ${this.getReadableTriggerAction(trigger.action)}
+                                        <span class="d-md-none font-weight-bold">${L.translate('Action: // Aktion:')} </span>
+                                        <a href="javascript:;"
+                                           onclick="${() => this.openEditModal(slot, trigger, index + 1)}"
+                                           title="${L.translate('Edit action // Aktion bearbeiten')}">
+                                            ${this.getReadableActionLabel(trigger.action)}
                                         </a>
                                     </div>
-                                    <div class="col-12 col-md-2 text-md-right">
-                                        <button onclick="${() => this.clearTrigger(slot, trigger)}" disabled="${state.busy}" class="p-1 mb-0" title="${L.translate('Delete trigger // Trigger löschen')}">
+                                    <div class="col-12 col-md-2 d-flex">
+                                        <button onclick="${() => this.clearTrigger(slot, trigger)}"
+                                                disabled="${state.busy}"
+                                                class="p-1 p-md-0 mx-1 mb-0"
+                                                title="${L.translate('Delete trigger // Trigger löschen')}">
                                             ${html`<${FaIcon} icon="fas trash-alt"/>`}
                                         </button>
                                     </div>
                                 </div>
-                            `)}
-                            <div class="row mt-2">
-                                <div class="col-12">
-                                    <a href="#" onclick="${(e) => { e.preventDefault(); this.openNewTrigger(slot); }}">
-                                        ${html`<${FaIcon} icon="fas plus"/>`} ${L.translate('Add trigger // Trigger hinzufügen')}
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                            </li>
+                        `)}
+                        <li class="p-2" style="border: 1px solid lightgray; background-color: #f0f8ff;">
+                            <button onclick="${() => this.openNewTriggerModal(slot)}"
+                                    disabled="${state.busy}"
+                                    class="p-1 p-md-0 mb-0"
+                                    title="${L.translate('Add new trigger // Neuen Trigger hinzufügen')}">
+                                ${html`<${FaIcon} icon="fas plus-circle"/>`}
+                                <span>${L.translate('Add trigger // Trigger hinzufügen')}</span>
+                            </button>
+                        </li>
+                    </ol>
                 </div>
-                `;
+              `;
             })}
-
-            ${(state.editingTrigger !== null || state.isNewTrigger) ? html`
-                <${TriggerEditModal}
-                    trigger="${state.editingTrigger}"
-                    slot="${state.editingSlot}"
-                    buttonOptions="${this.getButtonOptions()}"
-                    closeHandler="${(changed) => this.handleModalClose(changed)}"/>
-            ` : ''}
 
             ${TabActions.style}
         </div>`;
@@ -237,6 +285,12 @@ class TabActions extends Component {
 }
 
 TabActions.style = html`<style>
+    #tabActions ol.trigger-list {
+        list-style-type: none;
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+
     #tabActions .trigger-slot {
         border: 1px solid #ccc;
         border-radius: 4px;
@@ -252,7 +306,7 @@ TabActions.style = html`<style>
         text-transform: none;
     }
 
-    #tabActions .ta-error-msg {
+    #tabActions .error-message {
         color: #b00020;
         margin-bottom: 12px;
     }
