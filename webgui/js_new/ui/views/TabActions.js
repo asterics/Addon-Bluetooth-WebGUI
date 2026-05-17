@@ -11,8 +11,6 @@ const html = htm.bind(h);
 const KEY_TAB_ACTIONS_VIEW_MODE = 'KEY_TAB_ACTIONS_VIEW_MODE';
 
 const VIEW_MODE_SINGLE_SLOT = 'VIEW_MODE_SINGLE_SLOT';
-const VIEW_MODE_ALL_SLOTS_TABLE = 'VIEW_MODE_ALL_SLOTS_TABLE';
-const VIEW_MODE_ALL_SLOTS_LIST = 'VIEW_MODE_ALL_SLOTS_LIST';
 
 class TabActions extends Component {
 
@@ -21,7 +19,6 @@ class TabActions extends Component {
 
     TabActions.instance = this;
     this.state = {
-      viewMode: localStorageService.hasKey(KEY_TAB_ACTIONS_VIEW_MODE) ? localStorageService.get(KEY_TAB_ACTIONS_VIEW_MODE) : VIEW_MODE_SINGLE_SLOT,
       editModal: null,
       busy: false,
       error: '',
@@ -86,10 +83,7 @@ class TabActions extends Component {
     return 0;
   }
 
-  setViewMode(value) {
-    this.setState({ viewMode: value });
-    localStorageService.save(KEY_TAB_ACTIONS_VIEW_MODE, value);
-  }
+
 
   openEditModal(slot, trigger, index) {
     L.addClass('body', 'modal-open');
@@ -147,50 +141,16 @@ class TabActions extends Component {
     }
   }
 
-  async clearAll(slot) {
-    this.setState({ busy: true, error: '' });
-    try {
-      await ATDevice.clearAllTriggers(slot);
-      this.setState({ busy: false, error: '' });
-    } catch (error) {
-      console.warn(error);
-      this.setState({ busy: false, error: L.translate('Could not clear triggers. // Trigger konnten nicht gelöscht werden.') });
-    }
-  }
 
-  async reloadSlot(slot) {
-    this.setState({ busy: true, error: '' });
-    try {
-      await ATDevice.reloadTriggersFromDevice(slot);
-      this.setState({ busy: false, error: '' });
-    } catch (error) {
-      console.warn(error);
-      this.setState({ busy: false, error: L.translate('Could not load triggers from device. // Trigger konnten nicht vom Gerät geladen werden.') });
-    }
-  }
 
-  async copyTriggersToAllSlots(slot) {
-    this.setState({ busy: true, error: '' });
-    try {
-      await ATDevice.copyConfigToAllSlots([C.AT_CMD_TRIGGER], slot, false);
-      this.setState({ busy: false, error: '' });
-    } catch (error) {
-      console.warn(error);
-      this.setState({ busy: false, error: L.translate('Could not copy triggers to all slots. // Trigger konnten nicht auf alle Slots kopiert werden.') });
-    }
-  }
+
 
     render() {
         let state = this.state;
-        let slots = state.viewMode !== VIEW_MODE_SINGLE_SLOT ? ATDevice.getSlots(): [ATDevice.getCurrentSlot()];
-        let slotElements = [{value: VIEW_MODE_SINGLE_SLOT, label: 'Current slot // Aktueller Slot'}, {value: VIEW_MODE_ALL_SLOTS_TABLE, label: 'All slots (table) // Alle Slots (Tabelle)'}, {value: VIEW_MODE_ALL_SLOTS_LIST, label: 'All slots (list) // Alle Slots (Liste)'}];
+        let slots = [ATDevice.getCurrentSlot()];
         let buttonOptions = this.getButtonOptions();
 
         return html`<div id="tabActions">
-             <h2>${L.translate('Trigger configuration // Trigger-Konfiguration')}</h2>
-            <div class="filter-buttons mb-3">
-                ${html`<${RadioFieldset} legend="Show slots: // Zeige Slots:" onchange="${(value) => this.setViewMode(value)}" elements="${slotElements}" value="${state.viewMode}"/>`}
-            </div>
 
             <div class="error-message ${state.error ? '' : 'd-none'}">${state.error}</div>
 
@@ -208,11 +168,6 @@ class TabActions extends Component {
                 <div class="trigger-slot mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h3 class="${this.getSlotStyle(slot)}">${L.translate('Slot // Slot')} "${slot}"</h3>
-                        <div>
-                            <button class="small-button" disabled="${state.busy}" onclick="${() => this.reloadSlot(slot)}">${L.translate('Reload // Neu laden')}</button>
-                            <button class="small-button" disabled="${state.busy}" onclick="${() => this.copyTriggersToAllSlots(slot)}">${L.translate('Copy to all slots // Auf alle Slots kopieren')}</button>
-                            <button class="small-button" disabled="${state.busy || triggers.length === 0}" onclick="${() => this.clearAll(slot)}">${L.translate('Clear all // Alle löschen')}</button>
-                        </div>
                     </div>
 
                     <div class="row d-none d-md-block mb-1">
