@@ -220,7 +220,7 @@ class TabSlots extends Component {
 
         // TBD: remove proxy when in production!
         const proxyUrl = "https://proxy.asterics-foundation.org/proxy.php?csurl=";
-        const apiUrl = encodeURIComponent(`https://texttospeech.responsivevoice.org/v1/text:synthesize?lang=${lang}&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=wlmYRdJY&gender=${gender}&text=${message}`);
+        const apiUrl = `https://texttospeech.responsivevoice.org/v1/text:synthesize?lang=${lang}&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=wlmYRdJY&gender=${gender}&text=${message}`;
 
         // const proxyUrl = "https://cors-anywhere.herokuapp.com/";
         // const apiUrl = `https://texttospeech.responsivevoice.org/v1/text:synthesize?lang=${encodeURIComponent(lang)}&engine=g1&name=&pitch=0.5&rate=0.5&volume=1&key=kvfbSITh&gender=${encodeURIComponent(gender)}&text=${encodeURIComponent(message)}`;
@@ -231,7 +231,7 @@ class TabSlots extends Component {
 
             // Fetch the MP3 file
             console.log("Fetching Audio ...");
-            const response = await fetch(proxyUrl+ apiUrl);
+            const response = await fetch(apiUrl);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const mp3ArrayBuffer = await response.arrayBuffer();
 
