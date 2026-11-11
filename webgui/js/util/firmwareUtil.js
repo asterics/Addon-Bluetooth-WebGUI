@@ -177,7 +177,7 @@ firmwareUtil.getDeviceFWInfo = function (device, majorVersion) {
         fileType = '.uf2'
     }
     else if (C.DEVICE_IS_FLIPPAD) {
-        releaseTag = 'tags/V1.4';    // note: capital V is important here, otherwise the request will fail
+        releaseTag = 'tags/V1.5';    // note: capital V is important here, otherwise the request will fail
     }
     else if (C.DEVICE_IS_FABI) {
         releaseTag = 'tags/v2.8';
