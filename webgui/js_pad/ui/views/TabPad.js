@@ -136,7 +136,7 @@ class TabPad extends Component {
                 </a>
             </div>
             <div class="${state.showAdvanced ? '' : 'd-none'}">
-                <div class="mt-4 ${ATDevice.getConfig(C.AT_CMD_FLIPMOUSE_MODE) === C.FLIPPAD_MODE_MOUSE.value ? '' : 'd-none'}">
+                <div class="mt-4">
                     ${html`<${Slider} label="Acceleration: // Beschleunigung:" oninput="${(value, constants) => this.valueChanged(value, constants)}" value="${state[C.AT_CMD_ACCELERATION]}"
                         min="0" max="100" updateConstants="${[C.AT_CMD_ACCELERATION]}"/>`}
                 </div>
